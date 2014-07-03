@@ -19,14 +19,19 @@ public class Coordinator extends AbstractSimulator {
     protected Coupled model;
     protected LinkedList<AbstractSimulator> simulators = new LinkedList<>();
 
-    public Coordinator(SimulationClock clock, Coupled model) {
+    public Coordinator(SimulationClock clock, Coupled model, boolean flatten) {
         super(clock);
-        this.model = model;
+        if(flatten) {
+            this.model = model.flatten(null);
+        }
+        else {
+            this.model = model;
+        }
         // Build hierarchy
         Collection<Component> components = model.getComponents();
         for (Component component : components) {
             if (component instanceof Coupled) {
-                Coordinator coordinator = new Coordinator(clock, (Coupled) component);
+                Coordinator coordinator = new Coordinator(clock, (Coupled) component, false);
                 simulators.add(coordinator);
             } else if (component instanceof Atomic) {
                 Simulator simulator = new Simulator(clock, (Atomic) component);
@@ -37,8 +42,12 @@ public class Coordinator extends AbstractSimulator {
         tN = tL + ta();
     } 
     
+    public Coordinator(Coupled model, boolean flatten) {
+        this(new SimulationClock(), model, flatten);
+    }
+
     public Coordinator(Coupled model) {
-        this(new SimulationClock(), model);
+        this(model, true);
     }
 
     @Override

@@ -20,7 +20,7 @@ public class CoordinatorParallel extends Coordinator {
     protected ExecutorService executor;
 
     public CoordinatorParallel(SimulationClock clock, Coupled model, int numberOfThreads) {
-        super(clock, model.flatten());
+        super(clock, model, true);
         this.numberOfThreads = numberOfThreads;
         executor = Executors.newFixedThreadPool(numberOfThreads);
         for (AbstractSimulator simulator : simulators) {
@@ -32,11 +32,11 @@ public class CoordinatorParallel extends Coordinator {
     }
 
     public CoordinatorParallel(SimulationClock clock, Coupled model) {
-        this(clock, model.flatten(), Runtime.getRuntime().availableProcessors());
+        this(clock, model, Runtime.getRuntime().availableProcessors());
     }
     
     public CoordinatorParallel(Coupled model) {
-        this(new SimulationClock(), model.flatten(), Runtime.getRuntime().availableProcessors());
+        this(new SimulationClock(), model, Runtime.getRuntime().availableProcessors());
     }
 
     @Override
@@ -62,11 +62,15 @@ public class CoordinatorParallel extends Coordinator {
     }
     
     @Override
-    public void finalize() throws Throwable {
-        try {
-            executor.shutdown();
-        } finally {
-            super.finalize();
-        }
+    public void simulate(long numIterations) {
+        super.simulate(numIterations);
+        executor.shutdown();
     }
+    
+    @Override
+    public void simulate(double timeInterval) {
+        super.simulate(timeInterval);
+        executor.shutdown();
+    }
+    
 }
