@@ -5,6 +5,7 @@
 package mitris.sim.core.modeling;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
@@ -53,67 +54,130 @@ public class Coupled extends Component {
     }
 
     public Coupled flatten(Coupled parent) {
-        /** TODO: This functions must be improved because:
-         * (1) Two different couplings can be connected to same EIC input port
-         * (2) The same EOC can be connected to two different models
-         * (2) Some residual couplings must be deleted (after removing the child 
-         * coupled model, remove also all the connections to/from it.
-         */
         for (int i = 0; i < components.size(); ++i) {
             Component component = components.get(i);
             if (component instanceof Coupled) {
                 ((Coupled) component).flatten(this);
+                removePortsAndCouplings(component);
                 components.remove(i--);
             }
         }
 
-        if (parent != null) {
-            LinkedList<Coupling> pEICs = parent.getEIC();
-            LinkedList<Coupling> pICs = parent.getIC();
-            LinkedList<Coupling> pEOCs = parent.getEOC();
-            for (Coupling cEIC : eic) {
-                for (int i=0; i<pEICs.size(); ++i) {
-                    Coupling pEIC = pEICs.get(i);
-                    if (pEIC.portTo == cEIC.portFrom) {
-                        cEIC.portFrom = pEIC.portFrom;
-                        pEICs.add(cEIC);
-                    }
-                }
-                for (int i = 0; i < pICs.size(); ++i) {
-                    Coupling pIC = pICs.get(i);
-                    if (pIC.portTo == cEIC.portFrom) {
-                        cEIC.portFrom = pIC.portFrom;
-                        pICs.add(cEIC);
-                    }
-                }
-            }
+        if (parent == null) {
+            return this;
+        }
 
-            for (Coupling cEOC : eoc) {
-                for (int i=0; i<pEOCs.size(); ++i) {
-                    Coupling pEOC = pEOCs.get(i);
-                    if (pEOC.portFrom == cEOC.portTo) {
-                        cEOC.portTo = pEOC.portTo;
-                        pEOCs.add(cEOC);
-                    }
+        // Process if parent ...
+        // First, we store all the parent ports connected to input ports
+        HashMap<Port, LinkedList<Port>> leftBridgeEIC = createLeftBrige(parent.eic);
+        HashMap<Port, LinkedList<Port>> leftBridgeIC = createLeftBrige(parent.ic);
+        // The same with the output ports
+        HashMap<Port, LinkedList<Port>> rightBridgeEOC = createRightBrige(parent.eoc);
+        HashMap<Port, LinkedList<Port>> rightBridgeIC = createRightBrige(parent.ic);
 
-                }
-                for (int i = 0; i < pICs.size(); ++i) {
-                    Coupling pIC = pICs.get(i);
-                    if (pIC.portFrom == cEOC.portTo) {
-                        cEOC.portTo = pIC.portTo;
-                        pICs.add(cEOC);
-                    }
-                }
-            }
+        completeLeftBridge(eic, leftBridgeEIC, parent.eic);
+        completeLeftBridge(eic, leftBridgeIC, parent.ic);
+        completeRightBridge(eoc, rightBridgeEOC, parent.eoc);
+        completeRightBridge(eoc, rightBridgeIC, parent.ic);
 
-            for (Component component : components) {
-                parent.addComponent(component);
-            }
+        for (Component component : components) {
+            parent.addComponent(component);
+        }
 
-            for (Coupling cIC : ic) {
-                pICs.add(cIC);
-            }
+        for (Coupling cIC : ic) {
+            parent.ic.add(cIC);
         }
         return this;
+    }
+
+    private void completeLeftBridge(LinkedList<Coupling> couplings,
+            HashMap<Port, LinkedList<Port>> leftBridge,
+            LinkedList<Coupling> pCouplings) {
+        for (Coupling c : couplings) {
+            LinkedList<Port> list = leftBridge.get(c.portFrom);
+            if (list != null) {
+                for (Port port : list) {
+                    pCouplings.add(new Coupling(port, c.portTo));
+                }
+            }
+        }
+    }
+
+    private void completeRightBridge(LinkedList<Coupling> couplings,
+            HashMap<Port, LinkedList<Port>> rightBridge,
+            LinkedList<Coupling> pCouplings) {
+        for (Coupling c : couplings) {
+            LinkedList<Port> list = rightBridge.get(c.portTo);
+            if (list != null) {
+                for (Port port : list) {
+                    pCouplings.add(new Coupling(c.portFrom, port));
+                }
+            }
+        }
+    }
+
+    private HashMap<Port, LinkedList<Port>> createLeftBrige(LinkedList<Coupling> couplings) {
+        HashMap<Port, LinkedList<Port>> leftBridge = new HashMap<>();
+        for (Port iPort : this.inPorts) {
+            for (Coupling c : couplings) {
+                if (c.portTo == iPort) {
+                    LinkedList<Port> list = leftBridge.get(iPort);
+                    if (list == null) {
+                        list = new LinkedList<>();
+                        leftBridge.put(iPort, list);
+                    }
+                    list.add(c.portFrom);
+                }
+            }
+        }
+        return leftBridge;
+    }
+
+    private HashMap<Port, LinkedList<Port>> createRightBrige(LinkedList<Coupling> couplings) {
+        HashMap<Port, LinkedList<Port>> rightBridge = new HashMap<>();
+        for (Port oPort : this.outPorts) {
+            for (Coupling c : couplings) {
+                if (c.portFrom == oPort) {
+                    LinkedList<Port> list = rightBridge.get(oPort);
+                    if (list == null) {
+                        list = new LinkedList<>();
+                        rightBridge.put(oPort, list);
+                    }
+                    list.add(c.portTo);
+                }
+            }
+        }
+        return rightBridge;
+    }
+
+    private void removePortsAndCouplings(Component child) {
+        for (Port iport : child.inPorts) {
+            for (int j = 0; j < eic.size(); ++j) {
+                Coupling c = eic.get(j);
+                if (c.portTo == iport) {
+                    eic.remove(j--);
+                }
+            }
+            for (int j = 0; j < ic.size(); ++j) {
+                Coupling c = ic.get(j);
+                if (c.portTo == iport) {
+                    ic.remove(j--);
+                }
+            }
+        }
+        for (Port oport : child.outPorts) {
+            for (int j = 0; j < eoc.size(); ++j) {
+                Coupling c = eoc.get(j);
+                if (c.portFrom == oport) {
+                    eoc.remove(j--);
+                }
+            }
+            for (int j = 0; j < ic.size(); ++j) {
+                Coupling c = ic.get(j);
+                if (c.portFrom == oport) {
+                    ic.remove(j--);
+                }
+            }
+        }
     }
 }

@@ -34,8 +34,8 @@ public class Gpt extends Coupled {
     public static void main(String args[]) {
         AbsysLogger.setup(Level.INFO);
         Gpt gpt = new Gpt(1, 10000);
-        CoordinatorParallel coordinator = new CoordinatorParallel(gpt);
-        //Coordinator coordinator = new Coordinator(gpt);
+        //CoordinatorParallel coordinator = new CoordinatorParallel(gpt);
+        Coordinator coordinator = new Coordinator(gpt);
         coordinator.simulate(Long.MAX_VALUE);
     }
 

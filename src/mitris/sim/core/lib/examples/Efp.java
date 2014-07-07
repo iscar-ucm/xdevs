@@ -17,9 +17,9 @@ import mitris.sim.core.simulation.Coordinator;
  */
 public class Efp extends Coupled {
     public Efp() {
-        Ef ef = new Ef(1, 100);
+        Ef ef = new Ef(1, 10000);
         addComponent(ef);
-        Processor processor = new Processor(2);
+        Processor processor = new Processor(3);
         addComponent(processor);
         addCoupling(ef, ef.oOut, processor, processor.iIn);
         addCoupling(processor, processor.oOut, ef, ef.iIn);
