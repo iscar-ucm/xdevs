@@ -8,7 +8,7 @@ import absys.logger.core.AbsysLogger;
 import java.util.logging.Level;
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.simulation.Coordinator;
-import mitris.sim.core.simulation.CoordinatorParallel;
+import mitris.sim.core.simulation.parallel.CoordinatorParallel;
 import mitris.sim.core.simulation.SimulationClock;
 
 /**

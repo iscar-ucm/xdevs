@@ -1,10 +1,13 @@
-package mitris.sim.core.simulation;
+package mitris.sim.core.simulation.parallel;
 
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import mitris.sim.core.modeling.Coupled;
+import mitris.sim.core.simulation.AbstractSimulator;
+import mitris.sim.core.simulation.Coordinator;
+import mitris.sim.core.simulation.SimulationClock;
 
 /**
  *

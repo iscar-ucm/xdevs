@@ -4,9 +4,10 @@
  * and open the template in the editor.
  */
 
-package mitris.sim.core.simulation;
+package mitris.sim.core.simulation.parallel;
 
 import java.util.concurrent.Callable;
+import mitris.sim.core.simulation.AbstractSimulator;
 
 /**
  *

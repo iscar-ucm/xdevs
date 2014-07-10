@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mitris.sim.core.simulation;
+package mitris.sim.core.simulation.parallel;
 
 import java.util.concurrent.Callable;
 import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.simulation.AbstractSimulator;
 
 /**
  *
