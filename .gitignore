@@ -1,5 +1,4 @@
-build.xml
-build/
-dist/
-manifest.mf
-nbproject/
+bin
+.classpath
+.settings
+.project
