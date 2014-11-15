@@ -4,12 +4,11 @@
  */
 package mitris.sim.core.lib.examples;
 
-import absys.logger.core.AbsysLogger;
 import java.util.logging.Level;
+
+import mitris.logger.core.MitrisLogger;
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.simulation.Coordinator;
-import mitris.sim.core.simulation.parallel.CoordinatorParallel;
-import mitris.sim.core.simulation.SimulationClock;
 
 /**
  *
@@ -32,7 +31,7 @@ public class Gpt extends Coupled {
     }
 
     public static void main(String args[]) {
-        AbsysLogger.setup(Level.INFO);
+        MitrisLogger.setup(Level.INFO);
         Gpt gpt = new Gpt(1, 10000);
         //CoordinatorParallel coordinator = new CoordinatorParallel(gpt);
         Coordinator coordinator = new Coordinator(gpt);

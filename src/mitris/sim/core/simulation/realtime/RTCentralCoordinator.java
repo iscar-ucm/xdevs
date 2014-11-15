@@ -5,9 +5,10 @@
  */
 package mitris.sim.core.simulation.realtime;
 
-import absys.logger.core.AbsysLogger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import mitris.logger.core.MitrisLogger;
 import mitris.sim.core.Constants;
 import mitris.sim.core.lib.examples.Efp;
 import mitris.sim.core.modeling.Coupled;
@@ -56,7 +57,7 @@ public class RTCentralCoordinator extends CoordinatorParallel implements Runnabl
     }
     
     public static void main(String[] args) {
-        AbsysLogger.setup(Level.FINE);
+        MitrisLogger.setup(Level.FINE);
         Efp efp = new Efp(1, 3, 30);
         RTCentralCoordinator coordinator = new RTCentralCoordinator(efp);
         coordinator.simulate(60.0);

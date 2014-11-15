@@ -4,8 +4,9 @@
  */
 package mitris.sim.core.lib.examples;
 
-import absys.logger.core.AbsysLogger;
 import java.util.logging.Level;
+
+import mitris.logger.core.MitrisLogger;
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.simulation.Coordinator;
 
@@ -26,7 +27,7 @@ public class Efp extends Coupled {
     }
 
     public static void main(String args[]) {
-        AbsysLogger.setup(Level.INFO);
+        MitrisLogger.setup(Level.INFO);
         Efp efp = new Efp(1, 3, 1000);
         Coordinator coordinator = new Coordinator(efp);
         coordinator.simulate(Long.MAX_VALUE);
