@@ -11,9 +11,14 @@ import java.util.LinkedList;
  *
  * @author José L. Risco-Martín and Saurabh Mittal
  */
-public class Port<E> {
+public class Port<E> extends Entity {
 
+	protected Component isPartOf;
 	protected LinkedList<E> values = new LinkedList<>();
+	
+	public Port(String name) {
+		super(name);
+	}
 
 	public void clear() {
 		values.clear();

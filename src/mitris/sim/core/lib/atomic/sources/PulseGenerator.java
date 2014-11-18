@@ -16,13 +16,14 @@ import mitris.sim.core.simulation.Coordinator;
  */
 public class PulseGenerator extends Atomic {
 
-    public Port<Double> portOut = new Port<>();
+    public Port<Double> portOut = new Port<>("portOut");
     protected double amplitude;
     protected double pulseWidth;
     protected double period;
     protected double phaseDelay;
 
-    public PulseGenerator(double amplitude, double pulseWidth, double period, double phaseDelay) {
+    public PulseGenerator(String name, double amplitude, double pulseWidth, double period, double phaseDelay) {
+    	super(name);
         super.addOutPort(portOut);
         this.amplitude = amplitude;
         this.pulseWidth = pulseWidth;
@@ -58,10 +59,10 @@ public class PulseGenerator extends Atomic {
     }
 
     public static void main(String[] args) {
-        Coupled pulseExample = new Coupled();
-        PulseGenerator pulse = new PulseGenerator(10, 3, 5, 5);
+        Coupled pulseExample = new Coupled("pulseExample");
+        PulseGenerator pulse = new PulseGenerator("pulse",10, 3, 5, 5);
         pulseExample.addComponent(pulse);
-        Console console = new Console();
+        Console console = new Console("console");
         pulseExample.addComponent(console);
         pulseExample.addCoupling(pulse, pulse.portOut, console, console.iIn);
         Coordinator coordinator = new Coordinator(pulseExample);

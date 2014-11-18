@@ -22,7 +22,7 @@ public class Disk extends Atomic {
 
     private static final Logger logger = Logger.getLogger(Disk.class.getName());
 
-    public Port<Object> iIn = new Port<>();
+    public Port<Object> iIn = new Port<>("iIn");
     // Parameters
     protected Writer file;
     protected double time;
@@ -32,7 +32,8 @@ public class Disk extends Atomic {
      *
      * @param fileName name of the file (complete path)
      */
-    public Disk(String fileName) {
+    public Disk(String name, String fileName) {
+    	super(name);
         super.addInPort(iIn);
         try {
             file = new BufferedWriter(new FileWriter(fileName));

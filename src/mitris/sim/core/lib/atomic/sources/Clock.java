@@ -1,27 +1,26 @@
 package mitris.sim.core.lib.atomic.sources;
 
 import mitris.sim.core.atomic.sinks.Console;
-import mitris.sim.core.atomic.sinks.Disk;
 import mitris.sim.core.modeling.Atomic;
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.modeling.Port;
 import mitris.sim.core.simulation.Coordinator;
-import mitris.sim.core.simulation.SimulationClock;
 
 /**
  *
- * @author jlrisco
+ * @author José Luis Risco Martín
  */
 public class Clock extends Atomic {
 
-    public Port<Object> iStop = new Port<>();
-    public Port<Integer> oClk = new Port<>();
+    public Port<Object> iStop = new Port<>("iStop");
+    public Port<Integer> oClk = new Port<>("oClk");
     protected double period;
     protected double semiPeriod;
     protected int nextValue;
     protected long count;
 
-    public Clock(double period, int initialValue) {
+    public Clock(String name, double period, int initialValue) {
+    	super(name);
         super.addInPort(iStop);
         super.addOutPort(oClk);
         this.period = period;
@@ -34,12 +33,12 @@ public class Clock extends Atomic {
         super.activate();
     }
 
-    public Clock(double period) {
-        this(period, 1);
+    public Clock(String name, double period) {
+        this(name, period, 1);
     }
 
-    public Clock() {
-        this(1, 1);
+    public Clock(String name) {
+        this(name, 1, 1);
     }
 
     @Override
@@ -69,10 +68,10 @@ public class Clock extends Atomic {
     }
 
     public static void main(String[] args) {
-        Coupled clockExample = new Coupled();
-        Clock clock = new Clock(10.0);
+        Coupled clockExample = new Coupled("clockExample");
+        Clock clock = new Clock("clock",10.0);
         clockExample.addComponent(clock);
-        Console console = new Console();
+        Console console = new Console("console");
         clockExample.addComponent(console);
         clockExample.addCoupling(clock, clock.oClk, console, console.iIn);
         Coordinator coordinator = new Coordinator(clockExample);

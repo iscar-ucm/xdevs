@@ -12,16 +12,17 @@ import mitris.sim.core.simulation.Coordinator;
 
 /**
  *
- * @author jlrisco
+ * @author José Luis Risco Martín
  */
 public class Step extends Atomic {
 
-    public Port<Double> portOut = new Port<Double>();
+    public Port<Double> portOut = new Port<Double>("portOut");
     protected double initialValue;
     protected double stepTime;
     protected double finalValue;
 
-    public Step(double initialValue, double stepTime, double finalValue) {
+    public Step(String name, double initialValue, double stepTime, double finalValue) {
+    	super(name);
         super.addOutPort(portOut);
         this.initialValue = initialValue;
         this.stepTime = stepTime;
@@ -52,10 +53,10 @@ public class Step extends Atomic {
     }
 
     public static void main(String[] args) {
-        Coupled stepExample = new Coupled();
-        Step step = new Step(0, 15, 10);
+        Coupled stepExample = new Coupled("stepExample");
+        Step step = new Step("step", 0, 15, 10);
         stepExample.addComponent(step);
-        Console console = new Console();
+        Console console = new Console("console");
         stepExample.addComponent(console);
         stepExample.addCoupling(step, step.portOut, console, console.iIn);
         Coordinator coordinator = new Coordinator(stepExample);

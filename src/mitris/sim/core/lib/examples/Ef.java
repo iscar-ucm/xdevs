@@ -5,19 +5,20 @@ import mitris.sim.core.modeling.Port;
 
 /**
  *
- * @author jlrisco
+ * @author José Luis Risco Martín
  */
 public class Ef extends Coupled {
 
-  protected Port<Job> iIn = new Port<Job>();
-  protected Port<Job> oOut = new Port<Job>();
+  protected Port<Job> iIn = new Port<Job>("iIn");
+  protected Port<Job> oOut = new Port<Job>("oOut");
 
-  public Ef(double period, double observationTime) {
+  public Ef(String name, double period, double observationTime) {
+	  super(name);
     super.addInPort(iIn);
     super.addOutPort(oOut);
-    Generator generator = new Generator(period);
+    Generator generator = new Generator("generator", period);
     addComponent(generator);
-    Transducer transducer = new Transducer(observationTime);
+    Transducer transducer = new Transducer("transducer", observationTime);
     addComponent(transducer);
     addCoupling(this, this.iIn, transducer, transducer.iSolved);
     addCoupling(generator, generator.oOut, this, this.oOut);

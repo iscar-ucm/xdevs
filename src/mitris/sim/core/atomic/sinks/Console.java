@@ -5,12 +5,8 @@
  */
 package mitris.sim.core.atomic.sinks;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Collection;
-import java.util.logging.Logger;
+
 import mitris.sim.core.modeling.Atomic;
 import mitris.sim.core.modeling.Port;
 
@@ -20,9 +16,9 @@ import mitris.sim.core.modeling.Port;
  */
 public class Console extends Atomic {
 
-    private static final Logger logger = Logger.getLogger(Console.class.getName());
+    //private static final Logger logger = Logger.getLogger(Console.class.getName());
 
-    public Port<Object> iIn = new Port<>();
+    public Port<Object> iIn = new Port<>("iIn");
     // Parameters
     protected double time;
 
@@ -30,7 +26,8 @@ public class Console extends Atomic {
      * Console atomic model.
      *
      */
-    public Console() {
+    public Console(String name) {
+    	super(name);
         super.addInPort(iIn);
         this.time = 0.0;
         super.passivate();

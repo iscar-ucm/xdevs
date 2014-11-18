@@ -13,12 +13,13 @@ import mitris.sim.core.modeling.Port;
  */
 public class Processor extends Atomic {
 
-  protected Port<Job> iIn = new Port<>();
-  protected Port<Job> oOut = new Port<>();
+  protected Port<Job> iIn = new Port<>("iIn");
+  protected Port<Job> oOut = new Port<>("oOut");
   protected Job currentJob = null;
   protected double processingTime;
 
-  public Processor(double processingTime) {
+  public Processor(String name, double processingTime) {
+	  super(name);
     super.addInPort(iIn);
     super.addOutPort(oOut);
     this.processingTime = processingTime;

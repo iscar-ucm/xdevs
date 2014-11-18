@@ -15,7 +15,8 @@ public abstract class Atomic extends Component {
     protected String phase;
     protected double sigma;
 
-    public Atomic() {
+    public Atomic(String name) {
+    	super(name);
         phase = Constants.PHASE_PASSIVE;
         sigma = Constants.INFINITY;
     }

@@ -16,13 +16,14 @@ import mitris.sim.core.simulation.Coordinator;
  */
 public class QRamp extends Atomic {
 
-    public Port<Double> portOut = new Port<>();
+    public Port<Double> portOut = new Port<>("portOut");
     protected double startTime;
     protected double slope;
     protected double nextOutput;
     protected double qOutput;
 
-    public QRamp(double initialOutput, double startTime, double slope, double qOutput) {
+    public QRamp(String name, double initialOutput, double startTime, double slope, double qOutput) {
+    	super(name);
         super.addOutPort(portOut);
         this.nextOutput = initialOutput;
         this.startTime = startTime;
@@ -52,10 +53,10 @@ public class QRamp extends Atomic {
     }
 
     public static void main(String[] args) {
-        Coupled example = new Coupled();
-        QRamp qramp = new QRamp(2, 10, 2, 0.1);
+        Coupled example = new Coupled("example");
+        QRamp qramp = new QRamp("qramp", 2, 10, 2, 0.1);
         example.addComponent(qramp);
-        Console console = new Console();
+        Console console = new Console("console");
         example.addComponent(console);
         example.addCoupling(qramp, qramp.portOut, console, console.iIn);
         Coordinator coordinator = new Coordinator(example);

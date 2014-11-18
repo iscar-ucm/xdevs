@@ -28,4 +28,8 @@ public class Coupling {
 	public Port getPortTo() {
 		return portTo;
 	}
+
+	public String toString(){
+		return "(" + portFrom.isPartOf.name + "." + portFrom + "->" + portTo.isPartOf.name + "." + portTo + ")";
+	}
 }

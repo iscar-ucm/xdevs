@@ -16,12 +16,13 @@ import mitris.sim.core.simulation.Coordinator;
  */
 public class Gpt extends Coupled {
 
-    public Gpt(double period, double observationTime) {
-        Generator generator = new Generator(period);
+    public Gpt(String name, double period, double observationTime) {
+    	super(name);
+        Generator generator = new Generator("generator", period);
         addComponent(generator);
-        Processor processor = new Processor(3*period);
+        Processor processor = new Processor("processor", 3*period);
         addComponent(processor);
-        Transducer transducer = new Transducer(observationTime);
+        Transducer transducer = new Transducer("transducer", observationTime);
         addComponent(transducer);
 
         addCoupling(generator, generator.oOut, processor, processor.iIn);
@@ -32,7 +33,7 @@ public class Gpt extends Coupled {
 
     public static void main(String args[]) {
         MitrisLogger.setup(Level.INFO);
-        Gpt gpt = new Gpt(1, 10000);
+        Gpt gpt = new Gpt("gpt", 1, 10000);
         //CoordinatorParallel coordinator = new CoordinatorParallel(gpt);
         Coordinator coordinator = new Coordinator(gpt);
         coordinator.simulate(Long.MAX_VALUE);

@@ -58,7 +58,7 @@ public class RTCentralCoordinator extends CoordinatorParallel implements Runnabl
     
     public static void main(String[] args) {
         MitrisLogger.setup(Level.FINE);
-        Efp efp = new Efp(1, 3, 30);
+        Efp efp = new Efp("EFP", 1, 3, 30);
         RTCentralCoordinator coordinator = new RTCentralCoordinator(efp);
         coordinator.simulate(60.0);
     }

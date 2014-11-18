@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mitris.sim.core.modeling;
 
 import java.util.Collection;
@@ -10,7 +6,7 @@ import java.util.LinkedList;
 
 /**
  *
- * @author jlrisco
+ * @author José Luis Risco Martín
  */
 public class Coupled extends Component {
 
@@ -19,6 +15,10 @@ public class Coupled extends Component {
     protected LinkedList<Coupling> ic = new LinkedList<>();
     protected LinkedList<Coupling> eic = new LinkedList<>();
     protected LinkedList<Coupling> eoc = new LinkedList<>();
+    
+    public Coupled(String name) {
+    	super(name);
+    }
 
     @SuppressWarnings("rawtypes")
     public void addCoupling(Component cFrom, Port pFrom, Component cTo, Port pTo) {
@@ -53,7 +53,8 @@ public class Coupled extends Component {
         return eoc;
     }
 
-    public Coupled flatten(Coupled parent) {
+    @SuppressWarnings("rawtypes")
+	public Coupled flatten(Coupled parent) {
         for (int i = 0; i < components.size(); ++i) {
             Component component = components.get(i);
             if (component instanceof Coupled) {
@@ -90,7 +91,8 @@ public class Coupled extends Component {
         return this;
     }
 
-    private void completeLeftBridge(LinkedList<Coupling> couplings,
+    @SuppressWarnings("rawtypes")
+	private void completeLeftBridge(LinkedList<Coupling> couplings,
             HashMap<Port, LinkedList<Port>> leftBridge,
             LinkedList<Coupling> pCouplings) {
         for (Coupling c : couplings) {
@@ -103,7 +105,8 @@ public class Coupled extends Component {
         }
     }
 
-    private void completeRightBridge(LinkedList<Coupling> couplings,
+    @SuppressWarnings("rawtypes")
+	private void completeRightBridge(LinkedList<Coupling> couplings,
             HashMap<Port, LinkedList<Port>> rightBridge,
             LinkedList<Coupling> pCouplings) {
         for (Coupling c : couplings) {
@@ -116,7 +119,8 @@ public class Coupled extends Component {
         }
     }
 
-    private HashMap<Port, LinkedList<Port>> createLeftBrige(LinkedList<Coupling> couplings) {
+    @SuppressWarnings("rawtypes")
+	private HashMap<Port, LinkedList<Port>> createLeftBrige(LinkedList<Coupling> couplings) {
         HashMap<Port, LinkedList<Port>> leftBridge = new HashMap<>();
         for (Port iPort : this.inPorts) {
             for (Coupling c : couplings) {
@@ -133,7 +137,8 @@ public class Coupled extends Component {
         return leftBridge;
     }
 
-    private HashMap<Port, LinkedList<Port>> createRightBrige(LinkedList<Coupling> couplings) {
+    @SuppressWarnings("rawtypes")
+	private HashMap<Port, LinkedList<Port>> createRightBrige(LinkedList<Coupling> couplings) {
         HashMap<Port, LinkedList<Port>> rightBridge = new HashMap<>();
         for (Port oPort : this.outPorts) {
             for (Coupling c : couplings) {
@@ -150,7 +155,8 @@ public class Coupled extends Component {
         return rightBridge;
     }
 
-    private void removePortsAndCouplings(Component child) {
+    @SuppressWarnings("rawtypes")
+	private void removePortsAndCouplings(Component child) {
         for (Port iport : child.inPorts) {
             for (int j = 0; j < eic.size(); ++j) {
                 Coupling c = eic.get(j);
