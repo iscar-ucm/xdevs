@@ -4,7 +4,7 @@
  */
 package mitris.sim.core.lib.examples;
 
-import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.DevsAtomic;
 import mitris.sim.core.modeling.Port;
 
 /**
@@ -12,7 +12,7 @@ import mitris.sim.core.modeling.Port;
  * @author José Luis Risco Martín
  * TODO: I must also modify this class, according to the source code implemented by Saurabh, a iStart input port must be added.
  */
-public class Generator extends Atomic {
+public class Generator extends DevsAtomic {
 
 	protected Port<Job> iStop = new Port<Job>("iStop");
 	protected Port<Job> oOut = new Port<Job>("oOut");

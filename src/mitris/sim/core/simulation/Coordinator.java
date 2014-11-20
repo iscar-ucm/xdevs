@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import mitris.sim.core.Constants;
-import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.DevsAtomic;
 import mitris.sim.core.modeling.Component;
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.modeling.Coupling;
@@ -39,8 +39,8 @@ public class Coordinator extends AbstractSimulator {
 			if (component instanceof Coupled) {
 				Coordinator coordinator = new Coordinator(clock, (Coupled) component, false);
 				simulators.add(coordinator);
-			} else if (component instanceof Atomic) {
-				Simulator simulator = new Simulator(clock, (Atomic) component);
+			} else if (component instanceof DevsAtomic) {
+				Simulator simulator = new Simulator(clock, (DevsAtomic) component);
 				simulators.add(simulator);
 			}
 		}

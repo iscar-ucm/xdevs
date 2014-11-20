@@ -11,14 +11,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.logging.Logger;
-import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.DevsAtomic;
 import mitris.sim.core.modeling.Port;
 
 /**
  *
  * @author jlrisco
  */
-public class Disk extends Atomic {
+public class Disk extends DevsAtomic {
 
     private static final Logger logger = Logger.getLogger(Disk.class.getName());
 

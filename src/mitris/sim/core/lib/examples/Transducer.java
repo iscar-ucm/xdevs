@@ -3,7 +3,7 @@ package mitris.sim.core.lib.examples;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
-import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.DevsAtomic;
 import mitris.sim.core.modeling.Port;
 
 
@@ -12,7 +12,7 @@ import mitris.sim.core.modeling.Port;
  * @author José Luis Risco Martín
  * TODO: I keep the Transducer atomic model for the end ... 
  */
-public class Transducer extends Atomic {
+public class Transducer extends DevsAtomic {
 
 	private static final Logger logger = Logger.getLogger(Transducer.class.getName());
 

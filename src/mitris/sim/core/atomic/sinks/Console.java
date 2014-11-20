@@ -2,14 +2,14 @@ package mitris.sim.core.atomic.sinks;
 
 import java.util.Collection;
 
-import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.DevsAtomic;
 import mitris.sim.core.modeling.Port;
 
 /**
  *
  * @author José Luis Risco Martín
  */
-public class Console extends Atomic {
+public class Console extends DevsAtomic {
 
     //private static final Logger logger = Logger.getLogger(Console.class.getName());
 

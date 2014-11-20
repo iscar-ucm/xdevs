@@ -3,33 +3,38 @@ package mitris.sim.core.modeling;
 
 /**
  *
- * @author jlrisco
+ * @author José Luis Risco Martín
  */
-@SuppressWarnings("rawtypes")
-public class Coupling {
+public class Coupling<E> implements Entity {
 
-	protected Port portFrom;
-	protected Port portTo;
+	protected Port<E> portFrom;
+	protected Port<E> portTo;
 
-	public Coupling(Port portFrom, Port portTo) {
+	public Coupling(Port<E> portFrom, Port<E> portTo) {
 		this.portFrom = portFrom;
 		this.portTo = portTo;
 	}
+	
+	// Entity members
+	public String getName() {
+		return "{" + portFrom.getName() + " -> " + portTo.getName() + "}"; 
+	}
 
-	@SuppressWarnings("unchecked")
+	public String toString(){
+		return "(" + portFrom.getParent().getName() + "." + portFrom + "->" + portTo.getParent().getName() + "." + portTo + ")";
+	}
+
+	// Coupling members
+	
 	public void propagateValues() {
 		portTo.addValues(portFrom.getValues());
 	}
 
-	public Port getPortFrom() {
+	public Port<E> getPortFrom() {
 		return portFrom;
 	}
 
-	public Port getPortTo() {
+	public Port<E> getPortTo() {
 		return portTo;
-	}
-
-	public String toString(){
-		return "(" + portFrom.partOf.name + "." + portFrom + "->" + portTo.partOf.name + "." + portTo + ")";
 	}
 }

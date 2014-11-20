@@ -4,14 +4,14 @@
  */
 package mitris.sim.core.lib.examples;
 
-import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.DevsAtomic;
 import mitris.sim.core.modeling.Port;
 
 /**
  *
  * @author jlrisco
  */
-public class Processor extends Atomic {
+public class Processor extends DevsAtomic {
 
   protected Port<Job> iIn = new Port<>("iIn");
   protected Port<Job> oOut = new Port<>("oOut");

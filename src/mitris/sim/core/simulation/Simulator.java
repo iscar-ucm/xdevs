@@ -6,7 +6,7 @@ package mitris.sim.core.simulation;
 
 import java.util.Collection;
 
-import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.DevsAtomic;
 import mitris.sim.core.modeling.Port;
 
 /**
@@ -15,9 +15,9 @@ import mitris.sim.core.modeling.Port;
  */
 public class Simulator extends AbstractSimulator {
 
-    protected Atomic model;
+    protected DevsAtomic model;
     
-    public Simulator(SimulationClock clock, Atomic model) {
+    public Simulator(SimulationClock clock, DevsAtomic model) {
         super(clock);
         this.model = model;
         tL = clock.getTime();

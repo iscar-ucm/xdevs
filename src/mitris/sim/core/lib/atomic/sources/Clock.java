@@ -1,7 +1,7 @@
 package mitris.sim.core.lib.atomic.sources;
 
 import mitris.sim.core.atomic.sinks.Console;
-import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.DevsAtomic;
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.modeling.Port;
 import mitris.sim.core.simulation.Coordinator;
@@ -10,7 +10,7 @@ import mitris.sim.core.simulation.Coordinator;
  *
  * @author José Luis Risco Martín
  */
-public class Clock extends Atomic {
+public class Clock extends DevsAtomic {
 
     public Port<Object> iStop = new Port<>("iStop");
     public Port<Integer> oClk = new Port<>("oClk");
