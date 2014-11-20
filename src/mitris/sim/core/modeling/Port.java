@@ -11,9 +11,13 @@ import java.util.LinkedList;
  *
  * @author José L. Risco-Martín and Saurabh Mittal
  */
+
 public class Port<E> extends Entity {
 
-	protected Component isPartOf;
+	public enum PortType {INPUT, OUTPUT}
+	
+	protected PortType portType;
+	protected Component partOf;
 	protected LinkedList<E> values = new LinkedList<>();
 	
 	public Port(String name) {
@@ -42,5 +46,13 @@ public class Port<E> extends Entity {
 
 	public void addValues(Collection<E> values) {
 		this.values.addAll(values);
+	}
+	
+	public boolean isInPort() {
+		return portType.equals(PortType.INPUT);
+	}
+
+	public boolean isOutPort() {
+		return portType.equals(PortType.OUTPUT);
 	}
 }

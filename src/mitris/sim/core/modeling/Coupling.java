@@ -30,6 +30,6 @@ public class Coupling {
 	}
 
 	public String toString(){
-		return "(" + portFrom.isPartOf.name + "." + portFrom + "->" + portTo.isPartOf.name + "." + portTo + ")";
+		return "(" + portFrom.partOf.name + "." + portFrom + "->" + portTo.partOf.name + "." + portTo + ")";
 	}
 }

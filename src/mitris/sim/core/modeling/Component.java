@@ -29,7 +29,7 @@ public abstract class Component extends Entity {
 	@SuppressWarnings("unchecked")
 	public void addInPort(Port port) {
 		inPorts.add(port);
-		port.isPartOf = this;
+		port.partOf = this;
 	}
 
 	public Collection<Port> getInPorts() {
@@ -39,7 +39,7 @@ public abstract class Component extends Entity {
 	@SuppressWarnings("unchecked")
 	public void addOutPort(Port port) {
 		outPorts.add(port);
-		port.isPartOf = this;
+		port.partOf = this;
 	}
 
 	public Collection<Port> getOutPorts() {

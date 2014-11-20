@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mitris.sim.core.atomic.sinks;
 
 import java.util.Collection;
@@ -12,7 +7,7 @@ import mitris.sim.core.modeling.Port;
 
 /**
  *
- * @author jlrisco
+ * @author José Luis Risco Martín
  */
 public class Console extends Atomic {
 
