@@ -4,17 +4,18 @@
  */
 package mitris.sim.core.lib.examples;
 
-import mitris.sim.core.modeling.DevsAtomic;
-import mitris.sim.core.modeling.Port;
+import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.InPort;
+import mitris.sim.core.modeling.OutPort;
 
 /**
  *
  * @author jlrisco
  */
-public class Processor extends DevsAtomic {
+public class Processor extends Atomic {
 
-  protected Port<Job> iIn = new Port<>("iIn");
-  protected Port<Job> oOut = new Port<>("oOut");
+  protected InPort<Job> iIn = new InPort<>("iIn");
+  protected OutPort<Job> oOut = new OutPort<>("oOut");
   protected Job currentJob = null;
   protected double processingTime;
 

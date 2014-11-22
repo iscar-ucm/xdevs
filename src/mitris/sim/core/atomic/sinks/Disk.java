@@ -11,18 +11,19 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.logging.Logger;
-import mitris.sim.core.modeling.DevsAtomic;
-import mitris.sim.core.modeling.Port;
+
+import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.InPort;
 
 /**
  *
  * @author jlrisco
  */
-public class Disk extends DevsAtomic {
+public class Disk extends Atomic {
 
     private static final Logger logger = Logger.getLogger(Disk.class.getName());
 
-    public Port<Object> iIn = new Port<>("iIn");
+    public InPort<Object> iIn = new InPort<>("iIn");
     // Parameters
     protected Writer file;
     protected double time;

@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mitris.sim.core.simulation;
 
 /**
  *
  * @author jlrisco
  */
-public abstract class AbstractSimulator {
+public abstract class AbstractSimulator implements DevsSimulator {
 
     protected SimulationClock clock;
     protected double tL; // Time of last event
@@ -18,14 +14,6 @@ public abstract class AbstractSimulator {
         this.clock = clock;
     }
 
-    abstract public double ta();
-
-    abstract public void lambda();
-
-    abstract public void deltfcn();
-
-    abstract public void clear();
-    
     public double getTL() {
         return tL;
     }

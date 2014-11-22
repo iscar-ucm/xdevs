@@ -1,7 +1,8 @@
 package mitris.sim.core.lib.examples;
 
 import mitris.sim.core.modeling.Coupled;
-import mitris.sim.core.modeling.Port;
+import mitris.sim.core.modeling.InPort;
+import mitris.sim.core.modeling.OutPort;
 
 /**
  *
@@ -9,8 +10,8 @@ import mitris.sim.core.modeling.Port;
  */
 public class Ef extends Coupled {
 
-  protected Port<Job> iIn = new Port<Job>("iIn");
-  protected Port<Job> oOut = new Port<Job>("oOut");
+  protected InPort<Job> iIn = new InPort<Job>("iIn");
+  protected OutPort<Job> oOut = new OutPort<Job>("oOut");
 
   public Ef(String name, double period, double observationTime) {
 	  super(name);

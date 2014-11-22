@@ -1,22 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mitris.sim.core.lib.atomic.sources;
 
 import mitris.sim.core.atomic.sinks.Console;
-import mitris.sim.core.modeling.DevsAtomic;
+import mitris.sim.core.modeling.Atomic;
 import mitris.sim.core.modeling.Coupled;
-import mitris.sim.core.modeling.Port;
+import mitris.sim.core.modeling.OutPort;
 import mitris.sim.core.simulation.Coordinator;
 
 /**
  *
  * @author jlrisco
  */
-public class Ramp extends DevsAtomic {
+public class Ramp extends Atomic {
 
-    public Port<Double> portOut = new Port<>("portOut");
+    public OutPort<Double> portOut = new OutPort<>("portOut");
     protected double startTime;
     protected double slope;
     protected double sampleTime;

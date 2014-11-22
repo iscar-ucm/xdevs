@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import mitris.sim.core.modeling.Coupled;
+import mitris.sim.core.modeling.DevsCoupled;
 import mitris.sim.core.modeling.Port;
 
 /**
  * @author Saurabh Mittal
+ * @author José Luis Risco Martín
  *
  */
 public class Util {
@@ -41,7 +42,7 @@ public class Util {
 
 	}
 
-	public static String printCouplings(Coupled model){
+	public static String printCouplings(DevsCoupled model){
 		StringBuilder sb = new StringBuilder(" coupling: [");
 		sb.append(printLinkedList("\n\tEIC", model.getEIC()));
 		sb.append(printLinkedList("\n\tIC", model.getIC()));

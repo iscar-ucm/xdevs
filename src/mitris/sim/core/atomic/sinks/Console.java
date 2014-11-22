@@ -2,18 +2,18 @@ package mitris.sim.core.atomic.sinks;
 
 import java.util.Collection;
 
-import mitris.sim.core.modeling.DevsAtomic;
-import mitris.sim.core.modeling.Port;
+import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.InPort;
 
 /**
  *
  * @author José Luis Risco Martín
  */
-public class Console extends DevsAtomic {
+public class Console extends Atomic {
 
     //private static final Logger logger = Logger.getLogger(Console.class.getName());
 
-    public Port<Object> iIn = new Port<>("iIn");
+    public InPort<Object> iIn = new InPort<>("iIn");
     // Parameters
     protected double time;
 

@@ -3,8 +3,9 @@ package mitris.sim.core.lib.examples;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
-import mitris.sim.core.modeling.DevsAtomic;
-import mitris.sim.core.modeling.Port;
+import mitris.sim.core.modeling.Atomic;
+import mitris.sim.core.modeling.InPort;
+import mitris.sim.core.modeling.OutPort;
 
 
 /**
@@ -12,13 +13,13 @@ import mitris.sim.core.modeling.Port;
  * @author José Luis Risco Martín
  * TODO: I keep the Transducer atomic model for the end ... 
  */
-public class Transducer extends DevsAtomic {
+public class Transducer extends Atomic {
 
 	private static final Logger logger = Logger.getLogger(Transducer.class.getName());
 
-	protected Port<Job> iArrived = new Port<>("iArrived");
-	protected Port<Job> iSolved = new Port<>("iSolved");
-	protected Port<Job> oOut = new Port<>("oOut");
+	protected InPort<Job> iArrived = new InPort<>("iArrived");
+	protected InPort<Job> iSolved = new InPort<>("iSolved");
+	protected OutPort<Job> oOut = new OutPort<>("oOut");
 	protected LinkedList<Job> jobsArrived = new LinkedList<>();
 	protected LinkedList<Job> jobsSolved = new LinkedList<>();
 	protected double totalTa;

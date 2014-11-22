@@ -6,11 +6,13 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import mitris.sim.core.Constants;
-import mitris.sim.core.modeling.DevsAtomic;
 import mitris.sim.core.modeling.Component;
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.modeling.Coupling;
-import mitris.sim.core.modeling.Port;
+import mitris.sim.core.modeling.DevsAtomic;
+import mitris.sim.core.modeling.DevsCoupled;
+import mitris.sim.core.modeling.InPort;
+import mitris.sim.core.modeling.OutPort;
 import mitris.sim.core.util.Util;
 
 /**
@@ -21,7 +23,7 @@ public class Coordinator extends AbstractSimulator {
 
 	private static final Logger logger = Logger.getLogger(Coordinator.class.getName());
 
-	protected Coupled model;
+	protected DevsCoupled model;
 	protected LinkedList<AbstractSimulator> simulators = new LinkedList<>();
 
 	public Coordinator(SimulationClock clock, Coupled model, boolean flatten) {
@@ -65,7 +67,6 @@ public class Coordinator extends AbstractSimulator {
 		this(model, true);
 	}
 
-	@Override
 	public final double ta() {
 		double tn = Constants.INFINITY;
 		for (AbstractSimulator simulator : simulators) {
@@ -76,7 +77,6 @@ public class Coordinator extends AbstractSimulator {
 		return tn - clock.getTime();
 	}
 
-	@Override
 	public void lambda() {
 		for (AbstractSimulator simulator : simulators) {
 			simulator.lambda();
@@ -85,13 +85,13 @@ public class Coordinator extends AbstractSimulator {
 	}
 
 	public void propagateOutput() {
-		LinkedList<Coupling> ic = model.getIC();
-		for (Coupling c : ic) {
+		LinkedList<Coupling<?>> ic = model.getIC();
+		for (Coupling<?> c : ic) {
 			c.propagateValues();
 		}
 
-		LinkedList<Coupling> eoc = model.getEOC();
-		for (Coupling c : eoc) {
+		LinkedList<Coupling<?>> eoc = model.getEOC();
+		for (Coupling<?> c : eoc) {
 			c.propagateValues();
 		}
 	}
@@ -107,24 +107,24 @@ public class Coordinator extends AbstractSimulator {
 	}
 
 	public void propagateInput() {
-		LinkedList<Coupling> eic = model.getEIC();
-		for (Coupling c : eic) {
+		LinkedList<Coupling<?>> eic = model.getEIC();
+		for (Coupling<?> c : eic) {
 			c.propagateValues();
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	public void clear() {
 		for (AbstractSimulator simulator : simulators) {
 			simulator.clear();
 		}
-		Collection<Port> ports;
-		ports = model.getInPorts();
-		for (Port port : ports) {
+		Collection<InPort<?>> inPorts;
+		inPorts = model.getInPorts();
+		for (InPort<?> port : inPorts) {
 			port.clear();
 		}
-		ports = model.getOutPorts();
-		for (Port port : ports) {
+		Collection<OutPort<?>> outPorts;
+		outPorts = model.getOutPorts();
+		for (OutPort<?> port : outPorts) {
 			port.clear();
 		}
 	} 

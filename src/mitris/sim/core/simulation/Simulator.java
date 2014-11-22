@@ -1,17 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mitris.sim.core.simulation;
 
 import java.util.Collection;
 
 import mitris.sim.core.modeling.DevsAtomic;
-import mitris.sim.core.modeling.Port;
+import mitris.sim.core.modeling.InPort;
+import mitris.sim.core.modeling.OutPort;
 
 /**
  *
- * @author jlrisco
+ * @author José Luis Risco Martín
  */
 public class Simulator extends AbstractSimulator {
 
@@ -24,12 +21,10 @@ public class Simulator extends AbstractSimulator {
         tN = tL + model.ta();
     }
 
-    @Override
-    public double ta() {
+   public double ta() {
         return model.ta();
     }
 
-    @Override
     public void deltfcn() {
         double t = clock.getTime();
         boolean isInputEmpty = model.isInputEmpty();
@@ -50,23 +45,21 @@ public class Simulator extends AbstractSimulator {
         tN = tL + model.ta();
     }
 
-    @Override
     public void lambda() {
         if (clock.getTime() == tN) {
             model.lambda();
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    @Override
     public void clear() {
-        Collection<Port> ports;
-        ports = model.getInPorts();
-        for (Port port : ports) {
+        Collection<InPort<?>> inPorts;
+        inPorts = model.getInPorts();
+        for (InPort<?> port : inPorts) {
             port.clear();
         }
-        ports = model.getOutPorts();
-        for (Port port : ports) {
+        Collection<OutPort<?>> outPorts;
+        outPorts = model.getOutPorts();
+        for (OutPort<?> port : outPorts) {
             port.clear();
         }
     }

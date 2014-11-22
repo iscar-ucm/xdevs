@@ -86,6 +86,7 @@ public class Coupled implements DevsCoupled {
 	 */
 
 	public void addCoupling(Component cFrom, Port<?> pFrom, Component cTo, Port<?> pTo) {
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		Coupling coupling = new Coupling(pFrom, pTo);
 		// Add to connections
 		if (cFrom == this) {
@@ -154,6 +155,7 @@ public class Coupled implements DevsCoupled {
 		return this;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void completeLeftBridge(LinkedList<Coupling<?>> couplings,
 			HashMap<Port<?>, LinkedList<Port<?>>> leftBridge,
 			LinkedList<Coupling<?>> pCouplings) {
@@ -167,6 +169,7 @@ public class Coupled implements DevsCoupled {
 		}
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void completeRightBridge(LinkedList<Coupling<?>> couplings,
 			HashMap<Port<?>, LinkedList<Port<?>>> rightBridge,
 			LinkedList<Coupling<?>> pCouplings) {
