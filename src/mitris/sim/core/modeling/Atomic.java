@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import mitris.sim.core.Constants;
+import mitris.sim.core.modeling.api.DevsAtomic;
+import mitris.sim.core.modeling.api.DevsCoupled;
 
 /**
  *

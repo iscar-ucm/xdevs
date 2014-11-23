@@ -1,5 +1,8 @@
 package mitris.sim.core.modeling;
 
+import mitris.sim.core.modeling.api.Entity;
+import mitris.sim.core.modeling.api.Port;
+
 
 /**
  * TODO: Saurabh wants and interface for Coupling. I find no reason to create such interface. There is only

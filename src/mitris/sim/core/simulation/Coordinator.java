@@ -6,13 +6,14 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import mitris.sim.core.Constants;
-import mitris.sim.core.modeling.Component;
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.modeling.Coupling;
-import mitris.sim.core.modeling.DevsAtomic;
-import mitris.sim.core.modeling.DevsCoupled;
 import mitris.sim.core.modeling.InPort;
 import mitris.sim.core.modeling.OutPort;
+import mitris.sim.core.modeling.api.Component;
+import mitris.sim.core.modeling.api.DevsAtomic;
+import mitris.sim.core.modeling.api.DevsCoupled;
+import mitris.sim.core.simulation.api.SimulationClock;
 import mitris.sim.core.util.Util;
 
 /**

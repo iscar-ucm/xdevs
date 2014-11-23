@@ -1,7 +1,9 @@
-package mitris.sim.core.modeling;
+package mitris.sim.core.modeling.api;
 
 import java.util.Collection;
 import java.util.LinkedList;
+
+import mitris.sim.core.modeling.Coupling;
 
 /**
  *

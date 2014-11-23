@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import mitris.sim.core.modeling.DevsCoupled;
-import mitris.sim.core.modeling.Port;
+import mitris.sim.core.modeling.api.DevsCoupled;
+import mitris.sim.core.modeling.api.Port;
 
 /**
  * @author Saurabh Mittal

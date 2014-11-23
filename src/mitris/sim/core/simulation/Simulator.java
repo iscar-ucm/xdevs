@@ -2,9 +2,10 @@ package mitris.sim.core.simulation;
 
 import java.util.Collection;
 
-import mitris.sim.core.modeling.DevsAtomic;
 import mitris.sim.core.modeling.InPort;
 import mitris.sim.core.modeling.OutPort;
+import mitris.sim.core.modeling.api.DevsAtomic;
+import mitris.sim.core.simulation.api.SimulationClock;
 
 /**
  *

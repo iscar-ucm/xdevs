@@ -12,7 +12,7 @@ import mitris.logger.core.MitrisLogger;
 import mitris.sim.core.Constants;
 import mitris.sim.core.lib.examples.Efp;
 import mitris.sim.core.modeling.Coupled;
-import mitris.sim.core.simulation.SimulationClock;
+import mitris.sim.core.simulation.api.SimulationClock;
 import mitris.sim.core.simulation.parallel.CoordinatorParallel;
 
 /**

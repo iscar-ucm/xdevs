@@ -1,4 +1,4 @@
-package mitris.sim.core.modeling;
+package mitris.sim.core.modeling.api;
 
 /**
  * 

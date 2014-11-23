@@ -1,5 +1,8 @@
 package mitris.sim.core.simulation;
 
+import mitris.sim.core.simulation.api.DevsSimulator;
+import mitris.sim.core.simulation.api.SimulationClock;
+
 /**
  *
  * @author jlrisco

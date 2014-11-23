@@ -4,6 +4,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import mitris.sim.core.modeling.api.Component;
+import mitris.sim.core.modeling.api.DevsCoupled;
+import mitris.sim.core.modeling.api.Port;
+
 /**
  *
  * @author José Luis Risco Martín
