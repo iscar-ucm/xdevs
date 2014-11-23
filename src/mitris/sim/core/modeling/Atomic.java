@@ -16,13 +16,14 @@ import mitris.sim.core.Constants;
 public abstract class Atomic implements DevsAtomic {
 
 	// Entity attributes
-	protected String name;
+	protected String name = Atomic.class.getSimpleName();
 	// Component attributes
+	protected DevsCoupled parent = null;
 	protected LinkedList<InPort<?>> inPorts = new LinkedList<>();
 	protected LinkedList<OutPort<?>> outPorts = new LinkedList<>();
 	// DevsAtomic attributes
-    protected String phase;
-    protected double sigma;
+    protected String phase = Constants.PHASE_PASSIVE;
+    protected double sigma = Constants.INFINITY;
 
     public Atomic(String name) {
     	this.name = name;
@@ -33,6 +34,11 @@ public abstract class Atomic implements DevsAtomic {
     public Atomic() {
     	this(Atomic.class.getSimpleName());
     }
+    
+	public void initialize() {
+        phase = Constants.PHASE_PASSIVE;
+        sigma = Constants.INFINITY;		
+	}
     
     // Entity methods
     public String getName() {
@@ -82,6 +88,13 @@ public abstract class Atomic implements DevsAtomic {
 		return outPorts;
 	}
 
+	public DevsCoupled getParent() {
+		return parent;
+	}
+	
+	public void setParent(DevsCoupled parent) {
+		this.parent = parent;
+	}
     
     // DevsAtomic methods
     
@@ -89,17 +102,11 @@ public abstract class Atomic implements DevsAtomic {
         return sigma;
     }
 
-    //abstract public void deltint();
-
-    //abstract public void deltext(double e);
-
     public void deltcon(double e) {
         deltint();
         deltext(0);
     }
 
-    //abstract public void lambda();
-    
     public void holdIn(String phase, double sigma) {
         this.phase = phase;
         this.sigma = sigma;
@@ -113,6 +120,11 @@ public abstract class Atomic implements DevsAtomic {
     public void passivate() {
         this.phase = Constants.PHASE_PASSIVE;
         this.sigma = Constants.INFINITY;
+    }
+    
+    public void passivateIn(String phase) {
+        this.phase = phase;
+        this.sigma = Constants.INFINITY;    	
     }
 
     public boolean phaseIs(String phase) {

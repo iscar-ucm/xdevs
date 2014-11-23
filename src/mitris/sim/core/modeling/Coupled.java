@@ -13,6 +13,7 @@ public class Coupled implements DevsCoupled {
 	// Entity attributes
 	protected String name;
 	// Component attributes
+	protected DevsCoupled parent;
 	protected LinkedList<InPort<?>> inPorts = new LinkedList<>();
 	protected LinkedList<OutPort<?>> outPorts = new LinkedList<>();
 	// Coupled attributes
@@ -29,6 +30,8 @@ public class Coupled implements DevsCoupled {
 		this(Coupled.class.getSimpleName());
 	}
 
+	public void initialize() {
+	}
 	/**
 	 * Entity members
 	 */
@@ -81,6 +84,13 @@ public class Coupled implements DevsCoupled {
 		return outPorts;
 	}
 
+	public DevsCoupled getParent() {
+		return parent;
+	}
+	
+	public void setParent(DevsCoupled parent) {
+		this.parent = parent;
+	}
 	/**
 	 * Coupled members
 	 */
@@ -98,11 +108,25 @@ public class Coupled implements DevsCoupled {
 		}
 	}
 
+	public void addCoupling(Port<?> pFrom, Port<?> pTo) {
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		Coupling coupling = new Coupling(pFrom, pTo);
+		// Add to connections
+		if (pFrom.getParent() == this) {
+			eic.add(coupling);
+		} else if (pTo.getParent() == this) {
+			eoc.add(coupling);
+		} else {
+			ic.add(coupling);
+		}
+	}
+
 	public Collection<Component> getComponents() {
 		return components;
 	}
 
 	public void addComponent(Component component) {
+		component.setParent(this);
 		components.add(component);
 	}
 
@@ -118,11 +142,11 @@ public class Coupled implements DevsCoupled {
 		return eoc;
 	}
 
-	public DevsCoupled flatten(DevsCoupled parent) {
+	public DevsCoupled flatten() {
 		for (int i = 0; i < components.size(); ++i) {
 			Component component = components.get(i);
 			if (component instanceof Coupled) {
-				((Coupled) component).flatten(this);
+				((Coupled) component).flatten();
 				removePortsAndCouplings(component);
 				components.remove(i--);
 			}

@@ -6,31 +6,34 @@ package mitris.sim.core.simulation;
  */
 public abstract class AbstractSimulator implements DevsSimulator {
 
-    protected SimulationClock clock;
-    protected double tL; // Time of last event
-    protected double tN; // Time of next event
-    
-    public AbstractSimulator(SimulationClock clock) {
-        this.clock = clock;
-    }
+	protected SimulationClock clock;
+	protected double tL; // Time of last event
+	protected double tN; // Time of next event
 
-    public double getTL() {
-        return tL;
-    }
+	public AbstractSimulator(SimulationClock clock) {
+		this.clock = clock;
+	}
 
-    public void setTL(double tL) {
-        this.tL = tL;
-    }
+	public void initialize() {    	
+	}
 
-    public double getTN() {
-        return tN;
-    }
+	public double getTL() {
+		return tL;
+	}
 
-    public void setTN(double tN) {
-        this.tN = tN;
-    }
+	public void setTL(double tL) {
+		this.tL = tL;
+	}
 
-    public SimulationClock getClock() {
-        return clock;
-    }
+	public double getTN() {
+		return tN;
+	}
+
+	public void setTN(double tN) {
+		this.tN = tN;
+	}
+
+	public SimulationClock getClock() {
+		return clock;
+	}
 }

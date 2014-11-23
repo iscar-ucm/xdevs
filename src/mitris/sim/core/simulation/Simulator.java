@@ -20,7 +20,7 @@ public class Simulator extends AbstractSimulator {
         tL = clock.getTime();
         tN = tL + model.ta();
     }
-
+    
    public double ta() {
         return model.ta();
     }

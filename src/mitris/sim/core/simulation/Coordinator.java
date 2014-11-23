@@ -30,7 +30,7 @@ public class Coordinator extends AbstractSimulator {
 		super(clock);
 		logger.fine("Hierarchical...\n" + Util.printCouplings(model));
 		if(flatten) {
-			this.model = model.flatten(null);
+			this.model = model.flatten();
 		}
 		else {
 			this.model = model;

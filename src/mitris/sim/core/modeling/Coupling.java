@@ -2,7 +2,8 @@ package mitris.sim.core.modeling;
 
 
 /**
- *
+ * TODO: Saurabh wants and interface for Coupling. I find no reason to create such interface. There is only
+ * one kind of Coupling (for now), so no interfaces are needed.
  * @author José Luis Risco Martín
  */
 public class Coupling<E> implements Entity {

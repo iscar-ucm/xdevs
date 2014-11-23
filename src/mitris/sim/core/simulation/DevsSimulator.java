@@ -9,6 +9,7 @@ package mitris.sim.core.simulation;
  * @author jlrisco
  */
 public interface DevsSimulator {
+	public void initialize();
     public double ta();
     public void lambda();
     public void deltfcn();

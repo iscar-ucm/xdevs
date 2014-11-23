@@ -18,6 +18,7 @@ public interface DevsAtomic extends Component {
     public void holdIn(String phase, double sigma);
     public void activate();
     public void passivate();
+    public void passivateIn(String phase);
     public boolean phaseIs(String phase);
     public String getPhase();
     public void setPhase(String phase);
