@@ -75,4 +75,9 @@ public class PortBase<E> implements Port<E> {
 	public Component getParent() {
 		return parent;
 	}
+
+	@Override
+	public String getQualifiedName() {
+		return name;
+	}
 }

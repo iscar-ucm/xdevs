@@ -20,13 +20,10 @@ public interface Entity {
 	 * @return Information about the current state of this entity
 	 */
 	public String toString();
-	
-	// TODO: Add this implementation
+
 	/**
-	 * Saurabh's comments:
-	 * this is needed for netcentric Message Enterprise bus implementation.
-	 * This is also de-facto way Eclipse finds various components
-	 * in its plugin architecture. Allows full traceability
+	 * Qualified name
+	 * @return the qualified name of the given entity
 	 */
-	// public String getQualifiedName(); 
+	public String getQualifiedName(); 
 }

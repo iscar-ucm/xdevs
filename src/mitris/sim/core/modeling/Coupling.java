@@ -41,4 +41,9 @@ public class Coupling<E> implements Entity {
 	public Port<E> getPortTo() {
 		return portTo;
 	}
+
+	@Override
+	public String getQualifiedName() {
+		return getName();
+	}
 }

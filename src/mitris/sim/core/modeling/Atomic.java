@@ -148,4 +148,12 @@ public abstract class Atomic implements DevsAtomic {
     public void setSigma(double sigma) {
         this.sigma = sigma;
     }
+    
+	public String getQualifiedName() {
+		if(parent==null) {
+			return name;
+		}
+		return parent.getQualifiedName() + "." + name;
+	}
+
 }

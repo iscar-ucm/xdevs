@@ -3,260 +3,291 @@
   realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
   <class id="1" language="java" name="mitris.sim.core.modeling.Atomic" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/modeling/Atomic.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="108" width="112" x="581" y="149"/>    
+    <position height="108" width="112" x="681" y="374"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="false" package="false" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <interface id="2" language="java" name="mitris.sim.core.modeling.Component" project="mitris-sim-core" 
-    file="/mitris-sim-core/src/mitris/sim/core/modeling/Component.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="203" width="211" x="349" y="491"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <class id="3" language="java" name="mitris.sim.core.modeling.Coupled" project="mitris-sim-core" 
+  <class id="2" language="java" name="mitris.sim.core.modeling.Coupled" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/modeling/Coupled.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="72" width="112" x="407" y="37"/>    
+    <position height="72" width="112" x="506" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="false" package="false" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <interface id="4" language="java" name="mitris.sim.core.modeling.DevsAtomic" project="mitris-sim-core" 
-    file="/mitris-sim-core/src/mitris/sim/core/modeling/DevsAtomic.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="311" width="149" x="525" y="734"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <interface id="5" language="java" name="mitris.sim.core.modeling.DevsCoupled" project="mitris-sim-core" 
-    file="/mitris-sim-core/src/mitris/sim/core/modeling/DevsCoupled.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="203" width="314" x="714" y="734"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <interface id="6" language="java" name="mitris.sim.core.modeling.Entity" project="mitris-sim-core" 
-    file="/mitris-sim-core/src/mitris/sim/core/modeling/Entity.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="95" width="112" x="83" y="356"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <interface id="7" language="java" name="mitris.sim.core.modeling.Port" project="mitris-sim-core" 
-    file="/mitris-sim-core/src/mitris/sim/core/modeling/Port.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="185" width="174" x="43" y="491"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <class id="8" language="java" name="mitris.sim.core.modeling.InPort" project="mitris-sim-core" 
+  <class id="3" language="java" name="mitris.sim.core.modeling.InPort" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/modeling/InPort.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="90" width="132" x="407" y="356"/>    
+    <position height="54" width="112" x="506" y="527"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="false" package="false" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <class id="9" language="java" name="mitris.sim.core.modeling.OutPort" project="mitris-sim-core" 
+  <class id="4" language="java" name="mitris.sim.core.modeling.OutPort" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/modeling/OutPort.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="90" width="132" x="235" y="356"/>    
+    <position height="54" width="112" x="721" y="527"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="false" package="false" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <class id="10" language="java" name="mitris.sim.core.modeling.Coupling" project="mitris-sim-core" 
+  <class id="5" language="java" name="mitris.sim.core.modeling.Coupling" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/modeling/Coupling.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="167" width="157" x="83" y="149"/>    
+    <position height="185" width="157" x="102" y="149"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <association id="11">    
-    <end type="SOURCE" refId="3" navigable="false" variant="ASSOCIATION">      
-      <attribute id="12" name="eoc"/>      
-      <multiplicity id="13" minimum="0" maximum="2147483647"/>    
+  <class id="6" language="java" name="mitris.sim.core.modeling.PortBase" project="mitris-sim-core" 
+    file="/mitris-sim-core/src/mitris/sim/core/modeling/PortBase.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="90" width="132" x="353" y="374"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <interface id="7" language="java" name="mitris.sim.core.modeling.api.Component" project="mitris-sim-core" 
+    file="/mitris-sim-core/src/mitris/sim/core/modeling/api/Component.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="203" width="211" x="255" y="527"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <interface id="8" language="java" name="mitris.sim.core.modeling.api.DevsAtomic" project="mitris-sim-core" 
+    file="/mitris-sim-core/src/mitris/sim/core/modeling/api/DevsAtomic.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="311" width="149" x="492" y="770"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <interface id="9" language="java" name="mitris.sim.core.modeling.api.DevsCoupled" project="mitris-sim-core" 
+    file="/mitris-sim-core/src/mitris/sim/core/modeling/api/DevsCoupled.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="203" width="314" x="681" y="770"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <interface id="10" language="java" name="mitris.sim.core.modeling.api.Entity" project="mitris-sim-core" 
+    file="/mitris-sim-core/src/mitris/sim/core/modeling/api/Entity.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="113" width="151" x="102" y="374"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <interface id="11" language="java" name="mitris.sim.core.modeling.api.Port" project="mitris-sim-core" 
+    file="/mitris-sim-core/src/mitris/sim/core/modeling/api/Port.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="185" width="174" x="41" y="527"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <association id="12">    
+    <bendpoint x="71" y="374"/>    
+    <end type="SOURCE" refId="5" navigable="false" variant="ASSOCIATION">      
+      <attribute id="13" name="portTo"/>      
+      <multiplicity id="14" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="10" navigable="true" variant="ASSOCIATION"/>    
+    <end type="TARGET" refId="11" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <generalization id="14">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="2"/>  
-  </generalization>  
   <association id="15">    
-    <bendpoint x="52" y="356"/>    
-    <end type="SOURCE" refId="10" navigable="false" variant="ASSOCIATION">      
-      <attribute id="16" name="portTo"/>      
-      <multiplicity id="17" minimum="0" maximum="1"/>    
+    <end type="SOURCE" refId="1" navigable="false" variant="ASSOCIATION">      
+      <attribute id="16" name="outPorts">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="17" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
     </end>    
-    <end type="TARGET" refId="7" navigable="true" variant="ASSOCIATION"/>    
+    <end type="TARGET" refId="4" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="18">    
-    <bendpoint x="416" y="149"/>    
-    <end type="SOURCE" refId="3" navigable="false" variant="ASSOCIATION">      
-      <attribute id="19" name="inPorts"/>      
-      <multiplicity id="20" minimum="0" maximum="2147483647"/>    
+    <end type="SOURCE" refId="2" navigable="false" variant="ASSOCIATION">      
+      <attribute id="19" name="ic">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="20" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
     </end>    
-    <end type="TARGET" refId="8" navigable="true" variant="ASSOCIATION"/>    
+    <end type="TARGET" refId="5" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="21">    
-    <end type="SOURCE" refId="9" navigable="false" variant="ASSOCIATION">      
-      <attribute id="22" name="parent"/>      
-      <multiplicity id="23" minimum="0" maximum="1"/>    
+    <end type="SOURCE" refId="2" navigable="false" variant="ASSOCIATION">      
+      <attribute id="22" name="eoc">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="23" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
     </end>    
-    <end type="TARGET" refId="2" navigable="true" variant="ASSOCIATION"/>    
+    <end type="TARGET" refId="5" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="24">    
+  <association id="24">    
+    <bendpoint x="50" y="374"/>    
+    <end type="SOURCE" refId="5" navigable="false" variant="ASSOCIATION">      
+      <attribute id="25" name="portFrom"/>      
+      <multiplicity id="26" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true" variant="ASSOCIATION"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="27">    
     <end type="SOURCE" refId="9"/>    
     <end type="TARGET" refId="7"/>  
-  </realization>  
-  <association id="25">    
-    <bendpoint x="330" y="149"/>    
-    <end type="SOURCE" refId="3" navigable="false" variant="ASSOCIATION">      
-      <attribute id="26" name="outPorts"/>      
-      <multiplicity id="27" minimum="0" maximum="2147483647"/>    
+  </generalization>  
+  <association id="28">    
+    <bendpoint x="863" y="149"/>    
+    <bendpoint x="863" y="374"/>    
+    <bendpoint x="863" y="527"/>    
+    <end type="SOURCE" refId="2" navigable="false" variant="ASSOCIATION">      
+      <attribute id="29" name="parent"/>      
+      <multiplicity id="30" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="9" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="28">    
-    <bendpoint x="657" y="356"/>    
-    <bendpoint x="657" y="491"/>    
-    <end type="SOURCE" refId="1" navigable="false" variant="ASSOCIATION">      
-      <attribute id="29" name="parent"/>      
-      <multiplicity id="30" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="5" navigable="true" variant="ASSOCIATION"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="31">    
-    <bendpoint x="723" y="149"/>    
-    <bendpoint x="723" y="356"/>    
-    <bendpoint x="723" y="491"/>    
-    <end type="SOURCE" refId="3" navigable="false" variant="ASSOCIATION">      
-      <attribute id="32" name="parent"/>      
-      <multiplicity id="33" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="5" navigable="true" variant="ASSOCIATION"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="34">    
-    <end type="SOURCE" refId="2"/>    
+  <realization id="31">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="11"/>  
+  </realization>  
+  <realization id="32">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="10"/>  
+  </realization>  
+  <generalization id="33">    
+    <end type="SOURCE" refId="3"/>    
     <end type="TARGET" refId="6"/>  
   </generalization>  
-  <realization id="35">    
-    <end type="SOURCE" refId="10"/>    
-    <end type="TARGET" refId="6"/>  
-  </realization>  
-  <association id="36">    
-    <end type="SOURCE" refId="1" navigable="false" variant="ASSOCIATION">      
-      <attribute id="37" name="inPorts"/>      
-      <multiplicity id="38" minimum="0" maximum="2147483647"/>    
+  <association id="34">    
+    <end type="SOURCE" refId="2" navigable="false" variant="ASSOCIATION">      
+      <attribute id="35" name="eic">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="36" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
     </end>    
-    <end type="TARGET" refId="8" navigable="true" variant="ASSOCIATION"/>    
+    <end type="TARGET" refId="5" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="39">    
-    <bendpoint x="31" y="356"/>    
-    <end type="SOURCE" refId="10" navigable="false" variant="ASSOCIATION">      
-      <attribute id="40" name="portFrom"/>      
-      <multiplicity id="41" minimum="0" maximum="1"/>    
+  <association id="37">    
+    <bendpoint x="690" y="527"/>    
+    <end type="SOURCE" refId="1" navigable="false" variant="ASSOCIATION">      
+      <attribute id="38" name="parent"/>      
+      <multiplicity id="39" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="9" navigable="true" variant="ASSOCIATION"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="40">    
+    <bendpoint x="823" y="149"/>    
+    <bendpoint x="823" y="374"/>    
+    <end type="SOURCE" refId="2" navigable="false" variant="ASSOCIATION">      
+      <attribute id="41" name="outPorts">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="42" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true" variant="ASSOCIATION"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="43">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="6"/>  
+  </generalization>  
+  <realization id="44">    
+    <bendpoint x="648" y="527"/>    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="8"/>  
+  </realization>  
+  <generalization id="45">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="10"/>  
+  </generalization>  
+  <association id="46">    
+    <end type="SOURCE" refId="6" navigable="false" variant="ASSOCIATION">      
+      <attribute id="47" name="parent"/>      
+      <multiplicity id="48" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="7" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="42">    
-    <bendpoint x="590" y="356"/>    
-    <bendpoint x="590" y="491"/>    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="4"/>  
+  <association id="49">    
+    <bendpoint x="515" y="149"/>    
+    <bendpoint x="515" y="374"/>    
+    <end type="SOURCE" refId="2" navigable="false" variant="ASSOCIATION">      
+      <attribute id="50" name="inPorts">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="51" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true" variant="ASSOCIATION"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="52">    
+    <bendpoint x="322" y="149"/>    
+    <bendpoint x="322" y="374"/>    
+    <end type="SOURCE" refId="2" navigable="false" variant="ASSOCIATION">      
+      <attribute id="53" name="components"/>      
+      <multiplicity id="54" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true" variant="ASSOCIATION"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="55">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="10"/>  
+  </generalization>  
+  <association id="56">    
+    <end type="SOURCE" refId="1" navigable="false" variant="ASSOCIATION">      
+      <attribute id="57" name="inPorts">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="58" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true" variant="ASSOCIATION"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="59">    
+    <bendpoint x="650" y="149"/>    
+    <bendpoint x="650" y="374"/>    
+    <bendpoint x="669" y="527"/>    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="9"/>  
   </realization>  
-  <realization id="43">    
-    <bendpoint x="744" y="149"/>    
-    <bendpoint x="744" y="356"/>    
-    <bendpoint x="744" y="491"/>    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="5"/>  
-  </realization>  
-  <realization id="44">    
+  <generalization id="60">    
     <end type="SOURCE" refId="8"/>    
     <end type="TARGET" refId="7"/>  
-  </realization>  
-  <association id="45">    
-    <end type="SOURCE" refId="3" navigable="false" variant="ASSOCIATION">      
-      <attribute id="46" name="eic"/>      
-      <multiplicity id="47" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="10" navigable="true" variant="ASSOCIATION"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="48">    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="6"/>  
   </generalization>  
-  <generalization id="49">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="2"/>  
-  </generalization>  
-  <association id="50">    
-    <end type="SOURCE" refId="8" navigable="false" variant="ASSOCIATION">      
-      <attribute id="51" name="parent">        
-        <position height="16" width="41" x="716" y="364"/>      
-      </attribute>      
-      <multiplicity id="52" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true" variant="ASSOCIATION"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="53">    
-    <end type="SOURCE" refId="1" navigable="false" variant="ASSOCIATION">      
-      <attribute id="54" name="outPorts"/>      
-      <multiplicity id="55" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="9" navigable="true" variant="ASSOCIATION"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="56">    
-    <bendpoint x="550" y="149"/>    
-    <bendpoint x="569" y="356"/>    
-    <end type="SOURCE" refId="3" navigable="false" variant="ASSOCIATION">      
-      <attribute id="57" name="components"/>      
-      <multiplicity id="58" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true" variant="ASSOCIATION"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="59">    
-    <end type="SOURCE" refId="3" navigable="false" variant="ASSOCIATION">      
-      <attribute id="60" name="ic"/>      
-      <multiplicity id="61" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="10" navigable="true" variant="ASSOCIATION"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     sort-features="false" accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    

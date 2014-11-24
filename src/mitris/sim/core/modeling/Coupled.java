@@ -91,7 +91,7 @@ public class Coupled implements DevsCoupled {
 	public DevsCoupled getParent() {
 		return parent;
 	}
-	
+
 	public void setParent(DevsCoupled parent) {
 		this.parent = parent;
 	}
@@ -276,5 +276,13 @@ public class Coupled implements DevsCoupled {
 				}
 			}
 		}
+	}
+
+	@Override
+	public String getQualifiedName() {
+		if(parent==null) {
+			return name;
+		}
+		return parent.getQualifiedName() + "." + name;
 	}
 }
