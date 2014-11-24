@@ -4,6 +4,8 @@
  */
 package mitris.sim.core.simulation.api;
 
+import mitris.sim.core.modeling.api.Component;
+
 /**
  *
  * @author jlrisco
@@ -19,4 +21,5 @@ public interface DevsSimulator {
     public double getTN();
     public void setTN(double tN);
     public SimulationClock getClock();
+    public Component getModel();
 }

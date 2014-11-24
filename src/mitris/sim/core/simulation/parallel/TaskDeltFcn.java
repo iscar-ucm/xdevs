@@ -7,7 +7,7 @@ package mitris.sim.core.simulation.parallel;
 
 import java.util.concurrent.Callable;
 
-import mitris.sim.core.simulation.AbstractSimulator;
+import mitris.sim.core.simulation.api.DevsSimulator;
 
 /**
  *
@@ -15,9 +15,9 @@ import mitris.sim.core.simulation.AbstractSimulator;
  */
 public class TaskDeltFcn implements Callable<Double> {
 
-    protected AbstractSimulator simulator;
+    protected DevsSimulator simulator;
 
-    public TaskDeltFcn(AbstractSimulator simulator) {
+    public TaskDeltFcn(DevsSimulator simulator) {
         this.simulator = simulator;
     }
 

@@ -13,6 +13,8 @@ import mitris.sim.core.modeling.OutPort;
 import mitris.sim.core.modeling.api.Component;
 import mitris.sim.core.modeling.api.DevsAtomic;
 import mitris.sim.core.modeling.api.DevsCoupled;
+import mitris.sim.core.simulation.api.DevsCoordinator;
+import mitris.sim.core.simulation.api.DevsSimulator;
 import mitris.sim.core.simulation.api.SimulationClock;
 import mitris.sim.core.util.Util;
 
@@ -20,12 +22,12 @@ import mitris.sim.core.util.Util;
  *
  * @author José Luis Risco Martín
  */
-public class Coordinator extends AbstractSimulator {
+public class Coordinator extends AbstractSimulator implements DevsCoordinator {
 
 	private static final Logger logger = Logger.getLogger(Coordinator.class.getName());
 
 	protected DevsCoupled model;
-	protected LinkedList<AbstractSimulator> simulators = new LinkedList<>();
+	protected LinkedList<DevsSimulator> simulators = new LinkedList<>();
 
 	public Coordinator(SimulationClock clock, Coupled model, boolean flatten) {
 		super(clock);
@@ -67,19 +69,23 @@ public class Coordinator extends AbstractSimulator {
 	public Coordinator(Coupled model) {
 		this(model, true);
 	}
+	
+	public Collection<DevsSimulator> getSimulators() {
+		return simulators;
+	}
 
 	public final double ta() {
 		double tn = Constants.INFINITY;
-		for (AbstractSimulator simulator : simulators) {
-			if (simulator.tN < tn) {
-				tn = simulator.tN;
+		for (DevsSimulator simulator : simulators) {
+			if (simulator.getTN() < tn) {
+				tn = simulator.getTN();
 			}
 		}
 		return tn - clock.getTime();
 	}
 
 	public void lambda() {
-		for (AbstractSimulator simulator : simulators) {
+		for (DevsSimulator simulator : simulators) {
 			simulator.lambda();
 		}
 		propagateOutput();
@@ -100,7 +106,7 @@ public class Coordinator extends AbstractSimulator {
 	@Override
 	public void deltfcn() {
 		propagateInput();
-		for (AbstractSimulator simulator : simulators) {
+		for (DevsSimulator simulator : simulators) {
 			simulator.deltfcn();
 		}
 		tL = clock.getTime();
@@ -115,7 +121,7 @@ public class Coordinator extends AbstractSimulator {
 	}
 
 	public void clear() {
-		for (AbstractSimulator simulator : simulators) {
+		for (DevsSimulator simulator : simulators) {
 			simulator.clear();
 		}
 		Collection<InPort<?>> inPorts;
@@ -150,5 +156,9 @@ public class Coordinator extends AbstractSimulator {
 			clear();
 			clock.setTime(tN);
 		}
+	}
+	
+	public DevsCoupled getModel() {
+		return model;
 	}
 }

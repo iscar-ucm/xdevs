@@ -65,4 +65,8 @@ public class Simulator extends AbstractSimulator {
         }
     }
     
+    public DevsAtomic getModel() {
+    	return model;
+    }
+    
 }
