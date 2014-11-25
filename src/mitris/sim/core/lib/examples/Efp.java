@@ -2,7 +2,7 @@ package mitris.sim.core.lib.examples;
 
 import java.util.logging.Level;
 
-import mitris.logger.core.MitrisLogger;
+import mitris.logger.core.*;
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.simulation.Coordinator;
 
