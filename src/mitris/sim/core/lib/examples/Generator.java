@@ -21,8 +21,11 @@ public class Generator extends Atomic {
 		super.addInPort(iStop);
 		super.addOutPort(oOut);
 		this.period = period;
+	}
+
+	public void initialize() {
 		jobCounter = 1;
-		this.holdIn("active", period);
+		this.holdIn("active", period);		
 	}
 
 	@Override

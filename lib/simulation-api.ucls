@@ -3,111 +3,111 @@
   realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
   <class id="1" language="java" name="mitris.sim.core.simulation.AbstractSimulator" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/simulation/AbstractSimulator.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="90" width="129" x="867" y="167"/>    
+    <position height="90" width="129" x="746" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="false" package="false" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <class id="2" language="java" name="mitris.sim.core.simulation.Coordinator" project="mitris-sim-core" 
-    file="/mitris-sim-core/src/mitris/sim/core/simulation/Coordinator.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="90" width="127" x="867" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="false" package="false" protected="false" private="false" static="true"/>    
-    </display>  
-  </class>  
-  <class id="3" language="java" name="mitris.sim.core.simulation.Simulator" project="mitris-sim-core" 
+  <class id="2" language="java" name="mitris.sim.core.simulation.Simulator" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/simulation/Simulator.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="72" width="120" x="1050" y="315"/>    
+    <position height="72" width="120" x="403" y="167"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="false" package="false" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <class id="4" language="java" name="mitris.sim.core.simulation.parallel.CoordinatorParallel" project="mitris-sim-core" 
+  <class id="3" language="java" name="mitris.sim.core.simulation.parallel.CoordinatorParallel" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/simulation/parallel/CoordinatorParallel.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="108" width="156" x="403" y="167"/>    
+    <position height="108" width="156" x="468" y="356"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="false" package="false" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <class id="5" language="java" name="mitris.sim.core.simulation.realtime.RTCentralCoordinator" 
+  <class id="4" language="java" name="mitris.sim.core.simulation.realtime.RTCentralCoordinator" 
     project="mitris-sim-core" file="/mitris-sim-core/src/mitris/sim/core/simulation/realtime/RTCentralCoordinator.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="108" width="153" x="456" y="315"/>    
+    <position height="108" width="153" x="45" y="504"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="false" package="false" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <interface id="6" language="java" name="mitris.sim.core.simulation.api.DevsCoordinator" project="mitris-sim-core" 
+  <interface id="5" language="java" name="mitris.sim.core.simulation.api.DevsCoordinator" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/simulation/api/DevsCoordinator.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="738" y="825"/>    
+    <position height="149" width="233" x="661" y="1255"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="7" language="java" name="mitris.sim.core.simulation.api.DevsSimulator" project="mitris-sim-core" 
+  <interface id="6" language="java" name="mitris.sim.core.simulation.api.DevsSimulator" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/simulation/api/DevsSimulator.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="277" y="593"/>    
+    <position height="257" width="157" x="661" y="958"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="8" language="java" name="mitris.sim.core.simulation.api.SimulationClock" project="mitris-sim-core" 
+  <class id="7" language="java" name="mitris.sim.core.simulation.api.SimulationClock" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/simulation/api/SimulationClock.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="149" width="143" x="867" y="315"/>    
+    <position height="149" width="143" x="563" y="167"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="9" language="java" name="mitris.sim.core.simulation.parallel.TaskDeltFcn" project="mitris-sim-core" 
+  <class id="8" language="java" name="mitris.sim.core.simulation.parallel.TaskDeltFcn" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/simulation/parallel/TaskDeltFcn.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="95" width="167" x="41" y="315"/>    
+    <position height="95" width="167" x="643" y="504"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="10" language="java" name="mitris.sim.core.simulation.parallel.TaskLambda" project="mitris-sim-core" 
+  <class id="9" language="java" name="mitris.sim.core.simulation.parallel.TaskLambda" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/simulation/parallel/TaskLambda.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="95" width="168" x="248" y="315"/>    
+    <position height="95" width="168" x="435" y="504"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="11" language="java" name="mitris.sim.core.simulation.profile.SimulatorProfile" project="mitris-sim-core" 
+  <class id="10" language="java" name="mitris.sim.core.simulation.profile.SimulatorProfile" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/simulation/profile/SimulatorProfile.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="414" width="157" x="670" y="315"/>    
+    <position height="414" width="157" x="238" y="504"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="false" package="false" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <class id="12" language="java" name="mitris.sim.core.simulation.profile.CoordinatorProfile" project="mitris-sim-core" 
+  <class id="11" language="java" name="mitris.sim.core.simulation.profile.CoordinatorProfile" project="mitris-sim-core" 
     file="/mitris-sim-core/src/mitris/sim/core/simulation/profile/CoordinatorProfile.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1008" y="599"/>    
+    <position height="180" width="194" x="427" y="958"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="12" language="java" name="mitris.sim.core.simulation.Coordinator" project="mitris-sim-core" 
+    file="/mitris-sim-core/src/mitris/sim/core/simulation/Coordinator.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="90" width="127" x="746" y="167"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -115,117 +115,145 @@
     </display>  
   </class>  
   <generalization id="13">    
-    <end type="SOURCE" refId="3"/>    
+    <end type="SOURCE" refId="12"/>    
     <end type="TARGET" refId="1"/>  
   </generalization>  
   <realization id="14">    
-    <bendpoint x="639" y="315"/>    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="7"/>  
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="6"/>  
   </realization>  
   <generalization id="15">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="4"/>  
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="10"/>  
   </generalization>  
   <association id="16">    
-    <end type="SOURCE" refId="9" navigable="false" variant="ASSOCIATION">      
-      <attribute id="17" name="simulator"/>      
-      <multiplicity id="18" minimum="0" maximum="1"/>    
+    <end type="SOURCE" refId="1" navigable="false" variant="ASSOCIATION">      
+      <attribute id="17" name="clock">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="18" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="7" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="19">    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="7"/>  
-  </realization>  
-  <generalization id="20">    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="1"/>  
-  </generalization>  
-  <generalization id="21">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="7"/>  
-  </generalization>  
+  <association id="19">    
+    <bendpoint x="840" y="356"/>    
+    <bendpoint x="840" y="504"/>    
+    <end type="SOURCE" refId="12" navigable="false" variant="ASSOCIATION">      
+      <attribute id="20" name="simulators"/>      
+      <multiplicity id="21" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true" variant="ASSOCIATION"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <association id="22">    
-    <end type="SOURCE" refId="1" navigable="false" variant="ASSOCIATION">      
-      <attribute id="23" name="clock"/>      
-      <multiplicity id="24" minimum="0" maximum="1"/>    
+    <end type="SOURCE" refId="3" navigable="false" variant="ASSOCIATION">      
+      <attribute id="23" name="deltfcnTasks">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="24" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="8" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="25">    
-    <end type="SOURCE" refId="4" navigable="false" variant="ASSOCIATION">      
-      <attribute id="26" name="lambdaTasks"/>      
-      <multiplicity id="27" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="10" navigable="true" variant="ASSOCIATION"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="28">    
-    <end type="SOURCE" refId="10" navigable="false" variant="ASSOCIATION">      
-      <attribute id="29" name="simulator"/>      
-      <multiplicity id="30" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="7" navigable="true" variant="ASSOCIATION"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="31">    
-    <end type="SOURCE" refId="2" navigable="false" variant="ASSOCIATION">      
-      <attribute id="32" name="simulators">        
+    <end type="SOURCE" refId="11" navigable="false" variant="ASSOCIATION">      
+      <attribute id="26" name="realCoordinator">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="33" minimum="0" maximum="2147483647">        
+      <multiplicity id="27" minimum="0" maximum="1">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
-    <end type="TARGET" refId="1" navigable="true" variant="ASSOCIATION"/>    
+    <end type="TARGET" refId="5" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="34">    
-    <bendpoint x="1200" y="167"/>    
-    <bendpoint x="1200" y="315"/>    
-    <bendpoint x="1200" y="769"/>    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="6"/>  
-  </realization>  
-  <association id="35">    
-    <end type="SOURCE" refId="11" navigable="false" variant="ASSOCIATION">      
-      <attribute id="36" name="realSimulator"/>      
-      <multiplicity id="37" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="7" navigable="true" variant="ASSOCIATION"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="38">    
-    <end type="SOURCE" refId="12"/>    
-    <end type="TARGET" refId="6"/>  
-  </realization>  
-  <generalization id="39">    
-    <end type="SOURCE" refId="12"/>    
-    <end type="TARGET" refId="11"/>  
-  </generalization>  
-  <generalization id="40">    
+  <generalization id="28">    
     <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="2"/>  
+    <end type="TARGET" refId="3"/>  
   </generalization>  
-  <association id="41">    
-    <end type="SOURCE" refId="12" navigable="false" variant="ASSOCIATION">      
-      <attribute id="42" name="realCoordinator"/>      
-      <multiplicity id="43" minimum="0" maximum="1"/>    
+  <realization id="29">    
+    <bendpoint x="903" y="167"/>    
+    <bendpoint x="903" y="356"/>    
+    <bendpoint x="861" y="504"/>    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="6"/>  
+  </realization>  
+  <association id="30">    
+    <end type="SOURCE" refId="8" navigable="false" variant="ASSOCIATION">      
+      <attribute id="31" name="simulator">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="32" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="6" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="44">    
-    <end type="SOURCE" refId="4" navigable="false" variant="ASSOCIATION">      
-      <attribute id="45" name="deltfcnTasks"/>      
-      <multiplicity id="46" minimum="0" maximum="2147483647"/>    
+  <generalization id="33">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <generalization id="34">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="6"/>  
+  </generalization>  
+  <realization id="35">    
+    <bendpoint x="882" y="356"/>    
+    <bendpoint x="882" y="504"/>    
+    <bendpoint x="882" y="958"/>    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="5"/>  
+  </realization>  
+  <association id="36">    
+    <end type="SOURCE" refId="9" navigable="false" variant="ASSOCIATION">      
+      <attribute id="37" name="simulator">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="38" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true" variant="ASSOCIATION"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="39">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="5"/>  
+  </realization>  
+  <association id="40">    
+    <end type="SOURCE" refId="10" navigable="false" variant="ASSOCIATION">      
+      <attribute id="41" name="realSimulator">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="42" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true" variant="ASSOCIATION"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="43">    
+    <end type="SOURCE" refId="3" navigable="false" variant="ASSOCIATION">      
+      <attribute id="44" name="lambdaTasks">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="45" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="9" navigable="true" variant="ASSOCIATION"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+  <generalization id="46">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="12"/>  
+  </generalization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     sort-features="false" accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    

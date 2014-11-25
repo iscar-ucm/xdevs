@@ -25,7 +25,10 @@ public class QRamp extends Atomic {
         this.startTime = startTime;
         this.slope = slope;
         this.qOutput = qOutput;
-        super.holdIn("initialOutput", 0.0);
+    }
+    
+    public void initialize() {
+        super.holdIn("initialOutput", 0.0);    	
     }
 
     @Override

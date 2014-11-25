@@ -41,8 +41,11 @@ public class Disk extends Atomic {
         } catch (IOException e) {
             logger.severe(e.getLocalizedMessage());
         }
+    }
+    
+    public void initialize() {
         this.time = 0.0;
-        super.passivate();
+        super.passivate();    	
     }
 
     @Override

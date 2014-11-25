@@ -6,13 +6,7 @@ package mitris.sim.core.modeling;
  */
 
 public class OutPort<E> extends PortBase<E> {
-
 	public OutPort(String name) {
-		this.name = name;
-	}
-	
-	public OutPort() {
-		this(OutPort.class.getSimpleName());
-	}
-	
+		super(name);
+	}		
 }

@@ -31,7 +31,6 @@ public class Clock extends Atomic {
         if (initialValue != 0) {
             this.nextValue = 1;
         }
-        super.activate();
     }
 
     public Clock(String name, double period) {
@@ -40,6 +39,10 @@ public class Clock extends Atomic {
 
     public Clock(String name) {
         this(name, 1, 1);
+    }
+    
+    public void initialize() {
+        super.activate();    	
     }
 
     @Override

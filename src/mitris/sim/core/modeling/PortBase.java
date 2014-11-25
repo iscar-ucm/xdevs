@@ -1,6 +1,3 @@
-/**
- * 
- */
 package mitris.sim.core.modeling;
 
 import java.util.Collection;
@@ -21,10 +18,6 @@ public class PortBase<E> implements Port<E> {
 	
 	public PortBase(String name) {
 		this.name = name;
-	}
-	
-	public PortBase() {
-		this(Port.class.getSimpleName());
 	}
 	
 	// Entity members

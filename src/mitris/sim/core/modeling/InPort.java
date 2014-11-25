@@ -10,13 +10,7 @@ package mitris.sim.core.modeling;
  */
 
 public class InPort<E> extends PortBase<E> {
-
 	public InPort(String name) {
-		this.name = name;
-	}
-	
-	public InPort() {
-		this(InPort.class.getSimpleName());
-	}
-	
+		super(name);
+	}		
 }

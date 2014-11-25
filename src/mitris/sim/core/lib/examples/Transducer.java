@@ -22,6 +22,7 @@ public class Transducer extends Atomic {
 	protected OutPort<Job> oOut = new OutPort<>("oOut");
 	protected LinkedList<Job> jobsArrived = new LinkedList<>();
 	protected LinkedList<Job> jobsSolved = new LinkedList<>();
+	protected double observationTime;
 	protected double totalTa;
 	protected double clock;
 
@@ -32,7 +33,11 @@ public class Transducer extends Atomic {
 		super.addOutPort(oOut);
 		totalTa = 0;
 		clock = 0;
-		super.holdIn("active", observationTime);
+		this.observationTime = observationTime;
+	}
+	
+	public void initialize() {
+		super.holdIn("active", observationTime);		
 	}
 
 	@Override

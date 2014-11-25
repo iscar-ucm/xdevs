@@ -30,12 +30,6 @@ public class Coupled implements DevsCoupled {
 		this.name = name;
 	}
 
-	public Coupled() {
-		this(Coupled.class.getSimpleName());
-	}
-
-	public void initialize() {
-	}
 	/**
 	 * Entity members
 	 */

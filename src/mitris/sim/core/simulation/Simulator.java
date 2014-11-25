@@ -18,8 +18,12 @@ public class Simulator extends AbstractSimulator {
     public Simulator(SimulationClock clock, DevsAtomic model) {
         super(clock);
         this.model = model;
+    }
+    
+    public void initialize() {
+    	model.initialize();
         tL = clock.getTime();
-        tN = tL + model.ta();
+        tN = tL + model.ta();    	
     }
     
    public double ta() {

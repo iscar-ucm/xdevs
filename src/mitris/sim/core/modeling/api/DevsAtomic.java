@@ -10,6 +10,7 @@ package mitris.sim.core.modeling.api;
  * @author José L. Risco Martín and Saurabh Mittal
  */
 public interface DevsAtomic extends Component {
+	public void initialize();	
     public double ta();
     public void deltint();
     public void deltext(double e);

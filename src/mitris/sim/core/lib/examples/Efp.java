@@ -24,9 +24,10 @@ public class Efp extends Coupled {
     }
 
     public static void main(String args[]) {
-        MitrisLogger.setup(Level.ALL);
+        MitrisLogger.setup(Level.INFO);
         Efp efp = new Efp("efp", 1, 3, 1000);
         Coordinator coordinator = new Coordinator(efp);
+        coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
     }
   

@@ -17,5 +17,4 @@ public interface Component extends Entity {
 	public Collection<OutPort<?>> getOutPorts();
 	public DevsCoupled getParent();
 	public void setParent(DevsCoupled parent);
-	public void initialize();	
 }

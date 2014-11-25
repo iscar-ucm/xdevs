@@ -56,11 +56,17 @@ public class Coordinator extends AbstractSimulator implements DevsCoordinator {
 		while(itr.hasNext()){
 			logger.fine("Component: "+itr.next());
 		}
-		logger.fine("START SIMULATION");        
 
+	} 
+
+	public void initialize() {
+		logger.fine("START SIMULATION");        
+		for (DevsSimulator simulator : simulators) {
+			simulator.initialize();
+		}
 		tL = clock.getTime();
 		tN = tL + ta();
-	} 
+	}
 
 	public Coordinator(Coupled model, boolean flatten) {
 		this(new SimulationClock(), model, flatten);
@@ -69,7 +75,7 @@ public class Coordinator extends AbstractSimulator implements DevsCoordinator {
 	public Coordinator(Coupled model) {
 		this(model, true);
 	}
-	
+
 	public Collection<DevsSimulator> getSimulators() {
 		return simulators;
 	}
@@ -157,7 +163,7 @@ public class Coordinator extends AbstractSimulator implements DevsCoordinator {
 			clock.setTime(tN);
 		}
 	}
-	
+
 	public DevsCoupled getModel() {
 		return model;
 	}

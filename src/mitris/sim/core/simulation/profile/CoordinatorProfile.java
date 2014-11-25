@@ -46,7 +46,7 @@ public class CoordinatorProfile extends SimulatorProfile implements DevsCoordina
 		realSimulators.clear();
 		realSimulators.addAll(profSimulators);
 	}
-
+	
 	@Override
 	public Collection<DevsSimulator> getSimulators() {
 		this.numCallsToGetSimulators++;
@@ -113,7 +113,7 @@ public class CoordinatorProfile extends SimulatorProfile implements DevsCoordina
     public static void main(String args[]) {
         MitrisLogger.setup(Level.INFO);
         Efp efp = new Efp("efp", 1, 3, 1000);
-        CoordinatorProfile coordinator = new CoordinatorProfile(new Coordinator(efp, false));
+        CoordinatorProfile coordinator = new CoordinatorProfile(new Coordinator(efp, true));
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);        
         System.out.println(coordinator.getStats());

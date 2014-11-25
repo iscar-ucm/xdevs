@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package mitris.sim.core.modeling;
 
 import java.util.Collection;
@@ -18,36 +14,25 @@ import mitris.sim.core.modeling.api.DevsCoupled;
 public abstract class Atomic implements DevsAtomic {
 
 	// Entity attributes
-	protected String name = Atomic.class.getSimpleName();
+	protected String name;
 	// Component attributes
 	protected DevsCoupled parent = null;
 	protected LinkedList<InPort<?>> inPorts = new LinkedList<>();
 	protected LinkedList<OutPort<?>> outPorts = new LinkedList<>();
 	// DevsAtomic attributes
-    protected String phase = Constants.PHASE_PASSIVE;
-    protected double sigma = Constants.INFINITY;
+	protected String phase = Constants.PHASE_PASSIVE;
+	protected double sigma = Constants.INFINITY;
 
-    public Atomic(String name) {
-    	this.name = name;
-        phase = Constants.PHASE_PASSIVE;
-        sigma = Constants.INFINITY;
-    }
-    
-    public Atomic() {
-    	this(Atomic.class.getSimpleName());
-    }
-    
-	public void initialize() {
-        phase = Constants.PHASE_PASSIVE;
-        sigma = Constants.INFINITY;		
+	public Atomic(String name) {
+		this.name = name;
 	}
-    
-    // Entity methods
-    public String getName() {
-    	return name;
-    }
-    
-    public String toString(){
+
+	// Entity methods
+	public String getName() {
+		return name;
+	}
+
+	public String toString(){
 		StringBuilder sb = new StringBuilder(name + " :");
 		sb.append(" Inports[ ");
 		for(InPort<?> p : inPorts){
@@ -61,8 +46,8 @@ public abstract class Atomic implements DevsAtomic {
 		sb.append("]");
 		return sb.toString();
 	}
-    
-    // Component methods
+
+	// Component methods
 	public boolean isInputEmpty() {
 		for (InPort<?> port : inPorts) {
 			if (!port.isEmpty()) {
@@ -93,62 +78,62 @@ public abstract class Atomic implements DevsAtomic {
 	public DevsCoupled getParent() {
 		return parent;
 	}
-	
+
 	public void setParent(DevsCoupled parent) {
 		this.parent = parent;
 	}
-    
-    // DevsAtomic methods
-    
-    public double ta() {
-        return sigma;
-    }
 
-    public void deltcon(double e) {
-        deltint();
-        deltext(0);
-    }
+	// DevsAtomic methods
 
-    public void holdIn(String phase, double sigma) {
-        this.phase = phase;
-        this.sigma = sigma;
-    }
+	public double ta() {
+		return sigma;
+	}
 
-    public void activate() {
-        this.phase = Constants.PHASE_ACTIVE;
-        this.sigma = 0;
-    }
+	public void deltcon(double e) {
+		deltint();
+		deltext(0);
+	}
 
-    public void passivate() {
-        this.phase = Constants.PHASE_PASSIVE;
-        this.sigma = Constants.INFINITY;
-    }
-    
-    public void passivateIn(String phase) {
-        this.phase = phase;
-        this.sigma = Constants.INFINITY;    	
-    }
+	public void holdIn(String phase, double sigma) {
+		this.phase = phase;
+		this.sigma = sigma;
+	}
 
-    public boolean phaseIs(String phase) {
-        return this.phase.equals(phase);
-    }
+	public void activate() {
+		this.phase = Constants.PHASE_ACTIVE;
+		this.sigma = 0;
+	}
 
-    public String getPhase() {
-        return phase;
-    }
+	public void passivate() {
+		this.phase = Constants.PHASE_PASSIVE;
+		this.sigma = Constants.INFINITY;
+	}
 
-    public void setPhase(String phase) {
-        this.phase = phase;
-    }
+	public void passivateIn(String phase) {
+		this.phase = phase;
+		this.sigma = Constants.INFINITY;    	
+	}
 
-    public double getSigma() {
-        return sigma;
-    }
+	public boolean phaseIs(String phase) {
+		return this.phase.equals(phase);
+	}
 
-    public void setSigma(double sigma) {
-        this.sigma = sigma;
-    }
-    
+	public String getPhase() {
+		return phase;
+	}
+
+	public void setPhase(String phase) {
+		this.phase = phase;
+	}
+
+	public double getSigma() {
+		return sigma;
+	}
+
+	public void setSigma(double sigma) {
+		this.sigma = sigma;
+	}
+
 	public String getQualifiedName() {
 		if(parent==null) {
 			return name;

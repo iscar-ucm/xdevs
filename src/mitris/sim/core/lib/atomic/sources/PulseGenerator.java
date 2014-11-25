@@ -29,7 +29,10 @@ public class PulseGenerator extends Atomic {
         this.pulseWidth = pulseWidth;
         this.period = period;
         this.phaseDelay = phaseDelay;
-        super.holdIn("delay", 0);
+    }
+    
+    public void initialize() {
+        super.holdIn("delay", 0);    	
     }
 
     @Override

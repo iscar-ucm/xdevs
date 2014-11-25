@@ -36,6 +36,7 @@ public class Gpt extends Coupled {
         Gpt gpt = new Gpt("gpt", 1, 10000);
         //CoordinatorParallel coordinator = new CoordinatorParallel(gpt);
         Coordinator coordinator = new Coordinator(gpt);
+        coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
     }
 

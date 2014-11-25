@@ -23,7 +23,10 @@ public class Step extends Atomic {
         this.initialValue = initialValue;
         this.stepTime = stepTime;
         this.finalValue = finalValue;
-        super.holdIn("initialValue", 0.0);
+    }
+    
+    public void initialize() {
+        super.holdIn("initialValue", 0.0);    	
     }
 
     @Override

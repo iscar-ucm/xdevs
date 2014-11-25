@@ -25,7 +25,10 @@ public class Ramp extends Atomic {
         this.startTime = startTime;
         this.slope = slope;
         this.sampleTime = sampleTime;
-        super.holdIn("initialOutput", 0.0);
+    }
+    
+    public void initialize() {
+        super.holdIn("initialOutput", 0.0);    	
     }
 
     @Override

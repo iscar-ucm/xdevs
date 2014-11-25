@@ -17,9 +17,6 @@ public abstract class AbstractSimulator implements DevsSimulator {
 		this.clock = clock;
 	}
 
-	public void initialize() {    	
-	}
-
 	public double getTL() {
 		return tL;
 	}

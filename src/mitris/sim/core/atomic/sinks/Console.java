@@ -24,10 +24,13 @@ public class Console extends Atomic {
     public Console(String name) {
     	super(name);
         super.addInPort(iIn);
-        this.time = 0.0;
-        super.passivate();
     }
-
+    
+    public void initialize() {
+        this.time = 0.0;
+    	super.passivate();
+    }
+    
     @Override
     public void deltint() {
         super.passivate();
