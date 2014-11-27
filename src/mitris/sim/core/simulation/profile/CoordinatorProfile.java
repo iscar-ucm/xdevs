@@ -112,7 +112,7 @@ public class CoordinatorProfile extends SimulatorProfile implements DevsCoordina
 	
     public static void main(String args[]) {
         MitrisLogger.setup(Level.INFO);
-        Efp efp = new Efp("efp", 1, 3, 1000);
+        Efp efp = new Efp("efp", 1, 3, 100);
         CoordinatorProfile coordinator = new CoordinatorProfile(new Coordinator(efp, false));
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);        

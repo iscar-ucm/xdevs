@@ -14,13 +14,7 @@ public interface Entity {
 	 * @return The name of this entity.
 	 */
 	public String getName();
-	/**
-	 * For debugging purposes, <code>toString</code> gives to the user useful information about the current
-	 * state of this entity.
-	 * @return Information about the current state of this entity
-	 */
-	public String toString();
-
+	
 	/**
 	 * Qualified name
 	 * @return the qualified name of the given entity

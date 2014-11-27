@@ -20,21 +20,31 @@ public class Transducer extends Atomic {
 	protected InPort<Job> iArrived = new InPort<>("iArrived");
 	protected InPort<Job> iSolved = new InPort<>("iSolved");
 	protected OutPort<Job> oOut = new OutPort<>("oOut");
+	protected OutPort<Job> oResult = new OutPort<>("oResult");
+	
 	protected LinkedList<Job> jobsArrived = new LinkedList<>();
 	protected LinkedList<Job> jobsSolved = new LinkedList<>();
 	protected double totalTa;
 	protected double clock;
-
+	protected double observationTime;
+ 	
 	public Transducer(String name, double observationTime) {
 		super(name);
 		super.addInPort(iArrived);
 		super.addInPort(iSolved);
 		super.addOutPort(oOut);
+		super.addOutPort(oResult);
 		totalTa = 0;
 		clock = 0;
-		super.holdIn("active", observationTime);
+		this.observationTime = observationTime;
+		
 	}
 
+	@Override
+	public void initialize() {
+		super.holdIn("active", observationTime);
+	}
+	
 	@Override
 	public void deltint() {
 		clock = clock + getSigma();
@@ -62,25 +72,31 @@ public class Transducer extends Atomic {
 	@Override
 	public void deltext(double e) {
 		clock = clock + e;
-		Job job = null;
-		if (!iArrived.isEmpty()) {
-			job = iArrived.getSingleValue();
-			logger.fine("Start job " + job.id + " @ t = " + clock);
-			job.time = clock;
-			jobsArrived.add(job);
-		}
-		if (!iSolved.isEmpty()) {
-			job = iSolved.getSingleValue();
-			totalTa += (clock - job.time);
-			logger.fine("Finish job " + job.id + " @ t = " + clock);
-			job.time = clock;
-			jobsSolved.add(job);
+		if(phaseIs("active")){
+			Job job = null;
+			if (!iArrived.isEmpty()) {
+				job = iArrived.getSingleValue();
+				logger.fine("Start job " + job.id + " @ t = " + clock);
+				job.time = clock;
+				jobsArrived.add(job);
+			}
+			if (!iSolved.isEmpty()) {
+				job = iSolved.getSingleValue();
+				totalTa += (clock - job.time);
+				logger.fine("Finish job " + job.id + " @ t = " + clock);
+				job.time = clock;
+				jobsSolved.add(job);
+			}
 		}
 	}
 
 	@Override
 	public void lambda() {
-		Job job = new Job("null");
-		oOut.addValue(job);
+		if(phaseIs("done")){
+			Job job = new Job("null");
+			oOut.addValue(job);
+			oResult.addValue(new Job("result"));
+		}
+		
 	}
 }

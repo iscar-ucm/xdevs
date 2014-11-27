@@ -24,7 +24,8 @@ import mitris.sim.core.util.Util;
  */
 public class Coordinator extends AbstractSimulator implements DevsCoordinator {
 
-	private static final Logger logger = Logger.getLogger(Coordinator.class.getName());
+	private static final Logger logger = Logger.getLogger(Coordinator.class
+			.getName());
 
 	protected DevsCoupled model;
 	protected LinkedList<DevsSimulator> simulators = new LinkedList<>();
@@ -32,35 +33,42 @@ public class Coordinator extends AbstractSimulator implements DevsCoordinator {
 	public Coordinator(SimulationClock clock, Coupled model, boolean flatten) {
 		super(clock);
 		logger.fine("Hierarchical...\n" + Util.printCouplings(model));
-		if(flatten) {
+		if (flatten) {
 			this.model = model.flatten();
-		}
-		else {
+		} else {
 			this.model = model;
 		}
 		// Build hierarchy
 		Collection<Component> components = model.getComponents();
 		for (Component component : components) {
 			if (component instanceof Coupled) {
-				Coordinator coordinator = new Coordinator(clock, (Coupled) component, false);
+				Coordinator coordinator = new Coordinator(clock,
+						(Coupled) component, false);
 				simulators.add(coordinator);
 			} else if (component instanceof DevsAtomic) {
-				Simulator simulator = new Simulator(clock, (DevsAtomic) component);
+				Simulator simulator = new Simulator(clock,
+						(DevsAtomic) component);
 				simulators.add(simulator);
 			}
 		}
 
-		logger.fine("After flattening.....\n"+ Util.printCouplings(this.model));
+		logger.fine("After flattening.....\n" + Util.printCouplings(this.model));
 		logger.fine(this.model.toString());
-		Iterator<Component> itr  = this.model.getComponents().iterator();
-		while(itr.hasNext()){
-			logger.fine("Component: "+itr.next());
+		Iterator<Component> itr = this.model.getComponents().iterator();
+		while (itr.hasNext()) {
+			logger.fine("Component: " + itr.next());
 		}
-		logger.fine("START SIMULATION");        
+	}
+
+	public void initialize() {
+		logger.fine("START SIMULATION");
+		for (DevsSimulator simulator : simulators) {
+			simulator.initialize();
+		}
 
 		tL = clock.getTime();
 		tN = tL + ta();
-	} 
+	}
 
 	public Coordinator(Coupled model, boolean flatten) {
 		this(new SimulationClock(), model, flatten);
@@ -69,7 +77,7 @@ public class Coordinator extends AbstractSimulator implements DevsCoordinator {
 	public Coordinator(Coupled model) {
 		this(model, true);
 	}
-	
+
 	public Collection<DevsSimulator> getSimulators() {
 		return simulators;
 	}
@@ -134,12 +142,13 @@ public class Coordinator extends AbstractSimulator implements DevsCoordinator {
 		for (OutPort<?> port : outPorts) {
 			port.clear();
 		}
-	} 
+	}
 
 	public void simulate(long numIterations) {
 		clock.setTime(tN);
 		long counter;
-		for (counter = 1; counter < numIterations && clock.getTime() < Constants.INFINITY; counter++) {
+		for (counter = 1; counter < numIterations
+				&& clock.getTime() < Constants.INFINITY; counter++) {
 			lambda();
 			deltfcn();
 			clear();
@@ -157,7 +166,7 @@ public class Coordinator extends AbstractSimulator implements DevsCoordinator {
 			clock.setTime(tN);
 		}
 	}
-	
+
 	public DevsCoupled getModel() {
 		return model;
 	}

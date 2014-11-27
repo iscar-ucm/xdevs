@@ -25,6 +25,11 @@ public class Processor extends Atomic {
     super.addOutPort(oOut);
     this.processingTime = processingTime;
   }
+  
+  @Override
+	public void initialize() {
+		passivate();
+	}
 
   @Override
   public void deltint() {

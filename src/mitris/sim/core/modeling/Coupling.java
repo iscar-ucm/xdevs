@@ -9,7 +9,7 @@ import mitris.sim.core.modeling.api.Port;
  * one kind of Coupling (for now), so no interfaces are needed.
  * @author José Luis Risco Martín
  */
-public class Coupling<E> implements Entity {
+public class Coupling<E> {
 
 	protected Port<E> portFrom;
 	protected Port<E> portTo;
@@ -18,14 +18,9 @@ public class Coupling<E> implements Entity {
 		this.portFrom = portFrom;
 		this.portTo = portTo;
 	}
-	
-	// Entity members
-	public String getName() {
-		return "{" + portFrom.getName() + " -> " + portTo.getName() + "}"; 
-	}
 
 	public String toString(){
-		return "(" + portFrom.getParent().getName() + "." + portFrom + "->" + portTo.getParent().getName() + "." + portTo + ")";
+		return "(" + portFrom + "->" + portTo+")";
 	}
 
 	// Coupling members
@@ -40,10 +35,5 @@ public class Coupling<E> implements Entity {
 
 	public Port<E> getPortTo() {
 		return portTo;
-	}
-
-	@Override
-	public String getQualifiedName() {
-		return getName();
 	}
 }
