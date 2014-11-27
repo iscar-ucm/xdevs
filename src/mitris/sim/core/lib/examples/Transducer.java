@@ -20,13 +20,14 @@ public class Transducer extends Atomic {
 	protected InPort<Job> iArrived = new InPort<>("iArrived");
 	protected InPort<Job> iSolved = new InPort<>("iSolved");
 	protected OutPort<Job> oOut = new OutPort<>("oOut");
-	protected OutPort<Job> oResult = new OutPort<>("oResult");
+	protected OutPort<Result> oResult = new OutPort<>("oResult");
 	
 	protected LinkedList<Job> jobsArrived = new LinkedList<>();
 	protected LinkedList<Job> jobsSolved = new LinkedList<>();
 	protected double observationTime;
 	protected double totalTa;
 	protected double clock;
+	protected Result result;
  	
 	public Transducer(String name, double observationTime) {
 		super(name);
@@ -66,10 +67,12 @@ public class Transducer extends Atomic {
 			logger.info("Jobs solved : " + jobsSolved.size());
 			logger.info("Average TA = " + avgTaTime);
 			logger.info("Throughput = " + throughput);
+			result = new Result(throughput, avgTaTime, jobsArrived.size(), jobsSolved.size());
 			holdIn("done", 0);
 		} else{
 			passivate();
 		}
+		//logger.info("####deltint: "+showState());
 	}
 
 	@Override
@@ -91,6 +94,7 @@ public class Transducer extends Atomic {
 				jobsSolved.add(job);
 			}
 		}
+		//logger.info("###Deltext: "+showState());
 	}
 
 	@Override
@@ -98,7 +102,8 @@ public class Transducer extends Atomic {
 		if(phaseIs("done")){
 			Job job = new Job("null");
 			oOut.addValue(job);
-			oResult.addValue(new Job("result"));
+			oResult.addValue(result);
+			logger.info(""+result);
 		}		
 	}
 }

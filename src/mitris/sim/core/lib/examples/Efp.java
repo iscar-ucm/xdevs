@@ -16,8 +16,8 @@ import mitris.sim.core.simulation.Coordinator;
  */
 public class Efp extends Coupled {
 	
-	protected InPort<Job> iStart = new InPort<Job>("iStart");
-	protected OutPort<Job> oResult = new OutPort<Job>("oResult");
+	protected InPort<Job> iStart = new InPort<>("iStart");
+	protected OutPort<Result> oResult = new OutPort<>("oResult");
 
     public Efp(String name, double generatorPeriod, double processorPeriod, double transducerPeriod) {
     	super(name);

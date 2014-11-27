@@ -25,4 +25,5 @@ Require-Bundle: org.eclipse.xtend.lib,
  org.eclipse.xtext.xbase.lib,
  org.eclipse.xtend;bundle-version="2.0.0",
  mitris-logger;bundle-version="1.0.0"
+Bundle-ClassPath: lib/lombok.jar
 

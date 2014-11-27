@@ -10,10 +10,10 @@ import mitris.sim.core.modeling.OutPort;
  */
 public class Ef extends Coupled {
 
-  protected InPort<Job> iStart = new InPort<Job>("iStart");
-  protected InPort<Job> iIn = new InPort<Job>("iIn");
-  protected OutPort<Job> oOut = new OutPort<Job>("oOut");
-  protected OutPort<Job> oResult = new OutPort<Job>("oResult");
+  protected InPort<Job> iStart = new InPort<>("iStart");
+  protected InPort<Job> iIn = new InPort<>("iIn");
+  protected OutPort<Job> oOut = new OutPort<>("oOut");
+  protected OutPort<Result> oResult = new OutPort<>("oResult");
 
   public Ef(String name, double period, double observationTime) {
 	  super(name);

@@ -70,6 +70,14 @@ public abstract class Atomic extends ComponentBase implements DevsAtomic {
 	public void setSigma(double sigma) {
 		this.sigma = sigma;
 	}
+	
+	public String showState(){
+		StringBuilder sb = new StringBuilder(name+":[");
+		sb.append("\tstate: "+phase);
+		sb.append("\t, sigma: " +sigma);
+		sb.append("]");
+		return sb.toString();
+	}
 
 
 }

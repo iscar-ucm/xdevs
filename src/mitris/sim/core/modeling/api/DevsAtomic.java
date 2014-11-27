@@ -25,4 +25,5 @@ public interface DevsAtomic extends Component {
     public void setPhase(String phase);
     public double getSigma();
     public void setSigma(double sigma);
+    public String showState();
 }
