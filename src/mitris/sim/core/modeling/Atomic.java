@@ -1,88 +1,25 @@
 package mitris.sim.core.modeling;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 import mitris.sim.core.Constants;
 import mitris.sim.core.modeling.api.DevsAtomic;
-import mitris.sim.core.modeling.api.DevsCoupled;
 
 /**
  *
  * @author José L. Risco Martín and Saurabh Mittal
  */
-public abstract class Atomic implements DevsAtomic {
+public abstract class Atomic extends ComponentBase implements DevsAtomic {
 
-	// Entity attributes
-	protected String name;
-	// Component attributes
-	protected DevsCoupled parent = null;
-	protected LinkedList<InPort<?>> inPorts = new LinkedList<>();
-	protected LinkedList<OutPort<?>> outPorts = new LinkedList<>();
 	// DevsAtomic attributes
 	protected String phase = Constants.PHASE_PASSIVE;
 	protected double sigma = Constants.INFINITY;
 
 	public Atomic(String name) {
-		this.name = name;
+		super(name);
 	}
-
-	// Entity methods
-	public String getName() {
-		return name;
+    
+	public Atomic(){
+		this(Atomic.class.getSimpleName());
 	}
-
-	public String toString(){
-		StringBuilder sb = new StringBuilder(name + " :");
-		sb.append(" Inports[ ");
-		for(InPort<?> p : inPorts){
-			sb.append(p + " ");
-		}
-		sb.append("]");
-		sb.append(" Outports[ ");
-		for(OutPort<?> p: outPorts){
-			sb.append(p+" ");
-		}
-		sb.append("]");
-		return sb.toString();
-	}
-
-	// Component methods
-	public boolean isInputEmpty() {
-		for (InPort<?> port : inPorts) {
-			if (!port.isEmpty()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public void addInPort(InPort<?> port) {
-		inPorts.add(port);
-		port.parent = this;
-	}
-
-	public Collection<InPort<?>> getInPorts() {
-		return inPorts;
-	}
-
-	public void addOutPort(OutPort<?> port) {
-		outPorts.add(port);
-		port.parent = this;
-	}
-
-	public Collection<OutPort<?>> getOutPorts() {
-		return outPorts;
-	}
-
-	public DevsCoupled getParent() {
-		return parent;
-	}
-
-	public void setParent(DevsCoupled parent) {
-		this.parent = parent;
-	}
-
 	// DevsAtomic methods
 
 	public double ta() {
@@ -134,11 +71,5 @@ public abstract class Atomic implements DevsAtomic {
 		this.sigma = sigma;
 	}
 
-	public String getQualifiedName() {
-		if(parent==null) {
-			return name;
-		}
-		return parent.getQualifiedName() + "." + name;
-	}
 
 }

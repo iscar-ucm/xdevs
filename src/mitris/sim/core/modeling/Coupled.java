@@ -12,14 +12,8 @@ import mitris.sim.core.modeling.api.Port;
  *
  * @author José Luis Risco Martín
  */
-public class Coupled implements DevsCoupled {
+public class Coupled extends ComponentBase implements DevsCoupled {
 
-	// Entity attributes
-	protected String name;
-	// Component attributes
-	protected DevsCoupled parent;
-	protected LinkedList<InPort<?>> inPorts = new LinkedList<>();
-	protected LinkedList<OutPort<?>> outPorts = new LinkedList<>();
 	// Coupled attributes
 	protected LinkedList<Component> components = new LinkedList<>();
 	protected LinkedList<Coupling<?>> ic = new LinkedList<>();
@@ -30,63 +24,20 @@ public class Coupled implements DevsCoupled {
 		this.name = name;
 	}
 
-	/**
-	 * Entity members
-	 */
-	public String getName() {
-		return name;
+	public Coupled() {
+		this(Coupled.class.getSimpleName());
 	}
 
-	public String toString(){
-		StringBuilder sb = new StringBuilder(name + " :");
-		sb.append(" Inports[ ");
-		for(InPort<?> p : inPorts){
-			sb.append(p + " ");
-		}
-		sb.append("]");
-		sb.append(" Outports[ ");
-		for(OutPort<?> p: outPorts){
-			sb.append(p+" ");
-		}
-		sb.append("]");
-		return sb.toString();
+	public void initialize() {
 	}
-
-	/**
-	 * Component members
-	 */
-	public boolean isInputEmpty() {
-		for (InPort<?> port : inPorts) {
-			if (!port.isEmpty()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public void addInPort(InPort<?> port) {
-		inPorts.add(port);
-		port.parent = this;
-	}
-
-	public Collection<InPort<?>> getInPorts() {
-		return inPorts;
-	}
-
-	public void addOutPort(OutPort<?> port) {
-		outPorts.add(port);
-		port.parent = this;
-	}
-
-	public Collection<OutPort<?>> getOutPorts() {
-		return outPorts;
-	}
-
-	public DevsCoupled getParent() {
+	
+	@Override
+	public Component getParent() {
 		return parent;
 	}
 
-	public void setParent(DevsCoupled parent) {
+	@Override
+	public void setParent(Component parent) {
 		this.parent = parent;
 	}
 	/**
@@ -156,23 +107,23 @@ public class Coupled implements DevsCoupled {
 
 		// Process if parent ...
 		// First, we store all the parent ports connected to input ports
-		HashMap<Port<?>, LinkedList<Port<?>>> leftBridgeEIC = createLeftBrige(parent.getEIC());
-		HashMap<Port<?>, LinkedList<Port<?>>> leftBridgeIC = createLeftBrige(parent.getIC());
+		HashMap<Port<?>, LinkedList<Port<?>>> leftBridgeEIC = createLeftBrige(((DevsCoupled)parent).getEIC());
+		HashMap<Port<?>, LinkedList<Port<?>>> leftBridgeIC = createLeftBrige(((DevsCoupled)parent).getIC());
 		// The same with the output ports
-		HashMap<Port<?>, LinkedList<Port<?>>> rightBridgeEOC = createRightBrige(parent.getEOC());
-		HashMap<Port<?>, LinkedList<Port<?>>> rightBridgeIC = createRightBrige(parent.getIC());
+		HashMap<Port<?>, LinkedList<Port<?>>> rightBridgeEOC = createRightBrige(((DevsCoupled)parent).getEOC());
+		HashMap<Port<?>, LinkedList<Port<?>>> rightBridgeIC = createRightBrige(((DevsCoupled)parent).getIC());
 
-		completeLeftBridge(eic, leftBridgeEIC, parent.getEIC());
-		completeLeftBridge(eic, leftBridgeIC, parent.getIC());
-		completeRightBridge(eoc, rightBridgeEOC, parent.getEOC());
-		completeRightBridge(eoc, rightBridgeIC, parent.getIC());
+		completeLeftBridge(eic, leftBridgeEIC, ((DevsCoupled)parent).getEIC());
+		completeLeftBridge(eic, leftBridgeIC, ((DevsCoupled)parent).getIC());
+		completeRightBridge(eoc, rightBridgeEOC, ((DevsCoupled)parent).getEOC());
+		completeRightBridge(eoc, rightBridgeIC, ((DevsCoupled)parent).getIC());
 
 		for (Component component : components) {
-			parent.addComponent(component);
+			((DevsCoupled)parent).addComponent(component);
 		}
 
 		for (Coupling<?> cIC : ic) {
-			parent.getIC().add(cIC);
+			((DevsCoupled)parent).getIC().add(cIC);
 		}
 		return this;
 	}
@@ -272,11 +223,4 @@ public class Coupled implements DevsCoupled {
 		}
 	}
 
-	@Override
-	public String getQualifiedName() {
-		if(parent==null) {
-			return name;
-		}
-		return parent.getQualifiedName() + "." + name;
-	}
 }

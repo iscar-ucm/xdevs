@@ -15,7 +15,7 @@ public interface DevsAtomic extends Component {
     public void deltint();
     public void deltext(double e);
     public void deltcon(double e);
-    abstract public void lambda();
+    public void lambda();
     public void holdIn(String phase, double sigma);
     public void activate();
     public void passivate();

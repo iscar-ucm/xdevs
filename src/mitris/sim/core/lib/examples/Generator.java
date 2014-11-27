@@ -11,6 +11,7 @@ import mitris.sim.core.modeling.OutPort;
  */
 public class Generator extends Atomic {
 
+	protected InPort<Job> iStart = new InPort<Job>("iStart");
 	protected InPort<Job> iStop = new InPort<Job>("iStop");
 	protected OutPort<Job> oOut = new OutPort<Job>("oOut");
 	protected int jobCounter;
@@ -19,6 +20,7 @@ public class Generator extends Atomic {
 	public Generator(String name, double period) {
 		super(name);
 		super.addInPort(iStop);
+		super.addInPort(iStart);
 		super.addOutPort(oOut);
 		this.period = period;
 	}

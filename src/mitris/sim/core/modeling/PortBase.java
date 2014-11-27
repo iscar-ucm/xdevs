@@ -10,26 +10,24 @@ import mitris.sim.core.modeling.api.Port;
  * @author smittal
  *
  */
-public class PortBase<E> implements Port<E> {
+public class PortBase<E> extends EntityBase implements Port<E> {
 
-	protected String name;
 	protected Component parent;
 	protected LinkedList<E> values = new LinkedList<>();
 	
 	public PortBase(String name) {
-		this.name = name;
+		super(name);
+	}
+	
+	public PortBase() {
+		this(Port.class.getSimpleName());
 	}
 	
 	// Entity members
-	
-	@Override
-	public String getName() {
-		return name;
-	}
-	
+
 	@Override
 	public String toString() {
-		return name;
+		return getQualifiedName();
 	}
 	
 	// Port members
@@ -69,8 +67,10 @@ public class PortBase<E> implements Port<E> {
 		return parent;
 	}
 
-	@Override
 	public String getQualifiedName() {
-		return name;
+		if(parent==null) {
+			return name;
+		}
+		return parent.getName() + "." + name;
 	}
 }

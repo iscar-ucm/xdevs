@@ -26,6 +26,7 @@ public class Processor extends Atomic {
 		this.processingTime = processingTime;
 	}
 
+	@Override
 	public void initialize() {
 		super.passivate();
 	}
