@@ -1,7 +1,4 @@
 bin
-.classpath
-.settings
-.project
 /logger.log.1
 /logger.log.1.lck
 /logger.log.2

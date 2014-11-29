@@ -1,15 +1,17 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: mitris-sim-core
+Bundle-Name: Mitris-sim-core
 Bundle-SymbolicName: mitris-sim-core
-Bundle-Version: 1.0.1
-Export-Package: mitris,
- mitris.sim,
+Bundle-Version: 1.0.0
+Bundle-Vendor: Dunip Technologies, LLC
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ClassPath: lib/lombok.jar,
+ .
+Require-Bundle: mitris-logger;bundle-version="1.0.0"
+Export-Package: lombok,
  mitris.sim.core,
- mitris.sim.core.atomic,
  mitris.sim.core.atomic.sinks,
  mitris.sim.core.lib.atomic.sources,
- mitris.sim.core.lib.examples,
  mitris.sim.core.modeling,
  mitris.sim.core.modeling.api,
  mitris.sim.core.simulation,
@@ -18,12 +20,3 @@ Export-Package: mitris,
  mitris.sim.core.simulation.profile,
  mitris.sim.core.simulation.realtime,
  mitris.sim.core.util
-Bundle-Vendor: Dunip Technologies, LLC
-Require-Bundle: org.eclipse.xtend.lib,
- org.eclipse.xtend.lib.macro,
- com.google.guava,
- org.eclipse.xtext.xbase.lib,
- org.eclipse.xtend;bundle-version="2.0.0",
- mitris-logger;bundle-version="1.0.0"
-Bundle-ClassPath: lib/lombok.jar
-
