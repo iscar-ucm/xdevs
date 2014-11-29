@@ -3,7 +3,6 @@
  */
 package mitris.sim.core.lib.examples;
 
-import lombok.Data;
 import mitris.sim.core.modeling.EntityBase;
 
 /**
@@ -11,7 +10,6 @@ import mitris.sim.core.modeling.EntityBase;
  *
  */
 
-@Data
 public class Result extends EntityBase{
 
 	double thruput, avgTaTime;

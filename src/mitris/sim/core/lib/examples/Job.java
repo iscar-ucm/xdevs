@@ -4,14 +4,12 @@
  */
 package mitris.sim.core.lib.examples;
 
-import lombok.Data;
 import mitris.sim.core.modeling.EntityBase;
 
 /**
  *
  * @author jlrisco
  */
-@Data
 public class Job extends EntityBase{
 
   protected String id;

@@ -2,11 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Mitris-sim-core
 Bundle-SymbolicName: mitris-sim-core
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.3
 Bundle-Vendor: Dunip Technologies, LLC
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ClassPath: lib/lombok.jar,
- .
 Require-Bundle: mitris-logger;bundle-version="1.0.0"
 Export-Package: mitris.sim.core,
  mitris.sim.core.atomic.sinks,
