@@ -8,8 +8,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: lib/lombok.jar,
  .
 Require-Bundle: mitris-logger;bundle-version="1.0.0"
-Export-Package: lombok,
- mitris.sim.core,
+Export-Package: mitris.sim.core,
  mitris.sim.core.atomic.sinks,
  mitris.sim.core.lib.atomic.sources,
  mitris.sim.core.modeling,
