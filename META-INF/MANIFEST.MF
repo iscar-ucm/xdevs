@@ -1,14 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Mitris-sim-core
-Bundle-SymbolicName: mitris-sim-core
-Bundle-Version: 1.0.3
+Bundle-Name: Mitris DEVS Engine
+Bundle-SymbolicName: com.duniptech.modeling.mitris.core
+Bundle-Version: 1.0.4
 Bundle-Vendor: Dunip Technologies, LLC
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: mitris-logger;bundle-version="1.0.0"
 Export-Package: mitris.sim.core,
  mitris.sim.core.atomic.sinks,
  mitris.sim.core.lib.atomic.sources,
+ mitris.sim.core.lib.examples,
  mitris.sim.core.modeling,
  mitris.sim.core.modeling.api,
  mitris.sim.core.simulation,
