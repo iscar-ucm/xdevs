@@ -1,6 +1,7 @@
+.settings
 bin
-/logger.log.1
-/logger.log.1.lck
-/logger.log.2
-/logger.log.2.lck
-/logger.log
+.classpath
+.project
+logger.log
+logger.log.*
+
