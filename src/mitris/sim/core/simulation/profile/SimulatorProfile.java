@@ -1,16 +1,16 @@
 package mitris.sim.core.simulation.profile;
 
-import mitris.sim.core.modeling.api.Component;
-import mitris.sim.core.simulation.api.DevsSimulator;
+import mitris.sim.core.modeling.api.ComponentInterface;
+import mitris.sim.core.simulation.api.SimulatorInterface;
 import mitris.sim.core.simulation.api.SimulationClock;
 
 /**
  *
  * @author José Luis Risco Martín
  */
-public class SimulatorProfile implements DevsSimulator {
+public class SimulatorProfile implements SimulatorInterface {
 
-	protected DevsSimulator realSimulator;
+	protected SimulatorInterface realSimulator;
 	protected long numCallsToTa = 0;
 	protected long timeUsedByTa = 0;
 	protected long numCallsToDeltFcn = 0;
@@ -32,7 +32,7 @@ public class SimulatorProfile implements DevsSimulator {
 	protected long numCallsToGetClock = 0;
 	protected long timeUsedByGetClock = 0;
 
-	public SimulatorProfile(DevsSimulator realSimulator) {
+	public SimulatorProfile(SimulatorInterface realSimulator) {
 		this.realSimulator = realSimulator;
 	}
 
@@ -127,7 +127,7 @@ public class SimulatorProfile implements DevsSimulator {
 		return result;
 	}
 	
-	public Component getModel() {
+	public ComponentInterface getModel() {
 		return realSimulator.getModel();
 	}
 

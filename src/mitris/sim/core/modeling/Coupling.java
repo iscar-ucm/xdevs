@@ -1,6 +1,6 @@
 package mitris.sim.core.modeling;
 
-import mitris.sim.core.modeling.api.Port;
+import mitris.sim.core.modeling.api.PortInterface;
 
 
 /**
@@ -10,10 +10,10 @@ import mitris.sim.core.modeling.api.Port;
  */
 public class Coupling<E> {
 
-	protected Port<E> portFrom;
-	protected Port<E> portTo;
+	protected PortInterface<E> portFrom;
+	protected PortInterface<E> portTo;
 
-	public Coupling(Port<E> portFrom, Port<E> portTo) {
+	public Coupling(PortInterface<E> portFrom, PortInterface<E> portTo) {
 		this.portFrom = portFrom;
 		this.portTo = portTo;
 	}
@@ -28,11 +28,11 @@ public class Coupling<E> {
 		portTo.addValues(portFrom.getValues());
 	}
 
-	public Port<E> getPortFrom() {
+	public PortInterface<E> getPortFrom() {
 		return portFrom;
 	}
 
-	public Port<E> getPortTo() {
+	public PortInterface<E> getPortTo() {
 		return portTo;
 	}
 }

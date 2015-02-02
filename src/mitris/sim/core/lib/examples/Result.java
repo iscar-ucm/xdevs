@@ -3,14 +3,14 @@
  */
 package mitris.sim.core.lib.examples;
 
-import mitris.sim.core.modeling.EntityBase;
+import mitris.sim.core.modeling.Entity;
 
 /**
  * @author smittal
  *
  */
 
-public class Result extends EntityBase{
+public class Result extends Entity{
 
 	double thruput, avgTaTime;
 	int arrived, solved;

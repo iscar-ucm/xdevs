@@ -1,13 +1,13 @@
 package mitris.sim.core.simulation;
 
-import mitris.sim.core.simulation.api.DevsSimulator;
+import mitris.sim.core.simulation.api.SimulatorInterface;
 import mitris.sim.core.simulation.api.SimulationClock;
 
 /**
  *
  * @author jlrisco
  */
-public abstract class AbstractSimulator implements DevsSimulator {
+public abstract class AbstractSimulator implements SimulatorInterface {
 
 	protected SimulationClock clock;
 	protected double tL; // Time of last event

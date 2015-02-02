@@ -8,9 +8,9 @@ package mitris.sim.core.modeling;
  *
  * @author José L. Risco-Martín and Saurabh Mittal
  */
+public class InPort<E> extends Port<E> {
 
-public class InPort<E> extends PortBase<E> {
-	public InPort(String name) {
-		super(name);
-	}		
+    public InPort(String name) {
+        super(name);
+    }
 }

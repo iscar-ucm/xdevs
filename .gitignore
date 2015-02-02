@@ -1,7 +1,11 @@
 .settings
 bin
+build
+dist
+nbproject
 .classpath
 .project
+build.xml
+manifest.mf
 logger.log
 logger.log.*
-

@@ -8,7 +8,7 @@ package mitris.sim.core.simulation.parallel;
 
 import java.util.concurrent.Callable;
 
-import mitris.sim.core.simulation.api.DevsSimulator;
+import mitris.sim.core.simulation.api.SimulatorInterface;
 
 /**
  *
@@ -16,9 +16,9 @@ import mitris.sim.core.simulation.api.DevsSimulator;
  */
 public class TaskLambda implements Callable<Double> {
     
-    protected DevsSimulator simulator;
+    protected SimulatorInterface simulator;
     
-    public TaskLambda(DevsSimulator simulator) {
+    public TaskLambda(SimulatorInterface simulator) {
         this.simulator = simulator;
     }
 

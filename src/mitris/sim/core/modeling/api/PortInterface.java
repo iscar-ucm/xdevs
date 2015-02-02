@@ -11,12 +11,12 @@ import java.util.Collection;
  * @author José L. Risco-Martín and Saurabh Mittal
  */
 
-public interface Port<E> extends Entity {
+public interface PortInterface<E> extends EntityInterface {
 	public void clear();
 	public boolean isEmpty();
 	public E getSingleValue();
 	public Collection<E> getValues();
 	public void addValue(E value);
 	public void addValues(Collection<E> values);
-	public Component getParent();
+	public ComponentInterface getParent();
 }

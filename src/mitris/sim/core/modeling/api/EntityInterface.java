@@ -8,7 +8,7 @@ package mitris.sim.core.modeling.api;
  * @author Saurabh Mittal
  *
  */
-public interface Entity {
+public interface EntityInterface {
 	/**
 	 * Member funcion to get the name of the entity
 	 * @return The name of this entity.

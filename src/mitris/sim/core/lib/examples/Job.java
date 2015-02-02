@@ -4,13 +4,13 @@
  */
 package mitris.sim.core.lib.examples;
 
-import mitris.sim.core.modeling.EntityBase;
+import mitris.sim.core.modeling.Entity;
 
 /**
  *
  * @author jlrisco
  */
-public class Job extends EntityBase{
+public class Job extends Entity{
 
   protected String id;
   protected double time;

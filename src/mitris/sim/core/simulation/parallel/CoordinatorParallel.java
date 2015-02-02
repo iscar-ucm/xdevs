@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.simulation.Coordinator;
-import mitris.sim.core.simulation.api.DevsSimulator;
+import mitris.sim.core.simulation.api.SimulatorInterface;
 import mitris.sim.core.simulation.api.SimulationClock;
 
 /**
@@ -27,10 +27,10 @@ public class CoordinatorParallel extends Coordinator {
         super(clock, model, true);
         this.numberOfThreads = numberOfThreads;
         executor = Executors.newFixedThreadPool(numberOfThreads);
-        for (DevsSimulator simulator : simulators) {
+        for (SimulatorInterface simulator : simulators) {
             lambdaTasks.add(new TaskLambda(simulator));
         }
-        for (DevsSimulator simulator : simulators) {
+        for (SimulatorInterface simulator : simulators) {
             deltfcnTasks.add(new TaskDeltFcn(simulator));
         }
     }

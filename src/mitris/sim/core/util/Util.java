@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import mitris.sim.core.modeling.api.DevsCoupled;
-import mitris.sim.core.modeling.api.Port;
+import mitris.sim.core.modeling.api.CoupledInterface;
+import mitris.sim.core.modeling.api.PortInterface;
 
 /**
  * @author Saurabh Mittal
@@ -27,10 +27,10 @@ public class Util {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static String printBridge(String prefix, HashMap<Port, LinkedList<Port>> bridge){
+	public static String printBridge(String prefix, HashMap<PortInterface, LinkedList<PortInterface>> bridge){
 		StringBuilder sb = new StringBuilder(prefix);
-		for(Port port: bridge.keySet()){
-			LinkedList<Port> ports = bridge.get(port);
+		for(PortInterface port: bridge.keySet()){
+			LinkedList<PortInterface> ports = bridge.get(port);
 			sb.append("{"+port+"(");
 			Iterator<?> it = ports.iterator();
 			while(it.hasNext()){
@@ -42,7 +42,7 @@ public class Util {
 
 	}
 
-	public static String printCouplings(DevsCoupled model){
+	public static String printCouplings(CoupledInterface model){
 		StringBuilder sb = new StringBuilder(" coupling: [");
 		sb.append(printLinkedList("\n\tEIC", model.getEIC()));
 		sb.append(printLinkedList("\n\tIC", model.getIC()));

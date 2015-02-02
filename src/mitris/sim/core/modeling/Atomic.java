@@ -1,13 +1,13 @@
 package mitris.sim.core.modeling;
 
 import mitris.sim.core.Constants;
-import mitris.sim.core.modeling.api.DevsAtomic;
+import mitris.sim.core.modeling.api.AtomicInterface;
 
 /**
  *
  * @author José L. Risco Martín and Saurabh Mittal
  */
-public abstract class Atomic extends ComponentBase implements DevsAtomic {
+public abstract class Atomic extends Component implements AtomicInterface {
 
 	// DevsAtomic attributes
 	protected String phase = Constants.PHASE_PASSIVE;
