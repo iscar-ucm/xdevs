@@ -1,7 +1,6 @@
 package mitris.sim.core.simulation.api;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import mitris.sim.core.modeling.InPort;
 
 /**
@@ -22,14 +21,14 @@ public interface CoordinatorInterface extends SimulatorInterface {
      * @param port input port to inject the set of values
      * @param values set of values to inject
      */
-    void simInject(double e, InPort port, Collection<Object> values);
+    public void simInject(double e, InPort port, Collection<Object> values);
 
     /**
      * @see mitris.sim.core.simulation.api.CoordinatorInterface#simInject(double, mitris.sim.core.modeling.InPort, java.util.Collection) simInject(0.0, InPort, Collection)
      * @param port input port to inject the set of values
      * @param values set of values to inject
      */
-    void simInject(InPort port, Collection<Object> values);
+    public void simInject(InPort port, Collection<Object> values);
 
     /**
      * Injects a single value in the given input port with elapsed time e.
@@ -38,7 +37,7 @@ public interface CoordinatorInterface extends SimulatorInterface {
      * @param port
      * @param value
      */
-    void simInject(double e, InPort port, Object value);
+    public void simInject(double e, InPort port, Object value);
 
     /**
      * Injects a single value in the given input port with elapsed time e equal to 0.
@@ -46,7 +45,7 @@ public interface CoordinatorInterface extends SimulatorInterface {
      * @param port
      * @param value
      */
-    void simInject(InPort port, Object value);
+    public void simInject(InPort port, Object value);
 
     public void simulate(long numIterations);
 
