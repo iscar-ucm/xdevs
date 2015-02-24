@@ -3,9 +3,12 @@ package mitris.sim.core.simulation;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import mitris.logger.core.MitrisLogger;
 
 import mitris.sim.core.Constants;
+import mitris.sim.core.lib.examples.Efp;
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.modeling.Coupling;
 import mitris.sim.core.modeling.InPort;
@@ -13,7 +16,6 @@ import mitris.sim.core.modeling.OutPort;
 import mitris.sim.core.modeling.api.ComponentInterface;
 import mitris.sim.core.modeling.api.AtomicInterface;
 import mitris.sim.core.modeling.api.CoupledInterface;
-import mitris.sim.core.modeling.api.EntityInterface;
 import mitris.sim.core.simulation.api.CoordinatorInterface;
 import mitris.sim.core.simulation.api.SimulatorInterface;
 import mitris.sim.core.simulation.api.SimulationClock;
@@ -150,16 +152,15 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
             port.clear();
         }
     }
-    
+
     @Override
     public void simInject(double e, InPort port, Collection<Object> values) {
         double time = tL + e;
-        if(time <= tN) {
+        if (time <= tN) {
             port.addValues(values);
             clock.setTime(time);
             deltfcn();
-        }
-        else {
+        } else {
             logger.severe("Time: " + tL + " - ERROR input rejected: elapsed time " + e + " is not in bounds.");
         }
     }
@@ -210,4 +211,13 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
     public CoupledInterface getModel() {
         return model;
     }
+
+    public static void main(String[] args) {
+        MitrisLogger.setup(Level.FINE);
+        Efp efp = new Efp("EFP", 1, 3, 30);
+        Coordinator coordinator = new Coordinator(efp);
+        coordinator.initialize();
+        coordinator.simulate(600.0);
+    }
+
 }

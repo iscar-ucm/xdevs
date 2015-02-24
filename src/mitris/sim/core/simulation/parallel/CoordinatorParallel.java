@@ -3,7 +3,10 @@ package mitris.sim.core.simulation.parallel;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import mitris.logger.core.MitrisLogger;
+import mitris.sim.core.lib.examples.Efp;
 
 import mitris.sim.core.modeling.Coupled;
 import mitris.sim.core.simulation.Coordinator;
@@ -17,7 +20,7 @@ import mitris.sim.core.simulation.api.SimulationClock;
 public class CoordinatorParallel extends Coordinator {
 
     private static final Logger logger = Logger.getLogger(CoordinatorParallel.class.getName());
-    
+
     protected int numberOfThreads;
     protected LinkedList<TaskLambda> lambdaTasks = new LinkedList<>();
     protected LinkedList<TaskDeltFcn> deltfcnTasks = new LinkedList<>();
@@ -38,7 +41,7 @@ public class CoordinatorParallel extends Coordinator {
     public CoordinatorParallel(SimulationClock clock, Coupled model) {
         this(clock, model, Runtime.getRuntime().availableProcessors());
     }
-    
+
     public CoordinatorParallel(Coupled model) {
         this(new SimulationClock(), model, Runtime.getRuntime().availableProcessors());
     }
@@ -64,17 +67,24 @@ public class CoordinatorParallel extends Coordinator {
         tL = clock.getTime();
         tN = tL + ta();
     }
-    
+
     @Override
     public void simulate(long numIterations) {
         super.simulate(numIterations);
         executor.shutdown();
     }
-    
+
     @Override
     public void simulate(double timeInterval) {
         super.simulate(timeInterval);
         executor.shutdown();
     }
-    
+
+    public static void main(String[] args) {
+        MitrisLogger.setup(Level.FINE);
+        Efp efp = new Efp("EFP", 1, 3, 30);
+        CoordinatorParallel coordinator = new CoordinatorParallel(efp);
+        coordinator.initialize();
+        coordinator.simulate(60.0);
+    }
 }

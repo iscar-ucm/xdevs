@@ -43,10 +43,12 @@ public class RTCentralCoordinator extends CoordinatorParallel implements Runnabl
         double tF = clock.getTime() + timeInterval;
         while (clock.getTime() < Constants.INFINITY && clock.getTime() < tF) {
             delay = (long) (1000 * clock.getTime() - System.currentTimeMillis());
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException ex) {
-                logger.severe(ex.getLocalizedMessage());
+            if (delay > 0) {
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException ex) {
+                    logger.severe(ex.getLocalizedMessage());
+                }
             }
             lambda();
             deltfcn();
@@ -55,11 +57,12 @@ public class RTCentralCoordinator extends CoordinatorParallel implements Runnabl
         }
         executor.shutdown();
     }
-    
+
     public static void main(String[] args) {
         MitrisLogger.setup(Level.FINE);
         Efp efp = new Efp("EFP", 1, 3, 30);
         RTCentralCoordinator coordinator = new RTCentralCoordinator(efp);
+        coordinator.initialize();
         coordinator.simulate(60.0);
     }
 }
