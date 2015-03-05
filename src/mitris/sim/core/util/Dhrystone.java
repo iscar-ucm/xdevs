@@ -122,6 +122,9 @@ public class Dhrystone extends Thread {
     }
 
     public static void execute(double seconds, boolean printResults) {
+        if (seconds <= 0) {
+            return;
+        }
         long milliSeconds = (long) (1000 * seconds);
         Dhrystone dhrystone = new Dhrystone();
         dhrystone.start();
@@ -131,9 +134,13 @@ public class Dhrystone extends Thread {
             Logger.getLogger(Dhrystone.class.getName()).log(Level.SEVERE, null, ex);
         }
         dhrystone.interrupt();
-        if(printResults) {
+        if (printResults) {
             dhrystone.printResults();
         }
+    }
+
+    public static void execute(double seconds) {
+        execute(seconds, false);
     }
 
     private void Proc_1(Record_Type Pointer_Par_Val) {

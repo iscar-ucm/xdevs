@@ -35,7 +35,7 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
 
     public Coordinator(SimulationClock clock, Coupled model, boolean flatten) {
         super(clock);
-        logger.fine("Hierarchical...\n" + Util.printCouplings(model));
+        logger.fine(model.getName() + "'s hierarchical...\n" + Util.printCouplings(model));
         if (flatten) {
             this.model = model.flatten();
         } else {
@@ -55,7 +55,9 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
             }
         }
 
-        logger.fine("After flattening.....\n" + Util.printCouplings(this.model));
+        if (flatten) {
+            logger.fine("After flattening.....\n" + Util.printCouplings(this.model));
+        }
         logger.fine(this.model.toString());
         Iterator<ComponentInterface> itr = this.model.getComponents().iterator();
         while (itr.hasNext()) {
@@ -73,7 +75,6 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
 
     @Override
     public void initialize() {
-        logger.fine("START SIMULATION");
         for (SimulatorInterface simulator : simulators) {
             simulator.initialize();
         }
@@ -184,6 +185,7 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
 
     @Override
     public void simulate(long numIterations) {
+        logger.fine("START SIMULATION");
         clock.setTime(tN);
         long counter;
         for (counter = 1; counter < numIterations
@@ -197,6 +199,7 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
 
     @Override
     public void simulate(double timeInterval) {
+        logger.fine("START SIMULATION");
         clock.setTime(tN);
         double tF = clock.getTime() + timeInterval;
         while (clock.getTime() < Constants.INFINITY && clock.getTime() < tF) {

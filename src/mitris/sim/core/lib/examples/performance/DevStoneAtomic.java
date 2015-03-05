@@ -1,19 +1,23 @@
 package mitris.sim.core.lib.examples.performance;
 
+import java.util.LinkedList;
+import java.util.logging.Logger;
 import mitris.sim.core.modeling.Atomic;
 import mitris.sim.core.modeling.InPort;
 import mitris.sim.core.modeling.OutPort;
 import mitris.sim.core.util.Dhrystone;
 
 /**
- *
- * @author José Luis Risco Martín TODO: I must also modify this class, according
- * to the source code implemented by Saurabh, a iStart input port must be added.
+ * Atomic model to study the performance using the DEVStone benchmark
+ * @author José Luis Risco Martín
+ * 
  */
 public class DevStoneAtomic extends Atomic {
+    private static final Logger logger = Logger.getLogger(DevStoneAtomic.class.getName());
     
-    public InPort<Object> in = new InPort<>("in");
-    public OutPort<Object> out = new OutPort<>("out");
+    public InPort<Integer> iIn = new InPort<>("in");
+    public OutPort<Integer> oOut = new OutPort<>("out");
+    protected LinkedList<Integer> outValues = new LinkedList<>();
     protected Dhrystone dhrystone;
     
     protected double preparationTime;
@@ -22,8 +26,8 @@ public class DevStoneAtomic extends Atomic {
     
     public DevStoneAtomic(String name, double preparationTime, double intDelayTime, double extDelayTime) {
         super(name);
-        super.addInPort(in);
-        super.addOutPort(out);
+        super.addInPort(iIn);
+        super.addOutPort(oOut);
         this.preparationTime = preparationTime;
         this.intDelayTime = intDelayTime;
         this.extDelayTime = extDelayTime;        
@@ -36,18 +40,22 @@ public class DevStoneAtomic extends Atomic {
     
     @Override
     public void deltint() {
-        Dhrystone.execute(intDelayTime, false);
+        outValues.clear();
+        Dhrystone.execute(intDelayTime);
         super.passivate();
     }
     
     @Override
     public void deltext(double e) {
-        Dhrystone.execute(extDelayTime, false);
+        Dhrystone.execute(extDelayTime);
+        if(!iIn.isEmpty()) {
+            outValues.addAll(iIn.getValues());
+        }
         super.holdIn("active", preparationTime);
     }
     
     @Override
     public void lambda() {
-        out.addValue(1);
+        oOut.addValues(outValues);
     }
 }
