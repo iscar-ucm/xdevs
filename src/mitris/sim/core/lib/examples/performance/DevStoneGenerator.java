@@ -12,7 +12,7 @@ public class DevStoneGenerator extends Atomic {
     public OutPort<Object> oOut = new OutPort<>("out");
     protected double preparationTime;
     protected double period;
-    protected long counter = 0;
+    protected long counter = 1;
     protected long maxEvents = Long.MAX_VALUE;
 
     public DevStoneGenerator(String name, double preparationTime, double period, long maxEvents) {
@@ -25,7 +25,7 @@ public class DevStoneGenerator extends Atomic {
 
     @Override
     public void initialize() {
-        counter = 0;
+        counter = 1;
         this.holdIn("active", preparationTime);
     }
 
@@ -46,6 +46,6 @@ public class DevStoneGenerator extends Atomic {
 
     @Override
     public void lambda() {
-        oOut.addValue(1);
+        oOut.addValue(counter);
     }
 }
