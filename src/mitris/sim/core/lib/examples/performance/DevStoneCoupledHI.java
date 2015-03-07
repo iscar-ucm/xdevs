@@ -44,8 +44,8 @@ public class DevStoneCoupledHI extends DevStoneCoupled {
         double preparationTime = 0.0;
         double period = 1.0;
         long maxEvents = 6000;
-        int width = 3;
-        int depth = 3;
+        int width = 100;
+        int depth = 5;
         double intDelayTime = 0;
         double extDelayTime = 0;
         Coupled framework = new Coupled("DevStoneHI");
@@ -60,6 +60,16 @@ public class DevStoneCoupledHI extends DevStoneCoupled {
         coordinator.simulate(Long.MAX_VALUE);
         long end = System.currentTimeMillis();
         double time = (end-start)/1000.0;
-        logger.info("Execution time (PreparationTime, Period, MaxEvents, Width, Depth, IntDelayTime, ExtDelatTime) = (" + preparationTime + ", " + period + ", " + maxEvents + ", " + width + ", " + depth + ", " + intDelayTime + ", " + extDelayTime + ") = " + time);
+        logger.info("STATS:");
+        logger.info("PreparationTime = " + preparationTime);
+        logger.info("Period = " + period);
+        logger.info("MaxEvents = " + maxEvents);
+        logger.info("Width = " + width);
+        logger.info("Depth = " + depth);
+        logger.info("IntDelayTime = " + intDelayTime);
+        logger.info("ExtDelatTime = " + extDelayTime);
+        logger.info("Num delta_int = " + DevStoneAtomic.NUM_DELT_INTS + " [" + maxEvents*((width-1+width-2)*(depth-1)+1) + "]");
+        logger.info("Num delta_ext = " + DevStoneAtomic.NUM_DELT_EXTS + " [" + maxEvents*((width-1+width-2)*(depth-1)+1) + "]");
+        logger.info("SIMULATION TIME = " + time);        
     }
 }
