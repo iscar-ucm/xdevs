@@ -35,7 +35,7 @@ public class DevStoneCoupledLI extends DevStoneCoupled {
     }
     
     public static void main(String[] args) {
-        MitrisLogger.setup(Level.FINE);
+        MitrisLogger.setup(Level.INFO);
         double preparationTime = 0.0;
         double period = 1.0;
         long maxEvents = 6000;

@@ -32,7 +32,8 @@ public class Port<E> extends Entity implements PortInterface<E> {
 	// Port members
     @Override
     public void clear() {
-        values.clear();
+        //values = new LinkedList<>();
+        values.clear(); // <- What choice has a better performance?
     }
 
     @Override
@@ -57,7 +58,8 @@ public class Port<E> extends Entity implements PortInterface<E> {
 
     @Override
     public void addValues(Collection<E> values) {
-        this.values.addAll(values);
+        for(E value : values)
+            this.values.add(value);
     }
 
     @Override
@@ -65,6 +67,7 @@ public class Port<E> extends Entity implements PortInterface<E> {
         return parent;
     }
 
+    @Override
     public String getQualifiedName() {
         if (parent == null) {
             return name;
