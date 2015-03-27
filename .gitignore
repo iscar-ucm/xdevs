@@ -7,5 +7,5 @@ nbproject
 .project
 build.xml
 manifest.mf
-logger.log
-logger.log.*
+*.log
+*.log.*
