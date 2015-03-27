@@ -30,13 +30,13 @@ public class DevStoneAtomic extends Atomic {
     public static long NUM_DELT_INTS = 0;
     public static long NUM_DELT_EXTS = 0;
 
-    public DevStoneAtomic(String name, double preparationTime, double intDelayTime, double extDelayTime) {
+    public DevStoneAtomic(String name, DevStoneProperties properties) {
         super(name);
         super.addInPort(iIn);
         super.addOutPort(oOut);
-        this.preparationTime = preparationTime;
-        this.intDelayTime = intDelayTime;
-        this.extDelayTime = extDelayTime;
+        this.preparationTime = properties.getPropertyAsDouble(DevStoneProperties.PREPARATION_TIME);
+        this.intDelayTime = properties.getPropertyAsDouble(DevStoneProperties.INT_DELAY_TIME);
+        this.extDelayTime = properties.getPropertyAsDouble(DevStoneProperties.INT_DELAY_TIME);
     }
 
     @Override

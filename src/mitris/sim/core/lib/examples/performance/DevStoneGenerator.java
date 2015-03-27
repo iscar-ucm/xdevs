@@ -9,18 +9,19 @@ import mitris.sim.core.modeling.OutPort;
  * @author José Luis Risco Martín
  */
 public class DevStoneGenerator extends Atomic {
+
     public OutPort<Long> oOut = new OutPort<>("out");
     protected double preparationTime;
     protected double period;
     protected long counter = 1;
     protected long maxEvents = Long.MAX_VALUE;
 
-    public DevStoneGenerator(String name, double preparationTime, double period, long maxEvents) {
+    public DevStoneGenerator(String name, DevStoneProperties properties, long maxEvents) {
         super(name);
         super.addOutPort(oOut);
-        this.preparationTime = preparationTime;
-        this.period = period;
-        this.maxEvents = maxEvents;
+        this.preparationTime = properties.getPropertyAsDouble(DevStoneProperties.PREPARATION_TIME);
+        this.period = properties.getPropertyAsDouble(DevStoneProperties.GENERATOR_PERIOD);
+        this.maxEvents = (maxEvents <= 0) ? 1 : maxEvents;
     }
 
     @Override

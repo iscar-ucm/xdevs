@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  *
  * @author José Luis Risco Martín
  */
-public class Dhrystone extends Thread {
+public class Dhrystone {
 
     public class Record_Type {
 
@@ -51,8 +51,7 @@ public class Dhrystone extends Thread {
     public Dhrystone() {
     }
 
-    @Override
-    public void run() {
+    public void run(double seconds) {
         int Int_Loc_1, Int_Loc_2, Int_Loc_3;
         int[] Int_Loc_3_Ref = new int[1];
         int[] Int_Loc_1_Ref = new int[1];
@@ -61,6 +60,7 @@ public class Dhrystone extends Thread {
         String String_Loc_1, String_Loc_2;
 
         long begin_time, end_time;
+        long milliSeconds = Math.round(1000 * seconds);
 
         // int Run_Index; // , Meas_Index; <-- Variable not used (???)
         Next_Record_Glob = Second_Record;
@@ -75,8 +75,10 @@ public class Dhrystone extends Thread {
         String_Loc_1 = "DHRYSTONE PROGRAM, 1'ST STRING";
 
         begin_time = System.currentTimeMillis();
+        end_time = Long.MAX_VALUE;
+        total_time = end_time - begin_time;
 
-        for (Run_Index = 1; Run_Index <= Number_Of_Runs && !super.isInterrupted(); ++Run_Index) {
+        for (Run_Index = 1; Run_Index <= Number_Of_Runs && total_time < milliSeconds; ++Run_Index) {
 
             Proc_5();
             Proc_4();
@@ -113,27 +115,22 @@ public class Dhrystone extends Thread {
             Proc_2(Int_Loc_1_Ref);
             Int_Loc_1 = Int_Loc_1_Ref[0];
 
+            end_time = System.currentTimeMillis();
+            total_time = end_time - begin_time;
+
         }
 
         end_time = System.currentTimeMillis();
         total_time = end_time - begin_time;
         dhrystonesPerSec = (Run_Index - 1) * 1000.0 / total_time;
-
     }
 
     public static void execute(double seconds, boolean printResults) {
         if (seconds <= 0) {
             return;
         }
-        long milliSeconds = (long) (1000 * seconds);
         Dhrystone dhrystone = new Dhrystone();
-        dhrystone.start();
-        try {
-            dhrystone.join(milliSeconds);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Dhrystone.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        dhrystone.interrupt();
+        dhrystone.run(seconds);
         if (printResults) {
             dhrystone.printResults();
         }
