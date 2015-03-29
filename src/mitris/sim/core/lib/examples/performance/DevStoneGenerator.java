@@ -21,7 +21,7 @@ public class DevStoneGenerator extends Atomic {
         super.addOutPort(oOut);
         this.preparationTime = properties.getPropertyAsDouble(DevStoneProperties.PREPARATION_TIME);
         this.period = properties.getPropertyAsDouble(DevStoneProperties.GENERATOR_PERIOD);
-        this.maxEvents = (maxEvents <= 0) ? 1 : maxEvents;
+        this.maxEvents = maxEvents;
     }
 
     @Override

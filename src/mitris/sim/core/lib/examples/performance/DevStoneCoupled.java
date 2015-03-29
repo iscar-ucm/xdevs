@@ -36,7 +36,7 @@ public class DevStoneCoupled extends Coupled {
         if (args.length == 1) {
             properties = new DevStoneProperties(args[0]);
         }
-        MitrisLogger.setup(properties.getProperty(DevStoneProperties.LOGGER_PATH), Level.FINE);
+        MitrisLogger.setup(properties.getProperty(DevStoneProperties.LOGGER_PATH), Level.INFO);
         int numTrials = properties.getPropertyAsInteger(DevStoneProperties.NUM_TRIALS);
         int[] widthsAsArray = properties.getPropertyAsArrayOfInteger(DevStoneProperties.WIDTH);
         int[] depthsAsArray = properties.getPropertyAsArrayOfInteger(DevStoneProperties.DEPTH);
@@ -45,6 +45,9 @@ public class DevStoneCoupled extends Coupled {
             for (int width = widthsAsArray[0]; width < widthsAsArray[2]; width += widthsAsArray[1]) {
                 for (int maxEvents = maxEventsAsArray[0]; maxEvents < maxEventsAsArray[2]; maxEvents += maxEventsAsArray[1]) {
                     for (int currentTrial = 0; currentTrial < numTrials; ++currentTrial) {
+                        DevStoneAtomic.NUM_DELT_INTS = 0;
+                        DevStoneAtomic.NUM_DELT_EXTS = 0;
+                        
                         Coupled framework = new Coupled("DevStone" + properties.getProperty(DevStoneProperties.BENCHMARK_NAME));
 
                         DevStoneGenerator generator = new DevStoneGenerator("Generator", properties, maxEvents);
@@ -64,9 +67,9 @@ public class DevStoneCoupled extends Coupled {
                         framework.addComponent(stoneCoupled);
                         framework.addCoupling(generator.oOut, stoneCoupled.iIn);
                         if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HO.toString())) {
-                            framework.addCoupling(generator.oOut, ((DevStoneCoupledHO)stoneCoupled).iInAux);
+                            framework.addCoupling(generator.oOut, ((DevStoneCoupledHO) stoneCoupled).iInAux);
                         } else if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HOmod.toString())) {
-                            framework.addCoupling(generator.oOut, ((DevStoneCoupledHO)stoneCoupled).iInAux);
+                            framework.addCoupling(generator.oOut, ((DevStoneCoupledHOmod) stoneCoupled).iInAux);
                         }
                         Coordinator coordinator = new Coordinator(framework, false);
                         coordinator.initialize();
@@ -80,17 +83,17 @@ public class DevStoneCoupled extends Coupled {
                             numDeltInts = maxEvents * ((width - 1) * (depth - 1) + 1);
                             numDeltExts = numDeltInts;
                         } else if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HI.toString())) {
-                            numDeltInts = maxEvents * (((width*width - width)/2) * (depth - 1) + 1);
+                            numDeltInts = maxEvents * (((width * width - width) / 2) * (depth - 1) + 1);
                             numDeltExts = numDeltInts;
                         } else if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HO.toString())) {
-                            numDeltInts = maxEvents * (((width*width - width)/2) * (depth - 1) + 1);
+                            numDeltInts = maxEvents * (((width * width - width) / 2) * (depth - 1) + 1);
                             numDeltExts = numDeltInts;
                         } else if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HOmod.toString())) {
 
-                            numDeltInts = maxEvents * ((width - 1 + width - 2) * (depth - 1) + 1);
-                            numDeltExts = maxEvents * ((width - 1 + width - 2) * (depth - 1) + 1);
+                            numDeltInts = maxEvents * (depth * (depth - 1) * 3 * width * (width - 1) / 4 + 1);
+                            numDeltExts = numDeltInts;
                         }
-                        String stats = (currentTrial + 1) + ";" + maxEvents + ";" + width + ";" + depth + ";" + DevStoneAtomic.NUM_DELT_INTS + ";" + numDeltInts + ";" + DevStoneAtomic.NUM_DELT_EXTS + ";" + numDeltExts + ";" + time;
+                        String stats = (currentTrial + 1) + ";" + maxEvents + ";" + width + ";" + depth + ";" + DevStoneAtomic.NUM_DELT_INTS + ";[" + numDeltInts + "];" + DevStoneAtomic.NUM_DELT_EXTS + ";[" + numDeltExts + "];" + time;
                         logger.info(stats);
                     }
                 }

@@ -71,7 +71,7 @@ public class DevStoneCoupledHOmod extends DevStoneCoupled {
                     super.addCoupling(fromAtomic.oOut, toAtomic.iIn);
                 }
                 prevLayer = currentLayer;
-                currentLayer.clear();
+                currentLayer = new ArrayList<>();
                 level++;
             }
         }

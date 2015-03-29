@@ -66,7 +66,7 @@ public class DevStoneProperties {
             properties.setProperty(EXT_DELAY_TIME, "0.0");
             properties.setProperty(NUM_TRIALS, "1");*/
             // HO typical values
-            properties.setProperty(LOGGER_PATH, "DevStoneHO.log");
+            /*properties.setProperty(LOGGER_PATH, "DevStoneHO.log");
             properties.setProperty(BENCHMARK_NAME, BenchMarkType.HO.toString());
             properties.setProperty(PREPARATION_TIME, "0.0");
             properties.setProperty(GENERATOR_PERIOD, "1");
@@ -75,18 +75,18 @@ public class DevStoneProperties {
             properties.setProperty(DEPTH, "3:1:4");
             properties.setProperty(INT_DELAY_TIME, "0.0");
             properties.setProperty(EXT_DELAY_TIME, "0.0");
-            properties.setProperty(NUM_TRIALS, "1");
+            properties.setProperty(NUM_TRIALS, "1");*/
             // HOmod typical values
-            /*properties.setProperty(LOGGER_PATH, "DevStoneHOmod.log");
+            properties.setProperty(LOGGER_PATH, "DevStoneHOmod.log");
             properties.setProperty(BENCHMARK_NAME, BenchMarkType.HOmod.toString());
             properties.setProperty(PREPARATION_TIME, "0.0");
             properties.setProperty(GENERATOR_PERIOD, "1");
-            properties.setProperty(GENERATOR_MAX_EVENTS, "10:1:11");
-            properties.setProperty(WIDTH, "3:1:4");
-            properties.setProperty(DEPTH, "3:1:4");
+            properties.setProperty(GENERATOR_MAX_EVENTS, "1:1:2");
+            properties.setProperty(WIDTH, "4:1:5");
+            properties.setProperty(DEPTH, "2:1:8");
             properties.setProperty(INT_DELAY_TIME, "0.0");
             properties.setProperty(EXT_DELAY_TIME, "0.0");
-            properties.setProperty(NUM_TRIALS, "1");*/
+            properties.setProperty(NUM_TRIALS, "1");
         }
     }
 
