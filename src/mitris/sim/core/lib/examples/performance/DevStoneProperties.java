@@ -83,7 +83,7 @@ public class DevStoneProperties {
             properties.setProperty(GENERATOR_PERIOD, "1");
             properties.setProperty(GENERATOR_MAX_EVENTS, "1:1:2");
             properties.setProperty(WIDTH, "4:1:5");
-            properties.setProperty(DEPTH, "2:1:8");
+            properties.setProperty(DEPTH, "8:1:9");
             properties.setProperty(INT_DELAY_TIME, "0.0");
             properties.setProperty(EXT_DELAY_TIME, "0.0");
             properties.setProperty(NUM_TRIALS, "1");

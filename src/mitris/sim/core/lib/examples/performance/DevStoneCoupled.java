@@ -1,10 +1,5 @@
 package mitris.sim.core.lib.examples.performance;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mitris.logger.core.MitrisLogger;
@@ -89,8 +84,12 @@ public class DevStoneCoupled extends Coupled {
                             numDeltInts = maxEvents * (((width * width - width) / 2) * (depth - 1) + 1);
                             numDeltExts = numDeltInts;
                         } else if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HOmod.toString())) {
-
-                            numDeltInts = maxEvents * (depth * (depth - 1) * 3 * width * (width - 1) / 4 + 1);
+                            int Gamma1 = width-1;
+                            int Gamma2 = width*(width-1)/2;
+                            int Gamma3 = Gamma1;
+                            int Kappa1 = depth-1;
+                            int Kappa3 = (depth-1)*(depth-2)/2;
+                            numDeltInts = maxEvents*(1+Kappa1*Gamma1*Gamma1+(Kappa1+Gamma3*Kappa3)*(Gamma1+Gamma2));
                             numDeltExts = numDeltInts;
                         }
                         String stats = (currentTrial + 1) + ";" + maxEvents + ";" + width + ";" + depth + ";" + DevStoneAtomic.NUM_DELT_INTS + ";[" + numDeltInts + "];" + DevStoneAtomic.NUM_DELT_EXTS + ";[" + numDeltExts + "];" + time;

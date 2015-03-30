@@ -15,21 +15,21 @@ import mitris.sim.core.util.Dhrystone;
  *
  */
 public class DevStoneAtomic extends Atomic {
-
+    
     private static final Logger logger = Logger.getLogger(DevStoneAtomic.class.getName());
-
-    public InPort<Long> iIn = new InPort<>("in");
-    public OutPort<Long> oOut = new OutPort<>("out");
-    protected LinkedList<Long> outValues = new LinkedList<>();
+    
+    public InPort<Integer> iIn = new InPort<>("in");
+    public OutPort<Integer> oOut = new OutPort<>("out");
+    protected LinkedList<Integer> outValues = new LinkedList<>();
     protected Dhrystone dhrystone;
-
+    
     protected double preparationTime;
     protected double intDelayTime;
     protected double extDelayTime;
-
+    
     public static long NUM_DELT_INTS = 0;
     public static long NUM_DELT_EXTS = 0;
-
+    
     public DevStoneAtomic(String name, DevStoneProperties properties) {
         super(name);
         super.addInPort(iIn);
@@ -38,12 +38,12 @@ public class DevStoneAtomic extends Atomic {
         this.intDelayTime = properties.getPropertyAsDouble(DevStoneProperties.INT_DELAY_TIME);
         this.extDelayTime = properties.getPropertyAsDouble(DevStoneProperties.INT_DELAY_TIME);
     }
-
+    
     @Override
     public void initialize() {
         super.passivate();
     }
-
+    
     @Override
     public void deltint() {
         NUM_DELT_INTS++;
@@ -51,20 +51,20 @@ public class DevStoneAtomic extends Atomic {
         Dhrystone.execute(intDelayTime);
         super.passivate();
     }
-
+    
     @Override
     public void deltext(double e) {
         NUM_DELT_EXTS++;
         Dhrystone.execute(extDelayTime);
         if (!iIn.isEmpty()) {
-            Collection<Long> values = iIn.getValues();
-            for (Long value : values) {
+            Collection<Integer> values = iIn.getValues();
+            for (Integer value : values) {
                 outValues.add(value);
             }
         }
         super.holdIn("active", preparationTime);
     }
-
+    
     @Override
     public void lambda() {
         oOut.addValues(outValues);
