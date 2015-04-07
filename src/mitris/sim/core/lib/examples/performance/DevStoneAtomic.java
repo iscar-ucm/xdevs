@@ -16,7 +16,7 @@ import mitris.sim.core.util.Dhrystone;
  */
 public class DevStoneAtomic extends Atomic {
     
-    private static final Logger logger = Logger.getLogger(DevStoneAtomic.class.getName());
+    // private static final Logger logger = Logger.getLogger(DevStoneAtomic.class.getName());
     
     public InPort<Integer> iIn = new InPort<>("in");
     public OutPort<Integer> oOut = new OutPort<>("out");
@@ -29,6 +29,7 @@ public class DevStoneAtomic extends Atomic {
     
     public static long NUM_DELT_INTS = 0;
     public static long NUM_DELT_EXTS = 0;
+    public static long NUM_OF_EVENTS = 0;
     
     public DevStoneAtomic(String name, DevStoneProperties properties) {
         super(name);
@@ -58,6 +59,7 @@ public class DevStoneAtomic extends Atomic {
         Dhrystone.execute(extDelayTime);
         if (!iIn.isEmpty()) {
             Collection<Integer> values = iIn.getValues();
+            NUM_OF_EVENTS += values.size();
             for (Integer value : values) {
                 outValues.add(value);
             }
