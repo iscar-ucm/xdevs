@@ -50,4 +50,19 @@ public class DevStoneCoupledHOmem extends DevStoneCoupled {
             }
         }
     }
+
+    @Override
+    public int getNumDeltExts(int maxEvents, int width, int depth) {
+        return maxEvents * (1 + 2 * (depth - 1) * (width - 1));
+    }
+
+    @Override
+    public int getNumDeltInts(int maxEvents, int width, int depth) {
+        return getNumDeltExts(maxEvents, width, depth);
+    }
+
+    @Override
+    public long getNumOfEvents(int maxEvents, int width, int depth) {
+        return getNumDeltExts(maxEvents, width, depth);
+    }
 }

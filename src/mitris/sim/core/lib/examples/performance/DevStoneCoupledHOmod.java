@@ -76,4 +76,96 @@ public class DevStoneCoupledHOmod extends DevStoneCoupled {
             }
         }
     }
+
+    @Override
+    public int getNumDeltExts(int maxEvents, int width, int depth) {
+        int Gamma1 = width - 1;
+        int Gamma2 = width * (width - 1) / 2;
+        int Gamma3 = Gamma1;
+        int Delta1 = depth - 1;
+        int Delta3 = (depth - 1) * (depth - 2) / 2;
+        return maxEvents * (1 + Delta1 * Gamma1 * Gamma1 + (Delta1 + Gamma3 * Delta3) * (Gamma1 + Gamma2));
+    }
+
+    @Override
+    public int getNumDeltInts(int maxEvents, int width, int depth) {
+        return getNumDeltExts(maxEvents, width, depth);
+    }
+
+    @Override
+    public long getNumOfEvents(int maxEvents, int width, int depth) {
+        long numEvents = 1;
+        int gamma1 = getGammaI(1, width);
+        int k = 1; // k for level 1
+        long[] bag = new long[1 + 1 + depth * gamma1]; // Maximum number of propagations (asumming first index is 1, index 0 is not used)
+        bag[1] = 1; // bag for level 1
+        for (int d = 1; d < depth; ++d) {
+            // Update numEvents
+            for (int c = 1; c <= (k + gamma1); ++c) {
+                if ((c <= k) && (c < gamma1)) {
+                    long popSum1 = 0;
+                    long popSum2 = 0;
+                    for (int i = 1; i <= c; ++i) {
+                        popSum1 += getGammaI(i, width) * bag[c - i + 1];
+                        popSum2 += getGammaI(1, width) * bag[c - i + 1];
+                    }
+                    numEvents += (popSum1 + popSum2);
+                } else if ((c <= k) && (c >= gamma1)) {
+                    long popSum1 = 0;
+                    long popSum2 = 0;
+                    for (int i = 1; i <= gamma1; ++i) {
+                        popSum1 += getGammaI(i, width) * bag[c - i + 1];
+                        popSum2 += getGammaI(1, width) * bag[c - i + 1];
+                    }
+                    numEvents += (popSum1 + popSum2);
+                } else if (c > k) {
+                    long popSum1 = getGammaI(c - k + 1, width) * bag[k];
+                    long popSum2 = 0;
+                    for (int i = c - k; i <= gamma1; ++i) {
+                        if (c - i > 0) {
+                            popSum2 += getGammaI(1, width) * bag[c - i];
+                        }
+                    }
+                    numEvents += (popSum1 + popSum2);
+                }
+            }
+            // Update bag for the next level
+            long[] nextBag = new long[1 + 1 + depth * gamma1]; // Maximum number of propagations (asumming first index is 1, index 0 is not used)
+            for (int c = 1; c <= (k + gamma1); ++c) {
+                if ((c <= k) && (c < gamma1)) {
+                    long popSum = 0;
+                    for (int i = 1; i <= c; ++i) {
+                        popSum += bag[c - i + 1];
+                    }
+                    nextBag[c] = gamma1 * popSum;
+                } else if ((c <= k) && (c >= gamma1)) {
+                    long popSum = 0;
+                    for (int i = 1; i <= gamma1; ++i) {
+                        popSum += bag[c - i + 1];
+                    }
+                    nextBag[c] = gamma1 * popSum;
+                } else if (c > k) {
+                    long popSum = 0;
+                    for (int i = c - k; i <= gamma1; ++i) {
+                        if (c - i > 0) {
+                            popSum += bag[c - i];
+                        }
+                    }
+                    nextBag[c] = gamma1 * popSum;
+                }
+            }
+            bag = nextBag;
+            // Compute k for the next level
+            k += gamma1;
+        }
+        return numEvents;
+    }
+
+    private int getGammaI(int i, int width) {
+        int res = (width - i);
+        if (res < 0) {
+            return 0;
+        }
+        return res;
+    }
 }

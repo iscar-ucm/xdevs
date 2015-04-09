@@ -13,7 +13,7 @@ import mitris.sim.core.simulation.Coordinator;
  *
  * @author José Luis Risco Martín
  */
-public class DevStoneCoupled extends Coupled {
+public abstract class DevStoneCoupled extends Coupled {
 
     private static final Logger logger = Logger.getLogger(DevStoneCoupled.class.getName());
 
@@ -25,6 +25,12 @@ public class DevStoneCoupled extends Coupled {
         addInPort(iIn);
         addOutPort(oOut);
     }
+
+    public abstract int getNumDeltExts(int maxEvents, int width, int depth);
+
+    public abstract int getNumDeltInts(int maxEvents, int width, int depth);
+
+    public abstract long getNumOfEvents(int maxEvents, int width, int depth);
 
     public static void main(String[] args) {
         DevStoneProperties properties = new DevStoneProperties();
@@ -77,33 +83,9 @@ public class DevStoneCoupled extends Coupled {
                         coordinator.simulate(Long.MAX_VALUE);
                         long end = System.currentTimeMillis();
                         double time = (end - start) / 1000.0;
-                        int numDeltInts = 0;
-                        int numDeltExts = 0;
-                        long numOfEvents = 0;
-                        if (benchmarkName.equals(DevStoneProperties.BenchMarkType.LI.toString())) {
-                            numDeltInts = maxEvents * ((width - 1) * (depth - 1) + 1);
-                            numDeltExts = numDeltInts;
-                            numOfEvents = numDeltInts;
-                        } else if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HI.toString())) {
-                            numDeltInts = maxEvents * (((width * width - width) / 2) * (depth - 1) + 1);
-                            numDeltExts = numDeltInts;
-                            numOfEvents = numDeltInts;
-                        } else if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HO.toString())) {
-                            numDeltInts = maxEvents * (((width * width - width) / 2) * (depth - 1) + 1);
-                            numDeltExts = numDeltInts;
-                            numOfEvents = numDeltInts;
-                        } else if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HOmem.toString())) {
-                            numDeltInts = maxEvents * (1 + 2 * (depth - 1) * (width - 1));
-                            numDeltExts = numDeltInts;
-                        } else if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HOmod.toString())) {
-                            int Gamma1 = width - 1;
-                            int Gamma2 = width * (width - 1) / 2;
-                            int Gamma3 = Gamma1;
-                            int Kappa1 = depth - 1;
-                            int Kappa3 = (depth - 1) * (depth - 2) / 2;
-                            numDeltInts = maxEvents * (1 + Kappa1 * Gamma1 * Gamma1 + (Kappa1 + Gamma3 * Kappa3) * (Gamma1 + Gamma2));
-                            numDeltExts = numDeltInts;
-                        }
+                        int numDeltInts = stoneCoupled.getNumDeltInts(maxEvents, width, depth);
+                        int numDeltExts = stoneCoupled.getNumDeltExts(maxEvents, width, depth);
+                        long numOfEvents = stoneCoupled.getNumOfEvents(maxEvents, width, depth);
                         String stats = (currentTrial + 1) + ";" + maxEvents + ";" + width + ";" + depth + ";" + DevStoneAtomic.NUM_DELT_INTS + ";[" + numDeltInts + "];" + DevStoneAtomic.NUM_DELT_EXTS + ";[" + numDeltExts + "];" + DevStoneAtomic.NUM_OF_EVENTS + ";[" + numOfEvents + "];" + time;
                         logger.info(stats);
                     }

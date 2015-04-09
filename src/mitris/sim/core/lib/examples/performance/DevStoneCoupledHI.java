@@ -6,7 +6,7 @@ package mitris.sim.core.lib.examples.performance;
  * @author José Luis Risco Martín
  */
 public class DevStoneCoupledHI extends DevStoneCoupled {
-    
+
     public DevStoneCoupledHI(String prefix, int width, int depth, DevStoneProperties properties) {
         super(prefix + (depth - 1));
         if (depth == 1) {
@@ -21,14 +21,29 @@ public class DevStoneCoupledHI extends DevStoneCoupled {
             super.addCoupling(coupled.oOut, oOut);
             DevStoneAtomic atomicPrev = null;
             for (int i = 0; i < (width - 1); ++i) {
-                DevStoneAtomic atomic = new DevStoneAtomic("A" + (i+1) + "_" + name, properties);
+                DevStoneAtomic atomic = new DevStoneAtomic("A" + (i + 1) + "_" + name, properties);
                 super.addComponent(atomic);
                 super.addCoupling(iIn, atomic.iIn);
-                if(atomicPrev!=null) {
+                if (atomicPrev != null) {
                     super.addCoupling(atomicPrev.oOut, atomic.iIn);
                 }
                 atomicPrev = atomic;
             }
         }
-    }    
+    }
+
+    @Override
+    public int getNumDeltExts(int maxEvents, int width, int depth) {
+        return maxEvents * (((width * width - width) / 2) * (depth - 1) + 1);
+    }
+
+    @Override
+    public int getNumDeltInts(int maxEvents, int width, int depth) {
+        return getNumDeltExts(maxEvents, width, depth);
+    }
+
+    @Override
+    public long getNumOfEvents(int maxEvents, int width, int depth) {
+        return getNumDeltExts(maxEvents, width, depth);
+    }
 }
