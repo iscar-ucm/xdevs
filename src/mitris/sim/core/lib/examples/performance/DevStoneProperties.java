@@ -37,6 +37,7 @@ public class DevStoneProperties {
     public static final String INT_DELAY_TIME = "IntDelayTime";
     public static final String EXT_DELAY_TIME = "ExtDelayTime";
     public static final String NUM_TRIALS = "NumTrials";
+    public static final String FLATTEN = "Flatten";
 
     protected Properties properties = new Properties();
 
@@ -82,7 +83,7 @@ public class DevStoneProperties {
     }
 
     public boolean getPropertyAsBoolean(String key) {
-        return Boolean.valueOf(properties.getProperty(key));
+        return Boolean.parseBoolean(properties.getProperty(key));
     }
 
     public final void getLiStandardProperties() {
@@ -97,6 +98,7 @@ public class DevStoneProperties {
         properties.setProperty(INT_DELAY_TIME, "0.0");
         properties.setProperty(EXT_DELAY_TIME, "0.0");
         properties.setProperty(NUM_TRIALS, "1");
+        properties.setProperty(FLATTEN, "false");
     }
 
     public final void getHiStandardProperties() {
@@ -111,6 +113,7 @@ public class DevStoneProperties {
         properties.setProperty(INT_DELAY_TIME, "0.0");
         properties.setProperty(EXT_DELAY_TIME, "0.0");
         properties.setProperty(NUM_TRIALS, "1");
+        properties.setProperty(FLATTEN, "false");
     }
 
     public final void getHoStandardProperties() {
@@ -125,6 +128,7 @@ public class DevStoneProperties {
         properties.setProperty(INT_DELAY_TIME, "0.0");
         properties.setProperty(EXT_DELAY_TIME, "0.0");
         properties.setProperty(NUM_TRIALS, "1");
+        properties.setProperty(FLATTEN, "false");
     }
 
     public final void getHoMemStandardProperties() {
@@ -133,12 +137,13 @@ public class DevStoneProperties {
         properties.setProperty(BENCHMARK_NAME, BenchMarkType.HOmem.toString());
         properties.setProperty(PREPARATION_TIME, "0.0");
         properties.setProperty(GENERATOR_PERIOD, "1");
-        properties.setProperty(GENERATOR_MAX_EVENTS, "1:1:2");
-        properties.setProperty(WIDTH, "4:1:5");
-        properties.setProperty(DEPTH, "3:1:4");
+        properties.setProperty(GENERATOR_MAX_EVENTS, "1:1:3");
+        properties.setProperty(WIDTH, "2:1:6");
+        properties.setProperty(DEPTH, "2:1:6");
         properties.setProperty(INT_DELAY_TIME, "0.0");
         properties.setProperty(EXT_DELAY_TIME, "0.0");
         properties.setProperty(NUM_TRIALS, "1");
+        properties.setProperty(FLATTEN, "false");
     }
 
     public final void getHoModStandardProperties() {
@@ -153,6 +158,7 @@ public class DevStoneProperties {
         properties.setProperty(INT_DELAY_TIME, "0.0");
         properties.setProperty(EXT_DELAY_TIME, "0.0");
         properties.setProperty(NUM_TRIALS, "1");
+        properties.setProperty(FLATTEN, "false");
     }
     
     public static void saveStandardPropertiesFile() throws IOException {
@@ -190,17 +196,20 @@ public class DevStoneProperties {
         writer.write("# Number of runs (integer):\n");
         writer.write(NUM_TRIALS + " = " + devStoneProp.properties.getProperty(NUM_TRIALS) + "\n\n");
 
+        writer.write("# Should the model be flattened?:\n");
+        writer.write(FLATTEN + " = " + devStoneProp.properties.getProperty(FLATTEN) + "\n\n");
+
         writer.write("# The information in the logger is a set of measures, in the following order (all in the same line):\n");
         writer.write("# Current trial;\n");
         writer.write("# Number of events injected;\n");
         writer.write("# Width;\n");
         writer.write("# Depth;\n");
         writer.write("# Number of internal transition functions;\n");
-        writer.write("# [Theoretical value];\n");
+        writer.write("# Theoretical value;\n");
         writer.write("# Number of external transition functions;\n");
-        writer.write("# [Theoretical value];\n");
+        writer.write("# Theoretical value;\n");
         writer.write("# Number of TOTAL events processed (both injected and generated);\n");
-        writer.write("# [Theoretical value];\n");
+        writer.write("# Theoretical value;\n");
         writer.write("# Wall clock execution time (including swapping time);\n");
 
         writer.flush();
