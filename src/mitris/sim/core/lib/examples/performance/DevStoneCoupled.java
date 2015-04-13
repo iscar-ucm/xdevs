@@ -68,6 +68,17 @@ public abstract class DevStoneCoupled extends Coupled {
                         } else if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HOmod.toString())) {
                             stoneCoupled = new DevStoneCoupledHOmod("C", width, depth, properties);
                         }
+                        
+                        // Theoretical values
+                        int numDeltInts = stoneCoupled.getNumDeltInts(maxEvents, width, depth);
+                        int numDeltExts = stoneCoupled.getNumDeltExts(maxEvents, width, depth);
+                        long numOfEvents = stoneCoupled.getNumOfEvents(maxEvents, width, depth);
+                        if(properties.getPropertyAsInteger(DevStoneProperties.MAX_NUMBER_OF_EVENTS)>0 && (numOfEvents/maxEvents)>properties.getPropertyAsInteger(DevStoneProperties.MAX_NUMBER_OF_EVENTS)) {
+                            String stats = (currentTrial + 1) + ";" + maxEvents + ";" + width + ";" + depth + ";" + numDeltInts + ";" + numDeltExts + ";" + numOfEvents + ";-1.0";
+                            logger.info(stats);
+                            continue;
+                        }
+
                         framework.addComponent(stoneCoupled);
                         framework.addCoupling(generator.oOut, stoneCoupled.iIn);
                         if (benchmarkName.equals(DevStoneProperties.BenchMarkType.HO.toString())) {
@@ -83,10 +94,13 @@ public abstract class DevStoneCoupled extends Coupled {
                         coordinator.simulate(Long.MAX_VALUE);
                         long end = System.currentTimeMillis();
                         double time = (end - start) / 1000.0;
-                        int numDeltInts = stoneCoupled.getNumDeltInts(maxEvents, width, depth);
-                        int numDeltExts = stoneCoupled.getNumDeltExts(maxEvents, width, depth);
-                        long numOfEvents = stoneCoupled.getNumOfEvents(maxEvents, width, depth);
-                        String stats = (currentTrial + 1) + ";" + maxEvents + ";" + width + ";" + depth + ";" + DevStoneAtomic.NUM_DELT_INTS + ";" + numDeltInts + ";" + DevStoneAtomic.NUM_DELT_EXTS + ";" + numDeltExts + ";" + DevStoneAtomic.NUM_OF_EVENTS + ";" + numOfEvents + ";" + time;
+                        String stats;
+                        if(DevStoneAtomic.NUM_DELT_INTS==numDeltInts && DevStoneAtomic.NUM_DELT_EXTS==numDeltExts && DevStoneAtomic.NUM_OF_EVENTS==numOfEvents) {
+                            stats = (currentTrial + 1) + ";" + maxEvents + ";" + width + ";" + depth + ";" + DevStoneAtomic.NUM_DELT_INTS + ";" + DevStoneAtomic.NUM_DELT_EXTS + ";" + DevStoneAtomic.NUM_OF_EVENTS + ";" + time;
+                        }
+                        else {
+                            stats = "ERROR: NumDeltInts or NumDeltExts or NumOfEvents do not match the theoretical values (between brackets): " + DevStoneAtomic.NUM_DELT_INTS + ";[" + numDeltInts + "];" + DevStoneAtomic.NUM_DELT_EXTS + ";[" + numDeltExts + "];" + DevStoneAtomic.NUM_OF_EVENTS + ";[" + numOfEvents + "];" + time;
+                        }
                         logger.info(stats);
                     }
                 }
