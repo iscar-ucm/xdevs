@@ -37,6 +37,9 @@ public abstract class DevStoneCoupled extends Coupled {
         if (args.length == 1) {
             properties = new DevStoneProperties(args[0]);
         }
+        else if(args.length>1) {
+            properties.loadFromCommandLine(args);
+        }
         MitrisLogger.setup(properties.getProperty(DevStoneProperties.LOGGER_PATH), Level.INFO);
         int numTrials = properties.getPropertyAsInteger(DevStoneProperties.NUM_TRIALS);
         int[] widthsAsArray = properties.getPropertyAsArrayOfInteger(DevStoneProperties.WIDTH);

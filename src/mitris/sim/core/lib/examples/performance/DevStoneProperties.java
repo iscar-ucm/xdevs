@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +21,8 @@ import java.util.logging.Logger;
  * @author José L. Risco
  */
 public class DevStoneProperties {
+    
+    private static final Logger logger = Logger.getLogger(DevStoneProperties.class.getName());
 
     public static enum BenchMarkType {
 
@@ -38,11 +41,24 @@ public class DevStoneProperties {
     public static final String EXT_DELAY_TIME = "ExtDelayTime";
     public static final String NUM_TRIALS = "NumTrials";
     public static final String FLATTEN = "Flatten";
-    public static final String MAX_NUMBER_OF_EVENTS = "MaxNumberOfEvents";
+    public static final String MAX_NUMBER_OF_EVENTS = "MaxNumberOfEvents";   
 
     protected Properties properties = new Properties();
+    protected HashSet<String> keys = new HashSet<>();
 
     public DevStoneProperties(String filePath) {
+        keys.add(LOGGER_PATH);
+        keys.add(BENCHMARK_NAME);
+        keys.add(PREPARATION_TIME);
+        keys.add(GENERATOR_PERIOD);
+        keys.add(GENERATOR_MAX_EVENTS);
+        keys.add(DEPTH);
+        keys.add(WIDTH);
+        keys.add(INT_DELAY_TIME);
+        keys.add(EXT_DELAY_TIME);
+        keys.add(NUM_TRIALS);
+        keys.add(FLATTEN);
+        keys.add(MAX_NUMBER_OF_EVENTS);
         if (filePath != null) {
             try {
                 properties.load(new BufferedReader(new FileReader(new File(filePath))));
@@ -60,6 +76,19 @@ public class DevStoneProperties {
 
     public DevStoneProperties() {
         this(null);
+    }
+    
+    public void loadFromCommandLine(String[] args) {
+        for(int i=0; i<args.length; ++i) {
+            String argument = args[i];
+            String[] parts = argument.split("=");
+            if(!keys.contains(parts[0])) {
+                logger.severe("There is no parameter called " + parts[0] + ".");
+            }
+            else {
+                properties.setProperty(parts[0], parts[1]);                
+            }
+        }
     }
 
     public String getProperty(String key) {
