@@ -69,8 +69,8 @@ public class DevStoneProperties {
             //getLiStandardProperties();
             //getHiStandardProperties();
             //getHoStandardProperties();
-            //getHoMemStandardProperties();
-            getHoModStandardProperties();
+            getHoMemStandardProperties();
+            //getHoModStandardProperties();
         }
     }
 
@@ -170,9 +170,9 @@ public class DevStoneProperties {
         properties.setProperty(BENCHMARK_NAME, BenchMarkType.HOmem.toString());
         properties.setProperty(PREPARATION_TIME, "0.0");
         properties.setProperty(GENERATOR_PERIOD, "1");
-        properties.setProperty(GENERATOR_MAX_EVENTS, "1:1:3");
-        properties.setProperty(WIDTH, "2:1:6");
-        properties.setProperty(DEPTH, "2:1:6");
+        properties.setProperty(GENERATOR_MAX_EVENTS, "1:1:2");
+        properties.setProperty(WIDTH, "2:1:3");
+        properties.setProperty(DEPTH, "7000:1:8000");
         properties.setProperty(INT_DELAY_TIME, "0.0");
         properties.setProperty(EXT_DELAY_TIME, "0.0");
         properties.setProperty(NUM_TRIALS, "1");
