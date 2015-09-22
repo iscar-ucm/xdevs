@@ -18,6 +18,7 @@
  *
  * Contributors:
  *  - José Luis Risco Martín
+ * 
  */
 package xdevs.core.atomic.sinks;
 
