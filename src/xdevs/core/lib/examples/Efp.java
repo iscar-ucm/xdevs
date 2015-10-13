@@ -62,6 +62,7 @@ public class Efp extends Coupled {
         Coordinator coordinator = new Coordinator(efp);
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
     }
   
 }

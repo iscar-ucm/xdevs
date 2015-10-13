@@ -31,6 +31,8 @@ import xdevs.core.modeling.api.ComponentInterface;
 public interface SimulatorInterface {
 
     public void initialize();
+    
+    public void exit();
 
     public double ta();
 

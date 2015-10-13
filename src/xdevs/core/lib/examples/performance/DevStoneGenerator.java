@@ -52,6 +52,10 @@ public class DevStoneGenerator extends Atomic {
     }
 
     @Override
+    public void exit() {
+    }
+
+    @Override
     public void deltint() {
         counter++;
         if (counter > maxEvents) {

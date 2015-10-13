@@ -105,6 +105,13 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
     }
 
     @Override
+    public void exit() {
+        for (SimulatorInterface simulator : simulators) {
+            simulator.exit();
+        }
+    }
+
+    @Override
     public Collection<SimulatorInterface> getSimulators() {
         return simulators;
     }
@@ -243,6 +250,7 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
         Coordinator coordinator = new Coordinator(efp);
         coordinator.initialize();
         coordinator.simulate(600.0);
+        coordinator.exit();
     }
 
 }

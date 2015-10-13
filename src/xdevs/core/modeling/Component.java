@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import xdevs.core.modeling.api.ComponentInterface;
-import xdevs.core.modeling.api.CoupledInterface;
 
 /**
  * @author smittal
@@ -46,6 +45,7 @@ public abstract class Component extends Entity implements ComponentInterface {
 		super(name);
 	}
 
+        @Override
 	public boolean isInputEmpty() {
 		for (InPort<?> port : inPorts) {
 			if (!port.isEmpty()) {
@@ -55,20 +55,24 @@ public abstract class Component extends Entity implements ComponentInterface {
 		return true;
 	}
 
+        @Override
 	public void addInPort(InPort<?> port) {
 		inPorts.add(port);
 		port.parent = this;
 	}
 
+        @Override
 	public Collection<InPort<?>> getInPorts() {
 		return inPorts;
 	}
 
+        @Override
 	public void addOutPort(OutPort<?> port) {
 		outPorts.add(port);
 		port.parent = this;
 	}
 
+        @Override
 	public Collection<OutPort<?>> getOutPorts() {
 		return outPorts;
 	}

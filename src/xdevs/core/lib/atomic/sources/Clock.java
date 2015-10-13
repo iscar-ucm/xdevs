@@ -62,8 +62,13 @@ public class Clock extends Atomic {
         this(name, 1, 1);
     }
     
+    @Override
     public void initialize() {
         super.activate();    	
+    }
+
+    @Override
+    public void exit() {
     }
 
     @Override
@@ -100,6 +105,8 @@ public class Clock extends Atomic {
         clockExample.addComponent(console);
         clockExample.addCoupling(clock, clock.oClk, console, console.iIn);
         Coordinator coordinator = new Coordinator(clockExample);
+        coordinator.initialize();
         coordinator.simulate(30.0);
+        coordinator.exit();
     }
 }

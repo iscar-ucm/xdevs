@@ -48,8 +48,13 @@ public class Ramp extends Atomic {
         this.sampleTime = sampleTime;
     }
     
+    @Override
     public void initialize() {
         super.holdIn("initialOutput", 0.0);    	
+    }
+
+    @Override
+    public void exit() {
     }
 
     @Override
@@ -79,6 +84,8 @@ public class Ramp extends Atomic {
         example.addComponent(console);
         example.addCoupling(ramp, ramp.portOut, console, console.iIn);
         Coordinator coordinator = new Coordinator(example);
+        coordinator.initialize();
         coordinator.simulate(30.0);
+        coordinator.exit();
     }
 }

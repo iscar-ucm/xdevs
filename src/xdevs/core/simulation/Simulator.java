@@ -48,6 +48,11 @@ public class Simulator extends AbstractSimulator {
         tL = clock.getTime();
         tN = tL + model.ta();
     }
+    
+    @Override
+    public void exit() {
+        model.exit();
+    }
 
     @Override
     public double ta() {

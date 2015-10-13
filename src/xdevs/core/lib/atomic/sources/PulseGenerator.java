@@ -48,8 +48,13 @@ public class PulseGenerator extends Atomic {
         this.phaseDelay = phaseDelay;
     }
     
+    @Override
     public void initialize() {
         super.holdIn("delay", 0);    	
+    }
+
+    @Override
+    public void exit() {
     }
 
     @Override
@@ -86,6 +91,8 @@ public class PulseGenerator extends Atomic {
         pulseExample.addComponent(console);
         pulseExample.addCoupling(pulse, pulse.portOut, console, console.iIn);
         Coordinator coordinator = new Coordinator(pulseExample);
+        coordinator.initialize();
         coordinator.simulate(30.0);
+        coordinator.exit();
     }
 }

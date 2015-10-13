@@ -139,6 +139,7 @@ public class CoordinatorProfile extends SimulatorProfile implements CoordinatorI
         CoordinatorProfile coordinator = new CoordinatorProfile(new Coordinator(efp, false));
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
         System.out.println(coordinator.getStats());
     }
 

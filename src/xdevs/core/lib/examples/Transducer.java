@@ -66,6 +66,10 @@ public class Transducer extends Atomic {
     }
 
     @Override
+    public void exit() {
+    }
+
+    @Override
     public void deltint() {
         clock = clock + getSigma();
         double throughput;

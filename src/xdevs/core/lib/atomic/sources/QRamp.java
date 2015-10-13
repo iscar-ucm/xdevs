@@ -48,8 +48,13 @@ public class QRamp extends Atomic {
         this.qOutput = qOutput;
     }
     
+    @Override
     public void initialize() {
         super.holdIn("initialOutput", 0.0);    	
+    }
+
+    @Override
+    public void exit() {
     }
 
     @Override
@@ -80,6 +85,8 @@ public class QRamp extends Atomic {
         example.addComponent(console);
         example.addCoupling(qramp, qramp.portOut, console, console.iIn);
         Coordinator coordinator = new Coordinator(example);
+        coordinator.initialize();
         coordinator.simulate(30.0);
+        coordinator.exit();
     }
 }

@@ -53,6 +53,9 @@ public class Coupled extends Component implements CoupledInterface {
     public void initialize() {
     }
 
+    public void exit() {
+    }
+
     @Override
     public ComponentInterface getParent() {
         return parent;

@@ -42,15 +42,21 @@ public class Console extends Atomic {
     /**
      * Console atomic model.
      *
+     * @param name Name of the atomic model
      */
     public Console(String name) {
     	super(name);
         super.addInPort(iIn);
     }
     
+    @Override
     public void initialize() {
         this.time = 0.0;
     	super.passivate();
+    }
+    
+    @Override
+    public void exit() {        
     }
     
     @Override

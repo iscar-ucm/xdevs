@@ -67,6 +67,10 @@ public class DevStoneAtomic extends Atomic {
     }
     
     @Override
+    public void exit() {
+    }
+
+    @Override
     public void deltint() {
         NUM_DELT_INTS++;
         outValues.clear();

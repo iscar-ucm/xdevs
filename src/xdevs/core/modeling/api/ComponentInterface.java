@@ -47,4 +47,6 @@ public interface ComponentInterface extends EntityInterface {
     public void setParent(ComponentInterface parent);
 
     public void initialize();
+    
+    public void exit();
 }

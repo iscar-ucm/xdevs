@@ -33,7 +33,7 @@ import xdevs.core.simulation.Coordinator;
  */
 public class Step extends Atomic {
 
-    public OutPort<Double> portOut = new OutPort<Double>("portOut");
+    public OutPort<Double> portOut = new OutPort<>("portOut");
     protected double initialValue;
     protected double stepTime;
     protected double finalValue;
@@ -46,8 +46,13 @@ public class Step extends Atomic {
         this.finalValue = finalValue;
     }
     
+    @Override
     public void initialize() {
         super.holdIn("initialValue", 0.0);    	
+    }
+
+    @Override
+    public void exit() {
     }
 
     @Override
@@ -80,6 +85,8 @@ public class Step extends Atomic {
         stepExample.addComponent(console);
         stepExample.addCoupling(step, step.portOut, console, console.iIn);
         Coordinator coordinator = new Coordinator(stepExample);
+        coordinator.initialize();
         coordinator.simulate(30.0);
+        coordinator.exit();
     }
 }

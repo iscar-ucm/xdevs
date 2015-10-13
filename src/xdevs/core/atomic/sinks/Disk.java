@@ -22,6 +22,7 @@
 package xdevs.core.atomic.sinks;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -47,22 +48,34 @@ public class Disk extends Atomic {
     /**
      * Disk atomic model.
      *
+     * @param name
      * @param fileName name of the file (complete path)
      */
     public Disk(String name, String fileName) {
-    	super(name);
+        super(name);
         super.addInPort(iIn);
         try {
-            file = new BufferedWriter(new FileWriter(fileName));
+            file = new BufferedWriter(new FileWriter(new File (fileName)));
         } catch (IOException e) {
             logger.severe(e.getLocalizedMessage());
         }
     }
-    
+
+    @Override
     public void initialize() {
         this.time = 0.0;
-        super.passivate();    	
+        super.passivate();
     }
+
+    @Override
+    public void exit() {
+        try {
+            file.flush();
+            file.close();
+        } catch (IOException ee) {
+            logger.severe(ee.getLocalizedMessage());
+        }
+    }    
 
     @Override
     public void deltint() {
@@ -93,15 +106,4 @@ public class Disk extends Atomic {
     public void lambda() {
     }
 
-    @Override
-    public void finalize() throws Throwable {
-        try {
-            file.flush();
-            file.close();
-        } catch (IOException ee) {
-            logger.severe(ee.getLocalizedMessage());
-        } finally {
-            super.finalize();
-        }
-    }
 }
