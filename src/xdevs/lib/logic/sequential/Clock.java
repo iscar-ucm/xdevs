@@ -19,7 +19,7 @@
  * Contributors:
  *  - José Luis Risco Martín
  */
-package xdevs.core.lib.atomic.sources;
+package xdevs.lib.logic.sequential;
 
 import xdevs.core.atomic.sinks.Console;
 import xdevs.core.modeling.Atomic;
@@ -29,7 +29,13 @@ import xdevs.core.modeling.OutPort;
 import xdevs.core.simulation.Coordinator;
 
 /**
- *
+ * Generate clock signal for logic systems.
+ * 
+ * The Clock block generates a clock signal for logic systems. The Clock block 
+ * outputs 1 for the first half of the specified sample period and 0 for the 
+ * other half of the sample period. You can use the Clock block to control 
+ * the execution of the D Flip-Flop, and other enabled and triggered subsystems.
+ * 
  * @author José Luis Risco Martín
  */
 public class Clock extends Atomic {
@@ -41,6 +47,14 @@ public class Clock extends Atomic {
     protected int nextValue;
     protected long count;
 
+    /**
+     * 
+     * @param name Name of the component
+     * @param period Specify the sample period. By default, the Clock block outputs 
+     * 1 for the first half of the sample period.
+     * @param initialValue Determines the first output of the clock. If initialValue == 0,
+     * the first output is 0. If initialValue != 0, the first output is 1.
+     */
     public Clock(String name, double period, int initialValue) {
     	super(name);
         super.addInPort(iStop);
@@ -59,9 +73,13 @@ public class Clock extends Atomic {
     }
 
     public Clock(String name) {
-        this(name, 1, 1);
+        this(name, 1);
     }
     
+    public Clock() {
+        this(Clock.class.getName());
+    }
+
     @Override
     public void initialize() {
         super.activate();    	
