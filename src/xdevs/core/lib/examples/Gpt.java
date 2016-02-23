@@ -25,6 +25,8 @@ import java.util.logging.Level;
 
 import xdevs.core.modeling.Coupled;
 import xdevs.core.simulation.Coordinator;
+import xdevs.core.simulation.parallel.CoordinatorParallel;
+import xdevs.core.simulation.realtime.RTCentralCoordinator;
 import xdevs.core.util.DevsLogger;
 
 /**
@@ -53,6 +55,7 @@ public class Gpt extends Coupled {
         Gpt gpt = new Gpt("gpt", 1, 100);
         //CoordinatorParallel coordinator = new CoordinatorParallel(gpt);
         Coordinator coordinator = new Coordinator(gpt);
+        //RTCentralCoordinator coordinator = new RTCentralCoordinator(gpt);
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
     }

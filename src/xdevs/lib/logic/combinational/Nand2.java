@@ -25,37 +25,34 @@ import xdevs.core.modeling.InPort;
 import xdevs.core.modeling.OutPort;
 
 /**
- * @author José Luis Risco Martín
+ *
+ * @author jlrisco
  */
-public class Nand3 { //extends Atomic {
+public class Nand2 extends Atomic {
 
-   /* public InPort<Integer> iIn0 = new InPort<>("iIn0");
-    public InPort<Integer> iIn1 = new InPort<>("iIn1");
-    public InPort<Integer> iIn2 = new InPort<>("iIn2");
+    public InPort<Integer> iIn0 = new InPort<>("In0");
+    public InPort<Integer> iIn1 = new InPort<>("In1");
     public OutPort<Integer> oOut = new OutPort<>("Out");
 
+    protected double delay;
+    protected Integer valueToOut = null;
     protected Integer valueAtIn0 = null;
     protected Integer valueAtIn1 = null;
-    protected Integer valueAtIn2 = null;
-    protected Integer valueToOut = null;
 
-    protected double delay;
-
-    public Nand3(String name, double delay) {
+    public Nand2(String name, double delay) {
         super(name);
         super.addInPort(iIn0);
         super.addInPort(iIn1);
-        super.addInPort(iIn2);
         super.addOutPort(oOut);
         this.delay = delay;
     }
 
-    public Nand3(String name) {
+    public Nand2(String name) {
         this(name, 0);
     }
 
-    public Nand3() {
-        this(Nand3.class.getName());
+    public Nand2() {
+        super(Nand2.class.getName());
     }
 
     @Override
@@ -74,7 +71,6 @@ public class Nand3 { //extends Atomic {
 
     @Override
     public void deltext(double e) {
-        // Primero procesamos los valores de las entradas.
         Integer tempValueAtIn0 = iIn0.getSingleValue();
         if (tempValueAtIn0 != null && !tempValueAtIn0.equals(valueAtIn0)) {
             valueAtIn0 = tempValueAtIn0;
@@ -85,7 +81,6 @@ public class Nand3 { //extends Atomic {
             valueAtIn1 = tempValueAtIn1;
             super.holdIn("active", delay);
         }
-
         if (super.phaseIs("active") && valueAtIn0 != null && valueAtIn1 != null) {
             valueToOut = valueAtIn0 & valueAtIn1;
         }
@@ -94,5 +89,5 @@ public class Nand3 { //extends Atomic {
     @Override
     public void lambda() {
         oOut.addValue(valueToOut);
-    }*/
+    }
 }
