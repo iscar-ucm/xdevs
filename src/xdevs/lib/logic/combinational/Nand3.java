@@ -27,9 +27,9 @@ import xdevs.core.modeling.OutPort;
 /**
  * @author José Luis Risco Martín
  */
-public class Nand3 { //extends Atomic {
+public class Nand3 extends Atomic {
 
-   /* public InPort<Integer> iIn0 = new InPort<>("iIn0");
+    public InPort<Integer> iIn0 = new InPort<>("iIn0");
     public InPort<Integer> iIn1 = new InPort<>("iIn1");
     public InPort<Integer> iIn2 = new InPort<>("iIn2");
     public OutPort<Integer> oOut = new OutPort<>("Out");
@@ -94,5 +94,5 @@ public class Nand3 { //extends Atomic {
     @Override
     public void lambda() {
         oOut.addValue(valueToOut);
-    }*/
+    }
 }
