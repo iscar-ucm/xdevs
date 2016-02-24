@@ -22,7 +22,6 @@ package xdevs.lib.general.sources;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,8 +46,7 @@ public class StimulusFile extends Atomic {
 
     private static final Logger logger = Logger.getLogger(StimulusFile.class.getName());
     protected HashMap<String, OutPort> myOutPorts = new HashMap<>();
-    
-    
+
     protected BufferedReader stimulusFile;
     protected Event currentEvent = null;
     protected Event nextEvent = null;
@@ -59,12 +57,15 @@ public class StimulusFile extends Atomic {
         try {
             stimulusFile = new BufferedReader(new FileReader(new File(stimulusFilePath)));
             // First we read all the output ports
-            String portName = stimulusFile.readLine();
-            while (portName != null && !portName.startsWith("#") && !portName.contains(";")) {
-                portName = stimulusFile.readLine();
-                OutPort<Double> port = new OutPort<>(portName);
-                super.addOutPort(port);
-                myOutPorts.put(portName, port);
+            String portName;
+            while ((portName = stimulusFile.readLine()) != null) {
+                if (portName.startsWith("# END PORTS")) {
+                    break;
+                } else if (!portName.startsWith("#")) {
+                    OutPort<Number> port = new OutPort<>(portName);
+                    super.addOutPort(port);
+                    myOutPorts.put(portName, port);
+                }
             }
         } catch (IOException ex) {
             stimulusFile = null;
@@ -78,7 +79,7 @@ public class StimulusFile extends Atomic {
         if (currentEvent != null) {
             events.add(currentEvent);
             nextEvent = readNextEvent();
-            while(nextEvent!=null && !(nextEvent.time>currentEvent.time)) {
+            while (nextEvent != null && !(nextEvent.time > currentEvent.time)) {
                 events.add(nextEvent);
                 nextEvent = readNextEvent();
             }
@@ -105,7 +106,7 @@ public class StimulusFile extends Atomic {
             events.add(nextEvent);
             currentEvent = nextEvent;
             nextEvent = readNextEvent();
-            while(nextEvent!=null && !(nextEvent.time>currentEvent.time)) {
+            while (nextEvent != null && !(nextEvent.time > currentEvent.time)) {
                 events.add(nextEvent);
                 nextEvent = readNextEvent();
             }
@@ -114,16 +115,21 @@ public class StimulusFile extends Atomic {
             super.passivate();
         }
     }
-    
+
     @Override
-    public void deltext(double e) {        
+    public void deltext(double e) {
     }
-    
+
     @Override
     public void lambda() {
-        for(Event event : events) {
+        for (Event event : events) {
             myOutPorts.get(event.portName).addValue(event.value);
         }
+    }
+
+    public OutPort<Number> getPortByName(String portName) {
+        OutPort<Number> port = myOutPorts.get(portName);
+        return port;
     }
 
     private Event readNextEvent() {

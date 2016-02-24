@@ -70,10 +70,12 @@ public class Console extends Atomic {
         if (iIn.isEmpty()) {
             return;
         }
+        System.out.print(name);
+        System.out.print("::");
         System.out.print(time);
         Collection<Object> values = iIn.getValues();
         for (Object value : values) {
-            System.out.print("\t");
+            System.out.print(":");
             System.out.print(value.toString());
         }
         System.out.println("");

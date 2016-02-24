@@ -114,17 +114,17 @@ public class IC7410 extends Atomic {
 
     @Override
     public void deltext(double e) {
-        Integer tempValueAtPin1 = iPin1.getSingleValue();
-        Integer tempValueAtPin2 = iPin2.getSingleValue();
-        Integer tempValueAtPin3 = iPin3.getSingleValue();
-        Integer tempValueAtPin4 = iPin4.getSingleValue();
-        Integer tempValueAtPin5 = iPin5.getSingleValue();
-        Integer tempValueAtPin7 = iPin7.getSingleValue();
-        Integer tempValueAtPin9 = iPin9.getSingleValue();
-        Integer tempValueAtPin10 = iPin10.getSingleValue();
-        Integer tempValueAtPin11 = iPin11.getSingleValue();
-        Integer tempValueAtPin13 = iPin13.getSingleValue();
-        Integer tempValueAtPin14 = iPin14.getSingleValue();
+        Integer tempValueAtPin1 = (iPin1.isEmpty())? null : iPin1.getSingleValue();
+        Integer tempValueAtPin2 = (iPin2.isEmpty())? null : iPin2.getSingleValue();
+        Integer tempValueAtPin3 = (iPin3.isEmpty())? null : iPin3.getSingleValue();
+        Integer tempValueAtPin4 = (iPin4.isEmpty())? null : iPin4.getSingleValue();
+        Integer tempValueAtPin5 = (iPin5.isEmpty())? null : iPin5.getSingleValue();
+        Integer tempValueAtPin7 = (iPin7.isEmpty())? null : iPin7.getSingleValue();
+        Integer tempValueAtPin9 = (iPin9.isEmpty())? null : iPin9.getSingleValue();
+        Integer tempValueAtPin10 = (iPin10.isEmpty())? null : iPin10.getSingleValue();
+        Integer tempValueAtPin11 = (iPin11.isEmpty())? null : iPin11.getSingleValue();
+        Integer tempValueAtPin13 = (iPin13.isEmpty())? null : iPin13.getSingleValue();
+        Integer tempValueAtPin14 = (iPin14.isEmpty())? null : iPin14.getSingleValue();
         if (tempValueAtPin7 != null && !tempValueAtPin7.equals(valueAtPin7)) {
             valueAtPin7 = tempValueAtPin7;
         }

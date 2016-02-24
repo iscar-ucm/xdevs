@@ -25,8 +25,6 @@ import java.util.logging.Level;
 
 import xdevs.core.modeling.Coupled;
 import xdevs.core.simulation.Coordinator;
-import xdevs.core.simulation.parallel.CoordinatorParallel;
-import xdevs.core.simulation.realtime.RTCentralCoordinator;
 import xdevs.core.util.DevsLogger;
 
 /**
@@ -38,16 +36,16 @@ public class Gpt extends Coupled {
     public Gpt(String name, double period, double observationTime) {
     	super(name);
         Generator generator = new Generator("generator", period);
-        addComponent(generator);
+        super.addComponent(generator);
         Processor processor = new Processor("processor", 3*period);
-        addComponent(processor);
+        super.addComponent(processor);
         Transducer transducer = new Transducer("transducer", observationTime);
-        addComponent(transducer);
+        super.addComponent(transducer);
 
-        addCoupling(generator, generator.oOut, processor, processor.iIn);
-        addCoupling(generator, generator.oOut, transducer, transducer.iArrived);
-        addCoupling(processor, processor.oOut, transducer, transducer.iSolved);
-        addCoupling(transducer, transducer.oOut, generator, generator.iStop);
+        super.addCoupling(generator, generator.oOut, processor, processor.iIn);
+        super.addCoupling(generator, generator.oOut, transducer, transducer.iArrived);
+        super.addCoupling(processor, processor.oOut, transducer, transducer.iSolved);
+        super.addCoupling(transducer, transducer.oOut, generator, generator.iStop);
     }
 
     public static void main(String args[]) {

@@ -26,26 +26,26 @@ import xdevs.core.modeling.OutPort;
 /**
  *
  * @author jlrisco
- */
-public class Constant extends Atomic {
+  */
+public class Constant<E extends Number> extends Atomic {
 
-    public OutPort<Double> oOut = new OutPort<>("out");
+    public OutPort<E> oOut = new OutPort<>("out");
 
-    protected double valueToOut;
+    protected E valueToOut;
     protected double stepTime;
 
-    public Constant(String name, double value, double stepTime) {
+    public Constant(String name, E value, double stepTime) {
         super(name);
         super.addOutPort(oOut);
         this.valueToOut = value;
         this.stepTime = stepTime;
     }
 
-    public Constant(String name, double value) {
+    public Constant(String name, E value) {
         this(name, value, 0);
     }
 
-    public Constant(double value) {
+    public Constant(E value) {
         this(Constant.class.getName(), value, 0);
     }
 
