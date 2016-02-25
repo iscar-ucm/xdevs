@@ -19,21 +19,14 @@
  * Contributors:
  *  - José Luis Risco Martín
  */
-package xdevs.core.lib.examples;
-
-import xdevs.core.modeling.Entity;
+package xdevs.core.util;
 
 /**
- *
- * @author jlrisco
+ * 
+ * @author José Luis Risco Martín
  */
-public class Job extends Entity{
-
-  protected String id;
-  protected double time;
-
-  public Job(String name) {
-    this.id = name;
-    this.time = 0.0;
-  }
+public class Constants {
+    public static final double INFINITY = Double.POSITIVE_INFINITY;
+    public static final String PHASE_PASSIVE = "passive";
+    public static final String PHASE_ACTIVE = "active";
 }

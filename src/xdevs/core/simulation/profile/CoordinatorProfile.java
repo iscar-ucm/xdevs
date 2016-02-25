@@ -26,11 +26,11 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.logging.Level;
 
-import xdevs.core.lib.examples.Efp;
 import xdevs.core.modeling.InPort;
 import xdevs.core.simulation.Coordinator;
 import xdevs.core.simulation.api.CoordinatorInterface;
 import xdevs.core.simulation.api.SimulatorInterface;
+import xdevs.core.test.efp.Efp;
 import xdevs.core.util.DevsLogger;
 
 /**

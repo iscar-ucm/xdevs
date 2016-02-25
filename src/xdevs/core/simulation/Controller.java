@@ -25,7 +25,7 @@ package xdevs.core.simulation;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import xdevs.core.Constants;
+import xdevs.core.util.Constants;
 import xdevs.core.modeling.InPort;
 import xdevs.core.simulation.api.ControllerInterface;
 import xdevs.core.simulation.api.CoordinatorInterface;

@@ -27,12 +27,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import xdevs.core.lib.examples.Efp;
 
 import xdevs.core.modeling.Coupled;
 import xdevs.core.simulation.Coordinator;
 import xdevs.core.simulation.api.SimulatorInterface;
 import xdevs.core.simulation.api.SimulationClock;
+import xdevs.core.test.efp.Efp;
 import xdevs.core.util.DevsLogger;
 
 /**

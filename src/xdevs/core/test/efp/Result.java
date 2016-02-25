@@ -19,7 +19,7 @@
  * Contributors:
  *  - José Luis Risco Martín
  */
-package xdevs.core.lib.examples;
+package xdevs.core.test.efp;
 
 import xdevs.core.modeling.Entity;
 

@@ -19,43 +19,50 @@
  * Contributors:
  *  - José Luis Risco Martín
  */
-package xdevs.core.lib.examples;
+package xdevs.core.test.efp;
 
 import java.util.logging.Level;
 
 import xdevs.core.modeling.Coupled;
+import xdevs.core.modeling.InPort;
+import xdevs.core.modeling.OutPort;
 import xdevs.core.simulation.Coordinator;
 import xdevs.core.util.DevsLogger;
+
+
 
 /**
  *
  * @author jlrisco
  */
-public class Gpt extends Coupled {
+public class Efp extends Coupled {
+	
+	protected InPort<Job> iStart = new InPort<>("iStart");
+	protected OutPort<Result> oResult = new OutPort<>("oResult");
 
-    public Gpt(String name, double period, double observationTime) {
+    public Efp(String name, double generatorPeriod, double processorPeriod, double transducerPeriod) {
     	super(name);
-        Generator generator = new Generator("generator", period);
-        super.addComponent(generator);
-        Processor processor = new Processor("processor", 3*period);
-        super.addComponent(processor);
-        Transducer transducer = new Transducer("transducer", observationTime);
-        super.addComponent(transducer);
-
-        super.addCoupling(generator, generator.oOut, processor, processor.iIn);
-        super.addCoupling(generator, generator.oOut, transducer, transducer.iArrived);
-        super.addCoupling(processor, processor.oOut, transducer, transducer.iSolved);
-        super.addCoupling(transducer, transducer.oOut, generator, generator.iStop);
+    	addInPort(iStart);
+    	addOutPort(oResult);
+    	
+        Ef ef = new Ef("ef", generatorPeriod, transducerPeriod);
+        addComponent(ef);
+        Processor processor = new Processor("processor", processorPeriod);
+        addComponent(processor);
+        
+        addCoupling(ef.oOut, processor.iIn);
+        addCoupling(processor.oOut, ef.iIn);
+        addCoupling(this.iStart, ef.iStart);
+        addCoupling(ef.oOut, this.oResult);
     }
 
     public static void main(String args[]) {
         DevsLogger.setup(Level.FINE);
-        Gpt gpt = new Gpt("gpt", 1, 100);
-        //CoordinatorParallel coordinator = new CoordinatorParallel(gpt);
-        Coordinator coordinator = new Coordinator(gpt);
-        //RTCentralCoordinator coordinator = new RTCentralCoordinator(gpt);
+        Efp efp = new Efp("efp", 1, 3, 1000);
+        Coordinator coordinator = new Coordinator(efp);
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
     }
-
+  
 }

@@ -19,7 +19,7 @@
  * Contributors:
  *  - José Luis Risco Martín
  */
-package xdevs.core.lib.examples;
+package xdevs.core.test.efp;
 
 import java.util.LinkedList;
 import java.util.logging.Logger;

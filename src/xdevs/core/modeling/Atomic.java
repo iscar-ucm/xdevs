@@ -21,7 +21,7 @@
  */
 package xdevs.core.modeling;
 
-import xdevs.core.Constants;
+import xdevs.core.util.Constants;
 import xdevs.core.modeling.api.AtomicInterface;
 
 /**

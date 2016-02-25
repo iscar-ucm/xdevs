@@ -19,36 +19,37 @@
  * Contributors:
  *  - José Luis Risco Martín
  */
-package xdevs.core.lib.examples.performance;
+package xdevs.core.test.efp;
 
 import xdevs.core.modeling.Atomic;
+import xdevs.core.modeling.InPort;
 import xdevs.core.modeling.OutPort;
 
 /**
- * Events generator for the DEVStone benchmark
  *
- * @author José Luis Risco Martín
+ * @author José Luis Risco Martín TODO: I must also modify this class, according
+ * to the source code implemented by Saurabh, a iStart input port must be added.
  */
-public class DevStoneGenerator extends Atomic {
+public class Generator extends Atomic {
 
-    public OutPort<Integer> oOut = new OutPort<>("out");
-    protected double preparationTime;
+    protected InPort<Job> iStart = new InPort<>("iStart");
+    protected InPort<Job> iStop = new InPort<>("iStop");
+    protected OutPort<Job> oOut = new OutPort<>("oOut");
+    protected int jobCounter;
     protected double period;
-    protected int counter = 1;
-    protected int maxEvents = Integer.MAX_VALUE;
 
-    public DevStoneGenerator(String name, DevStoneProperties properties, int maxEvents) {
+    public Generator(String name, double period) {
         super(name);
+        super.addInPort(iStop);
+        super.addInPort(iStart);
         super.addOutPort(oOut);
-        this.preparationTime = properties.getPropertyAsDouble(DevStoneProperties.PREPARATION_TIME);
-        this.period = properties.getPropertyAsDouble(DevStoneProperties.GENERATOR_PERIOD);
-        this.maxEvents = maxEvents;
+        this.period = period;
     }
 
     @Override
     public void initialize() {
-        counter = 1;
-        this.holdIn("active", preparationTime);
+        jobCounter = 1;
+        this.holdIn("active", period);
     }
 
     @Override
@@ -57,12 +58,8 @@ public class DevStoneGenerator extends Atomic {
 
     @Override
     public void deltint() {
-        counter++;
-        if (counter > maxEvents) {
-            super.passivate();
-        } else {
-            this.holdIn("active", period);
-        }
+        jobCounter++;
+        this.holdIn("active", period);
     }
 
     @Override
@@ -72,6 +69,7 @@ public class DevStoneGenerator extends Atomic {
 
     @Override
     public void lambda() {
-        oOut.addValue(counter);
+        Job job = new Job("" + jobCounter + "");
+        oOut.addValue(job);
     }
 }
