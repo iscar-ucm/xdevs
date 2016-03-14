@@ -21,8 +21,8 @@
  */
 package xdevs.core.modeling;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import xdevs.core.modeling.api.ComponentInterface;
 
@@ -34,8 +34,8 @@ public abstract class Component extends Entity implements ComponentInterface {
 
 	// Component attributes
 	protected ComponentInterface parent = null;
-	protected LinkedList<InPort<?>> inPorts = new LinkedList<>();
-	protected LinkedList<OutPort<?>> outPorts = new LinkedList<>();
+	protected ArrayList<InPort<?>> inPorts = new ArrayList<>();
+	protected ArrayList<OutPort<?>> outPorts = new ArrayList<>();
 
 	public Component(){
 		this(Component.class.getSimpleName());

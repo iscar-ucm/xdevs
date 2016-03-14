@@ -53,6 +53,7 @@ public class Coupled extends Component implements CoupledInterface {
     public void initialize() {
     }
 
+    @Override
     public void exit() {
     }
 
@@ -67,9 +68,34 @@ public class Coupled extends Component implements CoupledInterface {
     }
 
     /**
+     * This method add a connection to the DEVS component.
+     * @param cFrom Component at the beginning of the connection
+     * @param oPortIndex Index of the source port in cFrom, starting at 0
+     * @param cTo Component at the end of the connection
+     * @param iPortIndex Index of the destination port in cTo, starting at 0
+     */
+    public void addCoupling(Component cFrom, int oPortIndex, Component cTo, int iPortIndex) {
+        if (cFrom == this) { // EIC
+            Port portFrom = cFrom.inPorts.get(oPortIndex);
+            Port portTo = cTo.inPorts.get(iPortIndex);
+            Coupling coupling = new Coupling(portFrom, portTo);
+            eic.add(coupling);
+        } else if (cTo == this) { // EOC
+            Port portFrom = cFrom.outPorts.get(oPortIndex);
+            Port portTo = cTo.outPorts.get(iPortIndex);
+            Coupling coupling = new Coupling(portFrom, portTo);
+            eoc.add(coupling);
+        } else { // IC
+            Port portFrom = cFrom.outPorts.get(oPortIndex);
+            Port portTo = cTo.inPorts.get(iPortIndex);
+            Coupling coupling = new Coupling(portFrom, portTo);
+            ic.add(coupling);
+        }
+    }
+
+    /**
      * Coupled members	/** Coupled members
      */
-
     @Override
     public void addCoupling(ComponentInterface cFrom, PortInterface<?> pFrom, ComponentInterface cTo, PortInterface<?> pTo) {
         @SuppressWarnings({"rawtypes", "unchecked"})
@@ -139,7 +165,7 @@ public class Coupled extends Component implements CoupledInterface {
             return this;
         }
 
-		// Process if parent ...
+        // Process if parent ...
         // First, we store all the parent ports connected to input ports
         HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> leftBridgeEIC = createLeftBrige(((CoupledInterface) parent).getEIC());
         HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> leftBridgeIC = createLeftBrige(((CoupledInterface) parent).getIC());
