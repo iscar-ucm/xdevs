@@ -18,13 +18,11 @@
  *
  * Contributors:
  *  - José Luis Risco Martín <jlrisco@ucm.es>
- *  - Saurabh Mittal <smittal@duniptech.com>
- */
+  */
 package xdevs.core.simulation.parallel;
 
 import java.util.concurrent.Callable;
-
-import xdevs.core.simulation.api.SimulatorInterface;
+import xdevs.core.simulation.AbstractSimulator;
 
 /**
  *
@@ -32,9 +30,9 @@ import xdevs.core.simulation.api.SimulatorInterface;
  */
 public class TaskDeltFcn implements Callable<Double> {
 
-    protected SimulatorInterface simulator;
+    protected AbstractSimulator simulator;
 
-    public TaskDeltFcn(SimulatorInterface simulator) {
+    public TaskDeltFcn(AbstractSimulator simulator) {
         this.simulator = simulator;
     }
 

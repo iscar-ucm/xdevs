@@ -17,17 +17,32 @@
  * http://www.gnu.org/licenses/
  *
  * Contributors:
- *  - José Luis Risco Martín
+ *  - José Luis Risco Martín <jlrisco@ucm.es>
+ *  - Saurabh Mittal <smittal@duniptech.com>
  */
-package xdevs.core.modeling;
+package xdevs.core.simulation;
 
 /**
  *
- * @author José L. Risco-Martín and Saurabh Mittal
+ * @author jlrisco
  */
-public class InPort<E> extends Port<E> {
+public class SimulationClock {
 
-    public InPort(String name) {
-        super(name);
+    protected double time;
+
+    public SimulationClock(double time) {
+        this.time = time;
+    }
+
+    public SimulationClock() {
+        this(0);
+    }
+
+    public double getTime() {
+        return time;
+    }
+    
+    public void setTime(double time) {
+        this.time = time;
     }
 }

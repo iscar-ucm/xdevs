@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 import xdevs.core.util.Constants;
 import xdevs.core.modeling.Coupled;
-import xdevs.core.simulation.api.SimulationClock;
+import xdevs.core.simulation.SimulationClock;
 import xdevs.core.simulation.parallel.CoordinatorParallel;
 import xdevs.core.test.efp.Efp;
 import xdevs.core.util.DevsLogger;

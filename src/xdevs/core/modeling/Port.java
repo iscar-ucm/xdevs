@@ -24,75 +24,49 @@ package xdevs.core.modeling;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import xdevs.core.modeling.api.ComponentInterface;
-import xdevs.core.modeling.api.PortInterface;
-
-/**
- * @author smittal
- *
- */
-public class Port<E> extends Entity implements PortInterface<E> {
-
-    protected ComponentInterface parent;
+public class Port<E> {
+    protected Component parent = null;
+    protected String name;
     protected LinkedList<E> values = new LinkedList<>();
 
     public Port(String name) {
-        super(name);
+        this.name = name;
     }
 
     public Port() {
-        this(PortInterface.class.getSimpleName());
+        this(Port.class.getSimpleName());
+    }
+    
+    public String getName() {
+        return name;
     }
 
-	// Entity members
-    @Override
-    public String toString() {
-        return getQualifiedName();
-    }
-
-	// Port members
-    @Override
     public void clear() {
-        //values = new LinkedList<>();
-        values.clear(); // <- What choice has a better performance?
+        values.clear();
     }
 
-    @Override
     public boolean isEmpty() {
         return values.isEmpty();
     }
 
-    @Override
     public E getSingleValue() {
         return values.element();
     }
 
-    @Override
     public Collection<E> getValues() {
         return values;
     }
 
-    @Override
     public void addValue(E value) {
         values.add(value);
     }
 
-    @Override
     public void addValues(Collection<E> values) {
         for(E value : values)
             this.values.add(value);
     }
 
-    @Override
-    public ComponentInterface getParent() {
+    public Component getParent() {
         return parent;
-    }
-
-    @Override
-    public String getQualifiedName() {
-        if (parent == null) {
-            return name;
-        }
-        return parent.getName() + "." + name;
     }
 }

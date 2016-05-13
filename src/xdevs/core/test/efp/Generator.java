@@ -22,8 +22,7 @@
 package xdevs.core.test.efp;
 
 import xdevs.core.modeling.Atomic;
-import xdevs.core.modeling.InPort;
-import xdevs.core.modeling.OutPort;
+import xdevs.core.modeling.Port;
 
 /**
  *
@@ -32,9 +31,9 @@ import xdevs.core.modeling.OutPort;
  */
 public class Generator extends Atomic {
 
-    protected InPort<Job> iStart = new InPort<>("iStart");
-    protected InPort<Job> iStop = new InPort<>("iStop");
-    protected OutPort<Job> oOut = new OutPort<>("oOut");
+    protected Port<Job> iStart = new Port<>("iStart");
+    protected Port<Job> iStop = new Port<>("iStop");
+    protected Port<Job> oOut = new Port<>("oOut");
     protected int jobCounter;
     protected double period;
 

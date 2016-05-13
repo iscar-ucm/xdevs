@@ -24,10 +24,8 @@ package xdevs.core.simulation;
 
 import java.util.Collection;
 
-import xdevs.core.modeling.InPort;
-import xdevs.core.modeling.OutPort;
-import xdevs.core.modeling.api.AtomicInterface;
-import xdevs.core.simulation.api.SimulationClock;
+import xdevs.core.modeling.Port;
+import xdevs.core.modeling.Atomic;
 
 /**
  *
@@ -35,9 +33,9 @@ import xdevs.core.simulation.api.SimulationClock;
  */
 public class Simulator extends AbstractSimulator {
 
-    protected AtomicInterface model;
+    protected Atomic model;
 
-    public Simulator(SimulationClock clock, AtomicInterface model) {
+    public Simulator(SimulationClock clock, Atomic model) {
         super(clock);
         this.model = model;
     }
@@ -89,20 +87,20 @@ public class Simulator extends AbstractSimulator {
 
     @Override
     public void clear() {
-        Collection<InPort<?>> inPorts;
+        Collection<Port<?>> inPorts;
         inPorts = model.getInPorts();
-        for (InPort<?> port : inPorts) {
+        for (Port<?> port : inPorts) {
             port.clear();
         }
-        Collection<OutPort<?>> outPorts;
+        Collection<Port<?>> outPorts;
         outPorts = model.getOutPorts();
-        for (OutPort<?> port : outPorts) {
+        for (Port<?> port : outPorts) {
             port.clear();
         }
     }
 
     @Override
-    public AtomicInterface getModel() {
+    public Atomic getModel() {
         return model;
     }
 

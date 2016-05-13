@@ -25,24 +25,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import xdevs.core.modeling.api.ComponentInterface;
-import xdevs.core.modeling.api.CoupledInterface;
-import xdevs.core.modeling.api.PortInterface;
-
 /**
  *
  * @author José Luis Risco Martín
  */
-public class Coupled extends Component implements CoupledInterface {
+public class Coupled extends Component {
 
     // Coupled attributes
-    protected LinkedList<ComponentInterface> components = new LinkedList<>();
+    protected LinkedList<Component> components = new LinkedList<>();
     protected LinkedList<Coupling<?>> ic = new LinkedList<>();
     protected LinkedList<Coupling<?>> eic = new LinkedList<>();
     protected LinkedList<Coupling<?>> eoc = new LinkedList<>();
 
     public Coupled(String name) {
-        this.name = name;
+        super(name);
     }
 
     public Coupled() {
@@ -58,12 +54,12 @@ public class Coupled extends Component implements CoupledInterface {
     }
 
     @Override
-    public ComponentInterface getParent() {
+    public Component getParent() {
         return parent;
     }
 
     @Override
-    public void setParent(ComponentInterface parent) {
+    public void setParent(Component parent) {
         this.parent = parent;
     }
 
@@ -94,10 +90,16 @@ public class Coupled extends Component implements CoupledInterface {
     }
 
     /**
-     * Coupled members	/** Coupled members
-     */
-    @Override
-    public void addCoupling(ComponentInterface cFrom, PortInterface<?> pFrom, ComponentInterface cTo, PortInterface<?> pTo) {
+     * @deprecated This method add a connection to the DEVS component. This
+     * method is deprecated because since the addition of the
+     * <code>parent</code> attribute, both components <code>cFrom</code> and
+     * <code>cTo</code> are no longer needed inside the Coupling class.
+     * @param cFrom Component at the beginning of the connection
+     * @param pFrom Port at the beginning of the connection
+     * @param cTo Component at the end of the connection
+     * @param pTo Port at the end of the connection
+     */    
+    public void addCoupling(Component cFrom, Port<?> pFrom, Component cTo, Port<?> pTo) {
         @SuppressWarnings({"rawtypes", "unchecked"})
         Coupling coupling = new Coupling(pFrom, pTo);
         // Add to connections
@@ -110,8 +112,13 @@ public class Coupled extends Component implements CoupledInterface {
         }
     }
 
-    @Override
-    public void addCoupling(PortInterface<?> pFrom, PortInterface<?> pTo) {
+   /**
+     * This member adds a connection between ports pFrom and pTo
+     *
+     * @param pFrom Port at the beginning of the connection
+     * @param pTo Port at the end of the connection
+     */
+    public void addCoupling(Port<?> pFrom, Port<?> pTo) {
         @SuppressWarnings({"rawtypes", "unchecked"})
         Coupling coupling = new Coupling(pFrom, pTo);
         // Add to connections
@@ -124,36 +131,33 @@ public class Coupled extends Component implements CoupledInterface {
         }
     }
 
-    @Override
-    public Collection<ComponentInterface> getComponents() {
+    public Collection<Component> getComponents() {
         return components;
     }
 
-    @Override
-    public void addComponent(ComponentInterface component) {
+    public void addComponent(Component component) {
         component.setParent(this);
         components.add(component);
     }
 
-    @Override
     public LinkedList<Coupling<?>> getIC() {
         return ic;
     }
 
-    @Override
     public LinkedList<Coupling<?>> getEIC() {
         return eic;
     }
 
-    @Override
     public LinkedList<Coupling<?>> getEOC() {
         return eoc;
     }
 
-    @Override
-    public CoupledInterface flatten() {
+    /**
+     * @return The new DEVS coupled model
+     */
+    public Coupled flatten() {
         for (int i = 0; i < components.size(); ++i) {
-            ComponentInterface component = components.get(i);
+            Component component = components.get(i);
             if (component instanceof Coupled) {
                 ((Coupled) component).flatten();
                 removePortsAndCouplings(component);
@@ -167,35 +171,35 @@ public class Coupled extends Component implements CoupledInterface {
 
         // Process if parent ...
         // First, we store all the parent ports connected to input ports
-        HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> leftBridgeEIC = createLeftBrige(((CoupledInterface) parent).getEIC());
-        HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> leftBridgeIC = createLeftBrige(((CoupledInterface) parent).getIC());
+        HashMap<Port<?>, LinkedList<Port<?>>> leftBridgeEIC = createLeftBrige(((Coupled) parent).getEIC());
+        HashMap<Port<?>, LinkedList<Port<?>>> leftBridgeIC = createLeftBrige(((Coupled) parent).getIC());
         // The same with the output ports
-        HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> rightBridgeEOC = createRightBrige(((CoupledInterface) parent).getEOC());
-        HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> rightBridgeIC = createRightBrige(((CoupledInterface) parent).getIC());
+        HashMap<Port<?>, LinkedList<Port<?>>> rightBridgeEOC = createRightBrige(((Coupled) parent).getEOC());
+        HashMap<Port<?>, LinkedList<Port<?>>> rightBridgeIC = createRightBrige(((Coupled) parent).getIC());
 
-        completeLeftBridge(eic, leftBridgeEIC, ((CoupledInterface) parent).getEIC());
-        completeLeftBridge(eic, leftBridgeIC, ((CoupledInterface) parent).getIC());
-        completeRightBridge(eoc, rightBridgeEOC, ((CoupledInterface) parent).getEOC());
-        completeRightBridge(eoc, rightBridgeIC, ((CoupledInterface) parent).getIC());
+        completeLeftBridge(eic, leftBridgeEIC, ((Coupled) parent).getEIC());
+        completeLeftBridge(eic, leftBridgeIC, ((Coupled) parent).getIC());
+        completeRightBridge(eoc, rightBridgeEOC, ((Coupled) parent).getEOC());
+        completeRightBridge(eoc, rightBridgeIC, ((Coupled) parent).getIC());
 
-        for (ComponentInterface component : components) {
-            ((CoupledInterface) parent).addComponent(component);
+        for (Component component : components) {
+            ((Coupled) parent).addComponent(component);
         }
 
         for (Coupling<?> cIC : ic) {
-            ((CoupledInterface) parent).getIC().add(cIC);
+            ((Coupled) parent).getIC().add(cIC);
         }
         return this;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void completeLeftBridge(LinkedList<Coupling<?>> couplings,
-            HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> leftBridge,
+            HashMap<Port<?>, LinkedList<Port<?>>> leftBridge,
             LinkedList<Coupling<?>> pCouplings) {
         for (Coupling<?> c : couplings) {
-            LinkedList<PortInterface<?>> list = leftBridge.get(c.portFrom);
+            LinkedList<Port<?>> list = leftBridge.get(c.portFrom);
             if (list != null) {
-                for (PortInterface<?> port : list) {
+                for (Port<?> port : list) {
                     pCouplings.add(new Coupling(port, c.portTo));
                 }
             }
@@ -204,24 +208,24 @@ public class Coupled extends Component implements CoupledInterface {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void completeRightBridge(LinkedList<Coupling<?>> couplings,
-            HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> rightBridge,
+            HashMap<Port<?>, LinkedList<Port<?>>> rightBridge,
             LinkedList<Coupling<?>> pCouplings) {
         for (Coupling<?> c : couplings) {
-            LinkedList<PortInterface<?>> list = rightBridge.get(c.portTo);
+            LinkedList<Port<?>> list = rightBridge.get(c.portTo);
             if (list != null) {
-                for (PortInterface<?> port : list) {
+                for (Port<?> port : list) {
                     pCouplings.add(new Coupling(c.portFrom, port));
                 }
             }
         }
     }
 
-    private HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> createLeftBrige(LinkedList<Coupling<?>> couplings) {
-        HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> leftBridge = new HashMap<>();
-        for (PortInterface<?> iPort : this.inPorts) {
+    private HashMap<Port<?>, LinkedList<Port<?>>> createLeftBrige(LinkedList<Coupling<?>> couplings) {
+        HashMap<Port<?>, LinkedList<Port<?>>> leftBridge = new HashMap<>();
+        for (Port<?> iPort : this.inPorts) {
             for (Coupling<?> c : couplings) {
                 if (c.portTo == iPort) {
-                    LinkedList<PortInterface<?>> list = leftBridge.get(iPort);
+                    LinkedList<Port<?>> list = leftBridge.get(iPort);
                     if (list == null) {
                         list = new LinkedList<>();
                         leftBridge.put(iPort, list);
@@ -233,12 +237,12 @@ public class Coupled extends Component implements CoupledInterface {
         return leftBridge;
     }
 
-    private HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> createRightBrige(LinkedList<Coupling<?>> couplings) {
-        HashMap<PortInterface<?>, LinkedList<PortInterface<?>>> rightBridge = new HashMap<>();
-        for (PortInterface<?> oPort : this.outPorts) {
+    private HashMap<Port<?>, LinkedList<Port<?>>> createRightBrige(LinkedList<Coupling<?>> couplings) {
+        HashMap<Port<?>, LinkedList<Port<?>>> rightBridge = new HashMap<>();
+        for (Port<?> oPort : this.outPorts) {
             for (Coupling<?> c : couplings) {
                 if (c.portFrom == oPort) {
-                    LinkedList<PortInterface<?>> list = rightBridge.get(oPort);
+                    LinkedList<Port<?>> list = rightBridge.get(oPort);
                     if (list == null) {
                         list = new LinkedList<>();
                         rightBridge.put(oPort, list);
@@ -250,9 +254,9 @@ public class Coupled extends Component implements CoupledInterface {
         return rightBridge;
     }
 
-    private void removePortsAndCouplings(ComponentInterface child) {
-        Collection<InPort<?>> inPorts = child.getInPorts();
-        for (PortInterface<?> iport : inPorts) {
+    private void removePortsAndCouplings(Component child) {
+        Collection<Port<?>> inPorts = child.getInPorts();
+        for (Port<?> iport : inPorts) {
             for (int j = 0; j < eic.size(); ++j) {
                 Coupling<?> c = eic.get(j);
                 if (c.portTo == iport) {
@@ -266,8 +270,8 @@ public class Coupled extends Component implements CoupledInterface {
                 }
             }
         }
-        Collection<OutPort<?>> outPorts = child.getOutPorts();
-        for (OutPort<?> oport : outPorts) {
+        Collection<Port<?>> outPorts = child.getOutPorts();
+        for (Port<?> oport : outPorts) {
             for (int j = 0; j < eoc.size(); ++j) {
                 Coupling<?> c = eoc.get(j);
                 if (c.portFrom == oport) {

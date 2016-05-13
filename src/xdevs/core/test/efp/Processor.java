@@ -22,8 +22,7 @@
 package xdevs.core.test.efp;
 
 import xdevs.core.modeling.Atomic;
-import xdevs.core.modeling.InPort;
-import xdevs.core.modeling.OutPort;
+import xdevs.core.modeling.Port;
 
 /**
  *
@@ -31,8 +30,8 @@ import xdevs.core.modeling.OutPort;
  */
 public class Processor extends Atomic {
 
-    protected InPort<Job> iIn = new InPort<>("iIn");
-    protected OutPort<Job> oOut = new OutPort<>("oOut");
+    protected Port<Job> iIn = new Port<>("iIn");
+    protected Port<Job> oOut = new Port<>("oOut");
     protected Job currentJob = null;
     protected double processingTime;
 

@@ -22,8 +22,7 @@
 package xdevs.core.test.efp;
 
 import xdevs.core.modeling.Coupled;
-import xdevs.core.modeling.InPort;
-import xdevs.core.modeling.OutPort;
+import xdevs.core.modeling.Port;
 
 /**
  *
@@ -31,27 +30,24 @@ import xdevs.core.modeling.OutPort;
  */
 public class Ef extends Coupled {
 
-  protected InPort<Job> iStart = new InPort<>("iStart");
-  protected InPort<Job> iIn = new InPort<>("iIn");
-  protected OutPort<Job> oOut = new OutPort<>("oOut");
-  protected OutPort<Result> oResult = new OutPort<>("oResult");
+  protected Port<Job> iStart = new Port<>("iStart");
+  protected Port<Job> iIn = new Port<>("iIn");
+  protected Port<Job> oOut = new Port<>("oOut");
 
   public Ef(String name, double period, double observationTime) {
 	  super(name);
     super.addInPort(iIn);
     super.addInPort(iStart);
     super.addOutPort(oOut);
-    super.addOutPort(oResult);
     Generator generator = new Generator("generator", period);
-    addComponent(generator);
+    super.addComponent(generator);
     Transducer transducer = new Transducer("transducer", observationTime);
-    addComponent(transducer);
+    super.addComponent(transducer);
     
-    addCoupling(this.iIn, transducer.iSolved);
-    addCoupling(generator.oOut, this.oOut);
-    addCoupling(generator.oOut, transducer.iArrived);
-    addCoupling(transducer.oOut, generator.iStop);
-    addCoupling(this.iStart, generator.iStart);
-    addCoupling(transducer.oResult, this.oResult);
+    super.addCoupling(this.iIn, transducer.iSolved);
+    super.addCoupling(generator.oOut, this.oOut);
+    super.addCoupling(generator.oOut, transducer.iArrived);
+    super.addCoupling(transducer.oOut, generator.iStop);
+    super.addCoupling(this.iStart, generator.iStart);
   }
 }

@@ -23,65 +23,40 @@
 package xdevs.core.simulation;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import xdevs.core.util.Constants;
-import xdevs.core.modeling.Coupled;
 import xdevs.core.modeling.Coupling;
-import xdevs.core.modeling.InPort;
-import xdevs.core.modeling.OutPort;
-import xdevs.core.modeling.api.ComponentInterface;
-import xdevs.core.modeling.api.AtomicInterface;
-import xdevs.core.modeling.api.CoupledInterface;
-import xdevs.core.simulation.api.CoordinatorInterface;
-import xdevs.core.simulation.api.SimulatorInterface;
-import xdevs.core.simulation.api.SimulationClock;
+import xdevs.core.modeling.Port;
+import xdevs.core.modeling.Component;
+import xdevs.core.modeling.Atomic;
+import xdevs.core.modeling.Coupled;
 import xdevs.core.util.Util;
 
 /**
  *
  * @author José Luis Risco Martín
  */
-public class Coordinator extends AbstractSimulator implements CoordinatorInterface {
+public class Coordinator extends AbstractSimulator {
 
-    private static final Logger logger = Logger.getLogger(Coordinator.class
-            .getName());
+    private static final Logger LOGGER = Logger.getLogger(Coordinator.class.getName());
 
-    protected CoupledInterface model;
-    protected LinkedList<SimulatorInterface> simulators = new LinkedList<>();
+    protected Coupled model;
+    protected LinkedList<AbstractSimulator> simulators = new LinkedList<>();
 
     public Coordinator(SimulationClock clock, Coupled model, boolean flatten) {
         super(clock);
-        logger.fine(model.getName() + "'s hierarchical...\n" + Util.printCouplings(model));
+        LOGGER.fine(model.getName() + "'s hierarchical...\n" + Util.printCouplings(model));
         if (flatten) {
             this.model = model.flatten();
         } else {
             this.model = model;
         }
-        // Build hierarchy
-        Collection<ComponentInterface> components = model.getComponents();
-        for (ComponentInterface component : components) {
-            if (component instanceof Coupled) {
-                Coordinator coordinator = new Coordinator(clock,
-                        (Coupled) component, false);
-                simulators.add(coordinator);
-            } else if (component instanceof AtomicInterface) {
-                Simulator simulator = new Simulator(clock,
-                        (AtomicInterface) component);
-                simulators.add(simulator);
-            }
-        }
-
-        if (flatten) {
-            logger.fine("After flattening.....\n" + Util.printCouplings(this.model));
-        }
-        logger.fine(this.model.toString());
-        Iterator<ComponentInterface> itr = this.model.getComponents().iterator();
-        while (itr.hasNext()) {
-            logger.fine("Component: " + itr.next());
-        }
+    }
+    
+    public Coordinator(SimulationClock clock, Coupled model) {
+        this(clock, model, false);
     }
 
     public Coordinator(Coupled model, boolean flatten) {
@@ -91,10 +66,25 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
     public Coordinator(Coupled model) {
         this(model, true);
     }
+    
+    protected void buildHierarchy() {
+          // Build hierarchy
+        Collection<Component> components = model.getComponents();
+        for (Component component : components) {
+            if (component instanceof Coupled) {
+                Coordinator coordinator = new Coordinator(clock, (Coupled) component, false);
+                simulators.add(coordinator);
+            } else if (component instanceof Atomic) {
+                Simulator simulator = new Simulator(clock, (Atomic) component);
+                simulators.add(simulator);
+            }
+        }
+    }
 
     @Override
     public void initialize() {
-        for (SimulatorInterface simulator : simulators) {
+        this.buildHierarchy();
+        for (AbstractSimulator simulator : simulators) {
             simulator.initialize();
         }
         tL = clock.getTime();
@@ -103,20 +93,19 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
 
     @Override
     public void exit() {
-        for (SimulatorInterface simulator : simulators) {
+        for (AbstractSimulator simulator : simulators) {
             simulator.exit();
         }
     }
 
-    @Override
-    public Collection<SimulatorInterface> getSimulators() {
+    public Collection<AbstractSimulator> getSimulators() {
         return simulators;
     }
 
     @Override
-    public final double ta() {
+    public double ta() {
         double tn = Constants.INFINITY;
-        for (SimulatorInterface simulator : simulators) {
+        for (AbstractSimulator simulator : simulators) {
             if (simulator.getTN() < tn) {
                 tn = simulator.getTN();
             }
@@ -126,13 +115,12 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
 
     @Override
     public void lambda() {
-        for (SimulatorInterface simulator : simulators) {
+        for (AbstractSimulator simulator : simulators) {
             simulator.lambda();
         }
         propagateOutput();
     }
 
-    @Override
     public void propagateOutput() {
         LinkedList<Coupling<?>> ic = model.getIC();
         for (Coupling<?> c : ic) {
@@ -148,14 +136,13 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
     @Override
     public void deltfcn() {
         propagateInput();
-        for (SimulatorInterface simulator : simulators) {
+        for (AbstractSimulator simulator : simulators) {
             simulator.deltfcn();
         }
         tL = clock.getTime();
         tN = tL + ta();
     }
 
-    @Override
     public void propagateInput() {
         LinkedList<Coupling<?>> eic = model.getEIC();
         for (Coupling<?> c : eic) {
@@ -165,53 +152,82 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
 
     @Override
     public void clear() {
-        for (SimulatorInterface simulator : simulators) {
+        for (AbstractSimulator simulator : simulators) {
             simulator.clear();
         }
-        Collection<InPort<?>> inPorts;
+        Collection<Port<?>> inPorts;
         inPorts = model.getInPorts();
-        for (InPort<?> port : inPorts) {
+        for (Port<?> port : inPorts) {
             port.clear();
         }
-        Collection<OutPort<?>> outPorts;
+        Collection<Port<?>> outPorts;
         outPorts = model.getOutPorts();
-        for (OutPort<?> port : outPorts) {
+        for (Port<?> port : outPorts) {
             port.clear();
         }
     }
 
-    @Override
-    public void simInject(double e, InPort port, Collection<Object> values) {
+    /**
+     * Injects a value into the port "port", calling the transition function.
+     *
+     * @param e elapsed time
+     * @param port input port to inject the set of values
+     * @param values set of values to inject
+     */
+    public void simInject(double e, Port port, Collection<Object> values) {
         double time = tL + e;
         if (time <= tN) {
             port.addValues(values);
             clock.setTime(time);
             deltfcn();
         } else {
-            logger.severe("Time: " + tL + " - ERROR input rejected: elapsed time " + e + " is not in bounds.");
+            LOGGER.severe("Time: " + tL + " - ERROR input rejected: elapsed time " + e + " is not in bounds.");
         }
     }
 
-    @Override
-    public void simInject(InPort port, Collection<Object> values) {
+    /**
+     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(double,
+     * mitris.sim.core.modeling.InPort, java.util.Collection) simInject(0.0,
+     * InPort, Collection)
+     * @param port input port to inject the set of values
+     * @param values set of values to inject
+     */
+    public void simInject(Port port, Collection<Object> values) {
         simInject(0.0, port, values);
     }
 
-    @Override
-    public void simInject(double e, InPort port, Object value) {
+    /**
+     * Injects a single value in the given input port with elapsed time e.
+     *
+     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(double,
+     * mitris.sim.core.modeling.InPort, java.util.Collection) simInject(double,
+     * InPort, Collection)
+     * @param e
+     * @param port
+     * @param value
+     */
+    public void simInject(double e, Port port, Object value) {
         LinkedList values = new LinkedList();
         values.add(value);
         simInject(e, port, values);
     }
 
-    @Override
-    public void simInject(InPort port, Object value) {
+    /**
+     * Injects a single value in the given input port with elapsed time e equal
+     * to 0.
+     *
+     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(double,
+     * mitris.sim.core.modeling.InPort, java.util.Collection) simInject(0.0,
+     * InPort, Collection)
+     * @param port
+     * @param value
+     */
+    public void simInject(Port port, Object value) {
         simInject(0.0, port, value);
     }
 
-    @Override
     public void simulate(long numIterations) {
-        logger.fine("START SIMULATION");
+        LOGGER.fine("START SIMULATION");
         clock.setTime(tN);
         long counter;
         for (counter = 1; counter < numIterations
@@ -223,9 +239,8 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
         }
     }
 
-    @Override
     public void simulate(double timeInterval) {
-        logger.fine("START SIMULATION");
+        LOGGER.fine("START SIMULATION");
         clock.setTime(tN);
         double tF = clock.getTime() + timeInterval;
         while (clock.getTime() < Constants.INFINITY && clock.getTime() < tF) {
@@ -237,7 +252,7 @@ public class Coordinator extends AbstractSimulator implements CoordinatorInterfa
     }
 
     @Override
-    public CoupledInterface getModel() {
+    public Coupled getModel() {
         return model;
     }
 

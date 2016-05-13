@@ -23,13 +23,14 @@
 package xdevs.core.simulation.profile;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.logging.Level;
+import xdevs.core.modeling.Atomic;
+import xdevs.core.modeling.Component;
+import xdevs.core.modeling.Coupled;
+import xdevs.core.simulation.AbstractSimulator;
 
-import xdevs.core.modeling.InPort;
 import xdevs.core.simulation.Coordinator;
-import xdevs.core.simulation.api.CoordinatorInterface;
-import xdevs.core.simulation.api.SimulatorInterface;
+import xdevs.core.simulation.SimulationClock;
 import xdevs.core.test.efp.Efp;
 import xdevs.core.util.DevsLogger;
 
@@ -37,10 +38,31 @@ import xdevs.core.util.DevsLogger;
  *
  * @author José Luis Risco Martín
  */
-public class CoordinatorProfile extends SimulatorProfile implements CoordinatorInterface {
+public class CoordinatorProfile extends Coordinator {
 
-    //private static final Logger logger = Logger.getLogger(CoordinatorProfile.class.getName());
-    protected CoordinatorInterface realCoordinator;
+    // AbstractSimulator Calls
+    protected long numCallsToInitialize = 0;
+    protected long timeUsedByInitialize = 0;
+    protected long numCallsToExit = 0;
+    protected long timeUsedByExit = 0;
+    protected long numCallsToTa = 0;
+    protected long timeUsedByTa = 0;
+    protected long numCallsToDeltFcn = 0;
+    protected long timeUsedByDeltFcn = 0;
+    protected long numCallsToLambda = 0;
+    protected long timeUsedByLambda = 0;
+    protected long numCallsToClear = 0;
+    protected long timeUsedByClear = 0;
+    protected long numCallsToGetTN = 0;
+    protected long timeUsedByGetTN = 0;
+    protected long numCallsToGetTL = 0;
+    protected long timeUsedByGetTL = 0;
+    protected long numCallsToSetTN = 0;
+    protected long timeUsedBySetTN = 0;
+    protected long numCallsToSetTL = 0;
+    protected long timeUsedBySetTL = 0;
+    protected long numCallsToGetClock = 0;
+    protected long timeUsedByGetClock = 0;
 
     protected long numCallsToGetSimulators = 0;
     protected long timeUsedByGetSimulators = 0;
@@ -50,30 +72,140 @@ public class CoordinatorProfile extends SimulatorProfile implements CoordinatorI
     protected long timeUsedByPropagateInput = 0;
     protected double executionTime = 0.0;
 
-    public CoordinatorProfile(CoordinatorInterface realCoordinator) {
-        super(realCoordinator);
-        this.realCoordinator = realCoordinator;
+    public CoordinatorProfile(SimulationClock clock, Coupled model) {
+        super(clock, model);
+    }
 
-        Collection<SimulatorInterface> realSimulators = realCoordinator.getSimulators();
-        Collection<SimulatorInterface> profSimulators = new LinkedList<>();
-        for (SimulatorInterface realSimulatorAux : realSimulators) {
-            if (realSimulatorAux instanceof CoordinatorInterface) {
-                CoordinatorProfile profCoordinator = new CoordinatorProfile((CoordinatorInterface) realSimulatorAux);
-                profSimulators.add(profCoordinator);
-            } else if (realSimulatorAux instanceof SimulatorInterface) {
-                SimulatorProfile profSimulator = new SimulatorProfile(realSimulatorAux);
-                profSimulators.add(profSimulator);
-            }
-        }
-        realSimulators.clear();
-        realSimulators.addAll(profSimulators);
+    public CoordinatorProfile(Coupled model) {
+        super(model);
     }
 
     @Override
-    public Collection<SimulatorInterface> getSimulators() {
+    protected void buildHierarchy() {
+        // Build hierarchy
+        Collection<Component> components = model.getComponents();
+        for (Component component : components) {
+            if (component instanceof Coupled) {
+                CoordinatorProfile coordinator = new CoordinatorProfile(clock, (Coupled) component);
+                simulators.add(coordinator);
+            } else if (component instanceof Atomic) {
+                SimulatorProfile simulator = new SimulatorProfile(clock, (Atomic) component);
+                simulators.add(simulator);
+            }
+        }
+    }
+
+    // AbstractSimulator Calls
+    @Override
+    public void initialize() {
+        this.numCallsToInitialize++;
+        long start = System.currentTimeMillis();
+        super.initialize();
+        long end = System.currentTimeMillis();
+        this.timeUsedByInitialize += (end - start);
+
+    }
+
+    @Override
+    public void exit() {
+        this.numCallsToExit++;
+        long start = System.currentTimeMillis();
+        super.exit();
+        long end = System.currentTimeMillis();
+        this.timeUsedByExit += (end - start);
+
+    }
+
+    @Override
+    public double ta() {
+        numCallsToTa++;
+        long start = System.currentTimeMillis();
+        double result = super.ta();
+        long end = System.currentTimeMillis();
+        timeUsedByTa += (end - start);
+        return result;
+    }
+
+    @Override
+    public void lambda() {
+        this.numCallsToLambda++;
+        long start = System.currentTimeMillis();
+        super.lambda();
+        long end = System.currentTimeMillis();
+        this.timeUsedByLambda += (end - start);
+    }
+
+    @Override
+    public void deltfcn() {
+        this.numCallsToDeltFcn++;
+        long start = System.currentTimeMillis();
+        super.deltfcn();
+        long end = System.currentTimeMillis();
+        this.timeUsedByDeltFcn += (end - start);
+    }
+
+    @Override
+    public void clear() {
+        this.numCallsToClear++;
+        long start = System.currentTimeMillis();
+        super.clear();
+        long end = System.currentTimeMillis();
+        this.timeUsedByClear += (end - start);
+    }
+    
+    @Override
+    public double getTL() {
+        this.numCallsToGetTL++;
+        long start = System.currentTimeMillis();
+        double result = super.getTL();
+        long end = System.currentTimeMillis();
+        this.timeUsedByGetTL += (end - start);
+        return result;
+    }
+    
+    @Override
+    public void setTL(double tL) {
+        this.numCallsToSetTL++;
+        long start = System.currentTimeMillis();
+        super.setTL(tL);
+        long end = System.currentTimeMillis();
+        this.timeUsedBySetTL += (end - start);
+    }
+
+    @Override
+    public double getTN() {
+        this.numCallsToGetTN++;
+        long start = System.currentTimeMillis();
+        double result = super.getTN();
+        long end = System.currentTimeMillis();
+        this.timeUsedByGetTN += (end - start);
+        return result;
+    }
+
+    @Override
+    public void setTN(double tN) {
+        this.numCallsToSetTN++;
+        long start = System.currentTimeMillis();
+        super.setTN(tN);
+        long end = System.currentTimeMillis();
+        this.timeUsedBySetTN += (end - start);
+    }
+    
+    @Override
+    public SimulationClock getClock() {
+        this.numCallsToGetClock++;
+        long start = System.currentTimeMillis();
+        SimulationClock result = super.getClock();
+        long end = System.currentTimeMillis();
+        this.timeUsedByGetClock += (end - start);
+        return result;
+    }
+    
+    @Override
+    public Collection<AbstractSimulator> getSimulators() {
         this.numCallsToGetSimulators++;
         long start = System.currentTimeMillis();
-        Collection<SimulatorInterface> result = realCoordinator.getSimulators();
+        Collection<AbstractSimulator> result = super.getSimulators();
         long end = System.currentTimeMillis();
         this.timeUsedByGetSimulators += (end - start);
         return result;
@@ -83,7 +215,7 @@ public class CoordinatorProfile extends SimulatorProfile implements CoordinatorI
     public void propagateOutput() {
         this.numCallsToPropagateOutput++;
         long start = System.currentTimeMillis();
-        realCoordinator.propagateOutput();
+        super.propagateOutput();
         long end = System.currentTimeMillis();
         this.timeUsedByPropagateOutput += (end - start);
     }
@@ -92,7 +224,7 @@ public class CoordinatorProfile extends SimulatorProfile implements CoordinatorI
     public void propagateInput() {
         this.numCallsToPropagateInput++;
         long start = System.currentTimeMillis();
-        realCoordinator.propagateInput();
+        super.propagateInput();
         long end = System.currentTimeMillis();
         this.timeUsedByPropagateInput += (end - start);
     }
@@ -100,7 +232,7 @@ public class CoordinatorProfile extends SimulatorProfile implements CoordinatorI
     @Override
     public void simulate(long numIterations) {
         long start = System.currentTimeMillis();
-        realCoordinator.simulate(numIterations);
+        super.simulate(numIterations);
         long end = System.currentTimeMillis();
         this.executionTime += (end - start);
     }
@@ -108,18 +240,37 @@ public class CoordinatorProfile extends SimulatorProfile implements CoordinatorI
     @Override
     public void simulate(double timeInterval) {
         long start = System.currentTimeMillis();
-        realCoordinator.simulate(timeInterval);
+        super.simulate(timeInterval);
         long end = System.currentTimeMillis();
         this.executionTime += (end - start);
     }
 
     @Override
-    public String getStats() {
+    public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append("========================================================================\n");
-        buffer.append("Statistics for ").append(realCoordinator.getModel().getName()).append(":\n");
+        buffer.append("Statistics for ").append(super.getModel().getName()).append(":\n");
         buffer.append("========================================================================\n");
-        buffer.append(super.getStats());
+        buffer.append("numCallsToTa = ").append(numCallsToTa).append("\n");
+        buffer.append("timeUsedByTa = ").append(timeUsedByTa).append(" ms\n");
+        buffer.append("numCallsToDeltFcn = ").append(numCallsToDeltFcn).append("\n");
+        buffer.append("timeUsedByDeltFcn = ").append(timeUsedByDeltFcn).append(" ms\n");
+        buffer.append("numCallsToLambda = ").append(numCallsToLambda).append("\n");
+        buffer.append("timeUsedByLambda = ").append(timeUsedByLambda).append(" ms\n");
+        buffer.append("numCallsToClear = ").append(numCallsToClear).append("\n");
+        buffer.append("timeUsedByClear = ").append(timeUsedByClear).append(" ms\n");
+        buffer.append("numCallsToInitialize = ").append(numCallsToInitialize).append("\n");
+        buffer.append("timeUsedByInitialize = ").append(timeUsedByInitialize).append(" ms\n");
+        buffer.append("numCallsToGetTN = ").append(numCallsToGetTN).append("\n");
+        buffer.append("timeUsedByGetTN = ").append(timeUsedByGetTN).append(" ms\n");
+        buffer.append("numCallsToGetTL = ").append(numCallsToGetTL).append("\n");
+        buffer.append("timeUsedByGetTL = ").append(timeUsedByGetTL).append(" ms\n");
+        buffer.append("numCallsToSetTN = ").append(numCallsToSetTN).append("\n");
+        buffer.append("timeUsedBySetTN = ").append(timeUsedBySetTN).append(" ms\n");
+        buffer.append("numCallsToSetTL = ").append(numCallsToSetTL).append("\n");
+        buffer.append("timeUsedBySetTL = ").append(timeUsedBySetTL).append(" ms\n");
+        buffer.append("numCallsToGetClock = ").append(numCallsToGetClock).append("\n");
+        buffer.append("timeUsedByGetClock = ").append(timeUsedByGetClock).append(" ms\n");
         buffer.append("numCallsToGetSimulators = ").append(numCallsToGetSimulators).append("\n");
         buffer.append("timeUsedByGetSimulators = ").append(timeUsedByGetSimulators).append(" ms\n");
         buffer.append("numCallsToPropagateOutput = ").append(numCallsToPropagateOutput).append("\n");
@@ -127,8 +278,8 @@ public class CoordinatorProfile extends SimulatorProfile implements CoordinatorI
         buffer.append("numCallsToPropagateInput = ").append(numCallsToPropagateInput).append("\n");
         buffer.append("timeUsedByPropagateInput = ").append(timeUsedByPropagateInput).append(" ms\n");
         buffer.append("executionTime = ").append(executionTime).append(" ms\n");
-        for (SimulatorInterface simulator : realCoordinator.getSimulators()) {
-            buffer.append(((SimulatorProfile) simulator).getStats());
+        for (AbstractSimulator simulator : super.getSimulators()) {
+            buffer.append(simulator.toString());
         }
         return buffer.toString();
     }
@@ -136,31 +287,10 @@ public class CoordinatorProfile extends SimulatorProfile implements CoordinatorI
     public static void main(String args[]) {
         DevsLogger.setup(Level.INFO);
         Efp efp = new Efp("efp", 1, 3, 100);
-        CoordinatorProfile coordinator = new CoordinatorProfile(new Coordinator(efp, false));
+        CoordinatorProfile coordinator = new CoordinatorProfile(efp);
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
         coordinator.exit();
-        System.out.println(coordinator.getStats());
+        System.out.println(coordinator.toString());
     }
-
-    @Override
-    public void simInject(double e, InPort port, Collection<Object> values) {
-        realCoordinator.simInject(e, port, values);
-    }
-
-    @Override
-    public void simInject(InPort port, Collection<Object> values) {
-        realCoordinator.simInject(port, values);
-    }
-
-    @Override
-    public void simInject(double e, InPort port, Object value) {
-        realCoordinator.simInject(e, port, value);
-    }
-
-    @Override
-    public void simInject(InPort port, Object value) {
-        realCoordinator.simInject(port, value);
-    }
-
 }

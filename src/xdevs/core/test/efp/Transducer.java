@@ -25,8 +25,7 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import xdevs.core.modeling.Atomic;
-import xdevs.core.modeling.InPort;
-import xdevs.core.modeling.OutPort;
+import xdevs.core.modeling.Port;
 
 /**
  *
@@ -35,26 +34,23 @@ import xdevs.core.modeling.OutPort;
  */
 public class Transducer extends Atomic {
 
-    private static final Logger logger = Logger.getLogger(Transducer.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Transducer.class.getName());
 
-    protected InPort<Job> iArrived = new InPort<>("iArrived");
-    protected InPort<Job> iSolved = new InPort<>("iSolved");
-    protected OutPort<Job> oOut = new OutPort<>("oOut");
-    protected OutPort<Result> oResult = new OutPort<>("oResult");
+    protected Port<Job> iArrived = new Port<>("iArrived");
+    protected Port<Job> iSolved = new Port<>("iSolved");
+    protected Port<Job> oOut = new Port<>("oOut");
 
     protected LinkedList<Job> jobsArrived = new LinkedList<>();
     protected LinkedList<Job> jobsSolved = new LinkedList<>();
     protected double observationTime;
     protected double totalTa;
     protected double clock;
-    protected Result result;
 
     public Transducer(String name, double observationTime) {
         super(name);
         super.addInPort(iArrived);
         super.addInPort(iSolved);
         super.addOutPort(oOut);
-        super.addOutPort(oResult);
         totalTa = 0;
         clock = 0;
         this.observationTime = observationTime;
@@ -86,12 +82,11 @@ public class Transducer extends Atomic {
                 avgTaTime = 0.0;
                 throughput = 0.0;
             }
-            logger.info("End time: " + clock);
-            logger.info("Jobs arrived : " + jobsArrived.size());
-            logger.info("Jobs solved : " + jobsSolved.size());
-            logger.info("Average TA = " + avgTaTime);
-            logger.info("Throughput = " + throughput);
-            result = new Result(throughput, avgTaTime, jobsArrived.size(), jobsSolved.size());
+            LOGGER.info("End time: " + clock);
+            LOGGER.info("Jobs arrived : " + jobsArrived.size());
+            LOGGER.info("Jobs solved : " + jobsSolved.size());
+            LOGGER.info("Average TA = " + avgTaTime);
+            LOGGER.info("Throughput = " + throughput);
             holdIn("done", 0);
         } else {
             passivate();
@@ -106,14 +101,14 @@ public class Transducer extends Atomic {
             Job job = null;
             if (!iArrived.isEmpty()) {
                 job = iArrived.getSingleValue();
-                logger.fine("Start job " + job.id + " @ t = " + clock);
+                LOGGER.fine("Start job " + job.id + " @ t = " + clock);
                 job.time = clock;
                 jobsArrived.add(job);
             }
             if (!iSolved.isEmpty()) {
                 job = iSolved.getSingleValue();
                 totalTa += (clock - job.time);
-                logger.fine("Finish job " + job.id + " @ t = " + clock);
+                LOGGER.fine("Finish job " + job.id + " @ t = " + clock);
                 job.time = clock;
                 jobsSolved.add(job);
             }
@@ -126,8 +121,6 @@ public class Transducer extends Atomic {
         if (phaseIs("done")) {
             Job job = new Job("null");
             oOut.addValue(job);
-            oResult.addValue(result);
-            logger.info("" + result);
         }
     }
 }

@@ -24,45 +24,39 @@ package xdevs.core.test.efp;
 import java.util.logging.Level;
 
 import xdevs.core.modeling.Coupled;
-import xdevs.core.modeling.InPort;
-import xdevs.core.modeling.OutPort;
+import xdevs.core.modeling.Port;
 import xdevs.core.simulation.Coordinator;
 import xdevs.core.util.DevsLogger;
-
-
 
 /**
  *
  * @author jlrisco
  */
 public class Efp extends Coupled {
-	
-	protected InPort<Job> iStart = new InPort<>("iStart");
-	protected OutPort<Result> oResult = new OutPort<>("oResult");
+
+    protected Port<Job> iStart = new Port<>("iStart");
 
     public Efp(String name, double generatorPeriod, double processorPeriod, double transducerPeriod) {
-    	super(name);
-    	addInPort(iStart);
-    	addOutPort(oResult);
-    	
+        super(name);
+        super.addInPort(iStart);
+
         Ef ef = new Ef("ef", generatorPeriod, transducerPeriod);
-        addComponent(ef);
+        super.addComponent(ef);
         Processor processor = new Processor("processor", processorPeriod);
-        addComponent(processor);
-        
-        addCoupling(ef.oOut, processor.iIn);
-        addCoupling(processor.oOut, ef.iIn);
-        addCoupling(this.iStart, ef.iStart);
-        addCoupling(ef.oOut, this.oResult);
+        super.addComponent(processor);
+
+        super.addCoupling(ef.oOut, processor.iIn);
+        super.addCoupling(processor.oOut, ef.iIn);
+        super.addCoupling(this.iStart, ef.iStart);
     }
 
     public static void main(String args[]) {
-        DevsLogger.setup(Level.FINE);
-        Efp efp = new Efp("efp", 1, 3, 1000);
+        DevsLogger.setup(Level.INFO);
+        Efp efp = new Efp("efp", 1, 3, 100);
         Coordinator coordinator = new Coordinator(efp);
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
         coordinator.exit();
     }
-  
+
 }

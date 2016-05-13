@@ -24,90 +24,77 @@ package xdevs.core.modeling;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import xdevs.core.modeling.api.ComponentInterface;
+public abstract class Component {
 
-/**
- * @author smittal
- *
- */
-public abstract class Component extends Entity implements ComponentInterface {
+    // Component attributes
+    protected Component parent = null;
+    protected String name;
+    protected ArrayList<Port<?>> inPorts = new ArrayList<>();
+    protected ArrayList<Port<?>> outPorts = new ArrayList<>();
 
-	// Component attributes
-	protected ComponentInterface parent = null;
-	protected ArrayList<InPort<?>> inPorts = new ArrayList<>();
-	protected ArrayList<OutPort<?>> outPorts = new ArrayList<>();
+    public Component(String name) {
+        this.name = name;
+    }
 
-	public Component(){
-		this(Component.class.getSimpleName());
-	}
-	
-	public Component(String name){
-		super(name);
-	}
+    public Component() {
+        this(Component.class.getSimpleName());
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public abstract void initialize();
+    public abstract void exit();
 
-        @Override
-	public boolean isInputEmpty() {
-		for (InPort<?> port : inPorts) {
-			if (!port.isEmpty()) {
-				return false;
-			}
-		}
-		return true;
-	}
+    public boolean isInputEmpty() {
+        for (Port<?> port : inPorts) {
+            if (!port.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-        @Override
-	public void addInPort(InPort<?> port) {
-		inPorts.add(port);
-		port.parent = this;
-	}
+    public void addInPort(Port<?> port) {
+        inPorts.add(port);
+        port.parent = this;
+    }
 
-        @Override
-	public Collection<InPort<?>> getInPorts() {
-		return inPorts;
-	}
+    public Collection<Port<?>> getInPorts() {
+        return inPorts;
+    }
 
-        @Override
-	public void addOutPort(OutPort<?> port) {
-		outPorts.add(port);
-		port.parent = this;
-	}
+    public void addOutPort(Port<?> port) {
+        outPorts.add(port);
+        port.parent = this;
+    }
 
-        @Override
-	public Collection<OutPort<?>> getOutPorts() {
-		return outPorts;
-	}
+    public Collection<Port<?>> getOutPorts() {
+        return outPorts;
+    }
 
-	@Override
-	public ComponentInterface getParent() {
-		return parent;
-	}
+    public Component getParent() {
+        return parent;
+    }
 
-	@Override
-	public void setParent(ComponentInterface parent) {
-		this.parent = parent;
-	}
+    public void setParent(Component parent) {
+        this.parent = parent;
+    }
 
-	public String toString(){
-		StringBuilder sb = new StringBuilder(name + " :");
-		sb.append(" Inports[ ");
-		for(InPort<?> p : inPorts){
-			sb.append(p + " ");
-		}
-		sb.append("]");
-		sb.append(" Outports[ ");
-		for(OutPort<?> p: outPorts){
-			sb.append(p+" ");
-		}
-		sb.append("]");
-		return sb.toString();
-	}
-	
-	@Override
-	public String getQualifiedName() {
-		if (parent == null) {
-			return name;
-		}
-		return parent.getQualifiedName() + "." + name;
-	}
-
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(name + " :");
+        sb.append(" Inports[ ");
+        for (Port<?> p : inPorts) {
+            sb.append(p).append(" ");
+        }
+        sb.append("]");
+        sb.append(" Outports[ ");
+        for (Port<?> p : outPorts) {
+            sb.append(p).append(" ");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }

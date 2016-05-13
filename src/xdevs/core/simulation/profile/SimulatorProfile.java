@@ -22,17 +22,21 @@
  */
 package xdevs.core.simulation.profile;
 
-import xdevs.core.modeling.api.ComponentInterface;
-import xdevs.core.simulation.api.SimulatorInterface;
-import xdevs.core.simulation.api.SimulationClock;
+import xdevs.core.modeling.Atomic;
+import xdevs.core.simulation.SimulationClock;
+import xdevs.core.simulation.Simulator;
 
 /**
  *
  * @author José Luis Risco Martín
  */
-public class SimulatorProfile implements SimulatorInterface {
+public class SimulatorProfile extends Simulator {
 
-    protected SimulatorInterface realSimulator;
+    // AbstractSimulatorCalls
+    protected long numCallsToInitialize = 0;
+    protected long timeUsedByInitialize = 0;
+    protected long numCallsToExit = 0;
+    protected long timeUsedByExit = 0;
     protected long numCallsToTa = 0;
     protected long timeUsedByTa = 0;
     protected long numCallsToDeltFcn = 0;
@@ -41,8 +45,6 @@ public class SimulatorProfile implements SimulatorInterface {
     protected long timeUsedByLambda = 0;
     protected long numCallsToClear = 0;
     protected long timeUsedByClear = 0;
-    protected long numCallsToInitialize = 0;
-    protected long timeUsedByInitialize = 0;
     protected long numCallsToGetTN = 0;
     protected long timeUsedByGetTN = 0;
     protected long numCallsToGetTL = 0;
@@ -54,48 +56,16 @@ public class SimulatorProfile implements SimulatorInterface {
     protected long numCallsToGetClock = 0;
     protected long timeUsedByGetClock = 0;
 
-    public SimulatorProfile(SimulatorInterface realSimulator) {
-        this.realSimulator = realSimulator;
+    public SimulatorProfile(SimulationClock clock, Atomic model) {
+        super(clock, model);
     }
 
-    public double ta() {
-        numCallsToTa++;
-        long start = System.currentTimeMillis();
-        double result = realSimulator.ta();
-        long end = System.currentTimeMillis();
-        timeUsedByTa += (end - start);
-        return result;
-    }
-
-    public void deltfcn() {
-        this.numCallsToDeltFcn++;
-        long start = System.currentTimeMillis();
-        realSimulator.deltfcn();
-        long end = System.currentTimeMillis();
-        this.timeUsedByDeltFcn += (end - start);
-    }
-
-    public void lambda() {
-        this.numCallsToLambda++;
-        long start = System.currentTimeMillis();
-        realSimulator.lambda();
-        long end = System.currentTimeMillis();
-        this.timeUsedByLambda += (end - start);
-    }
-
-    public void clear() {
-        this.numCallsToClear++;
-        long start = System.currentTimeMillis();
-        realSimulator.clear();
-        long end = System.currentTimeMillis();
-        this.timeUsedByClear += (end - start);
-    }
-
+    // AbstractSimulatorCalls
     @Override
     public void initialize() {
         this.numCallsToInitialize++;
         long start = System.currentTimeMillis();
-        realSimulator.initialize();
+        super.initialize();
         long end = System.currentTimeMillis();
         this.timeUsedByInitialize += (end - start);
 
@@ -103,13 +73,56 @@ public class SimulatorProfile implements SimulatorInterface {
 
     @Override
     public void exit() {
+        this.numCallsToExit++;
+        long start = System.currentTimeMillis();
+        super.exit();
+        long end = System.currentTimeMillis();
+        this.timeUsedByExit += (end - start);
+
+    }
+
+    @Override
+    public double ta() {
+        numCallsToTa++;
+        long start = System.currentTimeMillis();
+        double result = super.ta();
+        long end = System.currentTimeMillis();
+        timeUsedByTa += (end - start);
+        return result;
+    }
+
+    @Override
+    public void deltfcn() {
+        this.numCallsToDeltFcn++;
+        long start = System.currentTimeMillis();
+        super.deltfcn();
+        long end = System.currentTimeMillis();
+        this.timeUsedByDeltFcn += (end - start);
+    }
+
+    @Override
+    public void lambda() {
+        this.numCallsToLambda++;
+        long start = System.currentTimeMillis();
+        super.lambda();
+        long end = System.currentTimeMillis();
+        this.timeUsedByLambda += (end - start);
+    }
+
+    @Override
+    public void clear() {
+        this.numCallsToClear++;
+        long start = System.currentTimeMillis();
+        super.clear();
+        long end = System.currentTimeMillis();
+        this.timeUsedByClear += (end - start);
     }
 
     @Override
     public double getTL() {
         this.numCallsToGetTL++;
         long start = System.currentTimeMillis();
-        double result = realSimulator.getTL();
+        double result = super.getTL();
         long end = System.currentTimeMillis();
         this.timeUsedByGetTL += (end - start);
         return result;
@@ -119,7 +132,7 @@ public class SimulatorProfile implements SimulatorInterface {
     public void setTL(double tL) {
         this.numCallsToSetTL++;
         long start = System.currentTimeMillis();
-        realSimulator.setTL(tL);
+        super.setTL(tL);
         long end = System.currentTimeMillis();
         this.timeUsedBySetTL += (end - start);
     }
@@ -128,7 +141,7 @@ public class SimulatorProfile implements SimulatorInterface {
     public double getTN() {
         this.numCallsToGetTN++;
         long start = System.currentTimeMillis();
-        double result = realSimulator.getTN();
+        double result = super.getTN();
         long end = System.currentTimeMillis();
         this.timeUsedByGetTN += (end - start);
         return result;
@@ -138,7 +151,7 @@ public class SimulatorProfile implements SimulatorInterface {
     public void setTN(double tN) {
         this.numCallsToSetTN++;
         long start = System.currentTimeMillis();
-        realSimulator.setTN(tN);
+        super.setTN(tN);
         long end = System.currentTimeMillis();
         this.timeUsedBySetTN += (end - start);
     }
@@ -147,19 +160,16 @@ public class SimulatorProfile implements SimulatorInterface {
     public SimulationClock getClock() {
         this.numCallsToGetClock++;
         long start = System.currentTimeMillis();
-        SimulationClock result = realSimulator.getClock();
+        SimulationClock result = super.getClock();
         long end = System.currentTimeMillis();
         this.timeUsedByGetClock += (end - start);
         return result;
     }
 
-    public ComponentInterface getModel() {
-        return realSimulator.getModel();
-    }
-
-    public String getStats() {
+    @Override
+    public String toString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("Statistics for ").append(realSimulator.getModel().getName()).append(":\n");
+        buffer.append("Statistics for ").append(super.getModel().getName()).append(":\n");
         buffer.append("----------------------------------------------------------------------\n");
         buffer.append("numCallsToTa = ").append(numCallsToTa).append("\n");
         buffer.append("timeUsedByTa = ").append(timeUsedByTa).append(" ms\n");

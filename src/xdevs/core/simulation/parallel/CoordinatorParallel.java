@@ -29,9 +29,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import xdevs.core.modeling.Coupled;
+import xdevs.core.simulation.AbstractSimulator;
 import xdevs.core.simulation.Coordinator;
-import xdevs.core.simulation.api.SimulatorInterface;
-import xdevs.core.simulation.api.SimulationClock;
+import xdevs.core.simulation.SimulationClock;
 import xdevs.core.test.efp.Efp;
 import xdevs.core.util.DevsLogger;
 
@@ -41,7 +41,7 @@ import xdevs.core.util.DevsLogger;
  */
 public class CoordinatorParallel extends Coordinator {
 
-    private static final Logger logger = Logger.getLogger(CoordinatorParallel.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CoordinatorParallel.class.getName());
 
     protected int numberOfThreads;
     protected LinkedList<TaskLambda> lambdaTasks = new LinkedList<>();
@@ -52,12 +52,6 @@ public class CoordinatorParallel extends Coordinator {
         super(clock, model, true);
         this.numberOfThreads = numberOfThreads;
         executor = Executors.newFixedThreadPool(numberOfThreads);
-        for (SimulatorInterface simulator : simulators) {
-            lambdaTasks.add(new TaskLambda(simulator));
-        }
-        for (SimulatorInterface simulator : simulators) {
-            deltfcnTasks.add(new TaskDeltFcn(simulator));
-        }
     }
 
     public CoordinatorParallel(SimulationClock clock, Coupled model) {
@@ -67,13 +61,24 @@ public class CoordinatorParallel extends Coordinator {
     public CoordinatorParallel(Coupled model) {
         this(new SimulationClock(), model, Runtime.getRuntime().availableProcessors());
     }
+    
+    @Override
+    public void buildHierarchy() {
+        super.buildHierarchy();
+        for (AbstractSimulator simulator : simulators) {
+            lambdaTasks.add(new TaskLambda(simulator));
+        }
+        for (AbstractSimulator simulator : simulators) {
+            deltfcnTasks.add(new TaskDeltFcn(simulator));
+        }        
+    }
 
     @Override
     public void lambda() {
         try {
             executor.invokeAll(lambdaTasks);
         } catch (InterruptedException ee) {
-            logger.severe(ee.getLocalizedMessage());
+            LOGGER.severe(ee.getLocalizedMessage());
         }
         propagateOutput();
     }
@@ -84,7 +89,7 @@ public class CoordinatorParallel extends Coordinator {
         try {
             executor.invokeAll(deltfcnTasks);
         } catch (InterruptedException ee) {
-            logger.severe(ee.getLocalizedMessage());
+            LOGGER.severe(ee.getLocalizedMessage());
         }
         tL = clock.getTime();
         tN = tL + ta();
@@ -103,10 +108,11 @@ public class CoordinatorParallel extends Coordinator {
     }
 
     public static void main(String[] args) {
-        DevsLogger.setup(Level.FINE);
-        Efp efp = new Efp("EFP", 1, 3, 30);
+        DevsLogger.setup(Level.INFO);
+        Efp efp = new Efp("EFP", 1, 3, 100);
         CoordinatorParallel coordinator = new CoordinatorParallel(efp);
         coordinator.initialize();
-        coordinator.simulate(60.0);
+        coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
     }
 }

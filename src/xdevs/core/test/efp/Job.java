@@ -21,13 +21,11 @@
  */
 package xdevs.core.test.efp;
 
-import xdevs.core.modeling.Entity;
-
 /**
  *
  * @author jlrisco
  */
-public class Job extends Entity{
+public class Job {
 
   protected String id;
   protected double time;

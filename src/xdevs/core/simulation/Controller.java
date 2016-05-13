@@ -25,44 +25,51 @@ package xdevs.core.simulation;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import xdevs.core.modeling.Port;
 import xdevs.core.util.Constants;
-import xdevs.core.modeling.InPort;
-import xdevs.core.simulation.api.ControllerInterface;
-import xdevs.core.simulation.api.CoordinatorInterface;
-import xdevs.core.simulation.api.SimulationClock;
 
 /**
- *
+ * This controller has been created to control the simulation in GUI-based environments
  * @author José Luis Risco Martín
  */
-public class Controller extends Thread implements ControllerInterface {
+public class Controller extends Thread {
 
-    protected CoordinatorInterface coordinator;
+    protected Coordinator coordinator;
     private boolean suspended = false;
     protected double tF = Constants.INFINITY;
 
-    public Controller(CoordinatorInterface coordinator) {
+    public Controller(Coordinator coordinator) {
         this.coordinator = coordinator;
     }
 
-    @Override
+ /**
+     * Starts the simulation, initializing the coordinator
+     * @param timeInterval Simulation time interval, in seconds
+     */
     public void startSimulation(double timeInterval) {
         coordinator.initialize();
         coordinator.getClock().setTime(coordinator.getTN());
         tF = coordinator.getClock().getTime() + timeInterval;
     }
 
-    @Override
+    /**
+     * Runs the simulation during a given time interval
+     * @see #startSimulation(double) 
+     */
     public void runSimulation() {
         super.start();
     }
 
-    @Override
+    /**
+     * Pauses the simulation
+     */
     public void pauseSimulation() {
         suspended = true;
     }
 
-    @Override
+    /**
+     * Resumes the simulation
+     */
     public void resumeSimulation() {
         suspended = false;
         synchronized (this) {
@@ -70,7 +77,9 @@ public class Controller extends Thread implements ControllerInterface {
         }
     }
 
-    @Override
+    /**
+     * Performs a single step in the simulation loop
+     */
     public void stepSimulation() {
         if (coordinator.getClock().getTime() < tF) {
             coordinator.lambda();
@@ -80,32 +89,59 @@ public class Controller extends Thread implements ControllerInterface {
         }
     }
 
-    @Override
+     /**
+     * Finishes the current simulation
+     */    
     public void terminateSimulation() {
         super.interrupt();
     }
 
-    @Override
-    public void simInject(double e, InPort port, Collection<Object> values) {
+     /**
+     * Injects a value into the port "port", calling the transition function.
+     * @param e Elapsed time
+     * @param port Input port
+     * @param values Set of values
+     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(double, mitris.sim.core.modeling.InPort, java.util.Collection) 
+     */
+    public void simInject(double e, Port port, Collection<Object> values) {
         coordinator.simInject(e, port, values);
     }
 
-    @Override
-    public void simInject(InPort port, Collection<Object> values) {
+     /**
+     * Injects a value into the port "port", calling the transition function.
+     * @param port Input port
+     * @param values Set of values
+     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(mitris.sim.core.modeling.InPort, java.util.Collection) 
+     */
+    public void simInject(Port port, Collection<Object> values) {
         coordinator.simInject(port, values);
     }
 
-    @Override
-    public void simInject(double e, InPort port, Object value) {
+    /**
+     * Injects a single value into the port "port", calling the transition function.
+     * @param e Elapsed time
+     * @param port Input port
+     * @param value Set of values
+     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(double, mitris.sim.core.modeling.InPort, java.lang.Object) 
+     */
+    public void simInject(double e, Port port, Object value) {
         coordinator.simInject(e, port, value);
     }
 
-    @Override
-    public void simInject(InPort port, Object value) {
+    /**
+     * Injects a single value into the port "port", calling the transition function.
+     * @param port Input port
+     * @param value Set of values
+     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(mitris.sim.core.modeling.InPort, java.lang.Object) 
+     */
+    public void simInject(Port port, Object value) {
         coordinator.simInject(port, value);
     }
 
-    @Override
+     /**
+     * Returns the simulation clock.
+     * @return the simulation clock
+     */
     public SimulationClock getSimulationClock() {
         return coordinator.getClock();
     }

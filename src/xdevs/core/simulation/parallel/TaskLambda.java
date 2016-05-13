@@ -23,8 +23,7 @@
 package xdevs.core.simulation.parallel;
 
 import java.util.concurrent.Callable;
-
-import xdevs.core.simulation.api.SimulatorInterface;
+import xdevs.core.simulation.AbstractSimulator;
 
 /**
  *
@@ -32,9 +31,9 @@ import xdevs.core.simulation.api.SimulatorInterface;
  */
 public class TaskLambda implements Callable<Double> {
     
-    protected SimulatorInterface simulator;
+    protected AbstractSimulator simulator;
     
-    public TaskLambda(SimulatorInterface simulator) {
+    public TaskLambda(AbstractSimulator simulator) {
         this.simulator = simulator;
     }
 

@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import xdevs.core.modeling.api.CoupledInterface;
-import xdevs.core.modeling.api.PortInterface;
+import xdevs.core.modeling.Coupled;
+import xdevs.core.modeling.Port;
 
 /**
  * @author Saurabh Mittal
@@ -48,10 +48,10 @@ public class Util {
     }
 
     @SuppressWarnings("rawtypes")
-    public static String printBridge(String prefix, HashMap<PortInterface, LinkedList<PortInterface>> bridge) {
+    public static String printBridge(String prefix, HashMap<Port, LinkedList<Port>> bridge) {
         StringBuilder sb = new StringBuilder(prefix);
-        for (PortInterface port : bridge.keySet()) {
-            LinkedList<PortInterface> ports = bridge.get(port);
+        for (Port port : bridge.keySet()) {
+            LinkedList<Port> ports = bridge.get(port);
             sb.append("{").append(port.toString()).append("(");
             Iterator<?> it = ports.iterator();
             while (it.hasNext()) {
@@ -63,7 +63,7 @@ public class Util {
 
     }
 
-    public static String printCouplings(CoupledInterface model) {
+    public static String printCouplings(Coupled model) {
         StringBuilder sb = new StringBuilder(" coupling: [");
         sb.append(printLinkedList("\n\tEIC", model.getEIC()));
         sb.append(printLinkedList("\n\tIC", model.getIC()));
