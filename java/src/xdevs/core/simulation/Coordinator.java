@@ -186,9 +186,7 @@ public class Coordinator extends AbstractSimulator {
     }
 
     /**
-     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(double,
-     * mitris.sim.core.modeling.InPort, java.util.Collection) simInject(0.0,
-     * InPort, Collection)
+     * @see xdevs.core.simulation.Coordinator#simInject(double, xdevs.core.modeling.Port, java.util.Collection) 
      * @param port input port to inject the set of values
      * @param values set of values to inject
      */
@@ -199,9 +197,7 @@ public class Coordinator extends AbstractSimulator {
     /**
      * Injects a single value in the given input port with elapsed time e.
      *
-     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(double,
-     * mitris.sim.core.modeling.InPort, java.util.Collection) simInject(double,
-     * InPort, Collection)
+     * @see xdevs.core.simulation.Coordinator#simInject(double, xdevs.core.modeling.Port, java.util.Collection) 
      * @param e
      * @param port
      * @param value
@@ -216,9 +212,7 @@ public class Coordinator extends AbstractSimulator {
      * Injects a single value in the given input port with elapsed time e equal
      * to 0.
      *
-     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(double,
-     * mitris.sim.core.modeling.InPort, java.util.Collection) simInject(0.0,
-     * InPort, Collection)
+     * @see xdevs.core.simulation.Coordinator#simInject(double, xdevs.core.modeling.Port, java.util.Collection) 
      * @param port
      * @param value
      */

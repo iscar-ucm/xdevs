@@ -132,7 +132,7 @@ public class Controller extends Thread {
      * Injects a single value into the port "port", calling the transition function.
      * @param port Input port
      * @param value Set of values
-     * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(mitris.sim.core.modeling.InPort, java.lang.Object) 
+     * @see xdevs.core.simulation.Coordinator#simInject(xdevs.core.modeling.Port, java.lang.Object)
      */
     public void simInject(Port port, Object value) {
         coordinator.simInject(port, value);
