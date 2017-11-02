@@ -41,11 +41,11 @@ public class Gpt extends Coupled {
         super.addComponent(processor);
         Transducer transducer = new Transducer("transducer", observationTime);
         super.addComponent(transducer);
-
-        super.addCoupling(generator, generator.oOut, processor, processor.iIn);
-        super.addCoupling(generator, generator.oOut, transducer, transducer.iArrived);
-        super.addCoupling(processor, processor.oOut, transducer, transducer.iSolved);
-        super.addCoupling(transducer, transducer.oOut, generator, generator.iStop);
+        
+        super.addCoupling(generator.oOut, processor.iIn);
+        super.addCoupling(generator.oOut, transducer.iArrived);
+        super.addCoupling(processor.oOut, transducer.iSolved);
+        super.addCoupling(transducer.oOut, generator.iStop);
     }
 
     public static void main(String args[]) {
