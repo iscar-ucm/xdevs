@@ -21,6 +21,8 @@
  */
 package xdevs.core.test.efp;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
 
@@ -40,6 +42,15 @@ public class Processor extends Atomic {
         super.addInPort(iIn);
         super.addOutPort(oOut);
         this.processingTime = processingTime;
+    }
+
+    public Processor(Element xmlAtomic) {
+        super(xmlAtomic);
+        iIn = (Port<Job>) super.getInPort(iIn.getName());
+        oOut = (Port<Job>) super.getOutPort(oOut.getName());
+        NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
+        Element xmlParameter = (Element)xmlParameters.item(0);
+        processingTime = Double.valueOf(xmlParameter.getAttribute("value"));
     }
 
     @Override

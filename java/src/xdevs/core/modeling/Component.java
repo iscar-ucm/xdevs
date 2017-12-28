@@ -60,6 +60,15 @@ public abstract class Component {
         inPorts.add(port);
         port.parent = this;
     }
+    
+    public Port<?> getInPort(String portName) {
+        for(Port<?> port : inPorts) {
+            if(port.name.equals(portName)) {
+                return port;
+            }
+        }
+        return null;
+    }
 
     public Collection<Port<?>> getInPorts() {
         return inPorts;
@@ -68,6 +77,15 @@ public abstract class Component {
     public void addOutPort(Port<?> port) {
         outPorts.add(port);
         port.parent = this;
+    }
+
+    public Port<?> getOutPort(String portName) {
+        for(Port<?> port : outPorts) {
+            if(port.name.equals(portName)) {
+                return port;
+            }
+        }
+        return null;
     }
 
     public Collection<Port<?>> getOutPorts() {

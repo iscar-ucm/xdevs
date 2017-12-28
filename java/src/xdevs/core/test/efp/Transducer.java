@@ -23,6 +23,8 @@ package xdevs.core.test.efp;
 
 import java.util.LinkedList;
 import java.util.logging.Logger;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
@@ -54,6 +56,18 @@ public class Transducer extends Atomic {
         totalTa = 0;
         clock = 0;
         this.observationTime = observationTime;
+    }
+
+    public Transducer(Element xmlAtomic) {
+        super(xmlAtomic);
+        iArrived = (Port<Job>) super.getInPort(iArrived.getName());
+        iSolved = (Port<Job>) super.getInPort(iSolved.getName());
+        oOut = (Port<Job>) super.getOutPort(oOut.getName());  
+        NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
+        Element xmlParameter = (Element)xmlParameters.item(0);
+        totalTa = 0;
+        clock = 0;
+        observationTime = Double.valueOf(xmlParameter.getAttribute("value"));
     }
 
     @Override

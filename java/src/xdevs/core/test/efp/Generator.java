@@ -21,6 +21,8 @@
  */
 package xdevs.core.test.efp;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
 
@@ -30,7 +32,6 @@ import xdevs.core.modeling.Port;
  * to the source code implemented by Saurabh, a iStart input port must be added.
  */
 public class Generator extends Atomic {
-
     protected Port<Job> iStart = new Port<>("iStart");
     protected Port<Job> iStop = new Port<>("iStop");
     protected Port<Job> oOut = new Port<>("oOut");
@@ -43,6 +44,16 @@ public class Generator extends Atomic {
         super.addInPort(iStart);
         super.addOutPort(oOut);
         this.period = period;
+    }
+    
+    public Generator(Element xmlAtomic) {
+        super(xmlAtomic);
+        iStart = (Port<Job>) super.getInPort(iStart.getName());
+        iStop = (Port<Job>) super.getInPort(iStop.getName());
+        oOut = (Port<Job>) super.getOutPort(oOut.getName());  
+        NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
+        Element xmlParameter = (Element)xmlParameters.item(0);
+        period = Double.valueOf(xmlParameter.getAttribute("value"));
     }
 
     @Override

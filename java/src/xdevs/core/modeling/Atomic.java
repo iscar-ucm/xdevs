@@ -21,6 +21,9 @@
  */
 package xdevs.core.modeling;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import xdevs.core.util.Constants;
 
 /**
@@ -40,22 +43,60 @@ public abstract class Atomic extends Component {
     public Atomic() {
         this(Atomic.class.getSimpleName());
     }
-       
-    // DevsAtomic methods
 
+    /**
+     * Constructor.
+     *
+     * @param xmlAtomic in the form:
+     * <atomic name="name" phase="passive" sigma="INFINITY" class="lib.atomic...">
+     * ...
+     * </atomic>
+     */
+    public Atomic(Element xmlAtomic) {
+        this(xmlAtomic.getAttribute("name"));
+        setPhase(xmlAtomic.getAttribute("phase"));
+        String sigmaAsString = xmlAtomic.getAttribute("sigma");
+        if (sigmaAsString.equals("INFINITY")) {
+            setSigma(Constants.INFINITY);
+        } else {
+            setSigma(Double.valueOf(sigmaAsString));
+        }
+        
+        NodeList xmlChildList = xmlAtomic.getChildNodes();
+        for (int i = 0; i < xmlChildList.getLength(); ++i) {
+            Node xmlNode = xmlChildList.item(i);
+            Element xmlElement;
+            String nodeName = xmlNode.getNodeName();
+            switch (nodeName) {
+                case "inport":
+                    xmlElement = (Element)xmlNode;
+                    super.addInPort(new Port(xmlElement.getAttribute("name")));
+                    break;
+                case "outport":
+                    xmlElement = (Element)xmlNode;
+                    super.addOutPort(new Port(xmlElement.getAttribute("name")));
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+    }
+
+    // DevsAtomic methods
     public double ta() {
         return sigma;
     }
-    
+
     public abstract void deltint();
-    
+
     public abstract void deltext(double e);
 
     public void deltcon(double e) {
         deltint();
         deltext(0);
     }
-    
+
     public abstract void lambda();
 
     public void holdIn(String phase, double sigma) {
@@ -86,7 +127,7 @@ public abstract class Atomic extends Component {
         return phase;
     }
 
-    public void setPhase(String phase) {
+    public final void setPhase(String phase) {
         this.phase = phase;
     }
 
@@ -94,7 +135,7 @@ public abstract class Atomic extends Component {
         return sigma;
     }
 
-    public void setSigma(double sigma) {
+    public final void setSigma(double sigma) {
         this.sigma = sigma;
     }
 
