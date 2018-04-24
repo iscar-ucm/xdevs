@@ -2,12 +2,15 @@
 from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 from xdevs.models import Atomic, Coupled, Port
 from xdevs.sim import Coordinator
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 PHASE_DONE = "done"
 
 class Job:
 	
-	def __init__(self):
+	def __init__(self, name):
 		self.name = name
 		self.time = 0
 		
@@ -16,7 +19,6 @@ class Generator(Atomic):
 
 	def __init__(self, name, period):
 		super().__init__(name)
-		
 		self.i_start = Port(Job, "i_start")
 		self.i_stop = Port(Job, "i_stop")
 		self.o_out = Port(Job, "o_out")
@@ -36,19 +38,16 @@ class Generator(Atomic):
 		
 	def deltint(self):
 		self.job_counter += 1
-		self.hold_in(PHASE_ACTIVE, period)
-	
+		self.hold_in(PHASE_ACTIVE, self.period)
+		
 	def deltext(self, e):
 		self.passivate()
 	
 	def lambdaf(self):
-		self.o_out.add(Job(str(job_counter)))
+		self.o_out.add(Job(str(self.job_counter)))
 		
 		
 class Processor(Atomic):
-
-	
-
 	def __init__(self, name, proc_time):
 		super().__init__(name)
 		
@@ -72,11 +71,11 @@ class Processor(Atomic):
 	
 	def deltext(self, e):
 		if self.phase == PHASE_PASSIVE:
-			self.current_job = i_in.get()
+			self.current_job = self.i_in.get()
 			self.hold_in(PHASE_ACTIVE, self.proc_time)
 	
 	def lambdaf(self):
-		self.o_out.add(current_job)
+		self.o_out.add(self.current_job)
 
 		
 class Transducer(Atomic):
@@ -88,8 +87,8 @@ class Transducer(Atomic):
 		self.i_solved = Port(Job, "i_solved")
 		self.o_out = Port(Job, "o_out")
 		
-		self.add_in_port(self.i_start)
-		self.add_in_port(self.i_stop)
+		self.add_in_port(self.i_arrived)
+		self.add_in_port(self.i_solved)
 		self.add_out_port(self.o_out)
 		
 		self.jobs_arrived = []
@@ -122,9 +121,9 @@ class Transducer(Atomic):
 			logging.info("Jobs arrived: %d" % len(self.jobs_arrived))
 			logging.info("Jobs solved: %d" % len(self.jobs_solved))
 			logging.info("Average TA: %d" % avg_ta)
-			logging.info("Throughput: %d" % throughput)
+			logging.info("Throughput: %d\n" % throughput)
 			
-			holdIn(PHASE_DONE, 0);
+			self.hold_in(PHASE_DONE, 0);
 		else:
 			self.passivate()
 			
@@ -134,15 +133,15 @@ class Transducer(Atomic):
 		if self.phase == PHASE_ACTIVE:
 			job = None
 			
-			if i_arrived:
-				job = i_arrived.get()
-				logging.info("Starting job %s @ t = %d" % (job.name, clock))
+			if self.i_arrived:
+				job = self.i_arrived.get()
+				logging.info("Starting job %s @ t = %d" % (job.name, self.clock))
 				job.time = self.clock
 				self.jobs_arrived.append(job)
 				
-			if i_solved:
-				job = i_solved.get()
-				logging.info("Job %s finished @ t = %d" % (job.name, clock))
+			if self.i_solved:
+				job = self.i_solved.get()
+				logging.info("Job %s finished @ t = %d" % (job.name, self.clock))
 				job.time = self.clock
 				self.jobs_solved.append(job)
 	
@@ -164,13 +163,13 @@ class Gpt(Coupled):
 		self.add_component(proc)
 		self.add_component(trans)
 		
-		self.add_coupling(gen, gen.o_out, proc, proc.i_in)
-		self.add_coupling(gen, gen.o_out, trans, trans.i_arrived)
-		self.add_coupling(proc, proc.o_out, trans, trans.i_solved)
-		self.add_coupling(trans, trans.o_out, gen, gen.i_stop)
+		self.add_coupling(gen.o_out, proc.i_in)
+		self.add_coupling(gen.o_out, trans.i_arrived)
+		self.add_coupling(proc.o_out, trans.i_solved)
+		self.add_coupling(trans.o_out, gen.i_stop)
 		
 	
 gpt = Gpt("gpt", 1, 100)
 coord = Coordinator(gpt)
 coord.initialize()
-coord.simulate(INFINITY)
+coord.simulate()
