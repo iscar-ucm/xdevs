@@ -5,11 +5,12 @@ from collections import deque, defaultdict
 
 
 class Port:
-    def __init__(self, p_type=None, name=None):
+    def __init__(self, p_type=None, name=None, serve=False):
         self.name = name if name else self.__class__.__name__
         self.parent = None
         self.values = deque()
         self.p_type = p_type
+        self.serve = serve
 
     def __bool__(self):
         return bool(self.values)
@@ -75,15 +76,19 @@ class Component(ABC):
 
 
 class Coupling:
-    def __init__(self, port_from, port_to):
+    def __init__(self, port_from, port_to, host=None):
         self.port_from = port_from
         self.port_to = port_to
+        self.host = host
 
     def __str__(self):
         return "(%s -> %s)" % (self.port_from, self.port_to)
 
     def propagate(self):
-        self.port_to.extend(self.port_from.values)
+        if self.host:
+            self.host.inject(self.port_to, list(self.port_from.values))
+        else:
+            self.port_to.extend(self.port_from.values)
 
 
 class Atomic(Component):
@@ -161,12 +166,12 @@ class Coupled(Component):
 
         return self.add_coupling(ports_from[i_from], ports_to[i_to])
 
-    def add_coupling(self, p_from, p_to):
-        coupling = Coupling(p_from, p_to)
+    def add_coupling(self, p_from, p_to, host=None):
+        coupling = Coupling(p_from, p_to, host)
 
         if p_from.parent == self:
             self.eic.append(coupling)
-        elif p_to.parent == self:
+        elif type(p_to) is Port and p_to.parent == self:
             self.eoc.append(coupling)
         else:
             self.ic.append(coupling)

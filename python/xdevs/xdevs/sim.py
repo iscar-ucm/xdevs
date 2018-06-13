@@ -1,8 +1,8 @@
 from xdevs import INFINITY
 from xdevs.models import Atomic, Coupled
 from abc import ABC, abstractmethod
-import logging
-
+import logging, _thread
+from xmlrpc.server import SimpleXMLRPCServer
 
 class SimulationClock:
     def __init__(self, time=0):
@@ -94,6 +94,7 @@ class Coordinator(AbstractSimulator):
         super().__init__(clock or SimulationClock())
         self.model = model.flatten() if flatten else model
         self.simulators = []
+        self.ports_to_serve = {}
 
     def initialize(self):
         self._build_hierarchy()
@@ -108,9 +109,24 @@ class Coordinator(AbstractSimulator):
         for comp in self.model.components:
             # logging.info("%s -> %s" % (self, comp))
             if isinstance(comp, Coupled):
-                self.simulators.append(Coordinator(comp, self.clock))
+                coord = Coordinator(comp, self.clock)
+                self.simulators.append(coord)
+                self.ports_to_serve.update(coord.ports_to_serve)
             elif isinstance(comp, Atomic):
-                self.simulators.append(Simulator(comp, self.clock))
+                sim = Simulator(comp, self.clock)
+                self.simulators.append(sim)
+                for pts in sim.model.in_ports:
+                    if pts.serve:
+                        port_name = "%s.%s" % (pts.parent.name, pts.name)
+                        self.ports_to_serve[port_name] = pts
+
+    def serve(self, host="localhost", port=8000):
+        server = SimpleXMLRPCServer((host, port))
+        server.register_function(self.inject)
+        _thread.start_new_thread(server.serve_forever, ())
+
+    def test(self, msg):
+        return msg + "aa"
 
     def exit(self):
         for sim in self.simulators:
@@ -160,12 +176,22 @@ class Coordinator(AbstractSimulator):
         if type(values) is not list:
             values = [values]
 
+        if type(port) is str:
+            if port in self.ports_to_serve:
+                port = self.ports_to_serve[port]
+            else:
+                logging.error("Port '%s' not found" % port)
+                return True
+
         if time <= self.time_next:
             port.extend(values)
             self.clock.time = time
             self.deltfcn()
+            return True
         else:
             logging.error("Time %d - Input rejected: elapsed time %d is not in bounds" % (self.time_last, e))
+            return False
+
 
     def simulate(self, num_iters=10000):
         logging.info("STARTING SIMULATION...")
