@@ -3,6 +3,8 @@ from xdevs.models import Atomic, Coupled
 from abc import ABC, abstractmethod
 import logging, _thread
 from xmlrpc.server import SimpleXMLRPCServer
+import pickle
+
 
 class SimulationClock:
     def __init__(self, time=0):
@@ -133,7 +135,7 @@ class Coordinator(AbstractSimulator):
             sim.exit()
 
     def ta(self):
-        return min([sim.time_next for sim in self.simulators]) - self.clock.time
+        return min([sim.time_next for sim in self.simulators], default=0) - self.clock.time
 
     def lambdaf(self):
         for sim in self.simulators:
@@ -172,18 +174,21 @@ class Coordinator(AbstractSimulator):
             out_port.clear()
 
     def inject(self, port, values, e=0):
+        logging.debug("INJECTING")
         time = self.time_last + e
+
         if type(values) is not list:
             values = [values]
 
         if type(port) is str:
+            values = list(map(lambda x: pickle.loads(x.encode()), values))
             if port in self.ports_to_serve:
                 port = self.ports_to_serve[port]
             else:
                 logging.error("Port '%s' not found" % port)
                 return True
 
-        if time <= self.time_next:
+        if time <= self.time_next or time != time:
             port.extend(values)
             self.clock.time = time
             self.deltfcn()
@@ -191,7 +196,6 @@ class Coordinator(AbstractSimulator):
         else:
             logging.error("Time %d - Input rejected: elapsed time %d is not in bounds" % (self.time_last, e))
             return False
-
 
     def simulate(self, num_iters=10000):
         logging.info("STARTING SIMULATION...")
@@ -211,6 +215,14 @@ class Coordinator(AbstractSimulator):
         tf = self.clock.time + time_interv
 
         while self.clock.time < tf:
+            self.lambdaf()
+            self.deltfcn()
+            self.clear()
+            self.clock.time = self.time_next
+
+    def simulate_inf(self):
+
+        while True:
             self.lambdaf()
             self.deltfcn()
             self.clear()

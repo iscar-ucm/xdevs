@@ -1,6 +1,3 @@
-
-
-
 import math
 
 INFINITY = math.inf

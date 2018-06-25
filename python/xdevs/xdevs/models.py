@@ -2,7 +2,10 @@ from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
 from abc import ABC, abstractmethod
 from collections import deque, defaultdict
+import pickle
+import logging
 
+logging.basicConfig(level=logging.DEBUG)
 
 class Port:
     def __init__(self, p_type=None, name=None, serve=False):
@@ -86,7 +89,12 @@ class Coupling:
 
     def propagate(self):
         if self.host:
-            self.host.inject(self.port_to, list(self.port_from.values))
+            if len(self.port_from.values) > 0:
+                values = list(map(lambda x: pickle.dumps(x, protocol=0).decode(), self.port_from.values))
+                try:
+                    self.host.inject(self.port_to, values)
+                except:
+                    logging.warning("Values could not be injected (%s)" % self.port_to)
         else:
             self.port_to.extend(self.port_from.values)
 
@@ -187,7 +195,7 @@ class Coupled(Component):
                 self._remove_couplings(comp)
                 self.components.remove(comp)
 
-        if parent is None:
+        if self.parent is None:
             return self
 
         left_bridge_eic = self._create_left_bridge(self.parent.eic)
@@ -195,16 +203,16 @@ class Coupled(Component):
         right_bridge_eic = self._create_right_bridge(self.parent.eoc)
         right_bridge_ic = self._create_right_bridge(self.parent.ic)
 
-        self._complete_left_bridge(left_bridge_eic, parent.eic)
-        self._complete_left_bridge(left_bridge_ic, parent.ic)
-        self._complete_right_bridge(right_bridge_eoc, parent.eoc)
-        self._complete_right_bridge(right_bridge_ic, parent.ic)
+        self._complete_left_bridge(left_bridge_eic, self.parent.eic)
+        self._complete_left_bridge(left_bridge_ic, self.parent.ic)
+        self._complete_right_bridge(right_bridge_eic, self.parent.eoc)
+        self._complete_right_bridge(right_bridge_ic, self.parent.ic)
 
         for comp in self.components:
-            parent.add_component(comp)
+            self.parent.add_component(comp)
 
         for coup in self.ic:
-            parent.ic.append(coup)
+            self.parent.ic.append(coup)
 
         return self
 
@@ -220,7 +228,7 @@ class Coupled(Component):
                 if coup.port_to == in_port:
                     self.ic.remove(coup)
 
-        for out_port in out_ports:
+        for out_port in self.out_ports:
             for coup in self.eoc:
                 if coup.port_to == out_port:
                     self.eoc.remove(coup)
