@@ -6,9 +6,8 @@
  */
 
 #include "Coordinator.h"
-#include "../util/Constants.h"
 
-Coordinator::Coordinator(SimulationClock* clock, Coupled* model) : AbstractSimulator(clock) {
+Coordinator::Coordinator(SimulationClock* clock, Coupled* model, std::string rulesFilePath = "") : AbstractSimulator(clock) {
 	this->model = model;
 	// Build hierarchy
 	std::list<Component*> components = model->getComponents();
@@ -23,9 +22,13 @@ Coordinator::Coordinator(SimulationClock* clock, Coupled* model) : AbstractSimul
 			simulators.push_back(simulator);
 		}
 	}
+
+	if(rulesFilePath != "") rulesEval.parseRules(rulesFilePath, model);
 }
 
 Coordinator::Coordinator(Coupled* model) : Coordinator(new SimulationClock(), model) {}
+
+Coordinator::Coordinator(Coupled* model, std::string rulesFilePath) : Coordinator(new SimulationClock(), model, rulesFilePath) {}
 
 Coordinator::~Coordinator() {
 	for(auto simulator : simulators) {
@@ -51,21 +54,21 @@ std::list<AbstractSimulator*>& Coordinator::getSimulators() {
 	return simulators;
 }
 
+void Coordinator::lambda() {
+	for (auto simulator : simulators) {
+		simulator->lambda();
+	}
+	propagateOutput();
+}
+
 double Coordinator::ta() {
-	double tn = Constants::INFINITY;
+	double tn = std::numeric_limits<double>::infinity();
 	for (auto simulator : simulators) {
 		if (simulator->getTN() < tn) {
 			tn = simulator->getTN();
 		}
 	}
 	return tn - clock->getTime();
-}
-
-void Coordinator::lambda() {
-	for (auto simulator : simulators) {
-		simulator->lambda();
-	}
-	propagateOutput();
 }
 
 void Coordinator::propagateOutput() {
@@ -113,9 +116,10 @@ void Coordinator::clear() {
 void Coordinator::simulate(long numIterations) {
 	clock->setTime(tN);
 	long counter;
-	for (counter = 1; counter < numIterations && clock->getTime() < Constants::INFINITY; counter++) {
+	for (counter = 1; counter < numIterations && clock->getTime() < std::numeric_limits<double>::infinity(); counter++) {
 		this->lambda();
 		this->deltfcn();
+		if(rulesEval.hasRules()) rulesEval.checkRules();
 		this->clear();
 		clock->setTime(tN);
 	}
@@ -124,7 +128,7 @@ void Coordinator::simulate(long numIterations) {
 void Coordinator::simulate(double timeInterval) {
 	clock->setTime(tN);
 	double tF = clock->getTime() + timeInterval;
-	while (clock->getTime() < Constants::INFINITY && clock->getTime() < tF) {
+	while (clock->getTime() < std::numeric_limits<double>::infinity() && clock->getTime() < tF) {
 		this->lambda();
 		this->deltfcn();
 		this->clear();

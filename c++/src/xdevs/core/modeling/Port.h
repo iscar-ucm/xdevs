@@ -32,6 +32,7 @@ protected:
 	std::list<Event> values;
 public:
 	Port(const std::string& name);
+	Port() {};
 	virtual ~Port();
 
 	void clear();

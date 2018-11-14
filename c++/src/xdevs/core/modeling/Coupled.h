@@ -22,6 +22,7 @@
 #ifndef SRC_XDEVS_CORE_MODELING_COUPLED_H_
 #define SRC_XDEVS_CORE_MODELING_COUPLED_H_
 
+#include <iostream>
 #include <list>
 #include <string>
 #include "Component.h"
@@ -47,6 +48,9 @@ public:
     const std::list<Coupling*>& getIC() const;
     const std::list<Coupling*>& getEIC() const;
     const std::list<Coupling*>& getEOC() const;
+
+    Component* compFromPath(std::string path);
+    Port* portFromPath(std::string path);
 	// TODO: Implement this function
 	// CoupledInterface flatten()
 };

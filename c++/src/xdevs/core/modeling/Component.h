@@ -35,6 +35,7 @@ protected:
 public:
 	Component(const std::string& name);
 	virtual ~Component();
+	const std::string getName();
 
 	virtual void initialize() = 0;
 	virtual void exit() = 0;

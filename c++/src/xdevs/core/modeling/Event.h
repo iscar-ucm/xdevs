@@ -23,22 +23,28 @@
 #define SRC_XDEVS_CORE_MODELING_EVENT_H_
 
 #include <memory>
+#include <iostream>
 
 class Event {
 protected:
 	std::shared_ptr<void> sharedPtr;
+	const char* vtype;
 public:
 	Event();
+	template <typename T> Event(T* sptr);
 	Event(const Event& src);
 	const Event& operator=(const Event& right);
 	virtual ~Event();
 
 	void* getPtr();
+	std::shared_ptr<void> getSharedPtr();
+	const char* getType();
 
 	template <typename T> static Event makeEvent(T* ptr) {
 		Event event;
 		event.sharedPtr.reset();
 		event.sharedPtr = std::shared_ptr<T>(ptr);
+		event.vtype = typeid(T).name();
 		return event;
 	}
 };

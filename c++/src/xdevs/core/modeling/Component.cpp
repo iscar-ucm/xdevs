@@ -30,6 +30,10 @@ const std::list<Port*>& Component::getInPorts() {
 	return inPorts;
 }
 
+const std::string Component::getName() {
+	return name;
+}
+
 void Component::addOutPort(Port* port) {
 	outPorts.push_back(port);
 }

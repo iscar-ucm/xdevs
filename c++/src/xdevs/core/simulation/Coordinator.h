@@ -27,14 +27,19 @@
 #include "../util/Constants.h"
 #include "AbstractSimulator.h"
 #include "Simulator.h"
+#include "../util/RulesEvaluator.h"
 
 class Coordinator : public AbstractSimulator {
 protected:
 	Coupled* model;
 	std::list<AbstractSimulator*> simulators;
+
+	RulesEvaluator rulesEval;
+
 public:
-	Coordinator(SimulationClock* clock, Coupled* model);
+	Coordinator(SimulationClock* clock, Coupled* model, std::string rulesFilePath);
 	Coordinator(Coupled* model);
+	Coordinator(Coupled* model, std::string rulesFilePath);
 	virtual ~Coordinator();
 
 	virtual void initialize();
