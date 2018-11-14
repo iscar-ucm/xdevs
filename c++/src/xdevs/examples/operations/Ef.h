@@ -1,0 +1,42 @@
+/*
+ * Copyright (C) 2016-2016 José Luis Risco Martín <jlrisco@ucm.es>.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see
+ * http://www.gnu.org/licenses/
+ *
+ * Contributors:
+ *  - José Luis Risco Martín
+ */
+
+#ifndef SRC_XDEVS_EXAMPLES_EFP_EF_H_
+#define SRC_XDEVS_EXAMPLES_EFP_EF_H_
+
+#include "../../core/modeling/Coupled.h"
+#include "Generator.h"
+#include "Logger.h"
+#include "Adder.h"
+#include "Mult.h"
+
+class Ef : public Coupled {
+protected:
+	Generator generator;
+	Logger logger;
+	Adder adder, adder2;
+	Mult mult;
+public:
+	Ef(const std::string& name, const double& period);
+	virtual ~Ef();
+};
+
+#endif /* SRC_XDEVS_EXAMPLES_EFP_EF_H_ */
