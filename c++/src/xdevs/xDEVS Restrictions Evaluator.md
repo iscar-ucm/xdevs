@@ -68,4 +68,4 @@ coordinator.exit();
 ```
 
 ### 3. Examples
-Some examples explaining that concepts can be found in the 'examples' folder of the C++ DEVS interpreter (‘operations’ and ‘operations are’, each one with an example rules file).
+Some examples explaining that concepts can be found in the 'examples' folder of the C++ DEVS interpreter (‘operations’ and ‘operations_arrays’, each one with an example rules file).
