@@ -11,7 +11,7 @@ being:
 - **boolean_expr**: boolean expression that indicates the activation condition of the rule. It can contain arithmetic ('+', '-', '*' and '/') and logic operators ('==', "!=", "<", "<=", ">", ">=", "&&" and "||"). As operators, it can contain the path of a port, a number or boolean literal or a variable (seen in the next section).  The path of the port will be expressed in the following format: ``` coupled1.coupled2.atomic1.port_name```.
 - **level**: specifies the severity level of the rule. It can be set to 'info' (only shows informative messages when a rule is accomplished) or 'error' (the simulation is stopped).
 
-Teniendo esto en cuenta, a basic restrictions file could have the following format (_mult_ and _adder_ are supposed to be modules with a floating point output):
+Keeping this in mind, a basic restrictions file could have the following format (_mult_ and _adder_ are supposed to be modules with a floating point output):
 ```
 {
 	"rules": {
