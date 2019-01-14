@@ -41,6 +41,7 @@ public class RTCentralCoordinator extends CoordinatorParallel implements Runnabl
     private static final Logger logger = Logger.getLogger(RTCentralCoordinator.class.getName());
     protected double timeInterval;
     protected Thread myThread;
+    protected int timeScale = 1000;
 
     public RTCentralCoordinator(Coupled model) {
         super(new SimulationClock(System.currentTimeMillis() / 1000.0), model);
@@ -53,13 +54,21 @@ public class RTCentralCoordinator extends CoordinatorParallel implements Runnabl
         myThread.start();
     }
 
+    public void setTimeScale(double realTimeFactor) {
+        // convert the given time factor to milliseconds
+        timeScale = (int) Math.floor(1000 * realTimeFactor);
+        System.out.println("Time Scale factor: " + realTimeFactor);
+    }
+
     @Override
     public void run() {
         long delay;
         clock.setTime(tN);
         double tF = clock.getTime() + timeInterval;
         while (clock.getTime() < Constants.INFINITY && clock.getTime() < tF) {
-            delay = (long) (1000 * clock.getTime() - System.currentTimeMillis());
+            //delay = (long) (1000 * clock.getTime() - System.currentTimeMillis())*timeScale;           
+            delay = (long) (clock.getTime() - tL) * timeScale;
+            delay = Math.max(delay, 0);
             if (delay > 0) {
                 try {
                     Thread.sleep(delay);
@@ -76,10 +85,14 @@ public class RTCentralCoordinator extends CoordinatorParallel implements Runnabl
     }
 
     public static void main(String[] args) {
+        double timeStart = System.currentTimeMillis();
         DevsLogger.setup(Level.FINE);
-        Efp efp = new Efp("EFP", 1, 3, 30);
+        Efp efp = new Efp("EFP", 1, 3, 20);
         RTCentralCoordinator coordinator = new RTCentralCoordinator(efp);
         coordinator.initialize();
+        coordinator.setTimeScale(0.1);
         coordinator.simulate(60.0);
+        double timeEnd = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (timeEnd - timeStart) + "ms");
     }
 }
