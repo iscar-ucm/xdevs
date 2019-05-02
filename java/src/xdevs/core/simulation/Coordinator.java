@@ -47,12 +47,12 @@ public class Coordinator extends AbstractSimulator {
 
     public Coordinator(SimulationClock clock, Coupled model, boolean flatten) {
         super(clock);
-        LOGGER.fine(model.getName() + "'s hierarchical...\n" + Util.printCouplings(model));
         if (flatten) {
             this.model = model.flatten();
         } else {
             this.model = model;
         }
+        LOGGER.fine(model.getName() + "'s hierarchical...\n" + Util.printCouplings(model));
     }
     
     public Coordinator(SimulationClock clock, Coupled model) {

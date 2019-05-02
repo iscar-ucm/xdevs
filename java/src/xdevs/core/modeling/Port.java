@@ -69,4 +69,17 @@ public class Port<E> {
     public Component getParent() {
         return parent;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(name);
+        Component parent = this.getParent();
+        while(parent!=null) {
+            sb.insert(0, ".");
+            sb.insert(0, parent.getName());
+            parent = parent.getParent();
+        }
+        return sb.toString();
+    }
 }
