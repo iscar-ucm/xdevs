@@ -26,7 +26,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,7 +36,7 @@ import org.w3c.dom.NodeList;
  * @author José Luis Risco Martín
  */
 public class Coupled extends Component {
-    
+
     private static final Logger LOGGER = Logger.getLogger(Coupled.class.getName());
 
     // Coupled attributes
@@ -45,15 +44,15 @@ public class Coupled extends Component {
     protected LinkedList<Coupling<?>> ic = new LinkedList<>();
     protected LinkedList<Coupling<?>> eic = new LinkedList<>();
     protected LinkedList<Coupling<?>> eoc = new LinkedList<>();
-    
+
     public Coupled(String name) {
         super(name);
     }
-    
+
     public Coupled() {
         this(Coupled.class.getSimpleName());
     }
-    
+
     public Coupled(Element xmlCoupled) {
         super(xmlCoupled.getAttribute("name"));
         // Creamos los distintos elementos
@@ -64,30 +63,30 @@ public class Coupled extends Component {
             String nodeName = xmlNode.getNodeName();
             switch (nodeName) {
                 case "inport":
-                    xmlChild = (Element)xmlNode;
+                    xmlChild = (Element) xmlNode;
                     super.addInPort(new Port(xmlChild.getAttribute("name")));
                     break;
                 case "outport":
-                    xmlChild = (Element)xmlNode;
+                    xmlChild = (Element) xmlNode;
                     super.addOutPort(new Port(xmlChild.getAttribute("name")));
                     break;
                 case "coupled":
-                    xmlChild = (Element)xmlNode;
+                    xmlChild = (Element) xmlNode;
                     this.addComponent(new Coupled(xmlChild));
                     break;
                 case "atomic":
-                    xmlChild = (Element)xmlNode;
+                    xmlChild = (Element) xmlNode;
                     try {
                         Class atomicClass = Class.forName(xmlChild.getAttribute("class"));
                         Constructor constructor = atomicClass.getConstructor(new Class[]{Class.forName("org.w3c.dom.Element")});
                         Object atomicObject = constructor.newInstance(new Object[]{xmlChild});
-                        this.addComponent((Atomic)atomicObject);
+                        this.addComponent((Atomic) atomicObject);
                     } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
                         LOGGER.severe(ex.getLocalizedMessage());
                     }
                     break;
                 case "connection":
-                    xmlChild = (Element)xmlNode;
+                    xmlChild = (Element) xmlNode;
                     String componentFrom = xmlChild.getAttribute("componentFrom");
                     String portFrom = xmlChild.getAttribute("portFrom");
                     String componentTo = xmlChild.getAttribute("componentTo");
@@ -98,22 +97,22 @@ public class Coupled extends Component {
                     break;
             }
         }
-        
+
     }
-    
+
     @Override
     public void initialize() {
     }
-    
+
     @Override
     public void exit() {
     }
-    
+
     @Override
     public Component getParent() {
         return parent;
     }
-    
+
     @Override
     public void setParent(Component parent) {
         this.parent = parent;
@@ -168,7 +167,7 @@ public class Coupled extends Component {
             ic.add(coupling);
         }
     }
-    
+
     public final void addCoupling(String cFromName, String pFromName, String cToName, String pToName) {
         Component cFrom = this.getComponentByName(cFromName);
         Component cTo = this.getComponentByName(cToName);
@@ -209,8 +208,15 @@ public class Coupled extends Component {
      * @param pFrom Port at the beginning of the connection
      * @param pTo Port at the end of the connection
      */
-    public void addCoupling(Port<?> pFrom, Port<?> pTo) {
-        @SuppressWarnings({"rawtypes", "unchecked"})
+    public void addCoupling(Port<?> pFrom, Port<?> pTo) {                
+        if (pFrom.getParent() == null) {
+            LOGGER.severe("Port " + pFrom.getName() + " does not have a parent component. Maybe the port was not added to the component?");
+            return;
+        }
+        if (pTo.getParent() == null) {
+            LOGGER.severe("Port " + pTo.getName() + " does not have a parent component. Maybe the port was not added to the component?");
+            return;
+        }
         Coupling coupling = new Coupling(pFrom, pTo);
         // Add to connections
         if (pFrom.getParent() == this) {
@@ -221,7 +227,7 @@ public class Coupled extends Component {
             ic.add(coupling);
         }
     }
-    
+
     public Collection<Component> getComponents() {
         return components;
     }
@@ -238,29 +244,29 @@ public class Coupled extends Component {
         if (this.name.equals(name)) {
             return this;
         }
-        
+
         for (Component component : components) {
             if (component.name.equals(name)) {
                 return component;
             }
         }
-        
+
         return null;
     }
-    
+
     public final void addComponent(Component component) {
         component.setParent(this);
         components.add(component);
     }
-    
+
     public LinkedList<Coupling<?>> getIC() {
         return ic;
     }
-    
+
     public LinkedList<Coupling<?>> getEIC() {
         return eic;
     }
-    
+
     public LinkedList<Coupling<?>> getEOC() {
         return eoc;
     }
@@ -277,7 +283,7 @@ public class Coupled extends Component {
                 components.remove(i--);
             }
         }
-        
+
         if (parent == null) {
             return this;
         }
@@ -289,22 +295,22 @@ public class Coupled extends Component {
         // The same with the output ports
         HashMap<Port<?>, LinkedList<Port<?>>> rightBridgeEOC = createRightBrige(((Coupled) parent).getEOC());
         HashMap<Port<?>, LinkedList<Port<?>>> rightBridgeIC = createRightBrige(((Coupled) parent).getIC());
-        
+
         completeLeftBridge(eic, leftBridgeEIC, ((Coupled) parent).getEIC());
         completeLeftBridge(eic, leftBridgeIC, ((Coupled) parent).getIC());
         completeRightBridge(eoc, rightBridgeEOC, ((Coupled) parent).getEOC());
         completeRightBridge(eoc, rightBridgeIC, ((Coupled) parent).getIC());
-        
+
         for (Component component : components) {
             ((Coupled) parent).addComponent(component);
         }
-        
+
         for (Coupling<?> cIC : ic) {
             ((Coupled) parent).getIC().add(cIC);
         }
         return this;
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void completeLeftBridge(LinkedList<Coupling<?>> couplings,
             HashMap<Port<?>, LinkedList<Port<?>>> leftBridge,
@@ -318,7 +324,7 @@ public class Coupled extends Component {
             }
         }
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void completeRightBridge(LinkedList<Coupling<?>> couplings,
             HashMap<Port<?>, LinkedList<Port<?>>> rightBridge,
@@ -332,7 +338,7 @@ public class Coupled extends Component {
             }
         }
     }
-    
+
     private HashMap<Port<?>, LinkedList<Port<?>>> createLeftBrige(LinkedList<Coupling<?>> couplings) {
         HashMap<Port<?>, LinkedList<Port<?>>> leftBridge = new HashMap<>();
         for (Port<?> iPort : this.inPorts) {
@@ -349,7 +355,7 @@ public class Coupled extends Component {
         }
         return leftBridge;
     }
-    
+
     private HashMap<Port<?>, LinkedList<Port<?>>> createRightBrige(LinkedList<Coupling<?>> couplings) {
         HashMap<Port<?>, LinkedList<Port<?>>> rightBridge = new HashMap<>();
         for (Port<?> oPort : this.outPorts) {
@@ -366,7 +372,7 @@ public class Coupled extends Component {
         }
         return rightBridge;
     }
-    
+
     private void removePortsAndCouplings(Component child) {
         Collection<Port<?>> inPorts = child.getInPorts();
         for (Port<?> iport : inPorts) {
@@ -399,5 +405,5 @@ public class Coupled extends Component {
             }
         }
     }
-    
+
 }
