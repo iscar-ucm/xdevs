@@ -175,11 +175,12 @@ public class Coordinator extends AbstractSimulator {
      * @param values set of values to inject
      */
     public void simInject(double e, Port port, Collection<Object> values) {
-        double time = tL + e;
+        double time = clock.getTime() + e;
         if (time <= tN) {
             port.addValues(values);
             clock.setTime(time);
             deltfcn();
+            clear();
         } else {
             LOGGER.severe("Time: " + tL + " - ERROR input rejected: elapsed time " + e + " is not in bounds.");
         }
