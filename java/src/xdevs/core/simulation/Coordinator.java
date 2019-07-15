@@ -44,7 +44,7 @@ public class Coordinator extends AbstractSimulator {
 
     protected Coupled model;
     protected LinkedList<AbstractSimulator> simulators = new LinkedList<>();
-    int totalIterations = 0;
+    long totalIterations = 0;
 
     public Coordinator(SimulationClock clock, Coupled model, boolean flatten) {
         super(clock);
