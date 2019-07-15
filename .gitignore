@@ -1,14 +1,1 @@
-.settings
-bin
-build
-dist
-nbproject
-.classpath
-.project
-build.xml
-manifest.mf
-*.log
-*.log.*
-.cproject
-Debug*
-__pycache__
+target
