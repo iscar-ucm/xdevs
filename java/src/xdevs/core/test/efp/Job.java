@@ -34,4 +34,9 @@ public class Job {
     this.id = name;
     this.time = 0.0;
   }
+  
+  @Override
+  public String toString() {
+      return "(id,t)=(" + id + "," + time + ")";
+  }
 }

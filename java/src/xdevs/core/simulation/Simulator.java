@@ -89,14 +89,14 @@ public class Simulator extends AbstractSimulator {
     public void clear() {
         Collection<Port<?>> inPorts;
         inPorts = model.getInPorts();
-        for (Port<?> port : inPorts) {
+        inPorts.forEach((port) -> {
             port.clear();
-        }
+        });
         Collection<Port<?>> outPorts;
         outPorts = model.getOutPorts();
-        for (Port<?> port : outPorts) {
+        outPorts.forEach((port) -> {
             port.clear();
-        }
+        });
     }
 
     @Override

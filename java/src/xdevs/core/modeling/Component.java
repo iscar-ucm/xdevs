@@ -48,12 +48,7 @@ public abstract class Component {
     public abstract void exit();
 
     public boolean isInputEmpty() {
-        for (Port<?> port : inPorts) {
-            if (!port.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
+        return inPorts.stream().noneMatch((port) -> (!port.isEmpty()));
     }
 
     public void addInPort(Port<?> port) {
@@ -104,14 +99,14 @@ public abstract class Component {
     public String toString() {
         StringBuilder sb = new StringBuilder(name + " :");
         sb.append(" Inports[ ");
-        for (Port<?> p : inPorts) {
+        inPorts.forEach((p) -> {
             sb.append(p).append(" ");
-        }
+        });
         sb.append("]");
         sb.append(" Outports[ ");
-        for (Port<?> p : outPorts) {
+        outPorts.forEach((p) -> {
             sb.append(p).append(" ");
-        }
+        });
         sb.append("]");
         return sb.toString();
     }

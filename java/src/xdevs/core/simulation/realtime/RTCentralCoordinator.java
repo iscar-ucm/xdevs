@@ -38,7 +38,7 @@ import xdevs.core.util.DevsLogger;
  */
 public class RTCentralCoordinator extends CoordinatorParallel implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(RTCentralCoordinator.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(RTCentralCoordinator.class.getName());
     protected double timeInterval;
     protected Thread myThread;
     protected int timeScale = 1000;
@@ -73,7 +73,7 @@ public class RTCentralCoordinator extends CoordinatorParallel implements Runnabl
                 try {
                     Thread.sleep(delay);
                 } catch (InterruptedException ex) {
-                    logger.severe(ex.getLocalizedMessage());
+                    LOGGER.severe(ex.getLocalizedMessage());
                 }
             }
             lambda();

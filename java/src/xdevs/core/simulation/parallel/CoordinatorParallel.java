@@ -65,12 +65,12 @@ public class CoordinatorParallel extends Coordinator {
     @Override
     public void buildHierarchy() {
         super.buildHierarchy();
-        for (AbstractSimulator simulator : simulators) {
+        simulators.forEach((simulator) -> {
             lambdaTasks.add(new TaskLambda(simulator));
-        }
-        for (AbstractSimulator simulator : simulators) {
+        });
+        simulators.forEach((simulator) -> {
             deltfcnTasks.add(new TaskDeltFcn(simulator));
-        }        
+        });        
     }
 
     @Override

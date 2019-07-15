@@ -301,13 +301,13 @@ public class Coupled extends Component {
         completeRightBridge(eoc, rightBridgeEOC, ((Coupled) parent).getEOC());
         completeRightBridge(eoc, rightBridgeIC, ((Coupled) parent).getIC());
 
-        for (Component component : components) {
+        components.forEach((component) -> {
             ((Coupled) parent).addComponent(component);
-        }
+        });
 
-        for (Coupling<?> cIC : ic) {
+        ic.forEach((cIC) -> {
             ((Coupled) parent).getIC().add(cIC);
-        }
+        });
         return this;
     }
 

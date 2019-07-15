@@ -62,8 +62,9 @@ public class Port<E> {
     }
 
     public void addValues(Collection<E> values) {
-        for(E value : values)
+        values.forEach((value) -> {
             this.values.add(value);
+        });
     }
 
     public Component getParent() {
@@ -74,11 +75,11 @@ public class Port<E> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(name);
-        Component parent = this.getParent();
-        while(parent!=null) {
+        Component parentAux = this.getParent();
+        while(parentAux!=null) {
             sb.insert(0, ".");
-            sb.insert(0, parent.getName());
-            parent = parent.getParent();
+            sb.insert(0, parentAux.getName());
+            parentAux = parentAux.getParent();
         }
         return sb.toString();
     }

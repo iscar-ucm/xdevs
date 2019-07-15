@@ -84,7 +84,7 @@ public class CoordinatorProfile extends Coordinator {
     protected void buildHierarchy() {
         // Build hierarchy
         Collection<Component> components = model.getComponents();
-        for (Component component : components) {
+        components.forEach((component) -> {
             if (component instanceof Coupled) {
                 CoordinatorProfile coordinator = new CoordinatorProfile(clock, (Coupled) component);
                 simulators.add(coordinator);
@@ -92,7 +92,7 @@ public class CoordinatorProfile extends Coordinator {
                 SimulatorProfile simulator = new SimulatorProfile(clock, (Atomic) component);
                 simulators.add(simulator);
             }
-        }
+        });
     }
 
     // AbstractSimulator Calls
@@ -278,9 +278,9 @@ public class CoordinatorProfile extends Coordinator {
         buffer.append("numCallsToPropagateInput = ").append(numCallsToPropagateInput).append("\n");
         buffer.append("timeUsedByPropagateInput = ").append(timeUsedByPropagateInput).append(" ms\n");
         buffer.append("executionTime = ").append(executionTime).append(" ms\n");
-        for (AbstractSimulator simulator : super.getSimulators()) {
+        super.getSimulators().forEach((simulator) -> {
             buffer.append(simulator.toString());
-        }
+        });
         return buffer.toString();
     }
 

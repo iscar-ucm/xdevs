@@ -71,7 +71,7 @@ public class Coordinator extends AbstractSimulator {
     protected void buildHierarchy() {
           // Build hierarchy
         Collection<Component> components = model.getComponents();
-        for (Component component : components) {
+        components.forEach((component) -> {
             if (component instanceof Coupled) {
                 Coordinator coordinator = new Coordinator(clock, (Coupled) component, false);
                 simulators.add(coordinator);
@@ -79,24 +79,24 @@ public class Coordinator extends AbstractSimulator {
                 Simulator simulator = new Simulator(clock, (Atomic) component);
                 simulators.add(simulator);
             }
-        }
+        });
     }
 
     @Override
     public void initialize() {
         this.buildHierarchy();
-        for (AbstractSimulator simulator : simulators) {
+        simulators.forEach((simulator) -> {
             simulator.initialize();
-        }
+        });
         tL = clock.getTime();
         tN = tL + ta();
     }
 
     @Override
     public void exit() {
-        for (AbstractSimulator simulator : simulators) {
+        simulators.forEach((simulator) -> {
             simulator.exit();
-        }
+        });
     }
 
     public Collection<AbstractSimulator> getSimulators() {
@@ -116,56 +116,56 @@ public class Coordinator extends AbstractSimulator {
 
     @Override
     public void lambda() {
-        for (AbstractSimulator simulator : simulators) {
+        simulators.forEach((simulator) -> {
             simulator.lambda();
-        }
+        });
         propagateOutput();
     }
 
     public void propagateOutput() {
         LinkedList<Coupling<?>> ic = model.getIC();
-        for (Coupling<?> c : ic) {
+        ic.forEach((c) -> {
             c.propagateValues();
-        }
+        });
 
         LinkedList<Coupling<?>> eoc = model.getEOC();
-        for (Coupling<?> c : eoc) {
+        eoc.forEach((c) -> {
             c.propagateValues();
-        }
+        });
     }
 
     @Override
     public void deltfcn() {
         propagateInput();
-        for (AbstractSimulator simulator : simulators) {
+        simulators.forEach((simulator) -> {
             simulator.deltfcn();
-        }
+        });
         tL = clock.getTime();
         tN = tL + ta();
     }
 
     public void propagateInput() {
         LinkedList<Coupling<?>> eic = model.getEIC();
-        for (Coupling<?> c : eic) {
+        eic.forEach((c) -> {
             c.propagateValues();
-        }
+        });
     }
 
     @Override
     public void clear() {
-        for (AbstractSimulator simulator : simulators) {
+        simulators.forEach((simulator) -> {
             simulator.clear();
-        }
+        });
         Collection<Port<?>> inPorts;
         inPorts = model.getInPorts();
-        for (Port<?> port : inPorts) {
+        inPorts.forEach((port) -> {
             port.clear();
-        }
+        });
         Collection<Port<?>> outPorts;
         outPorts = model.getOutPorts();
-        for (Port<?> port : outPorts) {
+        outPorts.forEach((port) -> {
             port.clear();
-        }
+        });
     }
 
     /**
