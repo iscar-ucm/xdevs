@@ -4,7 +4,6 @@ type Component interface {
 	GetName() string
 	Initialize()
 	Exit()
-	Clear()
 	IsInputEmpty() bool
 	AddInPort(port *Port)
 	GetInPort(portName string) *Port
@@ -30,57 +29,80 @@ type component struct {
 }
 
 func (c *component) GetName() string {
-	panic("implement me")
+	return c.Name
 }
 
 func (c *component) Initialize() {
-	panic("implement me")
+	panic("This method is abstract and must be implemented")
 }
 
 func (c *component) Exit() {
-	panic("implement me")
-}
-
-func (c *component) Clear() {
-	panic("implement me")
+	panic("This method is abstract and must be implemented")
 }
 
 func (c *component) IsInputEmpty() bool {
-	panic("implement me")
+	res := true
+	for _, inPort := range c.InPorts {
+		if ! (*inPort).IsEmpty() {
+			res = false
+			break
+		}
+	}
+	return res
 }
 
 func (c *component) AddInPort(port *Port) {
-	panic("implement me")
+	c.InPorts = append(c.InPorts, port)
 }
 
 func (c *component) GetInPort(portName string) *Port {
-	panic("implement me")
+	for _, inPort := range c.InPorts {
+		if (*inPort).GetName() == portName {
+			return inPort
+		}
+	}
+	panic("port name was not found within the input ports list")
 }
 
 func (c *component) GetInPorts() []*Port {
-	panic("implement me")
+	return c.InPorts
 }
 
 func (c *component) AddOutPort(port *Port) {
-	panic("implement me")
+	c.OutPorts = append(c.OutPorts, port)
 }
 
 func (c *component) GetOutPort(portName string) *Port {
-	panic("implement me")
+	for _, outPort := range c.OutPorts {
+		if (*outPort).GetName() == portName {
+			return outPort
+		}
+	}
+	panic("port name was not found within the output ports list")
 }
 
 func (c *component) GetOutPorts() []*Port {
-	panic("implement me")
+	return c.OutPorts
 }
 
 func (c *component) GetParent() *Component {
-	panic("implement me")
+	return c.Parent
 }
 
 func (c *component) SetParent(component *Component) {
-	panic("implement me")
+	c.Parent = component
 }
 
 func (c *component) ToString() string {
-	panic("implement me")
+	name := c.Name + ": "
+	name += "Inports[ "
+	for _, inPort := range c.InPorts {
+		name += (*inPort).GetName() + " "
+	}
+	name += "] Outports [ "
+	for _, outPort := range c.OutPorts {
+		name += (*outPort).GetName() + " "
+	}
+	name += "]"
+	return name
 }

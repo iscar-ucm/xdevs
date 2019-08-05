@@ -18,7 +18,7 @@ func NewPort(name string, portValue interface{}) Port {
 	switch reflect.ValueOf(portValue).Kind() {
 	case reflect.Slice:
 		p := port{Name: name, Parent:nil, Values:portValue}
-		// p.Clear()
+		p.Clear()
 		return &p
 	default:
 		panic("Port Value must be of kind reflect.Slice")
@@ -63,7 +63,13 @@ func (p *port) GetParent() *Component {
 }
 
 func (p *port) ToString() string {  // TODO implement this function
-	panic("implement me")
+	name := p.Name
+	auxComponent := p.Parent
+	for auxComponent != nil {
+		name = (*auxComponent).GetName() + "." + name
+		auxComponent = (*auxComponent).GetParent()
+	}
+	return name
 }
 
 func (p *port) GetName() string {
