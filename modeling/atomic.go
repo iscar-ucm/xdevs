@@ -31,12 +31,12 @@ func NewAtomic(name string) Atomic {
 
 type atomic struct {
 	Component
-	Phase string
-	Sigma float64
+	phase string
+	sigma float64
 }
 
 func (a *atomic) TA() float64 {
-	return a.Sigma
+	return a.sigma
 }
 
 func (a *atomic) DeltInt() {
@@ -57,49 +57,49 @@ func (a *atomic) Lambda() {
 }
 
 func (a *atomic) HoldIn(phase string, sigma float64) {
-	a.Phase = phase
-	a.Sigma = sigma
+	a.phase = phase
+	a.sigma = sigma
 }
 
 func (a *atomic) Activate() {
-	a.Phase = util.PhaseActive
-	a.Sigma = 0
+	a.phase = util.PhaseActive
+	a.sigma = 0
 }
 
 func (a *atomic) Passivate() {
-	a.Phase = util.PhasePassive
-	a.Sigma = util.INFINITY
+	a.phase = util.PhasePassive
+	a.sigma = util.INFINITY
 }
 
 func (a *atomic) PassivateIn(phase string) {
-	a.Phase = phase
-	a.Sigma = util.INFINITY
+	a.phase = phase
+	a.sigma = util.INFINITY
 }
 
 func (a *atomic) PhaseIs(phase string) bool {
-	return a.Phase == phase
+	return a.phase == phase
 }
 
 func (a *atomic) GetPhase() string {
-	return a.Phase
+	return a.phase
 }
 
 func (a *atomic) SetPhase(phase string) {
-	a.Phase = phase
+	a.phase = phase
 }
 
 func (a *atomic) GetSigma() float64 {
-	return a.Sigma
+	return a.sigma
 }
 
 func (a *atomic) SetSigma(sigma float64) {
-	a.Sigma = sigma
+	a.sigma = sigma
 }
 
 func (a *atomic) ShowState() string {
 	state := a.GetName() + " [ "
-	state += "\tstate: " + a.Phase
-	state += "\tsigma: " + fmt.Sprintf("%f", a.Sigma)
+	state += "\tstate: " + a.phase
+	state += "\tsigma: " + fmt.Sprintf("%f", a.sigma)
 	state += " ]"
 	return state
 }

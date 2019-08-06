@@ -10,14 +10,15 @@ type Port interface {
 	AddValues(val interface{})
 	GetSingleValue() interface{}
 	GetValues() interface{}
+	setParent(c Component)
 	GetParent() *Component
-	ToString() string
+	String() string
 }
 
 func NewPort(name string, portValue interface{}) Port {
 	switch reflect.ValueOf(portValue).Kind() {
 	case reflect.Slice:
-		p := port{Name: name, Parent:nil, Values:portValue}
+		p := port{Name: name, parent:nil, values:portValue}
 		p.Clear()
 		return &p
 	default:
@@ -26,45 +27,49 @@ func NewPort(name string, portValue interface{}) Port {
 }
 
 type port struct {
-	Name string
-	Parent *Component
-	Values interface{}
+	Name   string
+	parent *Component
+	values interface{}
 }
 
 func (p *port) IsEmpty() bool {
-	return reflect.ValueOf(p.Values).Len() == 0
+	return reflect.ValueOf(p.values).Len() == 0
 }
 
 func (p *port) AddValue(val interface{}) {
-	value := reflect.ValueOf(&p.Values).Elem()
-	value.Set(reflect.Append(reflect.ValueOf(p.Values), reflect.ValueOf(val)))
-	p.Values = value.Interface()
+	value := reflect.ValueOf(&p.values).Elem()
+	value.Set(reflect.Append(reflect.ValueOf(p.values), reflect.ValueOf(val)))
+	p.values = value.Interface()
 }
 
 func (p *port) AddValues(val interface{}) {
-	value := reflect.ValueOf(&p.Values).Elem()
+	value := reflect.ValueOf(&p.values).Elem()
 	add := reflect.ValueOf(val)
 	for i := 0; i < add.Len(); i++ {
-		value.Set(reflect.Append(reflect.ValueOf(p.Values), add.Index(i)))
+		value.Set(reflect.Append(reflect.ValueOf(p.values), add.Index(i)))
 	}
-	p.Values = value.Interface()
+	p.values = value.Interface()
 }
 
 func (p *port) GetSingleValue() interface{} {
-	return reflect.ValueOf(p.Values).Index(0)
+	return reflect.ValueOf(p.values).Index(0)
 }
 
 func (p *port) GetValues() interface{} {
-	return reflect.ValueOf(p.Values).Interface()
+	return reflect.ValueOf(p.values).Interface()
+}
+
+func (p *port) setParent(c Component)  {
+	p.parent = &c
 }
 
 func (p *port) GetParent() *Component {
-	return p.Parent
+	return p.parent
 }
 
-func (p *port) ToString() string {  // TODO implement this function
+func (p *port) String() string { // TODO implement this function
 	name := p.Name
-	auxComponent := p.Parent
+	auxComponent := p.parent
 	for auxComponent != nil {
 		name = (*auxComponent).GetName() + "." + name
 		auxComponent = (*auxComponent).GetParent()
@@ -77,5 +82,5 @@ func (p *port) GetName() string {
 }
 
 func (p *port) Clear() {
-	p.Values = reflect.MakeSlice(reflect.TypeOf(p.Values), 0, 0).Interface()
+	p.values = reflect.MakeSlice(reflect.TypeOf(p.values), 0, 0).Interface()
 }

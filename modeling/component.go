@@ -13,7 +13,7 @@ type Component interface {
 	GetOutPorts() []*Port
 	GetParent() *Component
 	SetParent(component *Component)
-	ToString() string
+	String() string
 }
 
 func NewComponent(name string) Component {
@@ -22,14 +22,14 @@ func NewComponent(name string) Component {
 }
 
 type component struct {
-	Name string
-	Parent *Component
-	InPorts []*Port
-	OutPorts []*Port
+	name     string
+	parent   *Component
+	inPorts  []*Port
+	outPorts []*Port
 }
 
 func (c *component) GetName() string {
-	return c.Name
+	return c.name
 }
 
 func (c *component) Initialize() {
@@ -42,7 +42,7 @@ func (c *component) Exit() {
 
 func (c *component) IsInputEmpty() bool {
 	res := true
-	for _, inPort := range c.InPorts {
+	for _, inPort := range c.inPorts {
 		if ! (*inPort).IsEmpty() {
 			res = false
 			break
@@ -52,11 +52,12 @@ func (c *component) IsInputEmpty() bool {
 }
 
 func (c *component) AddInPort(port *Port) {
-	c.InPorts = append(c.InPorts, port)
+	(*port).setParent(c)
+	c.inPorts = append(c.inPorts, port)
 }
 
 func (c *component) GetInPort(portName string) *Port {
-	for _, inPort := range c.InPorts {
+	for _, inPort := range c.inPorts {
 		if (*inPort).GetName() == portName {
 			return inPort
 		}
@@ -65,15 +66,16 @@ func (c *component) GetInPort(portName string) *Port {
 }
 
 func (c *component) GetInPorts() []*Port {
-	return c.InPorts
+	return c.inPorts
 }
 
 func (c *component) AddOutPort(port *Port) {
-	c.OutPorts = append(c.OutPorts, port)
+	(*port).setParent(c)
+	c.outPorts = append(c.outPorts, port)
 }
 
 func (c *component) GetOutPort(portName string) *Port {
-	for _, outPort := range c.OutPorts {
+	for _, outPort := range c.outPorts {
 		if (*outPort).GetName() == portName {
 			return outPort
 		}
@@ -82,25 +84,25 @@ func (c *component) GetOutPort(portName string) *Port {
 }
 
 func (c *component) GetOutPorts() []*Port {
-	return c.OutPorts
+	return c.outPorts
 }
 
 func (c *component) GetParent() *Component {
-	return c.Parent
+	return c.parent
 }
 
 func (c *component) SetParent(component *Component) {
-	c.Parent = component
+	c.parent = component
 }
 
-func (c *component) ToString() string {
-	name := c.Name + ": "
+func (c *component) String() string {
+	name := c.name + ": "
 	name += "Inports[ "
-	for _, inPort := range c.InPorts {
+	for _, inPort := range c.inPorts {
 		name += (*inPort).GetName() + " "
 	}
 	name += "] Outports [ "
-	for _, outPort := range c.OutPorts {
+	for _, outPort := range c.outPorts {
 		name += (*outPort).GetName() + " "
 	}
 	name += "]"
