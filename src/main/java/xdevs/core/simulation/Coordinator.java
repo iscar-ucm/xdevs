@@ -44,7 +44,7 @@ public class Coordinator extends AbstractSimulator {
 
     protected Coupled model;
     protected LinkedList<AbstractSimulator> simulators = new LinkedList<>();
-    long totalIterations = 0;
+    long totalIterations = 0, countIterations = 0;
 
     public Coordinator(SimulationClock clock, Coupled model, boolean flatten) {
         super(clock);
@@ -225,13 +225,12 @@ public class Coordinator extends AbstractSimulator {
     public void simulate(long numIterations) {
         LOGGER.fine("START SIMULATION");
         totalIterations += numIterations;
-        long counter;
-        for (counter = 1; counter < totalIterations
-                && tN < Constants.INFINITY; counter++) {
+        while (countIterations < totalIterations && tN < Constants.INFINITY) {
             clock.setTime(tN);
             lambda();
             deltfcn();
             clear();
+            countIterations++;
         }
     }
 
