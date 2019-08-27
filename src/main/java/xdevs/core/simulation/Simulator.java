@@ -63,16 +63,14 @@ public class Simulator extends AbstractSimulator {
         boolean isInputEmpty = model.isInputEmpty();
         if (isInputEmpty && t != tN) {
             return;
-        } else if (!isInputEmpty && t == tN) {
-            double e = t - tL;
-            model.setSigma(model.getSigma() - e);
-            model.deltcon(e);
-        } else if (isInputEmpty && t == tN) {
-            model.deltint();
         } else if (!isInputEmpty && t != tN) {
             double e = t - tL;
             model.setSigma(model.getSigma() - e);
             model.deltext(e);
+        } else if (isInputEmpty && t == tN) {
+            model.deltint();
+        } else if (!isInputEmpty && t == tN) {
+            model.deltcon();
         }
         tL = t;
         tN = tL + model.ta();

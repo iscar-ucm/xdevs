@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>xdevs</groupId>
     <artifactId>xdevs</artifactId>
-    <version>1.20190716</version>
+    <version>1.20190827</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>12</maven.compiler.source>
-        <maven.compiler.target>12</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 </project>

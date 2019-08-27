@@ -92,9 +92,9 @@ public abstract class Atomic extends Component {
 
     public abstract void deltext(double e);
 
-    public void deltcon(double e) {
+    public void deltcon() {
         deltint();
-        deltext(e);
+        deltext(0);
     }
 
     public abstract void lambda();
