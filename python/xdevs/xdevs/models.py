@@ -128,7 +128,7 @@ class Atomic(Component):
 
     def deltcon(self, e):
         self.deltint()
-        self.deltext(e)
+        self.deltext(0)
 
     def hold_in(self, phase, sigma):
         self.phase = phase
