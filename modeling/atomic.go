@@ -17,6 +17,7 @@ type Atomic interface {
 	Passivate()
 	PassivateIn(phase string)
 	PhaseIs(phase string) bool
+	GetComponent() *Component
 	GetPhase() string
 	SetPhase(phase string)
 	GetSigma() float64
@@ -49,7 +50,7 @@ func (a *atomic) DeltExt(e float64) {
 
 func (a *atomic) DeltCon(e float64) {
 	a.DeltInt()
-	a.DeltExt(e)
+	a.DeltExt(0)
 }
 
 func (a *atomic) Lambda() {
@@ -78,6 +79,10 @@ func (a *atomic) PassivateIn(phase string) {
 
 func (a *atomic) PhaseIs(phase string) bool {
 	return a.phase == phase
+}
+
+func (a *atomic) GetComponent() *Component {
+	return &a.Component
 }
 
 func (a *atomic) GetPhase() string {
