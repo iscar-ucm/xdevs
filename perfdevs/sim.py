@@ -1,9 +1,11 @@
-from xdevs import INFINITY
-from xdevs.models import Atomic, Coupled
-from abc import ABC, abstractmethod
-import logging, _thread
-from xmlrpc.server import SimpleXMLRPCServer
+import _thread
+import logging
 import pickle
+from abc import ABC, abstractmethod
+from xmlrpc.server import SimpleXMLRPCServer
+
+from . import INFINITY
+from .models import Atomic, Coupled
 
 
 class SimulationClock:

@@ -1,37 +1,53 @@
-from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
-
-from abc import ABC, abstractmethod
-from collections import deque, defaultdict
 import pickle
 import logging
+from itertools import chain
+from abc import ABC, abstractmethod
+from collections import deque, defaultdict
+
+from . import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 class Port:
-    def __init__(self, p_type=None, name=None, serve=False):
+    def __init__(self, p_type=None, name: str = None, serve: bool = False):
         self.name = name if name else self.__class__.__name__
         self.parent = None
         self.values = deque()
         self.p_type = p_type
         self.serve = serve
+        self.conn_ports = list()      # List of ports that inject data to the port
 
     def __bool__(self):
-        return bool(self.values)
+        return bool(self.values) or any(self.conn_ports)
 
     def __len__(self):
-        return len(self.values)
+        return len(self.values) + sum([len(port) for port in self.conn_ports])
 
     def __str__(self):
         return "{Port(%s): [%s]}" % (self.p_type, self.values)
 
     def empty(self):
-        return not bool(self)
+        return not bool(self) and all([not port for port in self.conn_ports])
 
     def clear(self):
         self.values.clear()
+        for port in self.conn_ports:    # TODO is this OK?
+            port.clear()
 
     def get(self):
-        return self.values[0]
+        try:
+            return self.values[0]
+        except IndexError:
+            for port in self.conn_ports:
+                try:
+                    return port.get()
+                except IndexError:
+                    pass
+        raise IndexError
+
+    def get_all(self):
+        return chain(self.values, *[port.get_all() for port in self.conn_ports])
 
     def add(self, val):
         if type and not isinstance(val, self.p_type):
@@ -44,11 +60,11 @@ class Port:
 
 
 class Component(ABC):
-    def __init__(self, name=None):
+    def __init__(self, name: str = None):
         self.name = name if name else self.__class__.__name__
         self.parent = None
-        self.in_ports = []
-        self.out_ports = []
+        self.in_ports = list()
+        self.out_ports = list()
 
     def __str__(self):
         in_str = " ".join([p.name for p in self.in_ports])
@@ -79,7 +95,7 @@ class Component(ABC):
 
 
 class Coupling:
-    def __init__(self, port_from, port_to, host=None):
+    def __init__(self, port_from: Port, port_to: Port, host=None):
         self.port_from = port_from
         self.port_to = port_to
         self.host = host
@@ -89,18 +105,18 @@ class Coupling:
 
     def propagate(self):
         if self.host:
-            if len(self.port_from.values) > 0:
-                values = list(map(lambda x: pickle.dumps(x, protocol=0).decode(), self.port_from.values))
+            if len(self.port_from) > 0:
+                values = list(map(lambda x: pickle.dumps(x, protocol=0).decode(), self.port_from.get_all()))
                 try:
                     self.host.inject(self.port_to, values)
                 except:
                     logging.warning("Values could not be injected (%s)" % self.port_to)
         else:
-            self.port_to.extend(self.port_from.values)
+            self.port_to.extend(self.port_from.get_all())
 
 
 class Atomic(Component):
-    def __init__(self, name=None):
+    def __init__(self, name: str = None):
         self.name = name if name else self.__class__.__name__
         super().__init__(name)
 
@@ -144,8 +160,9 @@ class Atomic(Component):
 
 
 class Coupled(Component):
-    def __init__(self, name=None):
+    def __init__(self, name: str = None, perf: bool = True):
         self.name = name if name else self.__class__.__name__
+        self.perf = perf
         super().__init__(name)
 
         self.components = []
@@ -159,30 +176,17 @@ class Coupled(Component):
     def exit(self):
         pass
 
-    def add_coupling(self, c_from, i_from, c_to, i_to):
-        """
-		This method add a connection to the DEVS component.
-		
-		:param Component c_from Component at the beginning of the connection
-		:param int i_from Index of the source port in c_from, starting at 0
-		:param Component c_to Component at the end of the connection
-		:param int i_to Index of the destination port in c_to, starting at 0
-		"""
-
-        ports_from = c_from.in_ports if c_from == self else c_from.out_ports
-        ports_to = c_to.out_ports if c_to == self else c_to.in_ports
-
-        return self.add_coupling(ports_from[i_from], ports_to[i_to])
-
-    def add_coupling(self, p_from, p_to, host=None):
-        coupling = Coupling(p_from, p_to, host)
-
-        if p_from.parent == self:
-            self.eic.append(coupling)
-        elif type(p_to) is Port and p_to.parent == self:
-            self.eoc.append(coupling)
+    def add_coupling(self, p_from: Port, p_to: Port, host=None):
+        if self.perf:
+            p_to.conn_ports.append(p_from)
         else:
-            self.ic.append(coupling)
+            coupling = Coupling(p_from, p_to, host)
+            if p_from.parent == self:
+                self.eic.append(coupling)
+            elif p_to.parent == self:
+                self.eoc.append(coupling)
+            else:
+                self.ic.append(coupling)
 
     def add_component(self, component):
         component.parent = self
@@ -244,7 +248,6 @@ class Coupled(Component):
             for coup in pc:
                 if coup.port_to == in_port:
                     bridge[in_port].append(coup.port_from)
-
         return bridge
 
     def _create_right_bridge(self, pc):
@@ -254,7 +257,6 @@ class Coupled(Component):
             for coup in pc:
                 if coup.port_from == out_port:
                     bridge[out_port].append(coup.port_to)
-
         return bridge
 
     def _complete_left_bridge(self, bridge, pc):

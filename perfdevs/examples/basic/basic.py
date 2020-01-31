@@ -1,12 +1,12 @@
-
-from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
-from xdevs.models import Atomic, Coupled, Port
-from xdevs.sim import Coordinator
 import logging
+from perfdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
+from perfdevs.models import Atomic, Coupled, Port
+from perfdevs.sim import Coordinator
 
 logging.basicConfig(level=logging.DEBUG)
 
 PHASE_DONE = "done"
+
 
 class Job:
 	
@@ -123,7 +123,7 @@ class Transducer(Atomic):
 			logging.info("Average TA: %d" % avg_ta)
 			logging.info("Throughput: %d\n" % throughput)
 			
-			self.hold_in(PHASE_DONE, 0);
+			self.hold_in(PHASE_DONE, 0)
 		else:
 			self.passivate()
 			

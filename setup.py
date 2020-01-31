@@ -1,10 +1,10 @@
 from setuptools import setup
 
-setup(name='xdevs',
+setup(name='perfdevs',
       version='0.1',
-      description='DEVS M&S framework',
-      url='https://github.com/jlrisco/xdevs/tree/master/python',
-      author='Kevin Henares',
-      author_email='khenares@ucm.es',
-      packages=['xdevs'],
+      description='Performance-enhanced DEVS M&S framework',
+      url='https://github.com/jlrisco/xdevs/tree/master/perfdevs',
+      author='Kevin Henares, Román Cárdenas',
+      author_email='khenares@ucm.es, r.cardenas@upm.es',
+      packages=['perfdevs'],
       zip_safe=False)
