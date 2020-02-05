@@ -10,13 +10,13 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class Port:
-    def __init__(self, p_type=None, name: str = None, serve: bool = False):
+    def __init__(self, p_type=None, name: str = None, serve: bool = False):  # TODO dar dirección a los puertos?
         self.name = name if name else self.__class__.__name__
         self.parent = None
         self.values = deque()
         self.p_type = p_type
         self.serve = serve
-        self.conn_ports = list()      # List of ports that inject data to the port
+        self.conn_ports = list()      # List of ports that inject data to the port (only used by input ports)
 
     def __bool__(self):
         return bool(self.values) or any(self.conn_ports)
@@ -25,15 +25,13 @@ class Port:
         return len(self.values) + sum([len(port) for port in self.conn_ports])
 
     def __str__(self):
-        return "{Port(%s): [%s]}" % (self.p_type, self.values)
+        return "{Port(%s): [%s]}" % (self.p_type, self.values)  # TODO se queda anticuado
 
     def empty(self):
         return not bool(self) and all([not port for port in self.conn_ports])
 
     def clear(self):
         self.values.clear()
-        for port in self.conn_ports:    # TODO is this OK?
-            port.clear()
 
     def get(self):
         try:
@@ -43,10 +41,10 @@ class Port:
                 try:
                     return port.get()
                 except IndexError:
-                    pass
+                    continue
         raise IndexError
 
-    def get_all(self):
+    def get_all(self):  # TODO Important change!
         return chain(self.values, *[port.get_all() for port in self.conn_ports])
 
     def add(self, val):
@@ -94,7 +92,7 @@ class Component(ABC):
         self.out_ports.append(port)
 
 
-class Coupling:
+class Coupling:  # Only used if performance is not activated
     def __init__(self, port_from: Port, port_to: Port, host=None):
         self.port_from = port_from
         self.port_to = port_to

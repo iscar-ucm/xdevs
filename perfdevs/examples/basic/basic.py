@@ -168,8 +168,9 @@ class Gpt(Coupled):
 		self.add_coupling(proc.o_out, trans.i_solved)
 		self.add_coupling(trans.o_out, gen.i_stop)
 		
-	
-gpt = Gpt("gpt", 1, 100)
-coord = Coordinator(gpt)
-coord.initialize()
-coord.simulate()
+
+if __name__ == '__main__':
+	gpt = Gpt("gpt", 1, 1000)
+	coord = Coordinator(gpt)
+	coord.initialize()
+	coord.simulate()

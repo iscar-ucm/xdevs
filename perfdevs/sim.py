@@ -9,12 +9,12 @@ from .models import Atomic, Coupled
 
 
 class SimulationClock:
-    def __init__(self, time=0):
+    def __init__(self, time: float = 0):
         self.time = time
 
 
 class AbstractSimulator(ABC):
-    def __init__(self, clock):
+    def __init__(self, clock: SimulationClock):
         self.clock = clock
         self.time_last = 0
         self.time_next = 0
@@ -45,7 +45,7 @@ class AbstractSimulator(ABC):
 
 
 class Simulator(AbstractSimulator):
-    def __init__(self, model, clock):
+    def __init__(self, model: Atomic, clock: SimulationClock):
         super().__init__(clock)
         self.model = model
 
@@ -94,11 +94,11 @@ class Simulator(AbstractSimulator):
 
 
 class Coordinator(AbstractSimulator):
-    def __init__(self, model, clock=None, flatten=False):
+    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False):
         super().__init__(clock or SimulationClock())
         self.model = model.flatten() if flatten else model
-        self.simulators = []
-        self.ports_to_serve = {}
+        self.simulators = list()
+        self.ports_to_serve = dict()
 
     def initialize(self):
         self._build_hierarchy()
@@ -111,26 +111,35 @@ class Coordinator(AbstractSimulator):
 
     def _build_hierarchy(self):
         for comp in self.model.components:
-            # logging.info("%s -> %s" % (self, comp))
             if isinstance(comp, Coupled):
-                coord = Coordinator(comp, self.clock)
-                self.simulators.append(coord)
-                self.ports_to_serve.update(coord.ports_to_serve)
+                self.__add_coordinator(comp)
             elif isinstance(comp, Atomic):
-                sim = Simulator(comp, self.clock)
-                self.simulators.append(sim)
-                for pts in sim.model.in_ports:
-                    if pts.serve:
-                        port_name = "%s.%s" % (pts.parent.name, pts.name)
-                        self.ports_to_serve[port_name] = pts
+                self.__add_simulator(comp)
+
+    def __add_coordinator(self, coupled: Coupled):
+        if coupled.perf:  # Performance-enhanced coupled models are "dummies". We can skip them from the hierarchy
+            for comp in coupled.components:
+                if isinstance(comp, Coupled):
+                    self.__add_coordinator(comp)
+                elif isinstance(comp, Atomic):
+                    self.__add_simulator(comp)
+        else:
+            coord = Coordinator(coupled, self.clock)
+            self.simulators.append(coord)
+            self.ports_to_serve.update(coord.ports_to_serve)
+
+    def __add_simulator(self, atomic: Atomic):
+        sim = Simulator(atomic, self.clock)
+        self.simulators.append(sim)
+        for pts in sim.model.in_ports:
+            if pts.serve:
+                port_name = "%s.%s" % (pts.parent.name, pts.name)
+                self.ports_to_serve[port_name] = pts
 
     def serve(self, host="localhost", port=8000):
         server = SimpleXMLRPCServer((host, port))
         server.register_function(self.inject)
         _thread.start_new_thread(server.serve_forever, ())
-
-    def test(self, msg):
-        return msg + "aa"
 
     def exit(self):
         for sim in self.simulators:
@@ -212,7 +221,7 @@ class Coordinator(AbstractSimulator):
             cont += 1
 
     def simulate_time(self, time_interv=10000):
-        logging.info("START SIMULATION")
+        logging.info("STARTING SIMULATION...")
         self.clock.time = self.time_next
         tf = self.clock.time + time_interv
 
