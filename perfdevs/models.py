@@ -8,27 +8,38 @@ from . import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
 logging.basicConfig(level=logging.DEBUG)
 
+PORT_IN = "in"
+PORT_OUT = "out"
+
 
 class Port:
-    def __init__(self, p_type=None, name: str = None, serve: bool = False):  # TODO dar dirección a los puertos?
+    def __init__(self, p_type=None, name: str = None, serve: bool = False):
+        """
+        xDEVS implementation of DEVS Port
+
+        :param p_type: data type of messages to be sent/received via the new port instance
+        :param name: name of the new port instance
+        :param serve: set to True if the port is going to be accessible via RPC server
+        """
         self.name = name if name else self.__class__.__name__
         self.parent = None
+        self.direction = None           # added direction to ports
         self.values = deque()
         self.p_type = p_type
         self.serve = serve
-        self.conn_ports = list()      # List of ports that inject data to the port (only used by input ports)
+        self.couplings_from = list()    # List of ports that inject data to the port (only used by input ports)
 
     def __bool__(self):
-        return bool(self.values) or any(self.conn_ports)
+        return bool(self.values) or any(self.couplings_from)
 
     def __len__(self):
-        return len(self.values) + sum([len(port) for port in self.conn_ports])
+        return len(self.values) + sum([len(port) for port in self.couplings_from])
 
     def __str__(self):
-        return "{Port(%s): [%s]}" % (self.p_type, self.values)  # TODO se queda anticuado
+        return "{Port(%s): [%s]}" % (self.p_type, list(self.get_all()))
 
     def empty(self):
-        return not bool(self) and all([not port for port in self.conn_ports])
+        return not bool(self) and all([not port for port in self.couplings_from])
 
     def clear(self):
         self.values.clear()
@@ -37,15 +48,15 @@ class Port:
         try:
             return self.values[0]
         except IndexError:
-            for port in self.conn_ports:
+            for port in self.couplings_from:
                 try:
                     return port.get()
                 except IndexError:
                     continue
         raise IndexError
 
-    def get_all(self):  # TODO Important change!
-        return chain(self.values, *[port.get_all() for port in self.conn_ports])
+    def get_all(self):
+        return chain(self.values, *[port.get_all() for port in self.couplings_from])
 
     def add(self, val):
         if type and not isinstance(val, self.p_type):
@@ -85,15 +96,25 @@ class Component(ABC):
 
     def add_in_port(self, port):
         port.parent = self
+        port.direction = PORT_IN
         self.in_ports.append(port)
 
     def add_out_port(self, port):
         port.parent = self
+        port.direction = PORT_OUT
         self.out_ports.append(port)
 
 
-class Coupling:  # Only used if performance is not activated
+class Coupling:
     def __init__(self, port_from: Port, port_to: Port, host=None):
+        # Check that couplings are valid
+        comp_from = port_from.parent
+        comp_to = port_to.parent
+        if isinstance(comp_from, Atomic) and port_from.direction == PORT_IN:
+            raise ValueError("An atomic input ports can not be coupled to any other port")
+        if isinstance(comp_to, Atomic) and port_to.direction == PORT_OUT:
+            raise ValueError("It is not possible to couple any port to an atomic output port")
+
         self.port_from = port_from
         self.port_to = port_to
         self.host = host
@@ -175,10 +196,11 @@ class Coupled(Component):
         pass
 
     def add_coupling(self, p_from: Port, p_to: Port, host=None):
+        # Coupling is created even if performance enhancement is activated in order to check that the coupling is valid
+        coupling = Coupling(p_from, p_to, host)
         if self.perf:
-            p_to.conn_ports.append(p_from)
+            p_to.couplings_from.append(p_from)
         else:
-            coupling = Coupling(p_from, p_to, host)
             if p_from.parent == self:
                 self.eic.append(coupling)
             elif p_to.parent == self:
