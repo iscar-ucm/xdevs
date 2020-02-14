@@ -336,7 +336,7 @@ class Coupled(Component, ABC):
         return self.chained
 
     def _split(self, child: Coupled):
-        unchained = [comp for comp in child.components if isinstance(comp, Coupled) and not comp.chained]
+        unchained = [comp for comp in child.components if not comp.chained]
         # TODO cargarse EICs, EOCs. Crear puertos auxiliares etc. para dividir el hijo correctamente
 
     @staticmethod
