@@ -253,15 +253,15 @@ class Atomic(Component, ABC):
 
 
 class Coupled(Component, ABC):
-    def __init__(self, name: str = None, chain: bool = False):
+    def __init__(self, name: str = None, chain_en: bool = False):
         """
         xDEVS implementation of DEVS Coupled Model.
         :param name: name of the Atomic Model. If no name is provided, it will take the class's name by default.
-        :param chain: set it to True to enable submodel chaining. By default, chaining is disabled.
+        :param chain_en: set it to True to enable submodel chaining. By default, chaining is disabled.
         """
         self.name = name if name else self.__class__.__name__
         super().__init__(name)
-        self.chain = chain
+        self.chain = chain_en
 
         self.components = []
         self.ic = []
@@ -294,6 +294,21 @@ class Coupled(Component, ABC):
         else:
             raise ValueError("Components that compose the coupling are not submodules of coupled model")
 
+    def remove_coupling(self, coupling: Coupling):
+        """
+        Removes coupling betweem two submodules of the coupled model.
+        :param coupling: Couplings to be removed.
+        :raises ValueError: if coupling is not found.
+        """
+        if coupling in self.eic:
+            self.eic.remove(coupling)
+        elif coupling in self.eoc:
+            self.eoc.remove(coupling)
+        elif coupling in self.ic:
+            self.ic.remove(coupling)
+        else:
+            raise ValueError("Coupling was not found in model definition")
+
     def add_component(self, component: Component):
         """
         Adds subcomponent to coupled model.
@@ -302,7 +317,7 @@ class Coupled(Component, ABC):
         component.parent = self
         self.components.append(component)
 
-    def chain_components(self, force: bool = False, split: bool = False) -> Tuple[List, List]:
+    def chain_components(self, force: bool = False, split: bool = False) -> Tuple[List, List, List]:
         """
         Chains submodules to enhance sequential execution performance.
         :param force: if True, the entire hierarchy is chained. By default, it is set to False.
@@ -310,46 +325,76 @@ class Coupled(Component, ABC):
         :return: True if chaining was triggered.
         """
         self.chain |= force
+        comps_up = list()           # It will contain children coupled models to be splitted from the chain
+        new_coups_up = list()       # It will contain couplings to be added to the parent due to splits
+        prev_coups_up = list()      # It will contain couplings to be removed by the parent due to splits
+
+        self._resolve_chain_splits(force, split)
+
+        if self.chain:
+            if split and self.parent is not None:
+                for comp in self.components:  # TODO antes de encadenar, si split está activado me cargo el componente
+                    if isinstance(comp, Coupled) and not comp.chain:
+                        self._split(comp)  # TODO modificar comps up, new coups_up, prev_coups_up
+
+            self._trigger_chaining()
+            self._unroll_internal_chains()
+
+        return comps_up, new_coups_up, prev_coups_up
+
+    def _resolve_chain_splits(self, force, split):
+        comps_down = list()  # It will contain new children coupled models to be added due to splits
+        new_coups_down = list()  # It will contain new couplings to be added due to splits
+        prev_coups_down = list()  # It will contain prior couplings to be removed due to splits
+
         for comp in self.components:
             comp.link = self.chain
             if isinstance(comp, Coupled):
-                if comp.chain_components(force, split) and split:
-                    self._unroll_component(comp)
-        if self.chain:
-            for coup in self.eic:
-                self._chain_component(coup)
-            self.eic.clear()
-            for coup in self.eoc:
-                self._chain_component(coup)
-            self.eoc.clear()
-            for coup in self.ic:
-                self._chain_component(coup)
-            self.ic.clear()
-            if split:
-                self._split()
-            if self.parent.chain:
-                self._unroll()
-        return self.chain
+                comp, n, p = comp.chain_components(force, split)
+                comps_down.extend(comp)
+                new_coups_down.extend(n)
+                prev_coups_down.extend(p)
+
+        for coup in prev_coups_down:
+            self.remove_coupling(coup)
+        for comp in comps_down:
+            self.add_component(comp)
+        for coup in new_coups_down:
+            self.add_coupling(coup.port_from, coup.port_to)
 
     def _split(self):
         # TODO detectar hijos acoplados y cargarnoslos
         pass
 
-    def _unroll(self):
-        # TODO: el parent es una cadena, nosotros también: primero apendizar listas de los puertos de salida y entrada
-        # TODO Despues hay que añadir los componentes hijo a el padre
-        # TODO cargarse EICs, EOCs. Crear puertos auxiliares etc. para dividir el hijo correctamente
-        pass
+    def _trigger_chaining(self):
+        for coup in self.eic:
+            chain_from_coupling(coup)
+        self.eic.clear()
+        for coup in self.eoc:
+            chain_from_coupling(coup)
+        self.eoc.clear()
+        for coup in self.ic:
+            chain_from_coupling(coup)
+        self.ic.clear()
 
-    @staticmethod
-    def _chain_component(coup: Coupling):
-        coup.port_from.couplings_to.append(coup.port_to)
-        coup.port_to.couplings_from.append(coup.port_from)
+    def _unroll_internal_chains(self):
+        # Las cadenas internas las desenrollo
+        new_comps = list()
+        prev_comps = list()
+        for comp in self.components:
+            if isinstance(comp, Coupled) and comp.chain:
+                unroll_chain(comp)
+                prev_comps.append(comp)
+                new_comps.extend(comp.components)
+        for comp in new_comps:
+            self.add_component(comp)
+        for comp in prev_comps:
+            self.components.remove(comp)
 
     def flatten(self) -> Tuple[List, List]:
         """
         Flattens coupled model (i.e., parent coupled model inherits the connection of the model).
-        :return: Components, EICs, EOCs and ICs to be transferred to parent
+        :return: Components and couplings to be transferred to parent
         """
         new_comp = list()   # list with children components to be inherited by parent
         new_coup = list()   # list with couplings to be inherited by parent
@@ -367,7 +412,7 @@ class Coupled(Component, ABC):
                     inherit_coup.extend(coup)
 
             for comp in old_comp:
-                self._remove_couplings(comp)
+                self._remove_child_couplings(comp)
                 self.components.remove(comp)
 
             for comp in inherit_comp:
@@ -393,7 +438,7 @@ class Coupled(Component, ABC):
 
         return new_comp, new_coup
 
-    def _remove_couplings(self, child):
+    def _remove_child_couplings(self, child):
         for in_port in child.in_ports:
             self.__remove_couplings(in_port, self.eic)
             self.__remove_couplings(in_port, self.ic)
@@ -441,3 +486,29 @@ class Coupled(Component, ABC):
             for port in ports:
                 couplings.append(Coupling(coup.port_from, port))
         return couplings
+
+
+def chain_from_coupling(coup: Coupling):
+    coup.port_from.couplings_to.append(coup.port_to)
+    coup.port_to.couplings_from.append(coup.port_from)
+
+
+def unroll_chain(comp: Coupled):
+    assert comp.chain and not comp.eic and not comp.eoc and not comp.ic
+
+    for in_port in comp.in_ports:
+        for port in in_port.couplings_to:
+            port.couplings_from.remove(in_port)
+            port.couplings_from.extend(in_port.couplings_from)
+        for port in in_port.couplings_from:
+            port.couplings_to.remove(in_port)
+            port.couplings_to.extend(in_port.couplings_to)
+
+    for out_port in comp.out_ports:
+        for port in out_port.couplings_from:
+            port.couplings_to.remove(out_port)
+            port.couplings_to.extend(out_port.couplings_to)
+        for port in out_port.couplings_to:
+            port.couplings_from.remove(out_port)
+            port.couplings_from.extend(out_port.couplings_from)
+
