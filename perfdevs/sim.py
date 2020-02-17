@@ -96,7 +96,9 @@ class Simulator(AbstractSimulator):
 class Coordinator(AbstractSimulator):
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False):
         super().__init__(clock or SimulationClock())
-        self.model = model.flatten() if flatten else model
+        self.model = model
+        if flatten:
+            model.flatten()
         self.simulators = list()
         self.ports_to_serve = dict()
 
@@ -117,16 +119,9 @@ class Coordinator(AbstractSimulator):
                 self.__add_simulator(comp)
 
     def __add_coordinator(self, coupled: Coupled):
-        if coupled.perf:  # Performance-enhanced coupled models are "dummies". We can skip them from the hierarchy
-            for comp in coupled.components:
-                if isinstance(comp, Coupled):
-                    self.__add_coordinator(comp)
-                elif isinstance(comp, Atomic):
-                    self.__add_simulator(comp)
-        else:
-            coord = Coordinator(coupled, self.clock)
-            self.simulators.append(coord)
-            self.ports_to_serve.update(coord.ports_to_serve)
+        coord = Coordinator(coupled, self.clock)
+        self.simulators.append(coord)
+        self.ports_to_serve.update(coord.ports_to_serve)
 
     def __add_simulator(self, atomic: Atomic):
         sim = Simulator(atomic, self.clock)

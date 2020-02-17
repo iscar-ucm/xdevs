@@ -151,26 +151,34 @@ class Transducer(Atomic):
 		
 
 class Gpt(Coupled):
-
 	def __init__(self, name, period, obs_time):
 		super().__init__(name)
-		
+
 		gen = Generator("generator", period)
 		proc = Processor("processor", 3*period)
 		trans = Transducer("transducer", obs_time)
-		
+
 		self.add_component(gen)
 		self.add_component(proc)
 		self.add_component(trans)
-		
+
 		self.add_coupling(gen.o_out, proc.i_in)
 		self.add_coupling(gen.o_out, trans.i_arrived)
 		self.add_coupling(proc.o_out, trans.i_solved)
 		self.add_coupling(trans.o_out, gen.i_stop)
-		
+
+
+class Wrap(Coupled):
+	def __init__(self, name, period, obs_time):
+		super().__init__("wrap")
+
+		gpt = Gpt(name, period, obs_time)
+
+		self.add_component(gpt)
+
 
 if __name__ == '__main__':
-	gpt = Gpt("gpt", 1, 1000)
-	coord = Coordinator(gpt)
+	wrap = Wrap("gpt", 1, 1000)
+	coord = Coordinator(wrap, flatten=True)
 	coord.initialize()
 	coord.simulate()

@@ -2,8 +2,8 @@ import pickle
 import logging
 from itertools import chain
 from abc import ABC, abstractmethod
-from typing import Any, Iterator
 from collections import deque, defaultdict
+from typing import Any, Iterator, Tuple, List
 
 from . import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
@@ -48,9 +48,7 @@ class Port:
 
     def clear(self):
         """Removes messages contained in the port."""
-        self.values.clear()
-        for port in self.couplings_from:  # TODO clear all of the linked ports?
-            port.clear()
+        self.values.clear()  # TODO clear all of the linked ports as well?
 
     def get(self) -> Any:
         """
@@ -92,23 +90,16 @@ class Port:
         for val in vals:
             self.add(val)
 
-    def chained(self) -> bool:
-        """
-        :return: whether or not port's parent model can be chained.
-        :raises AttributeError: if port does not have a parent model.
-        """
-        return self.parent.chained
-
 
 class Component(ABC):
-    def __init__(self, name: str = None, chained: bool = False):
+    def __init__(self, name: str = None):
         """
         Abstract Base Class for an xDEVS model.
         :param name: name of the xDEVS model. If no name is provided, it will take the class's name by default.
-        :param chained: True if the component can be chained to others. By default, chaining is disabled.
         """
         self.name = name if name else self.__class__.__name__
-        self.chained = chained
+        self.chain = False  # True if component is a chain
+        self.link = False   # True if component is a link of a chain
         self.parent = None
         self.in_ports = list()
         self.out_ports = list()
@@ -172,7 +163,7 @@ class Coupling:
             raise ValueError("Input ports whose parent is an Atomic model can not be coupled to any other port")
         if isinstance(comp_to, Atomic) and port_to.direction == PORT_OUT:
             raise ValueError("Output ports whose parent is an Atomic model can not be recipient of any other port")
-
+        # TODO assert that port types are compatible
         self.port_from = port_from
         self.port_to = port_to
         self.host = host
@@ -201,7 +192,7 @@ class Atomic(Component, ABC):
         :param name: name of the Atomic Model. If no name is provided, it will take the class's name by default.
         """
         self.name = name if name else self.__class__.__name__
-        super().__init__(name, True)
+        super().__init__(name)
 
         self.phase = PHASE_PASSIVE
         self.sigma = INFINITY
@@ -262,14 +253,15 @@ class Atomic(Component, ABC):
 
 
 class Coupled(Component, ABC):
-    def __init__(self, name: str = None, chained: bool = False):
+    def __init__(self, name: str = None, chain: bool = False):
         """
         xDEVS implementation of DEVS Coupled Model.
         :param name: name of the Atomic Model. If no name is provided, it will take the class's name by default.
-        :param chained: set it to True to enable submodel chaining. By default, chaining is disabled.
+        :param chain: set it to True to enable submodel chaining. By default, chaining is disabled.
         """
         self.name = name if name else self.__class__.__name__
-        super().__init__(name, chained)
+        super().__init__(name)
+        self.chain = chain
 
         self.components = []
         self.ic = []
@@ -290,12 +282,14 @@ class Coupled(Component, ABC):
         :param host: TODO documentation
         :raises ValueError: if coupling is not well defined.
         """
+        if self.chain and host is not None:
+            raise ValueError("A chain cannot host couplings")
         coupling = Coupling(p_from, p_to, host)
         if p_from.parent == self and p_to.parent in self.components:
             self.eic.append(coupling)
-        elif p_from in self.components and p_to.parent == self:
+        elif p_from.parent in self.components and p_to.parent == self:
             self.eoc.append(coupling)
-        elif p_from in self.components and p_to.parent in self.components:
+        elif p_from.parent in self.components and p_to.parent in self.components:
             self.ic.append(coupling)
         else:
             raise ValueError("Components that compose the coupling are not submodules of coupled model")
@@ -308,96 +302,116 @@ class Coupled(Component, ABC):
         component.parent = self
         self.components.append(component)
 
-    def chain(self, force: bool = False, split: bool = False) -> bool:
+    def chain_components(self, force: bool = False, split: bool = False) -> Tuple[List, List]:
         """
         Chains submodules to enhance sequential execution performance.
-        :param force: if True, all the hierarchy is chained. By default, it is set to False.
+        :param force: if True, the entire hierarchy is chained. By default, it is set to False.
         :param split: if True, coupled models may be divided into an equivalent set of chained and unchained models.
         :return: True if chaining was triggered.
         """
-        self.chained |= force
+        self.chain |= force
         for comp in self.components:
+            comp.link = self.chain
             if isinstance(comp, Coupled):
-                if comp.chain(force) and split:
-                    self._split(comp)
-        if self.chained:
+                if comp.chain_components(force, split) and split:
+                    self._unroll_component(comp)
+        if self.chain:
             for coup in self.eic:
-                self._chain_components(coup)
-                if not split or coup.port_to.chained():
-                    self.eic.remove(coup)
+                self._chain_component(coup)
+            self.eic.clear()
             for coup in self.eoc:
-                self._chain_components(coup)
-                if not split or coup.port_from.chained():
-                    self.eoc.remove(coup)
+                self._chain_component(coup)
+            self.eoc.clear()
             for coup in self.ic:
-                self._chain_components(coup)
-                if not split or coup.port_from.chained() and coup.port_to.chained():
-                    self.ic.remove(coup)
-        return self.chained
+                self._chain_component(coup)
+            self.ic.clear()
+            if split:
+                self._split()
+            if self.parent.chain:
+                self._unroll()
+        return self.chain
 
-    def _split(self, child: Coupled):
-        unchained = [comp for comp in child.components if not comp.chained]
+    def _split(self):
+        # TODO detectar hijos acoplados y cargarnoslos
+        pass
+
+    def _unroll(self):
+        # TODO: el parent es una cadena, nosotros también: primero apendizar listas de los puertos de salida y entrada
+        # TODO Despues hay que añadir los componentes hijo a el padre
         # TODO cargarse EICs, EOCs. Crear puertos auxiliares etc. para dividir el hijo correctamente
+        pass
 
     @staticmethod
-    def _chain_components(coup: Coupling):
+    def _chain_component(coup: Coupling):
         coup.port_from.couplings_to.append(coup.port_to)
         coup.port_to.couplings_from.append(coup.port_from)
 
-    def flatten(self) -> bool:
+    def flatten(self) -> Tuple[List, List]:
         """
         Flattens coupled model (i.e., parent coupled model inherits the connection of the model).
-        :return: True if flattening is feasible (chained coupled models cannot be flattened)
+        :return: Components, EICs, EOCs and ICs to be transferred to parent
         """
-        flattened = not self.chained
-        if flattened:
-            for comp in self.components:
-                if isinstance(comp, Coupled) and comp.flatten():  # propagate flattening to child coupled models
-                    self._remove_couplings(comp)
-                    self.components.remove(comp)
+        new_comp = list()   # list with children components to be inherited by parent
+        new_coup = list()   # list with couplings to be inherited by parent
 
-            if self.parent is not None:  # Root component cannot be flattened upwards
-                for comp in self.components:
-                    self.parent.add_component(comp)
+        if not self.chain:  # Chains cannot be flattened
+            old_comp = list()       # list with children coupled models to be deleted
+            inherit_comp = list()   # list with components to be inherited from children
+            inherit_coup = list()
+
+            for comp in self.components:
+                if isinstance(comp, Coupled) and not comp.chain:  # Propagate flattening to children coupled models
+                    comps, coup = comp.flatten()
+                    old_comp.append(comp)
+                    inherit_comp.extend(comps)
+                    inherit_coup.extend(coup)
+
+            for comp in old_comp:
+                self._remove_couplings(comp)
+                self.components.remove(comp)
+
+            for comp in inherit_comp:
+                self.add_component(comp)
+            for coup in inherit_coup:
+                self.add_coupling(coup.port_from, coup.port_to)
+
+            if self.parent is not None:  # If module is not root, trigger the flatten process
+                new_comp.extend(self.components)
 
                 left_bridge_eic = self._create_left_bridge(self.parent.eic)
+                new_coup.extend(self._complete_left_bridge(left_bridge_eic))
+
                 left_bridge_ic = self._create_left_bridge(self.parent.ic)
-                right_bridge_eic = self._create_right_bridge(self.parent.eoc)
                 right_bridge_ic = self._create_right_bridge(self.parent.ic)
+                new_coup.extend(self._complete_left_bridge(left_bridge_ic))
+                new_coup.extend(self._complete_right_bridge(right_bridge_ic))
 
-                self._complete_left_bridge(left_bridge_eic, self.parent.eic)
-                self._complete_left_bridge(left_bridge_ic, self.parent.ic)
-                self._complete_right_bridge(right_bridge_eic, self.parent.eoc)
-                self._complete_right_bridge(right_bridge_ic, self.parent.ic)
+                right_bridge_eoc = self._create_right_bridge(self.parent.eoc)
+                new_coup.extend(self._complete_right_bridge(right_bridge_eoc))
 
-                for coup in self.ic:
-                    self.parent.ic.append(coup)
-        return flattened
+                new_coup.extend(self.ic)
+
+        return new_comp, new_coup
 
     def _remove_couplings(self, child):
-        in_ports = child.in_ports
+        for in_port in child.in_ports:
+            self.__remove_couplings(in_port, self.eic)
+            self.__remove_couplings(in_port, self.ic)
+        for out_port in child.out_ports:
+            self.__remove_couplings(out_port, self.ic)
+            self.__remove_couplings(out_port, self.eoc)
 
-        for in_port in in_ports:
-            for coup in self.eic:
-                if coup.port_to == in_port:
-                    self.eic.remove(coup)
-
-            for coup in self.ic:
-                if coup.port_to == in_port:
-                    self.ic.remove(coup)
-
-        for out_port in self.out_ports:
-            for coup in self.eoc:
-                if coup.port_to == out_port:
-                    self.eoc.remove(coup)
-
-            for coup in self.ic:
-                if coup.port_to == out_port:
-                    self.ic.remove(coup)
+    @staticmethod
+    def __remove_couplings(port, couplings):
+        to_remove = list()
+        for coup in couplings:
+            if coup.port_to == port or coup.port_from == port:
+                to_remove.append(coup)
+        for coup in to_remove:
+            couplings.remove(coup)
 
     def _create_left_bridge(self, pc):
         bridge = defaultdict(list)
-
         for in_port in self.in_ports:
             for coup in pc:
                 if coup.port_to == in_port:
@@ -406,21 +420,24 @@ class Coupled(Component, ABC):
 
     def _create_right_bridge(self, pc):
         bridge = defaultdict(list)
-
         for out_port in self.out_ports:
             for coup in pc:
                 if coup.port_from == out_port:
                     bridge[out_port].append(coup.port_to)
         return bridge
 
-    def _complete_left_bridge(self, bridge, pc):
+    def _complete_left_bridge(self, bridge):
+        couplings = list()
         for coup in self.eic:
             ports = bridge[coup.port_from]
             for port in ports:
-                pc.append(Coupling(port, coup.port_to))
+                couplings.append(Coupling(port, coup.port_to))
+        return couplings
 
-    def _complete_right_bridge(self, bridge, pc):
+    def _complete_right_bridge(self, bridge):
+        couplings = list()
         for coup in self.eoc:
             ports = bridge[coup.port_to]
             for port in ports:
-                pc.append(Coupling(coup.port_from, port))
+                couplings.append(Coupling(coup.port_from, port))
+        return couplings
