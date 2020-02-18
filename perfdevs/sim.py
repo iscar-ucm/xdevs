@@ -94,9 +94,11 @@ class Simulator(AbstractSimulator):
 
 
 class Coordinator(AbstractSimulator):
-    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False):
+    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, force_chain: bool = False,
+                 split_chain: bool = False):
         super().__init__(clock or SimulationClock())
         self.model = model
+        model.chain_components(force_chain, split_chain)
         if flatten:
             model.flatten()
         self.simulators = list()
