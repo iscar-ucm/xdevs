@@ -1,5 +1,5 @@
 import logging
-from perfdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
+from perfdevs import PHASE_ACTIVE, PHASE_PASSIVE
 from perfdevs.models import Atomic, Coupled, Port
 from perfdevs.sim import Coordinator
 
@@ -178,7 +178,7 @@ class Wrap(Coupled):
 
 
 if __name__ == '__main__':
-	wrap = Gpt("gpt", 0.1, 10000000000000000000000000000000)
-	coord = Coordinator(wrap, flatten=False, force_chain=True)
+	wrap = Wrap("gpt", 0.1, 10000000000000000000000000000000)
+	coord = Coordinator(wrap, flatten=True, force_chain=True)
 	coord.initialize()
 	coord.simulate()

@@ -1,6 +1,5 @@
 import pickle
 import logging
-from itertools import chain
 from abc import ABC, abstractmethod
 from collections import deque, defaultdict
 from typing import Any, Iterator, Tuple, List, Dict
@@ -23,32 +22,27 @@ class Port:
         """
         self.name = name if name else self.__class__.__name__
         self.parent = None
-        self.direction = None           # added direction to ports
+        self.direction = None       # added direction to ports
         self.values = deque()
         self.p_type = p_type
         self.serve = serve
-        self.couplings_to = list()      # List of ports that receive data from the port (only used by output ports)
-        self.couplings_from = list()    # List of ports that inject data to the port (only used by input ports)
+        self.links_to = list()      # List of ports that receive data from the port (only used by output ports)
+        self.links_from = [self]    # List of ports that inject data to the port (only used by input ports)
 
     def __bool__(self) -> bool:
-        """:return: True if port contains any message."""
-        return bool(self.values) or any(self.couplings_from)
+        return any((bool(port.values) for port in self.links_from))
 
     def __len__(self) -> int:
-        """:return: number of messages contained in the port."""
-        return len(self.values) + sum([len(port) for port in self.couplings_from])
+        return sum((len(port.values) for port in self.links_from))
 
     def __str__(self) -> str:
-        """:return: stringified representation of the port."""
         return "{Port(%s): [%s]}" % (self.p_type, list(self.get_all()))
 
     def empty(self) -> bool:
-        """:return: True if no messages are contained in the port."""
-        return not bool(self) and all([not port for port in self.couplings_from])
+        return all((not port for port in self.links_from))
 
     def clear(self):
-        """Removes messages contained in the port."""
-        self.values.clear()  # TODO clear all of the linked ports as well?
+        self.values.clear()
 
     def get(self) -> Any:
         """
@@ -57,19 +51,18 @@ class Port:
             If no message is found in its own bag, it will iterate over chained ports looking for a message.
         :raises IndexError: if port is empty.
         """
-        try:
-            return self.values[0]
-        except IndexError:
-            for port in self.couplings_from:
-                try:
-                    return port.get()
-                except IndexError:
-                    continue
+        for port in self.links_from:
+            try:
+                return port.values[0]
+            except IndexError:
+                continue
         raise IndexError
 
     def get_all(self) -> Iterator[Any]:
         """:return: iterator containing all the messages in the port."""
-        return chain(self.values, *[port.get_all() for port in self.couplings_from])
+        for port in self.links_from:
+            for val in port.values:
+                yield val
 
     def add(self, val: Any):
         """
@@ -562,8 +555,8 @@ class Coupled(Component, ABC):
 
 
 def chain_from_coupling(coup: Coupling):
-    coup.port_from.couplings_to.append(coup.port_to)
-    coup.port_to.couplings_from.append(coup.port_from)
+    coup.port_from.links_to.append(coup.port_to)
+    coup.port_to.links_from.append(coup.port_from)
 
 
 def unroll_chain(comp: Coupled):
