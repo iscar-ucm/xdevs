@@ -1,3 +1,4 @@
+import inspect
 import pickle
 import logging
 from abc import ABC, abstractmethod
@@ -8,12 +9,12 @@ from . import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
 logging.basicConfig(level=logging.DEBUG)
 
-PORT_IN = "in"
-PORT_OUT = "out"
-
 
 class Port:
-    def __init__(self, p_type: type = None, name: str = None, serve: bool = False):
+    IN = "in"
+    OUT = "out"
+
+    def __init__(self, p_type: type, name: str = None, serve: bool = False):
         """
         xDEVS implementation of DEVS Port.
         :param p_type: data type of messages to be sent/received via the new port instance.
@@ -21,34 +22,43 @@ class Port:
         :param serve: set to True if the port is going to be accessible via RPC server.
         """
         self.name = name if name else self.__class__.__name__
+
+        if p_type is None or type(p_type) is not type:
+            raise TypeError("Invalid p_type")
+
         self.p_type = p_type
         self.serve = serve
-        self.parent = None          # xDEVS Component that owns the port
-        self.direction = None       # Message flow direction of the port. It is either PORT_IN or PORT_OUT
-        self.values = deque()       # Bag containing messages directly written to the port
-        self.links_to = list()      # List of ports that receive data from the port (only used by output ports)
-        self.links_from = [self]    # List of ports that inject data to the port (only used by input ports)
+        self.parent = None  # xDEVS Component that owns the port
+        self.direction = None  # Message flow direction of the port. It is either PORT_IN or PORT_OUT
+        self._values = deque()  # Bag containing messages directly written to the port
+        self.links_to = list()  # List of ports that receive data from the port (only used by output ports)
+        self.links_from = list()  # List of ports that inject data to the port (only used by input ports)
 
     def __bool__(self) -> bool:
-        for port in self.links_from:
-            if bool(port.values):
-                return True
-        return False
+        try:  # TODO: thing a better way to do this
+            next(self.values)
+            return True
+        except StopIteration:
+            return False
 
     def __len__(self) -> int:
-        return sum(1 for _ in self.get_all())
+        return sum(1 for _ in self.values)
 
     def __str__(self) -> str:
-        return "{Port(%s): [%s]}" % (self.p_type, list(self.get_all()))
+        return "{Port(%s): [%s]}" % (self.p_type, list(self.values))
 
     def empty(self) -> bool:
         return not self
 
     def clear(self):
-        self.values.clear()
+        self._values.clear()
 
-    def get_all(self) -> Generator[Any, None, None]:
+    @property
+    def values(self) -> Generator[Any, None, None]:
         """:return: Generator function that returns all the messages in the port."""
+        for val in self._values:
+            yield val
+
         for port in self.links_from:
             for val in port.values:
                 yield val
@@ -58,7 +68,7 @@ class Port:
         :return: first message from port.
         :raises StopIteration: if port is empty.
         """
-        return next(self.get_all())
+        return next(self.values)
 
     def add(self, val: Any):
         """
@@ -68,7 +78,7 @@ class Port:
         """
         if not isinstance(val, self.p_type):
             raise TypeError("Value type is %s (%s expected)" % (type(val).__name__, self.p_type.__name__))
-        self.values.append(val)
+        self._values.append(val)
 
     def extend(self, vals: Iterator[Any]):
         """
@@ -87,11 +97,11 @@ class Component(ABC):
         :param name: name of the xDEVS model. If no name is provided, it will take the class's name by default.
         """
         self.name = name if name else self.__class__.__name__
-        self.chain = False          # True if component is a chain
-        self.link = False           # True if component is a link of a chain
-        self.parent = None          # Parent component of this component
-        self.in_ports = list()      # List containing all the component's input ports
-        self.out_ports = list()     # List containing all the component's output ports
+        self.chain = False  # True if component is a chain
+        self.link = False  # True if component is a link of a chain
+        self.parent = None  # Parent component of this component
+        self.in_ports = list()  # List containing all the component's input ports
+        self.out_ports = list()  # List containing all the component's output ports
 
     def __str__(self) -> str:
         in_str = " ".join([p.name for p in self.in_ports])
@@ -127,7 +137,7 @@ class Component(ABC):
         :param port: port to be added to the model.
         """
         port.parent = self
-        port.direction = PORT_IN
+        port.direction = Port.IN
         self.in_ports.append(port)
 
     def add_out_port(self, port: Port):
@@ -136,7 +146,7 @@ class Component(ABC):
         :param port: port to be added to the model.
         """
         port.parent = self
-        port.direction = PORT_OUT
+        port.direction = Port.OUT
         self.out_ports.append(port)
 
 
@@ -152,11 +162,11 @@ class Coupling:
         # Check that couplings are valid
         comp_from = port_from.parent
         comp_to = port_to.parent
-        if isinstance(comp_from, Atomic) and port_from.direction == PORT_IN:
+        if isinstance(comp_from, Atomic) and port_from.direction == Port.IN:
             raise ValueError("Input ports whose parent is an Atomic model can not be coupled to any other port")
-        if isinstance(comp_to, Atomic) and port_to.direction == PORT_OUT:
+        if isinstance(comp_to, Atomic) and port_to.direction == Port.OUT:
             raise ValueError("Output ports whose parent is an Atomic model can not be recipient of any other port")
-        if port_from.p_type != port_to.p_type:  # TODO less restrictive checking? more isinstance-like
+        if port_to in inspect.getmro(port_from.p_type):
             raise ValueError("Ports don't share the same port type")
         self.port_from = port_from
         self.port_to = port_to
@@ -198,7 +208,7 @@ class Atomic(Component, ABC):
 
     def __str__(self) -> str:
         """:return: stringified representation of atomic model."""
-        return "%s(%s, %s)" % (self.name, self.phase, self.sigma)
+        return "%s(%s, %s)" % (self.name, str(self.phase), self.sigma)
 
     @abstractmethod
     def deltint(self):
@@ -322,22 +332,22 @@ class Coupled(Component, ABC):
 
         self._resolve_subchain_splits(force, split)  # If subcomponents are split chains, resolve new model topology
 
-        comps_up = list()           # It will contain children coupled models to be splitted from the chain
-        new_ics_up = list()         # It will contain internal couplings to be added to the parent due to splits
-        ports_split_up = dict()     # Legacy ports are keys. List of new ports are values
+        comps_up = list()  # It will contain children coupled models to be splitted from the chain
+        new_ics_up = list()  # It will contain internal couplings to be added to the parent due to splits
+        ports_split_up = dict()  # Legacy ports are keys. List of new ports are values
 
         if self.chain:
             if split and self.parent is not None:
                 self._trigger_split(comps_up, new_ics_up, ports_split_up)  # Split internal coupled models
-            self._trigger_chaining()        # Remaining components are then chained between them
+            self._trigger_chaining()  # Remaining components are then chained between them
             self._unroll_internal_chains()  # Chains within chains are unrolled
 
         return comps_up, new_ics_up, ports_split_up
 
     def _resolve_subchain_splits(self, force, split):
-        comps_down = list()         # It will contain new children coupled models to be added due to splits
-        new_ics_down = list()       # It will contain new internal couplings to be added due to splits
-        ports_split_down = dict()   # It will contain port split of internal chains due to splits
+        comps_down = list()  # It will contain new children coupled models to be added due to splits
+        new_ics_down = list()  # It will contain new internal couplings to be added due to splits
+        ports_split_down = dict()  # It will contain port split of internal chains due to splits
 
         # First, we trigger chaining to all the children models and gather all the splits together
         for comp in self.components:
@@ -489,12 +499,12 @@ class Coupled(Component, ABC):
         Flattens coupled model (i.e., parent coupled model inherits the connection of the model).
         :return: Components and couplings to be transferred to parent
         """
-        new_comp = list()   # list with children components to be inherited by parent
-        new_coup = list()   # list with couplings to be inherited by parent
+        new_comp = list()  # list with children components to be inherited by parent
+        new_coup = list()  # list with couplings to be inherited by parent
 
         if not self.chain:  # Chains cannot be flattened
-            old_comp = list()       # list with children coupled models to be deleted
-            inherit_comp = list()   # list with components to be inherited from children
+            old_comp = list()  # list with children coupled models to be deleted
+            inherit_comp = list()  # list with components to be inherited from children
             inherit_coup = list()
 
             for comp in self.components:
