@@ -1,6 +1,5 @@
 import inspect
 import pickle
-import logging
 from abc import ABC, abstractmethod
 from collections import deque, defaultdict
 from typing import Any, Iterator, Tuple, List, Dict, Generator
@@ -61,7 +60,7 @@ class Port:
             yield val
 
         for port in self.links_from:
-            for val in port.values:
+            for val in port._values:
                 yield val
 
     def get(self) -> Any:
@@ -121,11 +120,17 @@ class Component(ABC):
 
     def in_empty(self) -> bool:
         """:return: True if model has not any message in all its input ports."""
-        return self._ports_empty(self.in_ports)
+        for port in self.in_ports:
+            if port:
+                return False
+        return True
 
     def out_empty(self) -> bool:
         """:return: True if model has not any message in all its output ports."""
-        return self._ports_empty(self.out_ports)
+        for port in self.out_ports:
+            if port:
+                return False
+        return True
 
     @staticmethod
     def _ports_empty(ports: List[Port]) -> bool:
@@ -203,10 +208,7 @@ class Coupling:
         if self.host:
             if self.port_from:
                 values = list(map(lambda x: pickle.dumps(x, protocol=0).decode(), self.port_from.values))
-                try:
-                    self.host.inject(self.port_to, values)
-                except:  # TODO identify exception type
-                    logging.warning("Values could not be injected (%s)" % self.port_to)
+                self.host.inject(self.port_to, values)
         else:
             self.port_to.extend(self.port_from.values)
 

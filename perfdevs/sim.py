@@ -4,8 +4,13 @@ import pickle
 from abc import ABC, abstractmethod
 from xmlrpc.server import SimpleXMLRPCServer
 
-from . import INFINITY
+from . import INFINITY, DEBUG
 from .models import Atomic, Coupled
+
+if DEBUG:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.disable(logging.CRITICAL)
 
 
 class SimulationClock:
@@ -206,7 +211,7 @@ class Coordinator(AbstractSimulator):
             return False
 
     def simulate(self, num_iters=10000):
-        logging.info("STARTING SIMULATION...")
+        logging.debug("STARTING SIMULATION...")
         self.clock.time = self.time_next
 
         cont = 0
@@ -218,7 +223,7 @@ class Coordinator(AbstractSimulator):
             cont += 1
 
     def simulate_time(self, time_interv=10000):
-        logging.info("STARTING SIMULATION...")
+        logging.debug("STARTING SIMULATION...")
         self.clock.time = self.time_next
         tf = self.clock.time + time_interv
 
