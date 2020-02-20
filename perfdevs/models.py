@@ -7,10 +7,9 @@ from typing import Any, Iterator, Tuple, List, Dict, Generator
 
 from . import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
-logging.basicConfig(level=logging.DEBUG)
-
 
 class Port:
+
     IN = "in"
     OUT = "out"
 
@@ -35,11 +34,7 @@ class Port:
         self.links_from = list()  # List of ports that inject data to the port (only used by input ports)
 
     def __bool__(self) -> bool:
-        try:  # TODO: thing a better way to do this
-            next(self.values)
-            return True
-        except StopIteration:
-            return False
+        return not self.empty()
 
     def __len__(self) -> int:
         return sum(1 for _ in self.values)
@@ -48,7 +43,10 @@ class Port:
         return "{Port(%s): [%s]}" % (self.p_type, list(self.values))
 
     def empty(self) -> bool:
-        return not self
+        """:return: True if port does not contain any message"""
+        for _ in self.values:
+            return False
+        return True
 
     def clear(self):
         self._values.clear()
@@ -116,20 +114,25 @@ class Component(ABC):
     def exit(self):
         pass
 
+    def in_empty(self) -> bool:
+        """:return: True if model has not any message in all its input ports."""
+        return self._ports_empty(self.in_ports)
+
+    def out_empty(self) -> bool:
+        """:return: True if model has not any message in all its output ports."""
+        return self._ports_empty(self.out_ports)
+
     @staticmethod
-    def ports_empty(ports: List[Port]) -> bool:
+    def _ports_empty(ports: List[Port]) -> bool:
+        """
+        Checks if all the ports of a given list are empty
+        :param ports: list of ports to be checked
+        :return: True if all the ports are empty
+        """
         for port in ports:
             if port:
                 return False
         return True
-
-    def in_empty(self) -> bool:
-        """:return: True if model has not any message in all its input ports."""
-        return self.ports_empty(self.in_ports)
-
-    def out_empty(self) -> bool:
-        """:return: True if model has not any message in all its output ports."""
-        return self.ports_empty(self.out_ports)
 
     def add_in_port(self, port: Port):
         """
@@ -173,20 +176,19 @@ class Coupling:
         self.host = host
 
     def __str__(self) -> str:
-        """:return: stringified version of the coupling."""
         return "(%s -> %s)" % (self.port_from, self.port_to)
 
     def propagate(self):
         """Copies messages from the transmitter port to the receiver port"""
         if self.host:
             if self.port_from:
-                values = list(map(lambda x: pickle.dumps(x, protocol=0).decode(), self.port_from.get_all()))
+                values = list(map(lambda x: pickle.dumps(x, protocol=0).decode(), self.port_from.values))
                 try:
                     self.host.inject(self.port_to, values)
                 except:  # TODO identify exception type
                     logging.warning("Values could not be injected (%s)" % self.port_to)
         else:
-            self.port_to.extend(self.port_from.get_all())
+            self.port_to.extend(self.port_from.values)
 
 
 class Atomic(Component, ABC):
@@ -207,7 +209,6 @@ class Atomic(Component, ABC):
         return self.sigma
 
     def __str__(self) -> str:
-        """:return: stringified representation of atomic model."""
         return "%s(%s, %s)" % (self.name, str(self.phase), self.sigma)
 
     @abstractmethod
