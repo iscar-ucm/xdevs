@@ -95,7 +95,6 @@ class Component(ABC):
         :param name: name of the xDEVS model. If no name is provided, it will take the class's name by default.
         """
         self.name = name if name else self.__class__.__name__
-        self.chain = False  # True if component is a chain
         self.link = False  # True if component is a link of a chain
         self.parent = None  # Parent component of this component
         self.in_ports = list()  # List containing all the component's input ports
@@ -331,7 +330,7 @@ class Coupled(Component, ABC):
         """
         self.chain |= force
 
-        self._resolve_subchain_splits(force, split)  # If subcomponents are split chains, resolve new model topology
+        self._resolve_subchain_splits(force, split)
 
         comps_up = list()  # It will contain children coupled models to be splitted from the chain
         new_ics_up = list()  # It will contain internal couplings to be added to the parent due to splits
@@ -346,6 +345,11 @@ class Coupled(Component, ABC):
         return comps_up, new_ics_up, ports_split_up
 
     def _resolve_subchain_splits(self, force, split):
+        """
+        If subcomponents are split chains, resolve new model topology.
+        :param force: if True, the entire hierarchy is chained. By default, it is set to False.
+        :param split: if True, coupled models may be divided into an equivalent set of chained and unchained models.
+        """
         comps_down = list()  # It will contain new children coupled models to be added due to splits
         new_ics_down = list()  # It will contain new internal couplings to be added due to splits
         ports_split_down = dict()  # It will contain port split of internal chains due to splits
@@ -363,8 +367,8 @@ class Coupled(Component, ABC):
         # External ports of children could be split. We build new couplings and remove legacy couplings
         for prev_port, new_ports in ports_split_down.values():
             prev_coups = [coup for coup in self.eic if coup.port_to == prev_port]
-            prev_coups.extend([coup for coup in self.eoc if coup.port_from == prev_port])
-            prev_coups.extend([coup for coup in self.ic if prev_port in [coup.port_from, coup.port_to]])
+            prev_coups.extend((coup for coup in self.eoc if coup.port_from == prev_port))
+            prev_coups.extend((coup for coup in self.ic if prev_port == coup.port_from or prev_port == coup.port_to))
 
             new_coups = list()
             for prev_coup in prev_coups:
@@ -386,11 +390,11 @@ class Coupled(Component, ABC):
         for comp in self.components:
             if isinstance(comp, Coupled) and not comp.chain:
                 int_ports_splits = dict()  # {comp_port: new_ext_port}
-                new_ics_up.extend(self.__split(comp, ports_split_up, int_ports_splits))
+                new_ics_up.extend(self._split_chain(comp, ports_split_up, int_ports_splits))
                 comps_up.append(comp)
 
         remaining_operating_ports = [coup.port_from for coup in self.eic]
-        remaining_operating_ports.extend([coup.port_to for coup in self.eoc])
+        remaining_operating_ports.extend((coup.port_to for coup in self.eoc))
         for port in ports_split_up:
             if port in remaining_operating_ports:
                 ports_split_up[port].append(port)
@@ -407,22 +411,21 @@ class Coupled(Component, ABC):
         for comp in self.components:
             comp.link = self.chain
         for coup in self.eic:
-            self.__chain_from_coupling(coup)
+            self._chain_from_coupling(coup)
         self.eic.clear()
         for coup in self.eoc:
-            self.__chain_from_coupling(coup)
+            self._chain_from_coupling(coup)
         self.eoc.clear()
         for coup in self.ic:
-            self.__chain_from_coupling(coup)
+            self._chain_from_coupling(coup)
         self.ic.clear()
 
     def _unroll_internal_chains(self):
-        # Las cadenas internas las desenrollo
         new_comps = list()
         prev_comps = list()
         for comp in self.components:
             if isinstance(comp, Coupled) and comp.chain:
-                self.__unroll_chain(comp)
+                self._unroll_chain(comp)
                 prev_comps.append(comp)
                 new_comps.extend(comp.components)
         for comp in new_comps:
@@ -430,7 +433,7 @@ class Coupled(Component, ABC):
         for comp in prev_comps:
             self.components.remove(comp)
 
-    def __split(self, comp, ext_ports_split, int_ports_split) -> List:
+    def _split_chain(self, comp, ext_ports_split, int_ports_split) -> List:
         assert isinstance(comp, Coupled)
 
         # FIRST EXTERNAL COUPLINGS ARE DELETED AND PORTS SPLIT
@@ -471,12 +474,12 @@ class Coupled(Component, ABC):
         return ics_up
 
     @staticmethod
-    def __chain_from_coupling(coup: Coupling):
+    def _chain_from_coupling(coup: Coupling):
         coup.port_from.links_to.append(coup.port_to)
         coup.port_to.links_from.append(coup.port_from)
 
     @staticmethod
-    def __unroll_chain(comp):
+    def _unroll_chain(comp):
         assert comp.chain and not comp.eic and not comp.eoc and not comp.ic  # Assert that component is a proper chain
 
         for in_port in comp.in_ports:
@@ -544,14 +547,14 @@ class Coupled(Component, ABC):
 
     def _remove_child_couplings(self, child):
         for in_port in child.in_ports:
-            self.__remove_couplings(in_port, self.eic)
-            self.__remove_couplings(in_port, self.ic)
+            self._remove_couplings(in_port, self.eic)
+            self._remove_couplings(in_port, self.ic)
         for out_port in child.out_ports:
-            self.__remove_couplings(out_port, self.ic)
-            self.__remove_couplings(out_port, self.eoc)
+            self._remove_couplings(out_port, self.ic)
+            self._remove_couplings(out_port, self.eoc)
 
     @staticmethod
-    def __remove_couplings(port, couplings):
+    def _remove_couplings(port, couplings):
         to_remove = list()
         for coup in couplings:
             if coup.port_to == port or coup.port_from == port:
