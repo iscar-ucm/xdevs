@@ -40,7 +40,10 @@ class Port:
         return sum(1 for _ in self.values)
 
     def __str__(self) -> str:
-        return "{Port(%s): [%s]}" % (self.p_type, list(self.values))
+        return "%s.%s(%s)" % (self.parent.name, self.name, self.p_type)
+
+    def __repr__(self) -> str:
+        return str(self)
 
     def empty(self) -> bool:
         """:return: True if port does not contain any message"""
@@ -105,6 +108,9 @@ class Component(ABC):
         out_str = " ".join([p.name for p in self.out_ports])
         return "%s: InPorts[%s] OutPorts[%s]" % (self.name, in_str, out_str)
 
+    def __repr__(self):
+        return self.name
+
     @abstractmethod
     def initialize(self):
         pass
@@ -151,6 +157,18 @@ class Component(ABC):
         port.direction = Port.OUT
         self.out_ports.append(port)
 
+    def get_in_port(self, name):
+        for port in self.in_ports:
+            if port.name == name:
+                return port
+        return None
+
+    def get_out_port(self, name):
+        for port in self.out_ports:
+            if port.name == name:
+                return port
+        return None
+
 
 class Coupling:
     def __init__(self, port_from: Port, port_to: Port, host=None):  # TODO identify host's variable type
@@ -176,6 +194,9 @@ class Coupling:
 
     def __str__(self) -> str:
         return "(%s -> %s)" % (self.port_from, self.port_to)
+
+    def __repr__(self) -> str:
+        return str(self)
 
     def propagate(self):
         """Copies messages from the transmitter port to the receiver port"""
