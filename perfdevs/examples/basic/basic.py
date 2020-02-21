@@ -106,8 +106,6 @@ class Transducer(Atomic):
 		
 	def deltint(self):
 		self.clock += self.sigma
-		throughput = 0
-		avg_ta = 0
 		
 		if self.phase == PHASE_ACTIVE:
 			if self.jobs_solved:
@@ -178,7 +176,7 @@ class Wrap(Coupled):
 
 
 if __name__ == '__main__':
-	wrap = Wrap("gpt", 0.1, 1000)
-	coord = Coordinator(wrap, flatten=False, force_chain=True)
+	wrap = Wrap("gpt", 1, 100)
+	coord = Coordinator(wrap, flatten=False, force_chain=False)
 	coord.initialize()
 	coord.simulate()

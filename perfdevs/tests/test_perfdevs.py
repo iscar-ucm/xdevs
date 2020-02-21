@@ -59,8 +59,6 @@ class DummyCoupled(Coupled):
                 self.add_coupling(comp.out_ports[i], port)
 
 
-
-
 class MyTestCase(unittest.TestCase):
     def test_flatten(self):
         n_ports = 2
