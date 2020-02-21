@@ -122,11 +122,20 @@ class TestLI(DevstoneUtilsTestCase):
             params = dict(zip(("depth", "width", "int_delay", "ext_delay"), params_tuple))
 
             with self.subTest(**params):
-                li_root = LI("LI_root", **params)
-                self.assertEqual(Utils.count_atomics(li_root), (params["width"] - 1) * (params["depth"] - 1) + 1)
-                self.assertEqual(Utils.count_eic(li_root), params["width"] * (params["depth"] - 1) + 1)
-                self.assertEqual(Utils.count_eoc(li_root), params["depth"])
-                self.assertEqual(Utils.count_ic(li_root), 0)
+                self._check_structure(**params)
+
+    def test_structure_corner_cases(self):
+        params = {"depth": 10, "width": 1, "int_delay": 1, "ext_delay": 1}
+        self._check_structure(**params)
+        params["depth"] = 1
+        self._check_structure(**params)
+
+    def _check_structure(self, **params):
+        li_root = LI("LI_root", **params)
+        self.assertEqual(Utils.count_atomics(li_root), (params["width"] - 1) * (params["depth"] - 1) + 1)
+        self.assertEqual(Utils.count_eic(li_root), params["width"] * (params["depth"] - 1) + 1)
+        self.assertEqual(Utils.count_eoc(li_root), params["depth"])
+        self.assertEqual(Utils.count_ic(li_root), 0)
 
     def test_behavior(self):
         """
@@ -160,11 +169,21 @@ class TestHI(DevstoneUtilsTestCase):
             params = dict(zip(("depth", "width", "int_delay", "ext_delay"), params_tuple))
 
             with self.subTest(**params):
-                hi_root = HI("HI_root", **params)
-                self.assertEqual(Utils.count_atomics(hi_root), (params["width"] - 1) * (params["depth"] - 1) + 1)
-                self.assertEqual(Utils.count_eic(hi_root), params["width"] * (params["depth"] - 1) + 1)
-                self.assertEqual(Utils.count_eoc(hi_root), params["depth"])
-                self.assertEqual(Utils.count_ic(hi_root), (params["width"] - 2) * (params["depth"] - 1) if params["width"] > 2 else 0)
+                self._check_structure(**params)
+
+    def test_structure_corner_cases(self):
+        params = {"depth": 10, "width": 1, "int_delay": 1, "ext_delay": 1}
+        self._check_structure(**params)
+        params["depth"] = 1
+        self._check_structure(**params)
+
+    def _check_structure(self, **params):
+        hi_root = HI("HI_root", **params)
+        self.assertEqual(Utils.count_atomics(hi_root), (params["width"] - 1) * (params["depth"] - 1) + 1)
+        self.assertEqual(Utils.count_eic(hi_root), params["width"] * (params["depth"] - 1) + 1)
+        self.assertEqual(Utils.count_eoc(hi_root), params["depth"])
+        self.assertEqual(Utils.count_ic(hi_root),
+                         (params["width"] - 2) * (params["depth"] - 1) if params["width"] > 2 else 0)
 
     def test_behavior(self):
         """
