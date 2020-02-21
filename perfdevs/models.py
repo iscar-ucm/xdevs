@@ -373,41 +373,35 @@ class Coupled(Component, ABC):
         :param force: if True, the entire hierarchy is chained. By default, it is set to False.
         :param split: if True, coupled models may be divided into an equivalent set of chained and unchained models.
         """
-        comps_down = list()  # It will contain new children coupled models to be added due to splits
-        new_ics_down = list()  # It will contain new internal couplings to be added due to splits
-        ports_split_down = dict()  # It will contain port split of internal chains due to splits
-
         # First, we trigger chaining to all the children models and gather all the splits together
         for comp in self.components:
             if isinstance(comp, Coupled):
                 new_comps, new_ics, new_ports = comp.chain_components(force, split)
-                comps_down.extend(new_comps)
-                new_ics_down.extend(new_ics)
-                ports_split_down.update(new_ports)
-        # All new components are added to the hierarchy
-        for comp in comps_down:
-            self.add_component(comp)
-        # External ports of children could be split. We build new couplings and remove legacy couplings
-        for prev_port, new_ports in ports_split_down.values():
-            prev_coups = [coup for coup in self.eic if coup.port_to == prev_port]
-            prev_coups.extend((coup for coup in self.eoc if coup.port_from == prev_port))
-            prev_coups.extend((coup for coup in self.ic if prev_port == coup.port_from or prev_port == coup.port_to))
 
-            new_coups = list()
-            for prev_coup in prev_coups:
-                for new_port in new_ports:
-                    if prev_coup.port_to == prev_port:
-                        new_coups.append(Coupling(prev_coup.port_from, new_port))
-                    elif prev_coup.port_from == prev_port:
-                        new_coups.append(Coupling(new_port, prev_coup.port_to))
+                for c in new_comps:
+                    self.add_component(c)
 
-            for coup in prev_coups:
-                self.remove_coupling(coup)
-            for coup in new_coups:
-                self.add_coupling(coup.port_from, coup.port_to)
+                for prev_port, new_p in new_ports.values():
+                    prev_coups = [coup for coup in self.eic if coup.port_to == prev_port]
+                    prev_coups.extend((coup for coup in self.eoc if coup.port_from == prev_port))
+                    prev_coups.extend(
+                        (coup for coup in self.ic if prev_port == coup.port_from or prev_port == coup.port_to))
 
-        for coup in new_ics_down:
-            self.add_coupling(coup.port_from, coup.port_to)
+                    new_coups = list()
+                    for prev_coup in prev_coups:
+                        for new_port in new_p:
+                            if prev_coup.port_to == prev_port:
+                                new_coups.append(Coupling(prev_coup.port_from, new_port))
+                            elif prev_coup.port_from == prev_port:
+                                new_coups.append(Coupling(new_port, prev_coup.port_to))
+
+                    for coup in prev_coups:
+                        self.remove_coupling(coup)
+                    for coup in new_coups:
+                        self.add_coupling(coup.port_from, coup.port_to)
+
+                for coup in new_ics:
+                    self.add_coupling(coup.port_from, coup.port_to)
 
     def _trigger_split(self, comps_up, new_ics_up, ports_split_up):
         for comp in self.components:
