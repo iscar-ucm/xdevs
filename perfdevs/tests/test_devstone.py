@@ -67,15 +67,40 @@ class Utils:
 
         return eoc_count
 
+    @staticmethod
+    def count_transitions(coupled):
+        """
+        :return: Number of atomic components in a coupled model
+        """
+        int_count = 0
+        ext_count = 0
+        for comp in coupled.components:
+            if isinstance(comp, Atomic):
+                int_count += comp.int_count
+                ext_count += comp.ext_count
+            elif isinstance(comp, Coupled):
+                pic, pec = Utils.count_transitions(comp)
+                int_count += pic
+                ext_count += pec
+            else:
+                raise RuntimeError("Unrecognized type of component")
+
+        return int_count, ext_count
+
 
 class DevstoneUtilsTestCase(TestCase):
 
-    def __init__(self, name, num_valid_param_sets: int = 20):
+    def __init__(self, name, num_valid_params_sets: int = 10):
         super().__init__(name)
-        self.valid_params = []
+        self.valid_high_params = []
+        self.valid_low_params = []
 
-        for _ in range(int(num_valid_param_sets)):
-            self.valid_params.append([random.randint(1, 100), random.randint(1, 200),
+        for _ in range(int(num_valid_params_sets)):
+            self.valid_high_params.append([random.randint(1, 100), random.randint(1, 200),
+                                           random.randint(1, 1000), random.randint(1, 1000)])
+
+        for _ in range(int(num_valid_params_sets)):
+            self.valid_low_params.append([random.randint(1, 50), random.randint(1, 50),
                                       random.randint(1, 1000), random.randint(1, 1000)])
 
 
@@ -85,7 +110,7 @@ class TestLI(DevstoneUtilsTestCase):
         """
         Check structure params: atomic modules, ic's, eic's and eoc's.
         """
-        for params_tuple in self.valid_params:
+        for params_tuple in self.valid_high_params:
             params = dict(zip(("depth", "width", "int_delay", "ext_delay"), params_tuple))
 
             with self.subTest(**params):
@@ -95,6 +120,23 @@ class TestLI(DevstoneUtilsTestCase):
                 self.assertEqual(Utils.count_eoc(li_root), params["depth"])
                 self.assertEqual(Utils.count_ic(li_root), 0)
 
+    def test_behavior(self):
+        """
+        Check behaviour params: number of int and ext transitions.
+        """
+        for params_tuple in self.valid_low_params:
+            params = dict(zip(("depth", "width", "int_delay", "ext_delay"), params_tuple))
+
+            with self.subTest(**params):
+                li_root = LI("LI_root", **params)
+                coord = Coordinator(li_root, flatten=False, force_chain=False)
+                coord.initialize()
+                coord.inject(li_root.i_in, 0)
+                coord.simulate()
+
+                int_count, ext_count = Utils.count_transitions(li_root)
+                self.assertEqual(int_count, (params["width"] - 1) * (params["depth"] - 1) + 1)
+                self.assertEqual(ext_count, (params["width"] - 1) * (params["depth"] - 1) + 1)
 
 class TestHI(DevstoneUtilsTestCase):
 
@@ -102,7 +144,7 @@ class TestHI(DevstoneUtilsTestCase):
         """
         Check structure params: atomic modules, ic's, eic's and eoc's.
         """
-        for params_tuple in self.valid_params:
+        for params_tuple in self.valid_high_params:
             params = dict(zip(("depth", "width", "int_delay", "ext_delay"), params_tuple))
 
             with self.subTest(**params):

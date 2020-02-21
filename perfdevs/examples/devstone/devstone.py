@@ -37,9 +37,14 @@ class DelayedAtomic(Atomic):
         # TODO: Dhrystone call with ext_delay
         self.hold_in(PHASE_ACTIVE, 0)  # TODO: Change to preparation time
 
+    """def deltcon(self, e: Any):
+        self.deltext(0)
+        self.deltint()"""
+
     def lambdaf(self):
         # TODO: find out what to add in output
-        self.o_out.add(0)
+        if hasattr(self, "o_out"):
+            self.o_out.add(0)
 
     def initialize(self):
         self.passivate()

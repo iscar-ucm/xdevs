@@ -205,6 +205,8 @@ class Coordinator(AbstractSimulator):
             port.extend(values)
             self.clock.time = time
             self.deltfcn()
+            self.clear()
+            self.clock.time = self.time_next
             return True
         else:
             logging.error("Time %d - Input rejected: elapsed time %d is not in bounds" % (self.time_last, e))
@@ -219,7 +221,6 @@ class Coordinator(AbstractSimulator):
             self.lambdaf()
             self.deltfcn()
             self.clear()
-            self.clock.time = self.time_next
             cont += 1
 
     def simulate_time(self, time_interv=10000):
