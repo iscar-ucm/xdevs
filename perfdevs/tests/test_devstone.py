@@ -1,7 +1,7 @@
 from unittest import TestCase, TestLoader, TestSuite, TextTestRunner
 
 from perfdevs.sim import Coordinator
-from perfdevs.examples.devstone.devstone import LI, HI
+from perfdevs.examples.devstone.devstone import LI, HI, HO
 from perfdevs.models import Atomic, Coupled
 
 import random
@@ -103,6 +103,14 @@ class DevstoneUtilsTestCase(TestCase):
             self.valid_low_params.append([random.randint(1, 20), random.randint(1, 30),
                                       random.randint(1, 1000), random.randint(1, 1000)])
 
+    def check_invalid_inputs(self, base_class):
+        self.assertRaises(ValueError, base_class, "root", 0, 1, 1, 1)
+        self.assertRaises(ValueError, base_class, "root", 1, 0, 1, 1)
+        self.assertRaises(ValueError, base_class, "root", 1, 1, -1, 0)
+        self.assertRaises(ValueError, base_class, "root", 1, 1, 0, -1)
+        self.assertRaises(ValueError, base_class, "root", 0, 1, -1, -1)
+        self.assertRaises(ValueError, base_class, "root", 0, 0, -1, -1)
+
 
 class TestLI(DevstoneUtilsTestCase):
 
@@ -138,6 +146,10 @@ class TestLI(DevstoneUtilsTestCase):
                 self.assertEqual(int_count, (params["width"] - 1) * (params["depth"] - 1) + 1)
                 self.assertEqual(ext_count, (params["width"] - 1) * (params["depth"] - 1) + 1)
 
+    def test_invalid_inputs(self):
+        super().check_invalid_inputs(LI)
+
+
 class TestHI(DevstoneUtilsTestCase):
 
     def test_structure(self):
@@ -171,3 +183,55 @@ class TestHI(DevstoneUtilsTestCase):
                 int_count, ext_count = Utils.count_transitions(hi_root)
                 self.assertEqual(int_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
                 self.assertEqual(ext_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
+
+    def test_invalid_inputs(self):
+        super().check_invalid_inputs(HI)
+
+
+class TestHO(DevstoneUtilsTestCase):
+
+    def test_structure(self):
+        """
+        Check structure params: atomic modules, ic's, eic's and eoc's.
+        """
+        for params_tuple in self.valid_high_params:
+            params = dict(zip(("depth", "width", "int_delay", "ext_delay"), params_tuple))
+
+            with self.subTest(**params):
+                self._check_structure(**params)
+
+    def test_structure_corner_cases(self):
+        params = {"depth": 10, "width": 1, "int_delay": 1, "ext_delay": 1}
+        self._check_structure(**params)
+        params["depth"] = 1
+        self._check_structure(**params)
+
+    def _check_structure(self, **params):
+        ho_root = HO("HO_root", **params)
+        self.assertEqual(Utils.count_atomics(ho_root), (params["width"] - 1) * (params["depth"] - 1) + 1)
+        self.assertEqual(Utils.count_eic(ho_root), (params["width"] + 1) * (params["depth"] - 1) + 1)
+        self.assertEqual(Utils.count_eoc(ho_root), params["width"] * (params["depth"] - 1) + 1)
+        self.assertEqual(Utils.count_ic(ho_root),
+                         (params["width"] - 2) * (params["depth"] - 1) if params["width"] > 2 else 0)
+
+    def test_behavior(self):
+        """
+        Check behaviour params: number of int and ext transitions.
+        """
+        for params_tuple in self.valid_low_params:
+            params = dict(zip(("depth", "width", "int_delay", "ext_delay"), params_tuple))
+
+            with self.subTest(**params):
+                ho_root = HO("HO_root", **params)
+                coord = Coordinator(ho_root, flatten=False, force_chain=False)
+                coord.initialize()
+                coord.inject(ho_root.i_in, 0)
+                coord.inject(ho_root.i_in2, 0)
+                coord.simulate()
+
+                int_count, ext_count = Utils.count_transitions(ho_root)
+                self.assertEqual(int_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
+                self.assertEqual(ext_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
+
+    def test_invalid_inputs(self):
+        super().check_invalid_inputs(HO)

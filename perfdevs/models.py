@@ -531,24 +531,19 @@ class Coupled(Component, ABC):
 
         if not self.chain:  # Chains cannot be flattened
             old_comp = list()  # list with children coupled models to be deleted
-            inherit_comp = list()  # list with components to be inherited from children
-            inherit_coup = list()
 
             for comp in self.components:
                 if isinstance(comp, Coupled) and not comp.chain:  # Propagate flattening to children coupled models
-                    comps, coup = comp.flatten()
+                    comps, coups = comp.flatten()
                     old_comp.append(comp)
-                    inherit_comp.extend(comps)
-                    inherit_coup.extend(coup)
+                    for comp in comps:
+                        self.add_component(comp)
+                    for coup in coups:
+                        self.add_coupling(coup.port_from, coup.port_to)
 
             for comp in old_comp:
-                self._remove_child_couplings(comp)
+                self._remove_couplings_of_child(comp)
                 self.components.remove(comp)
-
-            for comp in inherit_comp:
-                self.add_component(comp)
-            for coup in inherit_coup:
-                self.add_coupling(coup.port_from, coup.port_to)
 
             if self.parent is not None:  # If module is not root, trigger the flatten process
                 new_comp.extend(self.components)
@@ -568,7 +563,7 @@ class Coupled(Component, ABC):
 
         return new_comp, new_coup
 
-    def _remove_child_couplings(self, child):
+    def _remove_couplings_of_child(self, child):
         for in_port in child.in_ports:
             self._remove_couplings(in_port, self.eic)
             self._remove_couplings(in_port, self.ic)
