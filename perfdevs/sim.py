@@ -222,6 +222,7 @@ class Coordinator(AbstractSimulator):
             self.lambdaf()
             self.deltfcn()
             self.clear()
+            self.clock.time = self.time_next
             cont += 1
 
     def simulate_time(self, time_interv=10000):
