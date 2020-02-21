@@ -10,7 +10,7 @@ type Coordinator interface {
 	PropagateInput()
 	SimInject(e float64, port *modeling.Port, values interface{})
 	SimulateIterations(numIterations int)
-	SimulateTime(timeInterval float64))
+	SimulateTime(timeInterval float64)
 }
 
 
