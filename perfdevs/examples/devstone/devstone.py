@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from test.pystone import pystones
 from typing import Any
 
 from perfdevs.models import Atomic, Coupled, Port
@@ -9,7 +10,7 @@ import typing
 
 class DelayedAtomic(Atomic):
 
-    def __init__(self, name: str, int_delay: float, ext_delay: float, add_out_port: bool = False):
+    def __init__(self, name: str, int_delay: float, ext_delay: float, add_out_port: bool = False, prep_time=0):
         super().__init__(name)
 
         self.int_delay = int_delay
@@ -17,6 +18,8 @@ class DelayedAtomic(Atomic):
 
         self.int_count = 0
         self.ext_count = 0
+
+        self.prep_time = prep_time  # TODO What is this for?
 
         self.i_in = Port(int, "i_in")
         self.add_in_port(self.i_in)
@@ -28,14 +31,14 @@ class DelayedAtomic(Atomic):
     def deltint(self):
         self.int_count += 1
 
-        # TODO: Dhrystone call with int_delay
+        pystones(self.int_delay)
         self.passivate()
 
     def deltext(self, e: Any):
         self.ext_count += 1
 
-        # TODO: Dhrystone call with ext_delay
-        self.hold_in(PHASE_ACTIVE, 0)  # TODO: Change to preparation time
+        pystones(self.ext_delay)
+        self.hold_in(PHASE_ACTIVE, self.prep_time)
 
     """def deltcon(self, e: Any):
         self.deltext(0)
