@@ -115,11 +115,11 @@ class Transducer(Atomic):
 				avg_ta = 0
 				throughput = 0
 				
-			logging.info("End time: %d" % self.clock)
+			logging.info("End time: %f" % self.clock)
 			logging.info("Jobs arrived: %d" % len(self.jobs_arrived))
 			logging.info("Jobs solved: %d" % len(self.jobs_solved))
-			logging.info("Average TA: %d" % avg_ta)
-			logging.info("Throughput: %d\n" % throughput)
+			logging.info("Average TA: %f" % avg_ta)
+			logging.info("Throughput: %f\n" % throughput)
 			
 			self.hold_in(PHASE_DONE, 0)
 		else:
@@ -140,7 +140,7 @@ class Transducer(Atomic):
 			if self.i_solved:
 				job = self.i_solved.get()
 				logging.info("Job %s finished @ t = %d" % (job.name, self.clock))
-				job.time = self.clock
+				self.total_ta += self.clock - job.time
 				self.jobs_solved.append(job)
 	
 	def lambdaf(self):
