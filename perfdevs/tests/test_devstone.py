@@ -100,7 +100,7 @@ class DevstoneUtilsTestCase(TestCase):
                                            random.randint(1, 1000), random.randint(1, 1000)])
 
         for _ in range(int(num_valid_params_sets)):
-            self.valid_low_params.append([random.randint(1, 50), random.randint(1, 50),
+            self.valid_low_params.append([random.randint(1, 20), random.randint(1, 30),
                                       random.randint(1, 1000), random.randint(1, 1000)])
 
 
@@ -152,5 +152,22 @@ class TestHI(DevstoneUtilsTestCase):
                 self.assertEqual(Utils.count_atomics(hi_root), (params["width"] - 1) * (params["depth"] - 1) + 1)
                 self.assertEqual(Utils.count_eic(hi_root), params["width"] * (params["depth"] - 1) + 1)
                 self.assertEqual(Utils.count_eoc(hi_root), params["depth"])
-                self.assertEqual(Utils.count_ic(hi_root), (params["width"] - 2) * (params["depth"] - 1))
+                self.assertEqual(Utils.count_ic(hi_root), (params["width"] - 2) * (params["depth"] - 1) if params["width"] > 2 else 0)
 
+    def test_behavior(self):
+        """
+        Check behaviour params: number of int and ext transitions.
+        """
+        for params_tuple in self.valid_low_params:
+            params = dict(zip(("depth", "width", "int_delay", "ext_delay"), params_tuple))
+
+            with self.subTest(**params):
+                hi_root = HI("HI_root", **params)
+                coord = Coordinator(hi_root, flatten=False, force_chain=False)
+                coord.initialize()
+                coord.inject(hi_root.i_in, 0)
+                coord.simulate()
+
+                int_count, ext_count = Utils.count_transitions(hi_root)
+                self.assertEqual(int_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
+                self.assertEqual(ext_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
