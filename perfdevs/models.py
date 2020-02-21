@@ -500,20 +500,20 @@ class Coupled(Component, ABC):
         assert comp.chain and not comp.eic and not comp.eoc and not comp.ic  # Assert that component is a proper chain
 
         for in_port in comp.in_ports:
-            for port in in_port.couplings_to:
-                port.couplings_from.remove(in_port)
-                port.couplings_from.extend(in_port.couplings_from)
-            for port in in_port.couplings_from:
-                port.couplings_to.remove(in_port)
-                port.couplings_to.extend(in_port.couplings_to)
+            for port in in_port.links_to:
+                port.links_from.remove(in_port)
+                port.links_from.extend(in_port.links_from)
+            for port in in_port.links_from:
+                port.links_to.remove(in_port)
+                port.links_to.extend(in_port.links_to)
 
         for out_port in comp.out_ports:
-            for port in out_port.couplings_from:
-                port.couplings_to.remove(out_port)
-                port.couplings_to.extend(out_port.couplings_to)
-            for port in out_port.couplings_to:
-                port.couplings_from.remove(out_port)
-                port.couplings_from.extend(out_port.couplings_from)
+            for port in out_port.links_from:
+                port.links_to.remove(out_port)
+                port.links_to.extend(out_port.links_to)
+            for port in out_port.links_to:
+                port.links_from.remove(out_port)
+                port.links_from.extend(out_port.links_from)
 
     def flatten(self) -> Tuple[List, List]:
         """

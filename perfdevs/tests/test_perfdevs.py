@@ -68,6 +68,14 @@ class MyTestCase(unittest.TestCase):
         comp.flatten()
         self.assertEqual(True, False)
 
+    def test_pure_chain(self):
+        n_ports = 2
+        n_atomics = 2
+        n_coupleds = 2
+        comp = DummyCoupled(n_ports, n_atomics, n_coupleds, ' ', False)
+        comp.chain_components(force=True)
+        self.assertEqual(True, False)
+
 
 if __name__ == '__main__':
     unittest.main()
