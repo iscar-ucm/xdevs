@@ -29,12 +29,14 @@ class DelayedAtomic(Atomic):
             self.add_out_port(self.o_out)
 
     def deltint(self):
+        #print(self.name + " int")
         self.int_count += 1
 
         pystones(self.int_delay)
         self.passivate()
 
     def deltext(self, e: Any):
+        #print(self.name + " ext")
         self.ext_count += 1
 
         pystones(self.ext_delay)
@@ -76,6 +78,10 @@ class DEVStoneWrapper(Coupled, ABC):
             raise ValueError("Invalid depth")
         if width < 1:
             raise ValueError("Invalid width")
+        if int_delay < 0:
+            raise ValueError("Invalid int_delay")
+        if ext_delay < 0:
+            raise ValueError("Invalid ext_delay")
 
         if depth == 1:
             atomic = DelayedAtomic("Atomic_0_0", int_delay, ext_delay, add_out_port=True)
@@ -141,13 +147,14 @@ class HO(DEVStoneWrapper):
         self.o_out2 = Port(int, "o_out2")
         self.add_out_port(self.o_out2)
 
+        assert len(self.components) > 0
+        if isinstance(self.components[0], Coupled):
+            self.add_coupling(self.i_in, self.components[0].get_in_port("i_in2"))  # Coupled second input
+
         if len(self.components) > 1:
             assert isinstance(self.components[-1], Atomic)
             self.add_coupling(self.i_in2, self.components[-1].get_in_port("i_in"))
             self.add_coupling(self.components[-1].get_out_port("o_out"), self.o_out2)
-
-            assert isinstance(self.components[0], Coupled)
-            self.add_coupling(self.i_in, self.components[0].get_in_port("i_in2"))  # Coupled second input
 
         for idx in range(1, len(self.components) - 1):
             assert isinstance(self.components[idx], Atomic)
