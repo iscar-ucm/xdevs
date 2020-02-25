@@ -520,42 +520,42 @@ class Coupled(Component, ABC):
         Flattens coupled model (i.e., parent coupled model inherits the connection of the model).
         :return: Components and couplings to be transferred to parent
         """
-        new_comp = list()  # list with children components to be inherited by parent
-        new_coup = list()  # list with couplings to be inherited by parent
+        new_comps_up = list()  # list with children components to be inherited by parent
+        new_coups_up = list()  # list with couplings to be inherited by parent
 
         if not self.chain:  # Chains cannot be flattened
-            old_comp = list()  # list with children coupled models to be deleted
+            old_comps = list()  # list with children coupled models to be deleted
 
             for comp in self.components:
                 if isinstance(comp, Coupled) and not comp.chain:  # Propagate flattening to children coupled models
-                    comps, coups = comp.flatten()
-                    old_comp.append(comp)
-                    for comp in comps:
-                        self.add_component(comp)
-                    for coup in coups:
+                    new_comps_down, new_coups_down = comp.flatten()
+                    old_comps.append(comp)
+                    for new_comp in new_comps_down:
+                        self.add_component(new_comp)
+                    for coup in new_coups_down:
                         self.add_coupling(coup.port_from, coup.port_to)
 
-            for comp in old_comp:
+            for comp in old_comps:
                 self._remove_couplings_of_child(comp)
                 self.components.remove(comp)
 
             if self.parent is not None:  # If module is not root, trigger the flatten process
-                new_comp.extend(self.components)
+                new_comps_up.extend(self.components)
 
                 left_bridge_eic = self._create_left_bridge(self.parent.eic)
-                new_coup.extend(self._complete_left_bridge(left_bridge_eic))
+                new_coups_up.extend(self._complete_left_bridge(left_bridge_eic))
 
                 left_bridge_ic = self._create_left_bridge(self.parent.ic)
                 right_bridge_ic = self._create_right_bridge(self.parent.ic)
-                new_coup.extend(self._complete_left_bridge(left_bridge_ic))
-                new_coup.extend(self._complete_right_bridge(right_bridge_ic))
+                new_coups_up.extend(self._complete_left_bridge(left_bridge_ic))
+                new_coups_up.extend(self._complete_right_bridge(right_bridge_ic))
 
                 right_bridge_eoc = self._create_right_bridge(self.parent.eoc)
-                new_coup.extend(self._complete_right_bridge(right_bridge_eoc))
+                new_coups_up.extend(self._complete_right_bridge(right_bridge_eoc))
 
-                new_coup.extend(self.ic)
+                new_coups_up.extend(self.ic)
 
-        return new_comp, new_coup
+        return new_comps_up, new_coups_up
 
     def _remove_couplings_of_child(self, child):
         for in_port in child.in_ports:

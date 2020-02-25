@@ -63,10 +63,23 @@ class MyTestCase(unittest.TestCase):
     def test_flatten(self):
         n_ports = 2
         n_atomics = 2
-        n_coupleds = 2
+        n_coupleds = 1
         comp = DummyCoupled(n_ports, n_atomics, n_coupleds, ' ', False)
         comp.flatten()
-        self.assertEqual(True, False)
+
+        # Compute the expected amount of components of the flattened version
+        n_components = 0
+        n_ics = 0
+        for i in range(n_coupleds + 1):
+            n_components *= i
+            n_ics *= i
+            n_components += n_atomics
+            n_ics += n_ports * sum(range(n_atomics))
+
+        self.assertEqual(len(comp.components), n_components)
+        self.assertEqual(len(comp.eic), n_ports * n_components)
+        self.assertEqual(len(comp.eoc), n_ports * n_components)
+        self.assertEqual(len(comp.ic), )
 
     def test_pure_chain(self):
         n_ports = 2
