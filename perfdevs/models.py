@@ -291,9 +291,9 @@ class Coupled(Component, ABC):
         self.chain = to_chain
 
         self.components = []
-        self.ic = []
-        self.eic = []
-        self.eoc = []
+        self.ic = dict()
+        self.eic = dict()
+        self.eoc = dict()
 
     def initialize(self):
         pass
@@ -311,15 +311,23 @@ class Coupled(Component, ABC):
         """
         if self.chain and host is not None:
             raise ValueError("A chain cannot host couplings")
+
         coupling = Coupling(p_from, p_to, host)
         if p_from.parent == self and p_to.parent in self.components:
-            self.eic.append(coupling)
+            Coupled._safe_coup_add(self.eic, coupling)
         elif p_from.parent in self.components and p_to.parent == self:
-            self.eoc.append(coupling)
+            Coupled._safe_coup_add(self.eoc, coupling)
         elif p_from.parent in self.components and p_to.parent in self.components:
-            self.ic.append(coupling)
+            Coupled._safe_coup_add(self.ic, coupling)
         else:
             raise ValueError("Components that compose the coupling are not submodules of coupled model")
+
+    @staticmethod
+    def _safe_coup_add(dct, coup):
+        if coup.port_from not in dct:
+            dct[coup.port_from] = [coup]
+        else:
+            dct[coup.port_from].append(coup)
 
     def remove_coupling(self, coupling: Coupling):
         """
@@ -327,14 +335,22 @@ class Coupled(Component, ABC):
         :param coupling: Couplings to be removed.
         :raises ValueError: if coupling is not found.
         """
-        if coupling in self.eic:
-            self.eic.remove(coupling)
-        elif coupling in self.eoc:
-            self.eoc.remove(coupling)
-        elif coupling in self.ic:
-            self.ic.remove(coupling)
-        else:
-            raise ValueError("Coupling was not found in model definition")
+        for key, coup in self.eic.items():
+            if coupling == coup:
+                del self.eic[key]
+                return
+
+        for key, coup in self.eoc.items():
+            if coupling == coup:
+                del self.eoc[key]
+                return
+
+        for key, coup in self.ic.items():
+            if coupling == coup:
+                del self.ic[key]
+                return
+
+        raise ValueError("Coupling was not found in model definition")
 
     def add_component(self, component: Component):
         """
@@ -382,10 +398,10 @@ class Coupled(Component, ABC):
                     self.add_component(c)
 
                 for prev_port, new_p in new_ports.values():
-                    prev_coups = [coup for coup in self.eic if coup.port_to == prev_port]
-                    prev_coups.extend((coup for coup in self.eoc if coup.port_from == prev_port))
+                    prev_coups = [coup for coup in self.eic.values() if coup.port_to == prev_port]
+                    prev_coups.extend((coup for coup in self.eoc.values() if coup.port_from == prev_port))
                     prev_coups.extend(
-                        (coup for coup in self.ic if prev_port == coup.port_from or prev_port == coup.port_to))
+                        (coup for coup in self.ic.values() if prev_port == coup.port_from or prev_port == coup.port_to))
 
                     new_coups = list()
                     for prev_coup in prev_coups:
@@ -410,8 +426,8 @@ class Coupled(Component, ABC):
                 new_ics_up.extend(self._split_chain(comp, ports_split_up, int_ports_splits))
                 comps_up.append(comp)
 
-        remaining_operating_ports = [coup.port_from for coup in self.eic]
-        remaining_operating_ports.extend((coup.port_to for coup in self.eoc))
+        remaining_operating_ports = [coup.port_from for coup in self.eic.values()]
+        remaining_operating_ports.extend((coup.port_to for coup in self.eoc.values()))
         for port in ports_split_up:
             if port in remaining_operating_ports:
                 ports_split_up[port].append(port)
@@ -427,13 +443,13 @@ class Coupled(Component, ABC):
     def _trigger_chaining(self):
         for comp in self.components:
             comp.link = self.chain
-        for coup in self.eic:
+        for coup in self.eic.values():
             self._chain_from_coupling(coup)
         self.eic.clear()
-        for coup in self.eoc:
+        for coup in self.eoc.values():
             self._chain_from_coupling(coup)
         self.eoc.clear()
-        for coup in self.ic:
+        for coup in self.ic.values():
             self._chain_from_coupling(coup)
         self.ic.clear()
 
@@ -454,10 +470,10 @@ class Coupled(Component, ABC):
         assert isinstance(comp, Coupled)
 
         # FIRST EXTERNAL COUPLINGS ARE DELETED AND PORTS SPLIT
-        eic_to = [coup for coup in self.eic if coup.port_to in comp.in_ports]
-        eoc_from = [coup for coup in self.eoc if coup.port_from in comp.out_ports]
-        ic_to = [coup for coup in self.ic if coup.port_to in comp.in_ports]
-        ic_from = [coup for coup in self.ic if coup.port_from in comp.out_ports]
+        eic_to = [coup for coup in self.eic.values() if coup.port_to in comp.in_ports]
+        eoc_from = [coup for coup in self.eoc.values() if coup.port_from in comp.out_ports]
+        ic_to = [coup for coup in self.ic.values() if coup.port_to in comp.in_ports]
+        ic_from = [coup for coup in self.ic.values() if coup.port_from in comp.out_ports]
 
         for coup in eic_to:
             if coup.port_from not in ext_ports_split:
@@ -540,22 +556,30 @@ class Coupled(Component, ABC):
                 self.components.remove(comp)
 
             if self.parent is not None:  # If module is not root, trigger the flatten process
-                new_comps_up.extend(self.components)
+                Coupled._extend_couplings(new_comps_up, self.components)
 
                 left_bridge_eic = self._create_left_bridge(self.parent.eic)
-                new_coups_up.extend(self._complete_left_bridge(left_bridge_eic))
+                Coupled._extend_couplings(new_coups_up, self._complete_left_bridge(left_bridge_eic))
 
                 left_bridge_ic = self._create_left_bridge(self.parent.ic)
                 right_bridge_ic = self._create_right_bridge(self.parent.ic)
-                new_coups_up.extend(self._complete_left_bridge(left_bridge_ic))
-                new_coups_up.extend(self._complete_right_bridge(right_bridge_ic))
+                Coupled._extend_couplings(new_coups_up, self._complete_left_bridge(left_bridge_ic))
+                Coupled._extend_couplings(new_coups_up, self._complete_right_bridge(right_bridge_ic))
 
                 right_bridge_eoc = self._create_right_bridge(self.parent.eoc)
-                new_coups_up.extend(self._complete_right_bridge(right_bridge_eoc))
+                Coupled._extend_couplings(new_coups_up, self._complete_right_bridge(right_bridge_eoc))
 
-                new_coups_up.extend(self.ic)
+                Coupled._extend_couplings(new_coups_up, self.ic)
 
         return new_comps_up, new_coups_up
+
+    @staticmethod
+    def _extend_couplings(dic1, dic2):
+        for key, val in dic2:
+            if key in dic1:
+                dic1[key].extend(dic2[key])
+            else:
+                dic1[key] = dic2[key]
 
     def _remove_couplings_of_child(self, child):
         for in_port in child.in_ports:
@@ -568,11 +592,11 @@ class Coupled(Component, ABC):
     @staticmethod
     def _remove_couplings(port, couplings):
         to_remove = list()
-        for coup in couplings:
+        for key, coup in couplings.items():
             if coup.port_to == port or coup.port_from == port:
-                to_remove.append(coup)
-        for coup in to_remove:
-            couplings.remove(coup)
+                to_remove.append(key)
+        for key in to_remove:
+            del couplings[key]
 
     def _create_left_bridge(self, pc):
         bridge = defaultdict(list)
@@ -591,17 +615,17 @@ class Coupled(Component, ABC):
         return bridge
 
     def _complete_left_bridge(self, bridge):
-        couplings = list()
-        for coup in self.eic:
+        couplings = dict()
+        for coup in self.eic.values():
             ports = bridge[coup.port_from]
             for port in ports:
-                couplings.append(Coupling(port, coup.port_to))
+                Coupled._safe_coup_add(couplings, Coupling(port, coup.port_to))
         return couplings
 
     def _complete_right_bridge(self, bridge):
-        couplings = list()
-        for coup in self.eoc:
+        couplings = dict()
+        for coup in self.eoc.values():
             ports = bridge[coup.port_to]
             for port in ports:
-                couplings.append(Coupling(coup.port_from, port))
+                Coupled._safe_coup_add(couplings, Coupling(coup.port_from, port))
         return couplings
