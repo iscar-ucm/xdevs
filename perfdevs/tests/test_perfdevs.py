@@ -77,9 +77,8 @@ class MyTestCase(unittest.TestCase):
             n_ics += n_ports * sum(range(n_atomics))
 
         self.assertEqual(len(comp.components), n_components)
-        self.assertEqual(len(comp.eic), n_ports * n_components)
-        self.assertEqual(len(comp.eoc), n_ports * n_components)
-        self.assertEqual(len(comp.ic), )
+        self.assertEqual(sum([len(comp.eic[cl]) for cl in comp.eic]), n_ports * n_components)
+        self.assertEqual(sum([len(comp.eoc[cl]) for cl in comp.eoc]), n_ports * n_components)
 
     def test_pure_chain(self):
         n_ports = 2

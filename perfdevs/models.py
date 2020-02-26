@@ -556,20 +556,20 @@ class Coupled(Component, ABC):
                 self.components.remove(comp)
 
             if self.parent is not None:  # If module is not root, trigger the flatten process
-                Coupled._extend_couplings(new_comps_up, self.components)
+                new_comps_up.extend(self.components)
 
                 left_bridge_eic = self._create_left_bridge(self.parent.eic)
-                Coupled._extend_couplings(new_coups_up, self._complete_left_bridge(left_bridge_eic))
+                new_coups_up.extend(self._complete_left_bridge(left_bridge_eic))
 
                 left_bridge_ic = self._create_left_bridge(self.parent.ic)
                 right_bridge_ic = self._create_right_bridge(self.parent.ic)
-                Coupled._extend_couplings(new_coups_up, self._complete_left_bridge(left_bridge_ic))
-                Coupled._extend_couplings(new_coups_up, self._complete_right_bridge(right_bridge_ic))
+                new_coups_up.extend(self._complete_left_bridge(left_bridge_ic))
+                new_coups_up.extend(self._complete_right_bridge(right_bridge_ic))
 
                 right_bridge_eoc = self._create_right_bridge(self.parent.eoc)
-                Coupled._extend_couplings(new_coups_up, self._complete_right_bridge(right_bridge_eoc))
+                new_coups_up.extend(self._complete_right_bridge(right_bridge_eoc))
 
-                Coupled._extend_couplings(new_coups_up, self.ic)
+                new_coups_up.extend([c for cl in self.ic.values() for c in cl])
 
         return new_comps_up, new_coups_up
 
@@ -592,40 +592,45 @@ class Coupled(Component, ABC):
     @staticmethod
     def _remove_couplings(port, couplings):
         to_remove = list()
-        for key, coup in couplings.items():
-            if coup.port_to == port or coup.port_from == port:
-                to_remove.append(key)
-        for key in to_remove:
-            del couplings[key]
+        for _, coup_list in couplings.items():
+            for coup in coup_list:
+                if coup.port_to == port or coup.port_from == port:
+                    to_remove.append(coup)
+        for coup in to_remove:
+            couplings[coup.port_from].remove(coup)
 
     def _create_left_bridge(self, pc):
         bridge = defaultdict(list)
         for in_port in self.in_ports:
-            for coup in pc:
-                if coup.port_to == in_port:
-                    bridge[in_port].append(coup.port_from)
+            for coup_list in pc.values():
+                for coup in coup_list:
+                    if coup.port_to == in_port:
+                        bridge[in_port].append(coup.port_from)
         return bridge
 
     def _create_right_bridge(self, pc):
         bridge = defaultdict(list)
         for out_port in self.out_ports:
-            for coup in pc:
-                if coup.port_from == out_port:
-                    bridge[out_port].append(coup.port_to)
+            for coup_list in pc.values():
+                for coup in coup_list:
+                    if coup.port_from == out_port:
+                        bridge[out_port].append(coup.port_to)
         return bridge
 
     def _complete_left_bridge(self, bridge):
-        couplings = dict()
-        for coup in self.eic.values():
-            ports = bridge[coup.port_from]
-            for port in ports:
-                Coupled._safe_coup_add(couplings, Coupling(port, coup.port_to))
+        couplings = list()
+        for coup_list in self.eic.values():
+            for coup in coup_list:
+                ports = bridge[coup.port_from]
+                for port in ports:
+                    couplings.append(Coupling(port, coup.port_to))
         return couplings
 
     def _complete_right_bridge(self, bridge):
-        couplings = dict()
-        for coup in self.eoc.values():
-            ports = bridge[coup.port_to]
-            for port in ports:
-                Coupled._safe_coup_add(couplings, Coupling(coup.port_from, port))
+        couplings = list()
+        for coup_list in self.eoc.values():
+            for coup in coup_list:
+                ports = bridge[coup.port_to]
+                for port in ports:
+                    couplings.append(Coupling(coup.port_from, port))
         return couplings
