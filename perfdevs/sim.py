@@ -305,15 +305,6 @@ class Coordinator(AbstractSimulator):
         self.propagate_output()
 
     def propagate_output(self):
-        """
-        for coup in self.model.ic:
-            coup.propagate()
-
-        for coup in self.model.eoc:
-            coup.propagate()
-
-        for coord in self.coordinators:
-            coord.propagate_output()"""
 
         i = 0
         while i < len(self.handling.prop_out):
@@ -322,7 +313,20 @@ class Coordinator(AbstractSimulator):
 
             # TODO: check this condition
             if src_port.parent.link or (isinstance(src_port.parent, Coupled) and src_port.parent.chain):
-                raise NotImplementedError()
+                ports_to_follow = [src_port]
+
+                while ports_to_follow:
+                    port_to_follow = ports_to_follow.pop()
+
+                    for port_to in port_to_follow.links_to:
+                        if isinstance(port_to.parent, Atomic):
+                            sim = self.handling.simulators[port_to.parent]
+                            sim.add_ext_event()
+                            self.handling.sims_with_events_s.add(sim)
+                        elif isinstance(port_to.parent, Coupled):
+                            ports_to_follow.append(port_to)
+                        else:
+                            raise TypeError("Unrecognized type of component")
             else:
                 if src_port in parent_coord.ic:
                     for coup in parent_coord.ic[src_port]:
@@ -353,23 +357,23 @@ class Coordinator(AbstractSimulator):
     def propagate_input(self, src_port=None):
 
         if self.model.chain:
-            raise NotImplementedError()
-        else:
-            i = 0
-            while i < len(self.handling.prop_in):
-                src_port = self.handling.prop_in[i]
-                parent_coord = src_port.parent.parent
+            return  # All has been done in the previous propagate function
 
-                if src_port in parent_coord.eic:
-                    for coup in parent_coord.eic[src_port]:
-                        coup.propagate()
-                        if isinstance(coup.port_to.parent, Atomic):
-                            sim = self.handling.simulators[coup.port_to.parent]
-                            sim.add_ext_event()
-                            self.handling.sims_with_events_s.add(sim)
-                        else:
-                            self.handling.prop_in.append(coup.port_to)
-                i += 1
+        i = 0
+        while i < len(self.handling.prop_in):
+            src_port = self.handling.prop_in[i]
+            parent_coord = src_port.parent.parent
+
+            if src_port in parent_coord.eic:
+                for coup in parent_coord.eic[src_port]:
+                    coup.propagate()
+                    if isinstance(coup.port_to.parent, Atomic):
+                        sim = self.handling.simulators[coup.port_to.parent]
+                        sim.add_ext_event()
+                        self.handling.sims_with_events_s.add(sim)
+                    else:
+                        self.handling.prop_in.append(coup.port_to)
+            i += 1
 
     def clear(self):
         """for sim in self.simulators:
