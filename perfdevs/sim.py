@@ -115,7 +115,7 @@ class Simulator(AbstractSimulator):
 
             if self.model.sigma != INFINITY:
                 #self.time_next = t + self.model.sigma
-                self.handling.lambda_q.put((self.time_next, self))
+                self.handling.add_lambda_event(self.time_next, self)
 
         else:
             if self.event == Simulator.EV_INT:  # It's not included in lambdas queue
@@ -133,10 +133,10 @@ class Simulator(AbstractSimulator):
 
                     if self.model.sigma == INFINITY:
                         self.time_next = INFINITY
-                        self.handling.remove_lambdaf_sim(self)
+                        self.handling.remove_lambda_event(self)
                     elif last_ta != self.model.sigma:
                         self.time_next = t + self.model.sigma
-                        self.handling.remove_lambdaf_sim(self)
+                        self.handling.remove_lambda_event(self)
                         self.handling.add_lambda_event(self.time_next, self)
 
                 else:  # EV_CON
@@ -147,6 +147,7 @@ class Simulator(AbstractSimulator):
                         self.handling.add_lambda_event(self.time_next, self)
 
         self.time_last = t
+        self.event = Simulator.EV_NONE
 
     def lambdaf(self):
         assert self.clock.time == self.time_next
@@ -210,8 +211,8 @@ class Coordinator(AbstractSimulator):
             for ind, pair in enumerate(self.lambda_q):
                 if pair[1] == sim:
                     self.lambda_q[ind] = self.lambda_q[-1]
-                    self.lambda_q[ind].pop()
-                    heapq.heapify(self.lambda_q[ind])
+                    self.lambda_q.pop()
+                    heapq.heapify(self.lambda_q)
                     return
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, handling: Handling = None,
@@ -304,10 +305,10 @@ class Coordinator(AbstractSimulator):
             coup.propagate()
 
         for coup in self.model.eoc:
-            coup.propagate()
+            coup.propagate()"""
 
-        for coord in self.coordinators.values():
-            coord.propagate_output()"""
+        for coord in self.coordinators:
+            coord.propagate_output()
 
         while self.handling.prop_out:
             src_port = self.handling.prop_out.pop()
