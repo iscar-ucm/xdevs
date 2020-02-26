@@ -293,6 +293,9 @@ class Coordinator(AbstractSimulator):
             return INFINITY
 
     def lambdaf(self):
+        if not self.handling.lambda_q:
+            return
+
         self.clock.time, sim = self.handling.pop_lambda_event()
         sim.lambdaf()
         self.handling.sims_with_events_s.add(sim)
@@ -309,7 +312,6 @@ class Coordinator(AbstractSimulator):
         i = 0
         while i < len(self.handling.prop_out):
             src_port = self.handling.prop_out[i]
-            parent_coord = src_port.parent.parent
 
             # TODO: check this condition
             if src_port.parent.link or (isinstance(src_port.parent, Coupled) and src_port.parent.chain):
@@ -328,6 +330,12 @@ class Coordinator(AbstractSimulator):
                         else:
                             raise TypeError("Unrecognized type of component")
             else:
+                parent_coord = src_port.parent.parent
+
+                if parent_coord is None:
+                    parent_coord = src_port.parent
+                    self.handling.prop_in.append(src_port)
+
                 if src_port in parent_coord.ic:
                     for coup in parent_coord.ic[src_port]:
                         coup.propagate()
@@ -362,7 +370,7 @@ class Coordinator(AbstractSimulator):
         i = 0
         while i < len(self.handling.prop_in):
             src_port = self.handling.prop_in[i]
-            parent_coord = src_port.parent.parent
+            parent_coord = src_port.parent
 
             if src_port in parent_coord.eic:
                 for coup in parent_coord.eic[src_port]:
@@ -412,9 +420,11 @@ class Coordinator(AbstractSimulator):
                 return True
 
         if time <= self.time_next or time != time:
-            port.extend(values)
             self.clock.time = time
-            self.lambdaf()
+
+            port.extend(values)
+            self.handling.prop_out.append(port)
+            self.propagate_output()
             self.deltfcn()
             self.clear()
             self.clock.time = self.time_next
