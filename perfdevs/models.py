@@ -398,10 +398,10 @@ class Coupled(Component, ABC):
                     self.add_component(c)
 
                 for prev_port, new_p in new_ports.values():
-                    prev_coups = [coup for coup in self.eic.values() if coup.port_to == prev_port]
-                    prev_coups.extend((coup for coup in self.eoc.values() if coup.port_from == prev_port))
+                    prev_coups = [coup for coup_list in self.eic.values() for coup in coup_list if coup.port_to == prev_port]
+                    prev_coups.extend((coup for coup_list in self.eoc.values() for coup in coup_list if coup.port_from == prev_port))
                     prev_coups.extend(
-                        (coup for coup in self.ic.values() if prev_port == coup.port_from or prev_port == coup.port_to))
+                        (coup for coup_list in self.ic.values() for coup in coup_list if prev_port == coup.port_from or prev_port == coup.port_to))
 
                     new_coups = list()
                     for prev_coup in prev_coups:
@@ -426,8 +426,8 @@ class Coupled(Component, ABC):
                 new_ics_up.extend(self._split_chain(comp, ports_split_up, int_ports_splits))
                 comps_up.append(comp)
 
-        remaining_operating_ports = [coup.port_from for coup in self.eic.values()]
-        remaining_operating_ports.extend((coup.port_to for coup in self.eoc.values()))
+        remaining_operating_ports = [coup.port_from for coup in self.eic]
+        remaining_operating_ports.extend((coup.port_to for coup in self.eoc))
         for port in ports_split_up:
             if port in remaining_operating_ports:
                 ports_split_up[port].append(port)
@@ -443,14 +443,17 @@ class Coupled(Component, ABC):
     def _trigger_chaining(self):
         for comp in self.components:
             comp.link = self.chain
-        for coup in self.eic.values():
-            self._chain_from_coupling(coup)
+        for coup_list in self.eic.values():
+            for coup in coup_list:
+                self._chain_from_coupling(coup)
         self.eic.clear()
-        for coup in self.eoc.values():
-            self._chain_from_coupling(coup)
+        for coup_list in self.eoc.values():
+            for coup in coup_list:
+                self._chain_from_coupling(coup)
         self.eoc.clear()
-        for coup in self.ic.values():
-            self._chain_from_coupling(coup)
+        for coup_list in self.ic.values():
+            for coup in coup_list:
+                self._chain_from_coupling(coup)
         self.ic.clear()
 
     def _unroll_internal_chains(self):
@@ -470,10 +473,10 @@ class Coupled(Component, ABC):
         assert isinstance(comp, Coupled)
 
         # FIRST EXTERNAL COUPLINGS ARE DELETED AND PORTS SPLIT
-        eic_to = [coup for coup in self.eic.values() if coup.port_to in comp.in_ports]
-        eoc_from = [coup for coup in self.eoc.values() if coup.port_from in comp.out_ports]
-        ic_to = [coup for coup in self.ic.values() if coup.port_to in comp.in_ports]
-        ic_from = [coup for coup in self.ic.values() if coup.port_from in comp.out_ports]
+        eic_to = [coup for coup_list in self.eic.values() for coup in coup_list if coup.port_to in comp.in_ports]
+        eoc_from = [coup for coup_list in self.eoc.values() for coup in coup_list if coup.port_from in comp.out_ports]
+        ic_to = [coup for coup_list in self.ic.values() for coup in coup_list if coup.port_to in comp.in_ports]
+        ic_from = [coup for coup_list in self.ic.values() for coup in coup_list if coup.port_from in comp.out_ports]
 
         for coup in eic_to:
             if coup.port_from not in ext_ports_split:
