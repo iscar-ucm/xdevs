@@ -155,7 +155,7 @@ class Simulator(AbstractSimulator):
         self.model.lambdaf()
         for port in self.model.out_ports:
             if not port.empty():
-                self.handling.prop_out.add(port)
+                self.handling.prop_out.append(port)
 
         self.add_int_event()
 
@@ -185,8 +185,8 @@ class Coordinator(AbstractSimulator):
         def __init__(self):
             self.lambda_q = []  # binary heap
             self.sims_with_events_s = set()  # set of models with at least one event (int, ext, con)
-            self.prop_in = set()  # prop_in and prop_out stores the ports that have to be propagated
-            self.prop_out = set()
+            self.prop_in = []  # prop_in and prop_out stores the ports that have to be propagated
+            self.prop_out = []
             self.simulators = dict()  # look-up tables "atomic -> simulator"
             self.coordinators = dict()  # look-up tables "coupled -> coupled"
 
@@ -214,6 +214,11 @@ class Coordinator(AbstractSimulator):
                     self.lambda_q.pop()
                     heapq.heapify(self.lambda_q)
                     return
+
+        def clear(self):
+            self.sims_with_events_s.clear()
+            self.prop_in.clear()
+            self.prop_out.clear()
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, handling: Handling = None,
                  flatten: bool = False, force_chain: bool = False, split_chain: bool = False):
@@ -305,32 +310,36 @@ class Coordinator(AbstractSimulator):
             coup.propagate()
 
         for coup in self.model.eoc:
-            coup.propagate()"""
+            coup.propagate()
 
         for coord in self.coordinators:
-            coord.propagate_output()
+            coord.propagate_output()"""
 
-        while self.handling.prop_out:
-            src_port = self.handling.prop_out.pop()
+        i = 0
+        while i < len(self.handling.prop_out):
+            src_port = self.handling.prop_out[i]
+            parent_coord = src_port.parent.parent
 
             # TODO: check this condition
             if src_port.parent.link or (isinstance(src_port.parent, Coupled) and src_port.parent.chain):
                 raise NotImplementedError()
             else:
-                if src_port in self.model.ic:
-                    for coup in self.model.ic[src_port]:
+                if src_port in parent_coord.ic:
+                    for coup in parent_coord.ic[src_port]:
                         coup.propagate()
                         if isinstance(coup.port_to.parent, Atomic):
                             sim = self.handling.simulators[coup.port_to.parent]
                             sim.add_ext_event()
                             self.handling.sims_with_events_s.add(sim)
                         else:
-                            self.handling.prop_in.add(coup.port_to)
+                            self.handling.prop_in.append(coup.port_to)
 
-                if src_port in self.model.eoc:
-                    for coup in self.model.eoc[src_port]:
+                if src_port in parent_coord.eoc:
+                    for coup in parent_coord.eoc[src_port]:
                         coup.propagate()
-                        self.handling.prop_out.add(coup.port_to)
+                        self.handling.prop_out.append(coup.port_to)
+
+            i += 1
 
     def deltfcn(self):
         self.propagate_input()
@@ -343,26 +352,27 @@ class Coordinator(AbstractSimulator):
 
     def propagate_input(self, src_port=None):
 
-        if src_port:
-            if src_port in self.model.eic:
-                for coup in self.model.eic[src_port]:
-                    coup.propagate()
-                    if isinstance(coup.port_to.parent, Atomic):
-                        sim = self.handling.simulators[coup.port_to.parent]
-                        sim.add_ext_event()
-                        self.handling.sims_with_events_s.add(sim)
-                    else:
-                        self.handling.coordinators[coup.port_to.parent].propagate_input(coup.port_to)
+        if self.model.chain:
+            raise NotImplementedError()
         else:
-            if self.model.chain:
-                raise NotImplementedError()
-            else:
-                while self.handling.prop_in:
-                    port = self.handling.prop_in.pop()
-                    self.handling.coordinators[port.parent].propagate_input(port)
+            i = 0
+            while i < len(self.handling.prop_in):
+                src_port = self.handling.prop_in[i]
+                parent_coord = src_port.parent.parent
+
+                if src_port in parent_coord.eic:
+                    for coup in parent_coord.eic[src_port]:
+                        coup.propagate()
+                        if isinstance(coup.port_to.parent, Atomic):
+                            sim = self.handling.simulators[coup.port_to.parent]
+                            sim.add_ext_event()
+                            self.handling.sims_with_events_s.add(sim)
+                        else:
+                            self.handling.prop_in.append(coup.port_to)
+                i += 1
 
     def clear(self):
-        for sim in self.simulators:
+        """for sim in self.simulators:
             sim.clear()
 
         for coord in self.coordinators:
@@ -372,7 +382,15 @@ class Coordinator(AbstractSimulator):
             in_port.clear()
 
         for out_port in self.model.out_ports:
+            out_port.clear()"""
+
+        for out_port in self.handling.prop_out:
             out_port.clear()
+
+        for in_port in self.handling.prop_in:
+            in_port.clear()
+
+        self.handling.clear()
 
     def inject(self, port, values, e=0):
         logging.debug("INJECTING")
