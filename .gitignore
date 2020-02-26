@@ -12,3 +12,4 @@ manifest.mf
 .cproject
 Debug*
 __pycache__
+.idea/
