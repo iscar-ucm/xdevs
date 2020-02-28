@@ -1,17 +1,19 @@
-import csv, time
-from perfdevs.examples.devstone.devstone import LI, HI, HO
+import csv, time, sys
+from devstone import LI, HI, HO
 from perfdevs.sim import Coordinator
+import sys
+sys.setrecursionlimit(10000)
 
 sim_max_time = 1e10
-int_delay = 10
-ext_delay = 10
+int_delay = 0
+ext_delay = 0
 flatten = False
 
-depths_widths = [(100, 5), (5, 100), (100, 100)]
+depths_widths = [(1000, 10), (10, 1000), (10000, 10000)]
 
 filename = "xdevs_devstone_%s_%dc_%di_%de_%d.csv" % ("flatten" if flatten else "noflatten", len(depths_widths), int_delay, ext_delay, int(time.time()))
 
-with open(filename, "w") as csv_file:
+"""with open(filename, "w") as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=';')
     csv_writer.writerow(("model", "depth", "width", "uch_model_time", "uch_runner_time", "uch_sim_time", "uch_total_time", "ch_model_time", "ch_runner_time", "ch_sim_time", "ch_total_time"))
 
@@ -39,11 +41,11 @@ with open(filename, "w") as csv_file:
                 row = row + (model_time, runner_time, sim_time, total_time)
 
             print(row)
-            csv_writer.writerow(row)
+            csv_writer.writerow(row)"""
 
 
 
-"""with open(filename, "w") as csv_file:
+with open(filename, "w") as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=';')
     csv_writer.writerow(("chained", "model", "depth", "width", "model_time", "runner_time", "sim_time", "total_time"))
 
@@ -68,4 +70,4 @@ with open(filename, "w") as csv_file:
                 class_name = root_model.__class__.__name__
                 row = (int(chain_activated), class_name, depth, width, model_time, runner_time, sim_time, total_time)
                 print(row)
-                csv_writer.writerow(row)"""
+                csv_writer.writerow(row)
