@@ -32,14 +32,16 @@ class DelayedAtomic(Atomic):
         #print(self.name + " int")
         self.int_count += 1
 
-        pystones(self.int_delay)
+        if self.int_delay:
+            pystones(self.int_delay)
         self.passivate()
 
     def deltext(self, e: Any):
         #print(self.name + " ext")
         self.ext_count += 1
 
-        pystones(self.ext_delay)
+        if self.ext_delay:
+            pystones(self.ext_delay)
         self.hold_in(PHASE_ACTIVE, self.prep_time)
 
     """def deltcon(self, e: Any):
