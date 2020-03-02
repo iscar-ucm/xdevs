@@ -151,6 +151,12 @@ class Gpt(Coupled):
 	def __init__(self, name, period, obs_time):
 		super().__init__(name)
 
+		if period < 1:
+			raise ValueError("period has to be greater than 0")
+
+		if obs_time < 0:
+			raise ValueError("obs_time has to be greater or equal than 0")
+
 		gen = Generator("generator", period)
 		proc = Processor("processor", 3*period)
 		trans = Transducer("transducer", obs_time)
