@@ -7,8 +7,6 @@ nbproject
 .project
 build.xml
 manifest.mf
-*.log
-*.log.*
 .cproject
 Debug*
 __pycache__
@@ -69,7 +67,6 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
