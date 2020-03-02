@@ -30,7 +30,7 @@ class Utils:
         """
         :return: Number of ic couplings in a coupled model
         """
-        ic_count = len(coupled.ic)
+        ic_count = sum([len(cl) for cl in coupled.ic.values()])
         for comp in coupled.components:
             if isinstance(comp, Coupled):
                 ic_count += Utils.count_ic(comp)
@@ -44,7 +44,7 @@ class Utils:
         """
         :return: Number of eic couplings in a coupled model
         """
-        eic_count = len(coupled.eic)
+        eic_count = sum([len(cl) for cl in coupled.eic.values()])
         for comp in coupled.components:
             if isinstance(comp, Coupled):
                 eic_count += Utils.count_eic(comp)
@@ -58,7 +58,7 @@ class Utils:
         """
         :return: Number of eoc couplings in a coupled model
         """
-        eoc_count = len(coupled.eoc)
+        eoc_count = sum([len(cl) for cl in coupled.eoc.values()])
         for comp in coupled.components:
             if isinstance(comp, Coupled):
                 eoc_count += Utils.count_eoc(comp)
