@@ -1,11 +1,11 @@
-import sys, unittest
-from typing import Any
-from io import StringIO
 import logging
+import unittest
+from typing import Any
 
 from perfdevs.models import Atomic, Coupled, Port
-from perfdevs.sim import Coordinator, get_logger
+from io import StringIO
 from perfdevs.examples.basic.basic import Gpt, logger as basic_logger
+from perfdevs.sim import Coordinator
 
 class DummyAtomic(Atomic):
     def __init__(self, n_in, n_out, name=None):
@@ -34,11 +34,11 @@ class DummyAtomic(Atomic):
 
 
 class DummyCoupled(Coupled):
-    def __init__(self, n_ports, n_atomics, n_coupleds, name=None, to_chain=False):
-        super().__init__(name, to_chain)
+    def __init__(self, n_ports, n_atomics, n_coupleds, name=None):
+        super().__init__(name)
 
         for i in range(n_coupleds):
-            coupled = DummyCoupled(n_ports, n_atomics, n_coupleds - 1, name + 'C' + str(i), to_chain)
+            coupled = DummyCoupled(n_ports, n_atomics, n_coupleds - 1, name + 'C' + str(i))
             self.add_component(coupled)
 
         for i in range(n_atomics):
@@ -65,9 +65,9 @@ class DummyCoupled(Coupled):
 class MyTestCase(unittest.TestCase):
     def test_flatten(self):
         n_ports = 2
-        n_atomics = 2
-        n_coupleds = 1
-        comp = DummyCoupled(n_ports, n_atomics, n_coupleds, ' ', False)
+        n_atomics = 3
+        n_coupleds = 2
+        comp = DummyCoupled(n_ports, n_atomics, n_coupleds, ' ')
         comp.flatten()
 
         # Compute the expected amount of components of the flattened version
@@ -75,22 +75,21 @@ class MyTestCase(unittest.TestCase):
         n_ics = 0
         for i in range(n_coupleds + 1):
             n_components *= i
-            n_ics *= i
             n_components += n_atomics
-            n_ics += n_ports * sum(range(n_atomics))
+        for j in range(n_components):
+            n_ics += n_ports * j
 
         self.assertEqual(len(comp.components), n_components)
-        self.assertEqual(len(comp.eic), n_ports * n_components)
-        self.assertEqual(len(comp.eoc), n_ports * n_components)
-        self.assertEqual(len(comp.ic), )
+        self.assertEqual(sum([len(comp.eic[cl]) for cl in comp.eic]), n_ports * n_components)
+        self.assertEqual(sum([len(comp.eoc[cl]) for cl in comp.eoc]), n_ports * n_components)
+        self.assertEqual(sum([len(comp.ic[cl]) for cl in comp.ic]), n_ics)
 
     def test_pure_chain(self):
         n_ports = 2
         n_atomics = 2
         n_coupleds = 2
-        comp = DummyCoupled(n_ports, n_atomics, n_coupleds, ' ', False)
-        comp.chain_components(force=True)
-        self.assertEqual(True, False)
+        comp = DummyCoupled(n_ports, n_atomics, n_coupleds, ' ')
+        comp.chain_components()
 
     def test_basic_behavior(self):
 
@@ -108,7 +107,7 @@ class MyTestCase(unittest.TestCase):
                 stream.seek(0)
 
                 gpt = Gpt("gpt", params["period"], params["obs_time"])
-                coord = Coordinator(gpt, flatten=False, force_chain=False)
+                coord = Coordinator(gpt, flatten=False, chain=False)
                 coord.initialize()
                 coord.simulate()
 

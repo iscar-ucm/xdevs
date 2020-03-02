@@ -70,7 +70,7 @@ if __name__ == '__main__':
     store = StoreCashier(n_employees, mean_employees, mean_generator, stddev_employees, stddev_clients)
     middle = time.time()
     print("Model Created. Elapsed time: {} sec".format(middle - start))
-    coord = Coordinator(store, flatten=True, force_chain=force_chain)
+    coord = Coordinator(store, flatten=True, chain=force_chain)
     coord.initialize()
     middle = time.time()
     print("Coordinator Created. Elapsed time: {} sec".format(middle - start))
