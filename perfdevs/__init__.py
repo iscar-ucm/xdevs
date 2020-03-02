@@ -1,6 +1,6 @@
 import math
 import logging
-from io import StringIO
+import sys
 
 INFINITY = math.inf
 PHASE_PASSIVE = "passive"
@@ -16,7 +16,10 @@ def get_logger(name):
         logger = logging.getLogger(name)
 
         if DEBUG_LEVEL:
-            logger.setLevel(DEBUG_LEVEL)
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setLevel(DEBUG_LEVEL)
+            logger.addHandler(handler)
+            logger.setLevel(logging.DEBUG)
         else:
             logger.disabled = True
 

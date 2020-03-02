@@ -93,22 +93,32 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(True, False)
 
     def test_basic_behavior(self):
-        gpt = Gpt("gpt", 3, 1000)
-        coord = Coordinator(gpt, flatten=False, force_chain=False)
-        coord.initialize()
 
-        s = StringIO()
-        handler = logging.StreamHandler(s)
+        stream = StringIO()
+        handler = logging.StreamHandler(stream)
         handler.setLevel(logging.INFO)
+        basic_logger.removeHandler(basic_logger.handlers[0])
         basic_logger.addHandler(handler)
 
-        coord.simulate()
+        for params_tuple in [(1, 1), (1, 500), (3, 1000)]:
+            params = dict(zip(("period", "obs_time"), params_tuple))
 
-        s.seek(0)
-        with open("test_perfdevs/basic_3_100_ff.log", "r") as log_file:
-            self.assertEqual(s.read().strip(), log_file.read().strip())
+            with self.subTest(**params):
+                stream.truncate(0)
+                stream.seek(0)
 
+                gpt = Gpt("gpt", params["period"], params["obs_time"])
+                coord = Coordinator(gpt, flatten=False, force_chain=False)
+                coord.initialize()
+                coord.simulate()
 
+                stream.seek(0)
 
-if __name__ == '__main__':
-    unittest.main()
+                with open("test_perfdevs/basic_%d_%d.log" % (params["period"], params["obs_time"]), "r") as log_file:
+                    self.assertEqual(stream.read().strip(), log_file.read().strip())
+
+    def test_basic_invalid_params(self):
+        self.assertRaises(ValueError, Gpt, "gpt", -1, 100)
+        self.assertRaises(ValueError, Gpt, "gpt", 10, -1)
+        self.assertRaises(ValueError, Gpt, "gpt", -999, -999)
+        self.assertRaises(ValueError, Gpt, "gpt", 0, 1e3)
