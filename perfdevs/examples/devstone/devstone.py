@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from test.pystone import pystones
+from pystone import pystones
 from typing import Any
 
 from perfdevs.models import Atomic, Coupled, Port
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     import sys
     sys.setrecursionlimit(10000)
     root = HO("HO_root", 300, 10, 0, 0)
-    coord = Coordinator(root, flatten=False, force_chain=False)
+    coord = Coordinator(root, flatten=False, chain=False)
     coord.initialize()
     coord.inject(root.i_in, 0)
     coord.simulate()

@@ -29,7 +29,7 @@ with open(filename, "w") as csv_file:
                     start = time.time()
                     root_model = model_type("root", depth, width, int_delay, ext_delay)
                     middle = time.time()
-                    coord = Coordinator(root_model, flatten=flatten, force_chain=chain_activated)
+                    coord = Coordinator(root_model, flatten=flatten, chain=chain_activated)
                     coord.initialize()
                     coord.inject(root_model.i_in, 0)  # TODO How many input?
                     middle2 = time.time()
