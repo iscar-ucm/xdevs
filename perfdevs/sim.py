@@ -1,17 +1,12 @@
 import _thread
-import logging
 import pickle
 from abc import ABC, abstractmethod
 from xmlrpc.server import SimpleXMLRPCServer
 
-from . import INFINITY, DEBUG
+from . import INFINITY, get_logger
 from .models import Atomic, Coupled
 
-if DEBUG:
-    logging.basicConfig(level=logging.DEBUG)
-else:
-    logging.disable(logging.CRITICAL)
-
+logger = get_logger(__name__)
 
 class SimulationClock:
     def __init__(self, time: float = 0):
@@ -187,7 +182,7 @@ class Coordinator(AbstractSimulator):
             out_port.clear()
 
     def inject(self, port, values, e=0):
-        logging.debug("INJECTING")
+        logger.debug("INJECTING")
         time = self.time_last + e
 
         if type(values) is not list:
@@ -198,7 +193,7 @@ class Coordinator(AbstractSimulator):
             if port in self.ports_to_serve:
                 port = self.ports_to_serve[port]
             else:
-                logging.error("Port '%s' not found" % port)
+                logger.error("Port '%s' not found" % port)
                 return True
 
         if time <= self.time_next or time != time:
@@ -210,11 +205,11 @@ class Coordinator(AbstractSimulator):
             self.clock.time = self.time_next
             return True
         else:
-            logging.error("Time %d - Input rejected: elapsed time %d is not in bounds" % (self.time_last, e))
+            logger.error("Time %d - Input rejected: elapsed time %d is not in bounds" % (self.time_last, e))
             return False
 
     def simulate(self, num_iters=10000):
-        logging.debug("STARTING SIMULATION...")
+        logger.debug("STARTING SIMULATION...")
         self.clock.time = self.time_next
 
         cont = 0
@@ -226,7 +221,7 @@ class Coordinator(AbstractSimulator):
             cont += 1
 
     def simulate_time(self, time_interv=10000):
-        logging.debug("STARTING SIMULATION...")
+        logger.debug("STARTING SIMULATION...")
         self.clock.time = self.time_next
         tf = self.clock.time + time_interv
 

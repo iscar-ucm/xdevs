@@ -1,12 +1,11 @@
-import logging
-from perfdevs import PHASE_ACTIVE, PHASE_PASSIVE
+import logging, sys
+from perfdevs import PHASE_ACTIVE, PHASE_PASSIVE, get_logger
 from perfdevs.models import Atomic, Coupled, Port
 from perfdevs.sim import Coordinator
 
-logging.basicConfig(level=logging.DEBUG)
+logger = get_logger(__name__)
 
 PHASE_DONE = "done"
-
 
 class Job:
 	
@@ -115,11 +114,11 @@ class Transducer(Atomic):
 				avg_ta = 0
 				throughput = 0
 				
-			logging.info("End time: %f" % self.clock)
-			logging.info("Jobs arrived: %d" % len(self.jobs_arrived))
-			logging.info("Jobs solved: %d" % len(self.jobs_solved))
-			logging.info("Average TA: %f" % avg_ta)
-			logging.info("Throughput: %f\n" % throughput)
+			logger.info("End time: %f" % self.clock)
+			logger.info("Jobs arrived: %d" % len(self.jobs_arrived))
+			logger.info("Jobs solved: %d" % len(self.jobs_solved))
+			logger.info("Average TA: %f" % avg_ta)
+			logger.info("Throughput: %f\n" % throughput)
 			
 			self.hold_in(PHASE_DONE, 0)
 		else:
@@ -133,13 +132,13 @@ class Transducer(Atomic):
 			
 			if self.i_arrived:
 				job = self.i_arrived.get()
-				logging.info("Starting job %s @ t = %d" % (job.name, self.clock))
+				logger.info("Starting job %s @ t = %d" % (job.name, self.clock))
 				job.time = self.clock
 				self.jobs_arrived.append(job)
 				
 			if self.i_solved:
 				job = self.i_solved.get()
-				logging.info("Job %s finished @ t = %d" % (job.name, self.clock))
+				logger.info("Job %s finished @ t = %d" % (job.name, self.clock))
 				self.total_ta += self.clock - job.time
 				self.jobs_solved.append(job)
 	
@@ -176,7 +175,7 @@ class Wrap(Coupled):
 
 
 if __name__ == '__main__':
-	wrap = Wrap("gpt", 1, 100)
+	wrap = Wrap("gpt", 3, 1000)
 	coord = Coordinator(wrap, flatten=False, force_chain=False)
 	coord.initialize()
 	coord.simulate()
