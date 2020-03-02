@@ -3,10 +3,13 @@ import pickle
 from abc import ABC, abstractmethod
 from xmlrpc.server import SimpleXMLRPCServer
 
+from concurrent import futures
+
 from . import INFINITY, get_logger
 from .models import Atomic, Coupled
 
 logger = get_logger(__name__)
+
 
 class SimulationClock:
     def __init__(self, time: float = 0):
@@ -121,16 +124,16 @@ class Coordinator(AbstractSimulator):
     def _build_hierarchy(self):
         for comp in self.model.components:
             if isinstance(comp, Coupled):
-                self.__add_coordinator(comp)
+                self._add_coordinator(comp)
             elif isinstance(comp, Atomic):
-                self.__add_simulator(comp)
+                self._add_simulator(comp)
 
-    def __add_coordinator(self, coupled: Coupled):
+    def _add_coordinator(self, coupled: Coupled):
         coord = Coordinator(coupled, self.clock)
         self.simulators.append(coord)
         self.ports_to_serve.update(coord.ports_to_serve)
 
-    def __add_simulator(self, atomic: Atomic):
+    def _add_simulator(self, atomic: Atomic):
         sim = Simulator(atomic, self.clock)
         self.simulators.append(sim)
         for pts in sim.model.in_ports:
@@ -248,3 +251,48 @@ class Coordinator(AbstractSimulator):
             self.deltfcn()
             self.clear()
             self.clock.time = self.time_next
+
+
+class ParallelCoordinator(Coordinator):
+
+    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
+                 unroll: bool = True, executor: futures.ThreadPoolExecutor = None):
+        super().__init__(model, clock, flatten, chain, unroll)
+        self.executor = executor
+
+        if not executor:
+            self.executor = futures.ThreadPoolExecutor(max_workers=4)
+
+    def _add_coordinator(self, coupled: Coupled):
+        coord = ParallelCoordinator(coupled, self.clock, executor=self.executor)
+        self.simulators.append(coord)
+        self.ports_to_serve.update(coord.ports_to_serve)
+
+    def lambdaf(self):
+        ex_futures = []
+        for sim in self.simulators:
+            if isinstance(sim, Simulator):
+                ex_futures.append(self.executor.submit(sim.lambdaf))
+            elif isinstance(sim, ParallelCoordinator):
+                sim.lambdaf()
+
+        for _ in futures.as_completed(ex_futures):
+            pass
+
+        self.propagate_output()
+
+    def deltfcn(self):
+        self.propagate_input()
+
+        ex_futures = []
+        for sim in self.simulators:
+            if isinstance(sim, Simulator):
+                ex_futures.append(self.executor.submit(sim.deltfcn))
+            elif isinstance(sim, ParallelCoordinator):
+                sim.deltfcn()
+
+        for _ in futures.as_completed(ex_futures):
+            pass
+
+        self.time_last = self.clock.time
+        self.time_next = self.time_last + self.ta()
