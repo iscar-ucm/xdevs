@@ -8,7 +8,7 @@ sim_max_time = 1e10
 int_delay = 0
 ext_delay = 0
 flatten = False
-num_execs = 10
+num_execs = sys.argv[1] if len(sys.argv) > 1 else 10
 
 depths_widths = [(300, 10), (10, 300), (300, 300)]
 
