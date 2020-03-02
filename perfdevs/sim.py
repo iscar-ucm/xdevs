@@ -94,14 +94,19 @@ class Simulator(AbstractSimulator):
 
 
 class Coordinator(AbstractSimulator):
-    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, force_chain: bool = False,
-                 split_chain: bool = False):
+    def __init__(self, model: Coupled, clock: SimulationClock = None,
+                 flatten: bool = False, chain: bool = False, unroll: bool = True):
         super().__init__(clock or SimulationClock())
+
+        self.coordinators = []
+        self.simulators = []
         self.model = model
-        self.model.chain_components(force_chain, split_chain)
-        if flatten:
+        if chain:
+            if not unroll:
+                raise NotImplementedError
+            self.model.chain_components(unroll or flatten)
+        elif flatten:
             self.model.flatten()
-        self.simulators = list()
         self.ports_to_serve = dict()
 
     def initialize(self):
@@ -152,11 +157,14 @@ class Coordinator(AbstractSimulator):
         self.propagate_output()
 
     def propagate_output(self):
-        for coup in self.model.ic:
-            coup.propagate()
+        if not self.model.chain:
+            for _, coups in self.model.ic.items():
+                for coup in coups:
+                    coup.propagate()
 
-        for coup in self.model.eoc:
-            coup.propagate()
+            for _, coups in self.model.eoc.items():
+                for coup in coups:
+                    coup.propagate()
 
     def deltfcn(self):
         self.propagate_input()
@@ -168,8 +176,10 @@ class Coordinator(AbstractSimulator):
         self.time_next = self.time_last + self.ta()
 
     def propagate_input(self):
-        for coup in self.model.eic:
-            coup.propagate()
+        if not self.model.chain:
+            for _, coups in self.model.eic.items():
+                for coup in coups:
+                    coup.propagate()
 
     def clear(self):
         for sim in self.simulators:

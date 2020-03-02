@@ -1,7 +1,7 @@
-from unittest import TestCase, TestLoader, TestSuite, TextTestRunner
+from unittest import TestCase
 
 from perfdevs.sim import Coordinator
-from perfdevs.examples.devstone.devstone import LI, HI, HO
+from perfdevs.examples.devstone.devstone import LI, HI, HO, DelayedAtomic
 from perfdevs.models import Atomic, Coupled
 
 import random
@@ -30,7 +30,7 @@ class Utils:
         """
         :return: Number of ic couplings in a coupled model
         """
-        ic_count = len(coupled.ic)
+        ic_count = sum([len(cl) for cl in coupled.ic.values()])
         for comp in coupled.components:
             if isinstance(comp, Coupled):
                 ic_count += Utils.count_ic(comp)
@@ -44,7 +44,7 @@ class Utils:
         """
         :return: Number of eic couplings in a coupled model
         """
-        eic_count = len(coupled.eic)
+        eic_count = sum([len(cl) for cl in coupled.eic.values()])
         for comp in coupled.components:
             if isinstance(comp, Coupled):
                 eic_count += Utils.count_eic(comp)
@@ -58,7 +58,7 @@ class Utils:
         """
         :return: Number of eoc couplings in a coupled model
         """
-        eoc_count = len(coupled.eoc)
+        eoc_count = sum([len(cl) for cl in coupled.eoc.values()])
         for comp in coupled.components:
             if isinstance(comp, Coupled):
                 eoc_count += Utils.count_eoc(comp)
@@ -75,7 +75,7 @@ class Utils:
         int_count = 0
         ext_count = 0
         for comp in coupled.components:
-            if isinstance(comp, Atomic):
+            if isinstance(comp, DelayedAtomic):
                 int_count += comp.int_count
                 ext_count += comp.ext_count
             elif isinstance(comp, Coupled):
@@ -146,7 +146,7 @@ class TestLI(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 li_root = LI("LI_root", **params)
-                coord = Coordinator(li_root, flatten=False, force_chain=False)
+                coord = Coordinator(li_root, flatten=False, chain=False)
                 coord.initialize()
                 coord.inject(li_root.i_in, 0)
                 coord.simulate()
@@ -194,7 +194,7 @@ class TestHI(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 hi_root = HI("HI_root", **params)
-                coord = Coordinator(hi_root, flatten=False, force_chain=False)
+                coord = Coordinator(hi_root, flatten=False, chain=False)
                 coord.initialize()
                 coord.inject(hi_root.i_in, 0)
                 coord.simulate()
@@ -242,7 +242,7 @@ class TestHO(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 ho_root = HO("HO_root", **params)
-                coord = Coordinator(ho_root, flatten=False, force_chain=False)
+                coord = Coordinator(ho_root, flatten=False, chain=False)
                 coord.initialize()
                 coord.inject(ho_root.i_in, 0)
                 coord.inject(ho_root.i_in2, 0)
