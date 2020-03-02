@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-from pystone import pystones
 from typing import Any
 
+from perfdevs.examples.devstone.pystone import pystones
 from perfdevs.models import Atomic, Coupled, Port
 from perfdevs.sim import Coordinator
-from perfdevs import PHASE_ACTIVE, PHASE_PASSIVE
-import typing
+from perfdevs import PHASE_ACTIVE
 
 
 class DelayedAtomic(Atomic):
