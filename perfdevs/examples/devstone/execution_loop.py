@@ -8,7 +8,7 @@ sim_max_time = 1e10
 int_delay = 0
 ext_delay = 0
 flatten = False
-num_execs = 1
+num_execs = 10
 
 depths_widths = [(300, 10), (10, 300), (300, 300)]
 
@@ -16,7 +16,7 @@ filename = "xdevs_devstone_%s_%dc_%di_%de_%d.csv" % ("flatten" if flatten else "
 
 with open(filename, "w") as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=';')
-    csv_writer.writerow(("model", "depth", "width", "uch_model_time", "uch_runner_time", "uch_sim_time", "uch_total_time", "ch_model_time", "ch_runner_time", "ch_sim_time", "ch_total_time"))
+    csv_writer.writerow(("model", "depth", "width", "chained", "model_time", "runner_time", "sim_time", "total_time"))
 
     for depth, width in depths_widths:
         for model_type in (LI, HI, HO):
@@ -24,11 +24,8 @@ with open(filename, "w") as csv_file:
             row = (class_name, depth, width)
 
             for chain_activated in (False, True):
-                model_time = 0
-                runner_time = 0
-                sim_time = 0
-                total_time = 0
                 for i_exec in range(num_execs):
+
                     start = time.time()
                     root_model = model_type("root", depth, width, int_delay, ext_delay)
                     middle = time.time()
@@ -39,15 +36,15 @@ with open(filename, "w") as csv_file:
                     coord.simulate_time(sim_max_time)
                     end = time.time()
 
-                    model_time += middle - start
-                    runner_time += middle2 - middle
-                    sim_time += end - middle2
-                    total_time += end - start
+                    model_time = middle - start
+                    runner_time = middle2 - middle
+                    sim_time = end - middle2
+                    total_time = end - start
                     #print("acc: %d" % i_exec, model_time, runner_time, sim_time, total_time)
 
-                #print("mean: ", (model_time/num_execs, runner_time/num_execs, sim_time/num_execs, total_time/num_execs))
-                row = row + (model_time/num_execs, runner_time/num_execs, sim_time/num_execs, total_time/num_execs)
+                    #row = row + (model_time/num_execs, runner_time/num_execs, sim_time/num_execs, total_time/num_execs)
+                    curr_row = row + (chain_activated, model_time, runner_time, sim_time, total_time)
 
-            print(row)
-            csv_writer.writerow(row)
+                    print(curr_row)
+                    csv_writer.writerow(curr_row)
 
