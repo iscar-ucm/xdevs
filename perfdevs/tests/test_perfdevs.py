@@ -113,7 +113,7 @@ class MyTestCase(unittest.TestCase):
 
                 stream.seek(0)
 
-                with open("test_perfdevs/basic_%d_%d.log" % (params["period"], params["obs_time"]), "r") as log_file:
+                with open("perfdevs/tests/test_perfdevs/basic_%d_%d.log" % (params["period"], params["obs_time"]), "r") as log_file:
                     self.assertEqual(stream.read().strip(), log_file.read().strip())
 
     def test_basic_invalid_params(self):
