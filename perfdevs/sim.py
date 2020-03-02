@@ -221,14 +221,15 @@ class Coordinator(AbstractSimulator):
             self.prop_out.clear()
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, handling: Handling = None,
-                 flatten: bool = False, force_chain: bool = False, split_chain: bool = False):
+                 flatten: bool = False, chain: bool = False, unroll: bool = True):
         super().__init__(clock or SimulationClock())
 
         self.coordinators = []
         self.simulators = []
         self.model = model
-        self.model.chain_components(force_chain, split_chain)
-        if flatten:
+        if chain:
+            self.model.chain_components(unroll or flatten)
+        elif flatten:
             self.model.flatten()
         self.ports_to_serve = dict()
         self.handling = handling or Coordinator.Handling()
@@ -302,7 +303,8 @@ class Coordinator(AbstractSimulator):
             sim.lambdaf()
             self.handling.sims_with_events_s.add(sim)
 
-        self.propagate_output()
+        if not self.model.chain:
+            self.propagate_output()
 
     def propagate_output(self):
         """
@@ -321,7 +323,7 @@ class Coordinator(AbstractSimulator):
             parent_coord = src_port.parent.parent
 
             # TODO: check this condition
-            if src_port.parent.link or (isinstance(src_port.parent, Coupled) and src_port.parent.chain):
+            if isinstance(src_port.parent, Coupled) and src_port.parent.chain:
                 raise NotImplementedError()
             else:
                 if src_port in parent_coord.ic:
@@ -342,7 +344,8 @@ class Coordinator(AbstractSimulator):
             i += 1
 
     def deltfcn(self):
-        self.propagate_input()
+        if not self.model.chain:
+            self.propagate_input()
 
         while self.handling.sims_with_events_s:
             self.handling.sims_with_events_s.pop().deltfcn()

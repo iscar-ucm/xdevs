@@ -177,6 +177,6 @@ class Wrap(Coupled):
 
 if __name__ == '__main__':
 	wrap = Wrap("gpt", 1, 100)
-	coord = Coordinator(wrap, flatten=False, force_chain=True)
+	coord = Coordinator(wrap, flatten=False, chain=True)
 	coord.initialize()
 	coord.simulate()
