@@ -1,8 +1,11 @@
+import logging
 import unittest
 from typing import Any
 
 from perfdevs.models import Atomic, Coupled, Port
-
+from io import StringIO
+from perfdevs.examples.basic.basic import Gpt, logger as basic_logger
+from perfdevs.sim import Coordinator
 
 class DummyAtomic(Atomic):
     def __init__(self, n_in, n_out, name=None):
@@ -87,7 +90,6 @@ class MyTestCase(unittest.TestCase):
         n_coupleds = 2
         comp = DummyCoupled(n_ports, n_atomics, n_coupleds, ' ')
         comp.chain_components()
-        self.assertEqual(True, False)
 
     def test_basic_behavior(self):
 
@@ -105,7 +107,7 @@ class MyTestCase(unittest.TestCase):
                 stream.seek(0)
 
                 gpt = Gpt("gpt", params["period"], params["obs_time"])
-                coord = Coordinator(gpt, flatten=False, force_chain=False)
+                coord = Coordinator(gpt, flatten=False, chain=False)
                 coord.initialize()
                 coord.simulate()
 
