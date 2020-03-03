@@ -263,7 +263,7 @@ class Coordinator(AbstractSimulator):
 class ParallelCoordinator(Coordinator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
-                 unroll: bool = True, executor: futures.ProcessPoolExecutor = None):
+                 unroll: bool = True, executor: futures.Executor = None):
         super().__init__(model, clock, flatten, chain, unroll)
 
         if executor is None:
@@ -271,7 +271,7 @@ class ParallelCoordinator(Coordinator):
         self.executor = executor
 
     def _add_coordinator(self, coupled: Coupled):
-        coord = ParallelCoordinator(coupled, self.clock)
+        coord = ParallelCoordinator(coupled, self.clock, self.executor)
         self.coordinators.append(coord)
         self.ports_to_serve.update(coord.ports_to_serve)
 

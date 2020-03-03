@@ -170,7 +170,7 @@ class HO(DEVStoneWrapper):
 if __name__ == '__main__':
     import sys
     sys.setrecursionlimit(10000)
-    root = HO("HO_root", 300, 10, 0, 0)
+    root = HO("HO_root", 300, 10, 1000, 1000)
     parallel = True
     if parallel:
         coord = ParallelCoordinator(root, flatten=False, chain=False)
