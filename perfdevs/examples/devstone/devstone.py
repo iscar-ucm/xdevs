@@ -3,7 +3,7 @@ from typing import Any
 
 from perfdevs.examples.devstone.pystone import pystones
 from perfdevs.models import Atomic, Coupled, Port
-from perfdevs.sim import Coordinator, ParallelCoordinator
+from perfdevs.sim import Coordinator, ParallelCoordinator, ParallelProcessCoordinator
 from perfdevs import PHASE_ACTIVE, get_logger
 
 logger = get_logger(__name__)
@@ -56,6 +56,7 @@ class DelayedAtomic(Atomic):
     def lambdaf(self):
         # TODO: find out what to add in output
         if hasattr(self, "o_out"):
+            logger.debug(self.name + " lambda")
             self.o_out.add(0)
 
     def initialize(self):
@@ -176,10 +177,10 @@ class HO(DEVStoneWrapper):
 if __name__ == '__main__':
     import sys
     sys.setrecursionlimit(10000)
-    root = HO("HO_root", 20, 20, 10000, 10000)
+    root = HO("HO_root", 3, 3, 10000, 10000)
     parallel = True
     if parallel:
-        coord = ParallelCoordinator(root, flatten=False, chain=False)
+        coord = ParallelProcessCoordinator(root, flatten=False, chain=False)
     else:
         coord = Coordinator(root, flatten=False, chain=False)
     coord.initialize()

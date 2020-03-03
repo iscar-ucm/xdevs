@@ -1,5 +1,6 @@
 import _thread
 import pickle
+import queue
 from abc import ABC, abstractmethod
 from xmlrpc.server import SimpleXMLRPCServer
 
@@ -65,6 +66,7 @@ class Simulator(AbstractSimulator):
         self.model.exit()
 
     def deltfcn(self):
+        logger.debug("Deltfcn %s (empty: %s, t: %d)" % (self.model.name, self.model.in_empty(), self.clock.time))
         t = self.clock.time
         in_empty = self.model.in_empty()
 
@@ -83,6 +85,8 @@ class Simulator(AbstractSimulator):
 
         self.time_last = t
         self.time_next = self.time_last + self.model.ta
+        logger.debug("Deltfcn %s: TL: %s, TN: %s" % (self.model.name, self.time_last, self.time_next))
+        return self
 
     def lambdaf(self):
         if self.clock.time == self.time_next:
@@ -263,24 +267,22 @@ class Coordinator(AbstractSimulator):
 class ParallelCoordinator(Coordinator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
-                 unroll: bool = True, executor: futures.Executor = None):
+                 unroll: bool = True, executor=None):
         super().__init__(model, clock, flatten, chain, unroll)
 
-        if executor is None:
-            executor = futures.ProcessPoolExecutor(max_workers=8)
-        self.executor = executor
+        self.executor = executor or futures.ThreadPoolExecutor(max_workers=8)  # TODO calc max workers
 
     def _add_coordinator(self, coupled: Coupled):
-        coord = ParallelCoordinator(coupled, self.clock, self.executor)
+        coord = ParallelCoordinator(coupled, self.clock, executor=False)
         self.coordinators.append(coord)
         self.ports_to_serve.update(coord.ports_to_serve)
 
-    def lambdaf(self):
+    def _lambdaf(self):
         for coord in self.coordinators:
             coord.lambdaf()
         ex_futures = []
         for sim in self.simulators:
-            ex_futures.append(self.executor.submit(sim.lambdaf))
+            self.add_task_to_pool(sim.lambdaf)
 
         for future in futures.as_completed(ex_futures):
             future.result()
@@ -294,10 +296,91 @@ class ParallelCoordinator(Coordinator):
             coord.deltfcn()
         ex_futures = []
         for sim in self.simulators:
-            ex_futures.append(self.executor.submit(sim.deltfcn))
+            self.add_task_to_pool(sim.deltfcn)
 
         for future in futures.as_completed(ex_futures):
             future.result()
 
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.ta()
+
+    def add_task_to_pool(self, task):
+        self.executor.submit(task)
+
+
+executor = futures.ProcessPoolExecutor(max_workers=8)
+executor_futures = []
+
+
+class ParallelProcessCoordinator(Coordinator):
+
+    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
+                 unroll: bool = True, master=True):
+        super().__init__(model, clock, flatten, chain, unroll)
+        self.master = master
+
+    def _add_coordinator(self, coupled: Coupled):
+        coord = ParallelProcessCoordinator(coupled, self.clock, master=False)
+        self.coordinators.append(coord)
+        self.ports_to_serve.update(coord.ports_to_serve)
+
+    def lambdaf(self):
+
+        for coord in self.coordinators:
+            coord.lambdaf()
+
+        for sim in self.simulators:
+            executor_futures.append(executor.submit(sim.lambdaf))
+
+        if self.master:
+            i = 0
+            while i < len(executor_futures):
+                logger.debug("D: Waiting... (%d/%d)" % (i+1, len(executor_futures)))
+                futures.wait((executor_futures[i],))
+                i += 1
+
+            executor_futures.clear()
+            self.propagate_output()
+
+    def deltfcn(self):
+        if self.master:
+            self.propagate_input()
+
+        for coord in self.coordinators:
+            coord.deltfcn()
+
+        for sim in self.simulators:
+            executor_futures.append(executor.submit(sim.deltfcn))
+
+        if self.master:
+            i = 0
+            while i < len(executor_futures):
+                logger.debug("D: Waiting... (%d/%d)" % (i+1, len(executor_futures)))
+                logger.debug(str(executor_futures[i]))
+                futures.wait((executor_futures[i],))
+                logger.debug(str(executor_futures[i]))
+                i += 1
+
+            executor_futures.clear()
+            self.update_times()
+
+    def propagate_output(self):
+        for coord in self.coordinators:
+            coord.propagate_output()
+
+        super().propagate_output()
+
+    def propagate_input(self):
+        super().propagate_input()
+
+        for coord in self.coordinators:
+            coord.propagate_input()
+
+    def update_times(self):
+        for coord in self.coordinators:
+            coord.update_times()
+
+        self.time_last = self.clock.time
+        self.time_next = self.time_last + self.ta()
+        logger.debug({proc.model.name:proc.time_next for proc in self.processors})
+        logger.debug("Deltfcn %s: TL: %s, TN: %s" % (self.model.name, self.time_last, self.time_next))
