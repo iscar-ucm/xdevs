@@ -6,7 +6,6 @@ from perfdevs.models import Atomic, Coupled
 
 import random
 
-
 class Utils:
 
     @staticmethod
