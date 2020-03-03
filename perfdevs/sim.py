@@ -267,7 +267,7 @@ class ParallelCoordinator(Coordinator):
         super().__init__(model, clock, flatten, chain, unroll)
 
         if executor is None:
-            executor = futures.ThreadPoolExecutor(4)
+            executor = futures.ProcessPoolExecutor(max_workers=8)
         self.executor = executor
 
     def _add_coordinator(self, coupled: Coupled):
