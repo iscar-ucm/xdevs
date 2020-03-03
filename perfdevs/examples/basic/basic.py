@@ -1,11 +1,11 @@
-import logging, sys
 from perfdevs import PHASE_ACTIVE, PHASE_PASSIVE, get_logger
 from perfdevs.models import Atomic, Coupled, Port
-from perfdevs.sim import Coordinator
+from perfdevs.sim import Coordinator, ParallelCoordinator
 
 logger = get_logger(__name__)
 
 PHASE_DONE = "done"
+
 
 class Job:
 	
@@ -128,8 +128,6 @@ class Transducer(Atomic):
 		self.clock += e
 		
 		if self.phase == PHASE_ACTIVE:
-			job = None
-			
 			if self.i_arrived:
 				job = self.i_arrived.get()
 				logger.info("Starting job %s @ t = %d" % (job.name, self.clock))
@@ -182,6 +180,10 @@ class Wrap(Coupled):
 
 if __name__ == '__main__':
 	wrap = Wrap("gpt", 3, 1000)
-	coord = Coordinator(wrap, flatten=False, chain=False)
+	parallel = False
+	if parallel:
+		coord = ParallelCoordinator(wrap, flatten=False, chain=False)
+	else:
+		coord = Coordinator(wrap, flatten=False, chain=False)
 	coord.initialize()
 	coord.simulate()

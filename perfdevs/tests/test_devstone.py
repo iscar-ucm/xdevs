@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from perfdevs.sim import Coordinator
+from perfdevs.sim import Coordinator, ParallelCoordinator
 from perfdevs.examples.devstone.devstone import LI, HI, HO, DelayedAtomic
 from perfdevs.models import Atomic, Coupled
 
@@ -137,7 +137,7 @@ class TestLI(DevstoneUtilsTestCase):
         self.assertEqual(Utils.count_eoc(li_root), params["depth"])
         self.assertEqual(Utils.count_ic(li_root), 0)
 
-    def test_behavior(self):
+    def _test_behavior(self, coord_type):
         """
         Check behaviour params: number of int and ext transitions.
         """
@@ -146,7 +146,7 @@ class TestLI(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 li_root = LI("LI_root", **params)
-                coord = Coordinator(li_root, flatten=False, chain=False)
+                coord = coord_type(li_root, flatten=False, chain=False)
                 coord.initialize()
                 coord.inject(li_root.i_in, 0)
                 coord.simulate()
@@ -154,6 +154,12 @@ class TestLI(DevstoneUtilsTestCase):
                 int_count, ext_count = Utils.count_transitions(li_root)
                 self.assertEqual(int_count, (params["width"] - 1) * (params["depth"] - 1) + 1)
                 self.assertEqual(ext_count, (params["width"] - 1) * (params["depth"] - 1) + 1)
+
+    def test_behavior_sequential(self):
+        self._test_behavior(Coordinator)
+
+    def test_behavior_parallel(self):
+        self._test_behavior(ParallelCoordinator)
 
     def test_invalid_inputs(self):
         super().check_invalid_inputs(LI)
@@ -185,7 +191,7 @@ class TestHI(DevstoneUtilsTestCase):
         self.assertEqual(Utils.count_ic(hi_root),
                          (params["width"] - 2) * (params["depth"] - 1) if params["width"] > 2 else 0)
 
-    def test_behavior(self):
+    def _test_behavior(self, coord_type):
         """
         Check behaviour params: number of int and ext transitions.
         """
@@ -194,7 +200,7 @@ class TestHI(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 hi_root = HI("HI_root", **params)
-                coord = Coordinator(hi_root, flatten=False, chain=False)
+                coord = coord_type(hi_root, flatten=False, chain=False)
                 coord.initialize()
                 coord.inject(hi_root.i_in, 0)
                 coord.simulate()
@@ -202,6 +208,12 @@ class TestHI(DevstoneUtilsTestCase):
                 int_count, ext_count = Utils.count_transitions(hi_root)
                 self.assertEqual(int_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
                 self.assertEqual(ext_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
+
+    def test_behavior_sequential(self):
+        self._test_behavior(Coordinator)
+
+    def test_behavior_parallel(self):
+        self._test_behavior(ParallelCoordinator)
 
     def test_invalid_inputs(self):
         super().check_invalid_inputs(HI)
@@ -233,7 +245,7 @@ class TestHO(DevstoneUtilsTestCase):
         self.assertEqual(Utils.count_ic(ho_root),
                          (params["width"] - 2) * (params["depth"] - 1) if params["width"] > 2 else 0)
 
-    def test_behavior(self):
+    def _test_behavior(self, coord_type):
         """
         Check behaviour params: number of int and ext transitions.
         """
@@ -242,7 +254,7 @@ class TestHO(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 ho_root = HO("HO_root", **params)
-                coord = Coordinator(ho_root, flatten=False, chain=False)
+                coord = coord_type(ho_root, flatten=False, chain=False)
                 coord.initialize()
                 coord.inject(ho_root.i_in, 0)
                 coord.inject(ho_root.i_in2, 0)
@@ -251,6 +263,12 @@ class TestHO(DevstoneUtilsTestCase):
                 int_count, ext_count = Utils.count_transitions(ho_root)
                 self.assertEqual(int_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
                 self.assertEqual(ext_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
+
+    def test_behavior_sequential(self):
+        self._test_behavior(Coordinator)
+
+    def test_behavior_parallel(self):
+        self._test_behavior(ParallelCoordinator)
 
     def test_invalid_inputs(self):
         super().check_invalid_inputs(HO)

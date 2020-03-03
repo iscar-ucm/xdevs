@@ -5,7 +5,8 @@ from typing import Any
 from perfdevs.models import Atomic, Coupled, Port
 from io import StringIO
 from perfdevs.examples.basic.basic import Gpt, logger as basic_logger
-from perfdevs.sim import Coordinator
+from perfdevs.sim import Coordinator, ParallelCoordinator
+
 
 class DummyAtomic(Atomic):
     def __init__(self, n_in, n_out, name=None):
@@ -91,7 +92,7 @@ class MyTestCase(unittest.TestCase):
         comp = DummyCoupled(n_ports, n_atomics, n_coupleds, ' ')
         comp.chain_components()
 
-    def test_basic_behavior(self):
+    def _test_basic_behavior(self, coord_type):
 
         stream = StringIO()
         handler = logging.StreamHandler(stream)
@@ -107,7 +108,7 @@ class MyTestCase(unittest.TestCase):
                 stream.seek(0)
 
                 gpt = Gpt("gpt", params["period"], params["obs_time"])
-                coord = Coordinator(gpt, flatten=False, chain=False)
+                coord = coord_type(gpt, flatten=False, chain=False)
                 coord.initialize()
                 coord.simulate()
 
@@ -115,6 +116,12 @@ class MyTestCase(unittest.TestCase):
 
                 with open("perfdevs/tests/test_perfdevs/basic_%d_%d.log" % (params["period"], params["obs_time"]), "r") as log_file:
                     self.assertEqual(stream.read().strip(), log_file.read().strip())
+
+    def test_basic_behavior_sequential(self):
+        self._test_basic_behavior(Coordinator)
+
+    def test_basic_behavior_parallel(self):
+        self._test_basic_behavior(ParallelCoordinator)
 
     def test_basic_invalid_params(self):
         self.assertRaises(ValueError, Gpt, "gpt", -1, 100)

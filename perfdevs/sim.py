@@ -112,11 +112,18 @@ class Coordinator(AbstractSimulator):
             self.model.flatten()
         self.ports_to_serve = dict()
 
+    @property
+    def processors(self):
+        for coord in self.coordinators:
+            yield coord
+        for sim in self.simulators:
+            yield sim
+
     def initialize(self):
         self._build_hierarchy()
 
-        for sim in self.simulators:
-            sim.initialize()
+        for proc in self.processors:
+            proc.initialize()
 
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.ta()
@@ -130,7 +137,7 @@ class Coordinator(AbstractSimulator):
 
     def _add_coordinator(self, coupled: Coupled):
         coord = Coordinator(coupled, self.clock)
-        self.simulators.append(coord)
+        self.coordinators.append(coord)
         self.ports_to_serve.update(coord.ports_to_serve)
 
     def _add_simulator(self, atomic: Atomic):
@@ -147,15 +154,15 @@ class Coordinator(AbstractSimulator):
         _thread.start_new_thread(server.serve_forever, ())
 
     def exit(self):
-        for sim in self.simulators:
-            sim.exit()
+        for proc in self.processors:
+            proc.exit()
 
     def ta(self):
-        return min([sim.time_next for sim in self.simulators], default=0) - self.clock.time
+        return min([proc.time_next for proc in self.processors], default=0) - self.clock.time
 
     def lambdaf(self):
-        for sim in self.simulators:
-            sim.lambdaf()
+        for proc in self.processors:
+            proc.lambdaf()
 
         self.propagate_output()
 
@@ -172,8 +179,8 @@ class Coordinator(AbstractSimulator):
     def deltfcn(self):
         self.propagate_input()
 
-        for sim in self.simulators:
-            sim.deltfcn()
+        for proc in self.processors:
+            proc.deltfcn()
 
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.ta()
@@ -185,8 +192,8 @@ class Coordinator(AbstractSimulator):
                     coup.propagate()
 
     def clear(self):
-        for sim in self.simulators:
-            sim.clear()
+        for proc in self.processors:
+            proc.clear()
 
         for in_port in self.model.in_ports:
             in_port.clear()
@@ -256,43 +263,41 @@ class Coordinator(AbstractSimulator):
 class ParallelCoordinator(Coordinator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
-                 unroll: bool = True, executor: futures.ThreadPoolExecutor = None):
+                 unroll: bool = True, executor: futures.ProcessPoolExecutor = None):
         super().__init__(model, clock, flatten, chain, unroll)
+
+        if executor is None:
+            executor = futures.ThreadPoolExecutor(4)
         self.executor = executor
 
-        if not executor:
-            self.executor = futures.ThreadPoolExecutor(max_workers=4)
-
     def _add_coordinator(self, coupled: Coupled):
-        coord = ParallelCoordinator(coupled, self.clock, executor=self.executor)
-        self.simulators.append(coord)
+        coord = ParallelCoordinator(coupled, self.clock)
+        self.coordinators.append(coord)
         self.ports_to_serve.update(coord.ports_to_serve)
 
     def lambdaf(self):
+        for coord in self.coordinators:
+            coord.lambdaf()
         ex_futures = []
         for sim in self.simulators:
-            if isinstance(sim, Simulator):
-                ex_futures.append(self.executor.submit(sim.lambdaf))
-            elif isinstance(sim, ParallelCoordinator):
-                sim.lambdaf()
+            ex_futures.append(self.executor.submit(sim.lambdaf))
 
-        for _ in futures.as_completed(ex_futures):
-            pass
+        for future in futures.as_completed(ex_futures):
+            future.result()
 
         self.propagate_output()
 
     def deltfcn(self):
         self.propagate_input()
 
+        for coord in self.coordinators:
+            coord.deltfcn()
         ex_futures = []
         for sim in self.simulators:
-            if isinstance(sim, Simulator):
-                ex_futures.append(self.executor.submit(sim.deltfcn))
-            elif isinstance(sim, ParallelCoordinator):
-                sim.deltfcn()
+            ex_futures.append(self.executor.submit(sim.deltfcn))
 
-        for _ in futures.as_completed(ex_futures):
-            pass
+        for future in futures.as_completed(ex_futures):
+            future.result()
 
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.ta()

@@ -3,7 +3,7 @@ from typing import Any
 
 from perfdevs.examples.devstone.pystone import pystones
 from perfdevs.models import Atomic, Coupled, Port
-from perfdevs.sim import Coordinator
+from perfdevs.sim import Coordinator, ParallelCoordinator
 from perfdevs import PHASE_ACTIVE
 
 
@@ -171,7 +171,11 @@ if __name__ == '__main__':
     import sys
     sys.setrecursionlimit(10000)
     root = HO("HO_root", 300, 10, 0, 0)
-    coord = Coordinator(root, flatten=False, chain=False)
+    parallel = True
+    if parallel:
+        coord = ParallelCoordinator(root, flatten=False, chain=False)
+    else:
+        coord = Coordinator(root, flatten=False, chain=False)
     coord.initialize()
     coord.inject(root.i_in, 0)
     coord.simulate()
