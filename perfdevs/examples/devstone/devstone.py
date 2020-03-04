@@ -3,9 +3,11 @@ from typing import Any
 
 from perfdevs.examples.devstone.pystone import pystones
 from perfdevs.models import Atomic, Coupled, Port
-from perfdevs.sim import Coordinator, ParallelCoordinator
-from perfdevs import PHASE_ACTIVE
+from perfdevs.sim import Coordinator, ParallelCoordinator, ParallelProcessCoordinator
+from perfdevs import PHASE_ACTIVE, get_logger
 
+logger = get_logger(__name__)
+logger.disabled = False
 
 class DelayedAtomic(Atomic):
 
@@ -28,19 +30,23 @@ class DelayedAtomic(Atomic):
             self.add_out_port(self.o_out)
 
     def deltint(self):
-        #print(self.name + " int")
         self.int_count += 1
+        logger.debug(self.name + " int %d, init" % self.int_count)
 
         if self.int_delay:
             pystones(self.int_delay)
+
+        logger.debug(self.name + " int %d, end" % self.int_count)
         self.passivate()
 
     def deltext(self, e: Any):
-        #print(self.name + " ext")
         self.ext_count += 1
+        logger.debug(self.name + " ext %d, init" % self.ext_count)
 
         if self.ext_delay:
             pystones(self.ext_delay)
+
+        logger.debug(self.name + " ext %d, end" % self.ext_count)
         self.hold_in(PHASE_ACTIVE, self.prep_time)
 
     """def deltcon(self, e: Any):
@@ -50,6 +56,7 @@ class DelayedAtomic(Atomic):
     def lambdaf(self):
         # TODO: find out what to add in output
         if hasattr(self, "o_out"):
+            logger.debug(self.name + " lambda")
             self.o_out.add(0)
 
     def initialize(self):
