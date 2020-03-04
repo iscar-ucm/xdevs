@@ -8,7 +8,7 @@ from xmlrpc.server import SimpleXMLRPCServer
 from concurrent import futures
 
 from . import INFINITY, get_logger
-from .models import Atomic, Coupled
+from .models import Atomic, Coupled, Port
 
 logger = get_logger(__name__)
 
@@ -104,18 +104,18 @@ class Simulator(AbstractSimulator):
 
 class Coordinator(AbstractSimulator):
     def __init__(self, model: Coupled, clock: SimulationClock = None,
-                 flatten: bool = False, chain: bool = False, unroll: bool = True):
+                 flatten: bool = False, chain: bool = False):
         super().__init__(clock or SimulationClock())
 
         self.coordinators = []
         self.simulators = []
         self.model = model
-        if chain:
-            if not unroll:
-                raise NotImplementedError
-            self.model.chain_components(unroll or flatten)
-        elif flatten:
+        if flatten:
             self.model.flatten()
+        if chain:
+            self.model.to_chain()
+            for port in self.model.in_ports:  # root model inputs are considered outputs for injection in chains
+                port.direction = Port.OUT
         self.ports_to_serve = dict()
 
     @property
@@ -259,7 +259,7 @@ class Coordinator(AbstractSimulator):
 
     def simulate_inf(self):
 
-        while True:
+        while self.clock.time != INFINITY:
             self.lambdaf()
             self.deltfcn()
             self.clear()
@@ -269,8 +269,8 @@ class Coordinator(AbstractSimulator):
 class ParallelCoordinator(Coordinator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
-                 unroll: bool = True, executor=None):
-        super().__init__(model, clock, flatten, chain, unroll)
+                 executor: futures.Executor = None):
+        super().__init__(model, clock, flatten, chain)
 
         self.executor = executor or futures.ThreadPoolExecutor(max_workers=8)  # TODO calc max workers
 

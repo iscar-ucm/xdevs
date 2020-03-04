@@ -113,8 +113,8 @@ class Transducer(Atomic):
 			else:
 				avg_ta = 0
 				throughput = 0
-				
-			logger.info("End time: %f" % self.clock)
+
+			logger.info("\nEnd time: %f" % self.clock)
 			logger.info("Jobs arrived: %d" % len(self.jobs_arrived))
 			logger.info("Jobs solved: %d" % len(self.jobs_solved))
 			logger.info("Average TA: %f" % avg_ta)
@@ -179,11 +179,13 @@ class Wrap(Coupled):
 
 
 if __name__ == '__main__':
-	wrap = Wrap("gpt", 3, 1000)
+	wrap = Wrap("gpt", 3, 100000)
+	flatten = False
+	chain = True
 	parallel = False
 	if parallel:
-		coord = ParallelCoordinator(wrap, flatten=False, chain=False)
+		coord = ParallelCoordinator(wrap, flatten=flatten, chain=chain)
 	else:
-		coord = Coordinator(wrap, flatten=False, chain=False)
+		coord = Coordinator(wrap, flatten=flatten, chain=chain)
 	coord.initialize()
-	coord.simulate()
+	coord.simulate_inf()
