@@ -200,7 +200,7 @@ class TestHI(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 hi_root = HI("HI_root", **params)
-                coord = coord_type(hi_root, flatten=False, chain=False)
+                coord = coord_type(hi_root, flatten=True, chain=True)
                 coord.initialize()
                 coord.inject(hi_root.i_in, 0)
                 coord.simulate()

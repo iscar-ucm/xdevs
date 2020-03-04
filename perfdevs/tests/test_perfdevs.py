@@ -85,12 +85,12 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(sum([len(comp.eoc[cl]) for cl in comp.eoc]), n_ports * n_components)
         self.assertEqual(sum([len(comp.ic[cl]) for cl in comp.ic]), n_ics)
 
-    def test_pure_chain(self):
+    def test_pure_chain(self):  # TODO
         n_ports = 2
         n_atomics = 2
         n_coupleds = 2
         comp = DummyCoupled(n_ports, n_atomics, n_coupleds, ' ')
-        comp.chain_components()
+        comp.to_chain()
 
     def _test_basic_behavior(self, coord_type):
 

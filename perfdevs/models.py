@@ -1,5 +1,6 @@
 import inspect
-import pickle
+# import pickle
+from functools import partial
 from abc import ABC, abstractmethod
 from collections import deque, defaultdict
 from typing import Any, Iterator, Tuple, List, Dict, Generator
@@ -11,6 +12,7 @@ class Port:
 
     IN = "in"
     OUT = "out"
+    INOUT = "inout"
 
     def __init__(self, p_type: type, name: str = None, serve: bool = False):
         """
@@ -29,8 +31,10 @@ class Port:
         self.parent = None  # xDEVS Component that owns the port
         self.direction = None  # Message flow direction of the port. It is either PORT_IN or PORT_OUT
         self._values = deque()  # Bag containing messages directly written to the port
-        self.links_to = list()  # List of ports that receive data from the port (only used by output ports)
-        self.links_from = list()  # List of ports that inject data to the port (only used by input ports)
+
+        self.chained = False        # Indicates if chained mode is active
+        self.couplings_out = None  # List of couplings to be read from (only used in chained version)
+        self.couplings_in = None  # List of couplings to read from (only used in chained version)
 
     def __bool__(self) -> bool:
         return not self.empty()
@@ -44,6 +48,11 @@ class Port:
     def __repr__(self) -> str:
         return str(self)
 
+    def to_chain(self):
+        self.chained = True
+        self.couplings_out = list()
+        self.couplings_in = list()
+
     def empty(self) -> bool:
         """:return: True if port does not contain any message"""
         for _ in self.values:
@@ -56,12 +65,13 @@ class Port:
     @property
     def values(self) -> Generator[Any, None, None]:
         """:return: Generator function that returns all the messages in the port."""
-        for val in self._values:
-            yield val
-
-        for port in self.links_from:
-            for val in port._values:
+        if not self.chained or self.direction == Port.OUT:
+            for val in self._values:
                 yield val
+        else:
+            for coup in self.couplings_in:
+                for val in coup.values:
+                    yield val  # TODO filter must be applied here
 
     def get(self) -> Any:
         """
@@ -89,6 +99,7 @@ class Port:
         for val in vals:
             self.add(val)
 
+
 class Component(ABC):
     def __init__(self, name: str = None):
         """
@@ -100,6 +111,8 @@ class Component(ABC):
         self.in_ports = list()  # List containing all the component's input ports
         self.out_ports = list()  # List containing all the component's output ports
 
+        self.chain = False
+
     def __str__(self) -> str:
         in_str = " ".join([p.name for p in self.in_ports])
         out_str = " ".join([p.name for p in self.out_ports])
@@ -107,6 +120,13 @@ class Component(ABC):
 
     def __repr__(self):
         return self.name
+
+    def to_chain(self):
+        self.chain = True
+        for p in self.in_ports:
+            p.to_chain()
+        for p in self.out_ports:
+            p.to_chain()
 
     @abstractmethod
     def initialize(self):
@@ -126,18 +146,6 @@ class Component(ABC):
     def out_empty(self) -> bool:
         """:return: True if model has not any message in all its output ports."""
         for port in self.out_ports:
-            if port:
-                return False
-        return True
-
-    @staticmethod
-    def _ports_empty(ports: List[Port]) -> bool:
-        """
-        Checks if all the ports of a given list are empty
-        :param ports: list of ports to be checked
-        :return: True if all the ports are empty
-        """
-        for port in ports:
             if port:
                 return False
         return True
@@ -174,11 +182,13 @@ class Component(ABC):
 
 
 class Coupling:
-    def __init__(self, port_from: Port, port_to: Port, host=None):  # TODO identify host's variable type
+    def __init__(self, port_from: Port, port_to: Port, filter_func=None, map_func=None, host=None):  # TODO identify host's variable type
         """
         xDEVS implementation of DEVS couplings.
         :param port_from: DEVS transmitter port.
         :param port_to: DEVS receiver port.
+        :param filter_func: function to filter messages of coupling
+        :param map_func: function to map filtered input messages with expected output messages
         :param host: TODO documentation for this
         :raises ValueError: if coupling direction is incompatible with the target ports.
         """
@@ -195,20 +205,35 @@ class Coupling:
         self.port_to = port_to
         self.host = host
 
+        self.z_funcs = deque()
+        if filter_func is not None:
+            self.z_funcs.append(partial(filter, filter_func))
+        if map_func is not None:
+            self.z_funcs.append(partial(map, map_func))
+
     def __str__(self) -> str:
         return "(%s -> %s)" % (self.port_from, self.port_to)
 
     def __repr__(self) -> str:
         return str(self)
 
+    @property
+    def values(self):
+        values = self.port_from.values
+        for z in self.z_funcs:
+            values = z(values)
+        for val in values:
+            yield val
+
     def propagate(self):
         """Copies messages from the transmitter port to the receiver port"""
         if self.host:
             if self.port_from:
-                values = list(map(lambda x: pickle.dumps(x, protocol=0).decode(), self.port_from.values))
+                values = list(self.values)
                 self.host.inject(self.port_to, values)
         else:
-            self.port_to.extend(self.port_from.values)
+            for val in self.values:
+                self.port_to.add(val)
 
 
 class Atomic(Component, ABC):
@@ -298,6 +323,14 @@ class Coupled(Component, ABC):
     def exit(self):
         pass
 
+    def add_in_port(self, port: Port):
+        super().add_in_port(port)
+        port.direction = Port.INOUT
+
+    def add_out_port(self, port: Port):
+        super().add_out_port(port)
+        port.direction = Port.INOUT
+
     def add_coupling(self, p_from: Port, p_to: Port, host=None):
         """
         Adds coupling betweem two submodules of the coupled model.
@@ -357,17 +390,10 @@ class Coupled(Component, ABC):
         component.parent = self
         self.components.append(component)
 
-    def chain_components(self, unroll: bool = True):
-        """
-        Chains submodules to enhance sequential execution performance.
-        """
-        self.chain = True
-        if unroll:
-            self.flatten()
-        else:
-            for comp in self.components:
-                if isinstance(comp, Coupled):
-                    comp.chain_components(unroll)
+    def to_chain(self):
+        for comp in self.components:
+            comp.to_chain()
+        super().to_chain()
 
         for coup_list in self.eic.values():
             for coup in coup_list:
@@ -384,8 +410,8 @@ class Coupled(Component, ABC):
 
     @staticmethod
     def _chain_from_coupling(coup: Coupling):
-        coup.port_from.links_to.append(coup.port_to)
-        coup.port_to.links_from.append(coup.port_from)
+        coup.port_from.couplings_out.append(coup)
+        coup.port_to.couplings_in.append(coup)
 
     def flatten(self) -> Tuple[List[Atomic], List[Coupling]]:
         """
@@ -455,7 +481,7 @@ class Coupled(Component, ABC):
             for coup_list in pc.values():
                 for coup in coup_list:
                     if coup.port_to == in_port:
-                        bridge[in_port].append(coup.port_from)
+                        bridge[in_port].append((coup.port_from, coup.z_funcs))  # We add the port and the Z functions
         return bridge
 
     def _create_right_bridge(self, pc):
@@ -464,23 +490,30 @@ class Coupled(Component, ABC):
             for coup_list in pc.values():
                 for coup in coup_list:
                     if coup.port_from == out_port:
-                        bridge[out_port].append(coup.port_to)
+                        bridge[out_port].append((coup.port_to, coup.z_funcs))  # We add the port and the Z functions
         return bridge
 
     def _complete_left_bridge(self, bridge):
         couplings = list()
         for coup_list in self.eic.values():
-            for coup in coup_list:
+            for coup in coup_list:  # coup is the internal coupling (to be removed)
                 ports = bridge[coup.port_from]
-                for port in ports:
-                    couplings.append(Coupling(port, coup.port_to))
+                for port, z_funcs in ports:  # parent port and Z functions from parent
+                    c = Coupling(port, coup.port_to)
+                    c.z_funcs = z_funcs  # First, the Z functions of the parent
+                    c.z_funcs.extend(coup.z_funcs)  # Then, the corresponding internal Z functions
+                    couplings.append(c)
+
         return couplings
 
     def _complete_right_bridge(self, bridge):
         couplings = list()
         for coup_list in self.eoc.values():
-            for coup in coup_list:
+            for coup in coup_list:  # coup is the internal coupling (to be removed)
                 ports = bridge[coup.port_to]
-                for port in ports:
-                    couplings.append(Coupling(coup.port_from, port))
+                for port, z_funcs in ports:  # parent port and Z functions from parent
+                    c = Coupling(coup.port_from, port)
+                    c.z_funcs = coup.z_funcs  # First, the corresponding internal Z functions
+                    c.z_funcs.extend(z_funcs)  # Then, the external Z functions
+                    couplings.append(c)
         return couplings
