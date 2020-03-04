@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from perfdevs.sim import Coordinator, ParallelCoordinator
+from perfdevs.sim import Coordinator, ParallelCoordinator, ParallelProcessCoordinator
 from perfdevs.examples.devstone.devstone import LI, HI, HO, DelayedAtomic
 from perfdevs.models import Atomic, Coupled
 
@@ -89,7 +89,7 @@ class Utils:
 
 class DevstoneUtilsTestCase(TestCase):
 
-    def __init__(self, name, num_valid_params_sets: int = 10):
+    def __init__(self, name, num_valid_params_sets: int = 2):
         super().__init__(name)
         self.valid_high_params = []
         self.valid_low_params = []
@@ -100,7 +100,7 @@ class DevstoneUtilsTestCase(TestCase):
 
         for _ in range(int(num_valid_params_sets)):
             self.valid_low_params.append([random.randint(1, 20), random.randint(1, 30),
-                                      random.randint(1, 1000), random.randint(1, 1000)])
+                                      random.randint(0, 10), random.randint(0, 10)])
 
     def check_invalid_inputs(self, base_class):
         self.assertRaises(ValueError, base_class, "root", 0, 1, 1, 1)
@@ -267,7 +267,7 @@ class TestHO(DevstoneUtilsTestCase):
         self._test_behavior(Coordinator)
 
     def test_behavior_parallel(self):
-        self._test_behavior(ParallelCoordinator)
+        self._test_behavior(ParallelProcessCoordinator)
 
     def test_invalid_inputs(self):
         super().check_invalid_inputs(HO)

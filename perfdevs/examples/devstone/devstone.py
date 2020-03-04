@@ -188,3 +188,4 @@ if __name__ == '__main__':
     coord.initialize()
     coord.inject(root.i_in, 0)
     coord.simulate()
+    logger.debug("finish")
