@@ -35,17 +35,17 @@ public class CoordinatorChainedParallel extends CoordinatorParallel {
 
     private static final Logger LOGGER = Logger.getLogger(CoordinatorChainedParallel.class.getName());
 
-    public CoordinatorChainedParallel(SimulationClock clock, Coupled model, int numberOfThreads) throws Exception {
+    public CoordinatorChainedParallel(SimulationClock clock, Coupled model, int numberOfThreads) {
         super(clock, model, numberOfThreads);
         this.model.in2Out();
         this.model.toChain();
     }
 
-    public CoordinatorChainedParallel(SimulationClock clock, Coupled model) throws Exception {
+    public CoordinatorChainedParallel(SimulationClock clock, Coupled model) {
         this(clock, model, Runtime.getRuntime().availableProcessors());
     }
 
-    public CoordinatorChainedParallel(Coupled model) throws Exception {
+    public CoordinatorChainedParallel(Coupled model) {
         this(new SimulationClock(), model, Runtime.getRuntime().availableProcessors());
     }
 
@@ -69,7 +69,7 @@ public class CoordinatorChainedParallel extends CoordinatorParallel {
         tN = tL + ta();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         DevsLogger.setup(Level.INFO);
         Efp efp = new Efp("EFP", 1, 3, 1000000);
         CoordinatorChainedParallel coordinator = new CoordinatorChainedParallel(efp);

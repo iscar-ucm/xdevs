@@ -33,21 +33,21 @@ import java.util.logging.Level;
 
 
 public class CoordinatorChained extends Coordinator {
-    public CoordinatorChained(SimulationClock clock, Coupled model, boolean flatten) throws Exception {
+    public CoordinatorChained(SimulationClock clock, Coupled model, boolean flatten) {
         super(clock, model, flatten);
         this.model.in2Out();
         this.model.toChain();
     }
 
-    public CoordinatorChained(SimulationClock clock, Coupled model) throws Exception {
+    public CoordinatorChained(SimulationClock clock, Coupled model) {
         this(clock, model, false);
     }
 
-    public CoordinatorChained(Coupled model, boolean flatten) throws Exception {
+    public CoordinatorChained(Coupled model, boolean flatten) {
         this(new SimulationClock(), model, flatten);
     }
 
-    public CoordinatorChained(Coupled model) throws Exception {
+    public CoordinatorChained(Coupled model) {
         this(new SimulationClock(), model, false);
     }
 
@@ -63,7 +63,7 @@ public class CoordinatorChained extends Coordinator {
         tN = tL + ta();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         DevsLogger.setup(Level.INFO);
         Efp efp = new Efp("EFP", 1, 3, 1000000);
         CoordinatorChained coordinator = new CoordinatorChained(efp);

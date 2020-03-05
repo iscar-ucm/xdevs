@@ -257,7 +257,7 @@ public class Coordinator extends AbstractSimulator {
         return model;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         DevsLogger.setup(Level.INFO);
         Efp efp = new Efp("EFP", 1, 3, 1000000);
         Coordinator coordinator = new Coordinator(efp);

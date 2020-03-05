@@ -106,7 +106,7 @@ public class CoordinatorParallel extends Coordinator {
         executor.shutdown();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         DevsLogger.setup(Level.INFO);
         Efp efp = new Efp("EFP", 1, 3, 1000000);
         CoordinatorParallel coordinator = new CoordinatorParallel(efp);

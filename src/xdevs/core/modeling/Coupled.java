@@ -284,7 +284,7 @@ public class Coupled extends Component {
     }
 
     @Override
-    public void toChain() throws Exception {
+    public void toChain() {
         for (Component component: components) {
             component.toChain();
         }
@@ -301,7 +301,7 @@ public class Coupled extends Component {
         }
     }
 
-    public static void chainPorts(Coupling<?> coupling) throws Exception {
+    public static void chainPorts(Coupling<?> coupling) {
         coupling.portFrom.addCouplingOut(coupling);
         coupling.portTo.addCouplingIn(coupling);
     }

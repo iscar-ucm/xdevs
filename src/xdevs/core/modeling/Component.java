@@ -100,7 +100,7 @@ public abstract class Component {
         this.parent = parent;
     }
 
-    public void toChain() throws Exception {
+    public void toChain() {
         for (Port<?> port: inPorts) {
             port.toChain();
         }

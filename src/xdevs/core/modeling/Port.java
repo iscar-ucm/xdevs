@@ -111,17 +111,17 @@ public class Port<E> {
     }
 
     @SuppressWarnings({"unchecked"})
-    public void addCouplingIn(Coupling<?> coupling) throws Exception {
+    public void addCouplingIn(Coupling<?> coupling) {
         if (coupling.getPortTo() != this) {
-            throw new Exception("Coupling does not end in this port");
+            throw new RuntimeException("Coupling does not end in this port");
         }
         couplingsIn.add((Coupling<E>) coupling);
     }
 
     @SuppressWarnings({"unchecked"})
-    public void addCouplingOut(Coupling<?> coupling) throws Exception {
+    public void addCouplingOut(Coupling<?> coupling) {
         if (coupling.getPortFrom() != this) {
-            throw new Exception("Coupling does not start in this port");
+            throw new RuntimeException("Coupling does not start in this port");
         }
         couplingsOut.add((Coupling<E>)coupling);
     }
