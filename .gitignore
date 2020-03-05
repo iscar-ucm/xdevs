@@ -1,5 +1,9 @@
 target
+*.swp
+*.log
 
 # IntelliJ stuff
 .idea/
 xdevs.iml
+out/
+*.iml
