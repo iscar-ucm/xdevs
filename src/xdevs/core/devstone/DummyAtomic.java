@@ -8,7 +8,7 @@ public class DummyAtomic extends Atomic {
     private double intDelay, extDelay;
     private double prepTime;
     private int intCount, extCount;
-    private Port<Integer> iIn, oOut;
+    protected Port<Integer> iIn, oOut;
 
     public DummyAtomic(String name, double intDelay, double extDelay) {
         this(name, intDelay, extDelay, true, 0);
