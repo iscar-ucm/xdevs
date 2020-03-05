@@ -259,32 +259,34 @@ class Coordinator(AbstractSimulator):
 
     def simulate_inf(self):
 
-        while self.clock.time != INFINITY:
+        while True:
             self.lambdaf()
             self.deltfcn()
             self.clear()
             self.clock.time = self.time_next
 
 
-class ParallelCoordinator(Coordinator):
+class ParallelThreadCoordinator(Coordinator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
-                 executor: futures.Executor = None):
+                 executor: futures.ThreadPoolExecutor = None):
         super().__init__(model, clock, flatten, chain)
 
         self.executor = executor or futures.ThreadPoolExecutor(max_workers=8)  # TODO calc max workers
 
     def _add_coordinator(self, coupled: Coupled):
-        coord = ParallelCoordinator(coupled, self.clock, executor=False)
+        coord = ParallelThreadCoordinator(coupled, self.clock, executor=None)
         self.coordinators.append(coord)
         self.ports_to_serve.update(coord.ports_to_serve)
 
     def _lambdaf(self):
+        """
         for coord in self.coordinators:
             coord.lambdaf()
+        """
         ex_futures = []
-        for sim in self.simulators:
-            self.add_task_to_pool(sim.lambdaf)
+        for proc in self.processors:
+            self.add_task_to_pool(proc.lambdaf)
 
         for future in futures.as_completed(ex_futures):
             future.result()
@@ -293,12 +295,13 @@ class ParallelCoordinator(Coordinator):
 
     def deltfcn(self):
         self.propagate_input()
-
+        """
         for coord in self.coordinators:
             coord.deltfcn()
+       """
         ex_futures = []
-        for sim in self.simulators:
-            self.add_task_to_pool(sim.deltfcn)
+        for proc in self.processors:
+            self.add_task_to_pool(proc.deltfcn)
 
         for future in futures.as_completed(ex_futures):
             future.result()

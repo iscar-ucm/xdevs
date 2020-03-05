@@ -1,6 +1,6 @@
 from perfdevs import PHASE_ACTIVE, PHASE_PASSIVE, get_logger
-from perfdevs.models import Atomic, Coupled, Port
-from perfdevs.sim import Coordinator, ParallelCoordinator
+from perfdevs.models import Atomic, Coupled, Port, INFINITY
+from perfdevs.sim import Coordinator, ParallelThreadCoordinator
 
 logger = get_logger(__name__)
 
@@ -114,7 +114,7 @@ class Transducer(Atomic):
 				avg_ta = 0
 				throughput = 0
 
-			logger.info("\nEnd time: %f" % self.clock)
+			logger.info("End time: %f" % self.clock)
 			logger.info("Jobs arrived: %d" % len(self.jobs_arrived))
 			logger.info("Jobs solved: %d" % len(self.jobs_solved))
 			logger.info("Average TA: %f" % avg_ta)
@@ -184,8 +184,8 @@ if __name__ == '__main__':
 	chain = True
 	parallel = False
 	if parallel:
-		coord = ParallelCoordinator(wrap, flatten=flatten, chain=chain)
+		coord = ParallelThreadCoordinator(wrap, flatten=flatten, chain=chain)
 	else:
 		coord = Coordinator(wrap, flatten=flatten, chain=chain)
 	coord.initialize()
-	coord.simulate_inf()
+	coord.simulate_time(INFINITY)

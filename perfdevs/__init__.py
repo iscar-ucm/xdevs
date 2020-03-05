@@ -6,8 +6,9 @@ INFINITY = math.inf
 PHASE_PASSIVE = "passive"
 PHASE_ACTIVE = "active"
 
-DEBUG_LEVEL = logging.DEBUG
+DEBUG_LEVEL = logging.INFO
 loggers = dict()
+
 
 def get_logger(name):
     if name in loggers:

@@ -3,7 +3,7 @@ from typing import Any
 
 from perfdevs.examples.devstone.pystone import pystones
 from perfdevs.models import Atomic, Coupled, Port
-from perfdevs.sim import Coordinator, ParallelCoordinator, ParallelProcessCoordinator
+from perfdevs.sim import Coordinator, ParallelThreadCoordinator, ParallelProcessCoordinator
 from perfdevs import PHASE_ACTIVE, get_logger
 
 logger = get_logger(__name__)
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     chain = True
     parallel = False
     if parallel:
-        coord = ParallelCoordinator(root, flatten=flatten, chain=chain)
+        coord = ParallelThreadCoordinator(root, flatten=flatten, chain=chain)
     else:
         coord = Coordinator(root, flatten=flatten, chain=chain)
     coord.initialize()

@@ -1,6 +1,7 @@
+from abc import abstractmethod
 from unittest import TestCase
 
-from perfdevs.sim import Coordinator, ParallelCoordinator, ParallelProcessCoordinator
+from perfdevs.sim import Coordinator, ParallelThreadCoordinator, ParallelProcessCoordinator
 from perfdevs.examples.devstone.devstone import LI, HI, HO, DelayedAtomic
 from perfdevs.models import Atomic, Coupled
 
@@ -89,7 +90,7 @@ class Utils:
 
 class DevstoneUtilsTestCase(TestCase):
 
-    def __init__(self, name, num_valid_params_sets: int = 2):
+    def __init__(self, name, num_valid_params_sets: int = 10):
         super().__init__(name)
         self.valid_high_params = []
         self.valid_low_params = []
@@ -109,6 +110,16 @@ class DevstoneUtilsTestCase(TestCase):
         self.assertRaises(ValueError, base_class, "root", 1, 1, 0, -1)
         self.assertRaises(ValueError, base_class, "root", 0, 1, -1, -1)
         self.assertRaises(ValueError, base_class, "root", 0, 0, -1, -1)
+
+    def test_behavior_sequential(self):
+        self._test_behavior(Coordinator)
+
+    #def test_behavior_parallel(self):
+    #    self._test_behavior(ParallelThreadCoordinator)
+
+    @abstractmethod
+    def _test_behavior(self, Coordinator):
+        pass
 
 
 class TestLI(DevstoneUtilsTestCase):
@@ -153,12 +164,6 @@ class TestLI(DevstoneUtilsTestCase):
                 int_count, ext_count = Utils.count_transitions(li_root)
                 self.assertEqual(int_count, (params["width"] - 1) * (params["depth"] - 1) + 1)
                 self.assertEqual(ext_count, (params["width"] - 1) * (params["depth"] - 1) + 1)
-
-    def test_behavior_sequential(self):
-        self._test_behavior(Coordinator)
-
-    def test_behavior_parallel(self):
-        self._test_behavior(ParallelCoordinator)
 
     def test_invalid_inputs(self):
         super().check_invalid_inputs(LI)
@@ -207,12 +212,6 @@ class TestHI(DevstoneUtilsTestCase):
                 int_count, ext_count = Utils.count_transitions(hi_root)
                 self.assertEqual(int_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
                 self.assertEqual(ext_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
-
-    def test_behavior_sequential(self):
-        self._test_behavior(Coordinator)
-
-    def test_behavior_parallel(self):
-        self._test_behavior(ParallelCoordinator)
 
     def test_invalid_inputs(self):
         super().check_invalid_inputs(HI)
@@ -263,11 +262,7 @@ class TestHO(DevstoneUtilsTestCase):
                 self.assertEqual(int_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
                 self.assertEqual(ext_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
 
-    def test_behavior_sequential(self):
-        self._test_behavior(Coordinator)
 
-    def test_behavior_parallel(self):
-        self._test_behavior(ParallelProcessCoordinator)
 
     def test_invalid_inputs(self):
         super().check_invalid_inputs(HO)
