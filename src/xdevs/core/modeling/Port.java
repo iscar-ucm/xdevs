@@ -17,17 +17,26 @@
  * http://www.gnu.org/licenses/
  *
  * Contributors:
- *  - José Luis Risco Martín
+ *  - José Luis Risco Martín <jlrisco@ucm.es>
+ *  - Román Cárdenas Rodríguez <r.cardenas@upm.es>
  */
 package xdevs.core.modeling;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 public class Port<E> {
+    public enum Direction {NA, IN, OUT, INOUT};
+
     protected Component parent = null;
     protected String name;
+    protected Direction direction = Direction.NA;
     protected LinkedList<E> values = new LinkedList<>();
+
+    protected Boolean chained = false;
+    protected LinkedList<Coupling<E>> couplingsIn = null;
+    protected LinkedList<Coupling<E>> couplingsOut = null;
 
     public Port(String name) {
         this.name = name;
@@ -41,20 +50,46 @@ public class Port<E> {
         return name;
     }
 
+    public Direction getDirection() {
+        return direction;
+    }
+
     public void clear() {
         values.clear();
     }
 
     public boolean isEmpty() {
-        return values.isEmpty();
+        try {
+            getSingleValue();
+            return false;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     public E getSingleValue() {
-        return values.element();
+        if (!chained || direction == Direction.OUT) {
+            return values.element();
+        } else {
+            for (Coupling<E> coup: couplingsIn) {
+                try {
+                    return coup.getPortFrom().getSingleValue();
+                } catch (NoSuchElementException ignored) { }
+            }
+            throw new NoSuchElementException();
+        }
     }
 
     public Collection<E> getValues() {
-        return values;
+        if (!chained || direction == Direction.OUT) {
+            return values;
+        } else {
+            LinkedList<E> vals = new LinkedList<>();
+            for (Coupling<E> coup: couplingsIn) {
+                vals.addAll(coup.getPortFrom().getValues());
+            }
+            return vals;
+        }
     }
 
     public void addValue(E value) {
@@ -62,13 +97,33 @@ public class Port<E> {
     }
 
     public void addValues(Collection<E> values) {
-        values.forEach((value) -> {
-            this.values.add(value);
-        });
+        this.values.addAll(values);
     }
 
     public Component getParent() {
         return parent;
+    }
+
+    public void toChain() {
+        chained = true;
+        couplingsIn = new LinkedList<>();
+        couplingsOut = new LinkedList<>();
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public void addCouplingIn(Coupling<?> coupling) throws Exception {
+        if (coupling.getPortTo() != this) {
+            throw new Exception("Coupling does not end in this port");
+        }
+        couplingsIn.add((Coupling<E>) coupling);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public void addCouplingOut(Coupling<?> coupling) throws Exception {
+        if (coupling.getPortFrom() != this) {
+            throw new Exception("Coupling does not start in this port");
+        }
+        couplingsOut.add((Coupling<E>)coupling);
     }
     
     @Override

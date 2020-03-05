@@ -145,6 +145,18 @@ public class Coupled extends Component {
         }
     }
 
+    @Override
+    public void addInPort(Port<?> port) {
+        super.addInPort(port);
+        port.direction = Port.Direction.INOUT;
+    }
+
+    @Override
+    public void addOutPort(Port<?> port) {
+        super.addOutPort(port);
+        port.direction = Port.Direction.INOUT;
+    }
+
     /**
      * @deprecated This method add a connection to the DEVS component. This
      * method is deprecated because since the addition of the
@@ -269,6 +281,35 @@ public class Coupled extends Component {
 
     public LinkedList<Coupling<?>> getEOC() {
         return eoc;
+    }
+
+    @Override
+    public void toChain() throws Exception {
+        for (Component component: components) {
+            component.toChain();
+        }
+        super.toChain();
+
+        for (Coupling<?> coupling: ic) {
+            chainPorts(coupling);
+        }
+        for (Coupling<?> coupling: eic) {
+            chainPorts(coupling);
+        }
+        for (Coupling<?> coupling: eoc) {
+            chainPorts(coupling);
+        }
+    }
+
+    public static void chainPorts(Coupling<?> coupling) throws Exception {
+        coupling.portFrom.addCouplingOut(coupling);
+        coupling.portTo.addCouplingIn(coupling);
+    }
+
+    public void in2Out() {
+        for (Port<?> port: inPorts) {
+            port.direction = Port.Direction.OUT;
+        }
     }
 
     /**

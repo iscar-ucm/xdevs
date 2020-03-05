@@ -17,7 +17,8 @@
  * http://www.gnu.org/licenses/
  *
  * Contributors:
- *  - José Luis Risco Martín
+ *  - José Luis Risco Martín <jlrisco@ucm.es>
+ *  - Román Cárdenas Rodríguez <r.cardenas@upm.es>
  */
 package xdevs.core.modeling;
 
@@ -31,6 +32,8 @@ public abstract class Component {
     protected String name;
     protected ArrayList<Port<?>> inPorts = new ArrayList<>();
     protected ArrayList<Port<?>> outPorts = new ArrayList<>();
+
+    protected Boolean chained = false;
 
     public Component(String name) {
         this.name = name;
@@ -54,6 +57,7 @@ public abstract class Component {
     public void addInPort(Port<?> port) {
         inPorts.add(port);
         port.parent = this;
+        port.direction = Port.Direction.IN;
     }
     
     public Port<?> getInPort(String portName) {
@@ -72,6 +76,7 @@ public abstract class Component {
     public void addOutPort(Port<?> port) {
         outPorts.add(port);
         port.parent = this;
+        port.direction = Port.Direction.OUT;
     }
 
     public Port<?> getOutPort(String portName) {
@@ -93,6 +98,16 @@ public abstract class Component {
 
     public void setParent(Component parent) {
         this.parent = parent;
+    }
+
+    public void toChain() throws Exception {
+        for (Port<?> port: inPorts) {
+            port.toChain();
+        }
+        for (Port<?> port: outPorts) {
+            port.toChain();
+        }
+        chained = true;
     }
 
     @Override

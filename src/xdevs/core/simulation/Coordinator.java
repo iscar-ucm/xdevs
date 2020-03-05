@@ -24,14 +24,17 @@ package xdevs.core.simulation;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import xdevs.core.test.efp.Efp;
 import xdevs.core.util.Constants;
 import xdevs.core.modeling.Coupling;
 import xdevs.core.modeling.Port;
 import xdevs.core.modeling.Component;
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Coupled;
+import xdevs.core.util.DevsLogger;
 import xdevs.core.util.Util;
 
 /**
@@ -248,9 +251,18 @@ public class Coordinator extends AbstractSimulator {
         clock.setTime(tF);
     }
 
+
     @Override
     public Coupled getModel() {
         return model;
     }
 
+    public static void main(String[] args) throws Exception {
+        DevsLogger.setup(Level.INFO);
+        Efp efp = new Efp("EFP", 1, 3, 1000000);
+        Coordinator coordinator = new Coordinator(efp);
+        coordinator.initialize();
+        coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
+    }
 }

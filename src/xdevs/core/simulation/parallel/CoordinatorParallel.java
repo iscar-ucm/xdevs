@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import xdevs.core.modeling.Coupled;
-import xdevs.core.simulation.AbstractSimulator;
 import xdevs.core.simulation.Coordinator;
 import xdevs.core.simulation.SimulationClock;
 import xdevs.core.test.efp.Efp;
@@ -107,9 +106,9 @@ public class CoordinatorParallel extends Coordinator {
         executor.shutdown();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         DevsLogger.setup(Level.INFO);
-        Efp efp = new Efp("EFP", 1, 3, 100);
+        Efp efp = new Efp("EFP", 1, 3, 1000000);
         CoordinatorParallel coordinator = new CoordinatorParallel(efp);
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);

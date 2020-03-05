@@ -59,7 +59,7 @@ public abstract class Atomic extends Component {
         if (sigmaAsString.equals("INFINITY")) {
             setSigma(Constants.INFINITY);
         } else {
-            setSigma(Double.valueOf(sigmaAsString));
+            setSigma(Double.parseDouble(sigmaAsString));
         }
         
         NodeList xmlChildList = xmlAtomic.getChildNodes();
