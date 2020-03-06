@@ -45,7 +45,7 @@ public class HOmod extends Coupled {
             this.addCoupling(this.iIn, atomic.iIn);
             this.addCoupling(atomic.oOut, this.oOut);
         } else {
-            HOmod coupled = new HOmod("Coupled_" + (depth - 1), depth, width, intDelay, extDelay);
+            HOmod coupled = new HOmod("Coupled_" + (depth - 1), depth - 1, width, intDelay, extDelay);
             this.addComponent(coupled);
 
             this.addCoupling(this.iIn, coupled.iIn);

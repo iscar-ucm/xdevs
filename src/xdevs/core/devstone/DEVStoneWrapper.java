@@ -7,7 +7,7 @@ import xdevs.core.modeling.Port;
 /**
  * Auxiliar class to simplify the construction of LI, HI and HO models
  */
-public abstract class DEVStoneWrapper extends Coupled {
+abstract class DEVStoneWrapper extends Coupled {
 
     protected int depth;
     protected int width;

@@ -17,7 +17,7 @@ public class TestingWrapper extends Coupled {
         addComponent(model);
     }
 
-    public void addBuffer(Port port, Transducer transducer) {
+    public void addTransducer(Port port, Transducer transducer) {
         //addCoupling(port, buffer.iIn);
         //addComponent(buffer);
 

@@ -21,6 +21,6 @@ public class HI extends DEVStoneWrapper {
 
     @Override
     DEVStoneWrapper genCoupled() {
-        return new HI("Coupled_" + (this.depth - 1), this.depth, this.width, this.intDelay, this.extDelay);
+        return new HI("Coupled_" + (this.depth - 1), this.depth - 1, this.width, this.intDelay, this.extDelay);
     }
 }
