@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import xdevs.core.test.efp.Efp;
+import xdevs.core.examples.efp.Efp;
 import xdevs.core.util.Constants;
 import xdevs.core.modeling.Coupling;
 import xdevs.core.modeling.Port;

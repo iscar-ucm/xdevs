@@ -19,7 +19,7 @@
  * Contributors:
  *  - José Luis Risco Martín
  */
-package xdevs.core.test.efp;
+package xdevs.core.examples.efp;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -28,38 +28,34 @@ import xdevs.core.modeling.Port;
 
 /**
  *
- * @author José Luis Risco Martín TODO: I must also modify this class, according
- * to the source code implemented by Saurabh, a iStart input port must be added.
+ * @author jlrisco
  */
-public class Generator extends Atomic {
-    protected Port<Job> iStart = new Port<>("iStart");
-    protected Port<Job> iStop = new Port<>("iStop");
-    protected Port<Job> oOut = new Port<>("oOut");
-    protected int jobCounter;
-    protected double period;
+public class Processor extends Atomic {
 
-    public Generator(String name, double period) {
+    protected Port<Job> iIn = new Port<>("iIn");
+    protected Port<Job> oOut = new Port<>("oOut");
+    protected Job currentJob = null;
+    protected double processingTime;
+
+    public Processor(String name, double processingTime) {
         super(name);
-        super.addInPort(iStop);
-        super.addInPort(iStart);
+        super.addInPort(iIn);
         super.addOutPort(oOut);
-        this.period = period;
+        this.processingTime = processingTime;
     }
-    
-    public Generator(Element xmlAtomic) {
+
+    public Processor(Element xmlAtomic) {
         super(xmlAtomic);
-        iStart = (Port<Job>) super.getInPort(iStart.getName());
-        iStop = (Port<Job>) super.getInPort(iStop.getName());
-        oOut = (Port<Job>) super.getOutPort(oOut.getName());  
+        iIn = (Port<Job>) super.getInPort(iIn.getName());
+        oOut = (Port<Job>) super.getOutPort(oOut.getName());
         NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
         Element xmlParameter = (Element)xmlParameters.item(0);
-        period = Double.valueOf(xmlParameter.getAttribute("value"));
+        processingTime = Double.valueOf(xmlParameter.getAttribute("value"));
     }
 
     @Override
     public void initialize() {
-        jobCounter = 1;
-        this.holdIn("active", period);
+        super.passivate();
     }
 
     @Override
@@ -68,18 +64,19 @@ public class Generator extends Atomic {
 
     @Override
     public void deltint() {
-        jobCounter++;
-        this.holdIn("active", period);
-    }
-
-    @Override
-    public void deltext(double e) {
         super.passivate();
     }
 
     @Override
+    public void deltext(double e) {
+        if (super.phaseIs("passive")) {
+            currentJob = iIn.getSingleValue();
+            super.holdIn("active", processingTime);
+        }
+    }
+
+    @Override
     public void lambda() {
-        Job job = new Job("" + jobCounter + "");
-        oOut.addValue(job);
+        oOut.addValue(currentJob);
     }
 }

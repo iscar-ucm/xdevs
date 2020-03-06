@@ -5,12 +5,12 @@ import xdevs.core.modeling.Port;
 
 import java.util.LinkedList;
 
-public class Buffer<E> extends Atomic {
+public class Transducer<E> extends Atomic {
 
     protected Port<E> iIn = new Port<>("iIn");
     protected LinkedList<E> values = new LinkedList<>();
 
-    public Buffer(String name) {
+    public Transducer(String name) {
         super(name);
         super.addInPort(iIn);
     }

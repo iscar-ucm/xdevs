@@ -2,7 +2,6 @@
 package xdevs.core.test;
 
 import xdevs.core.modeling.Atomic;
-import xdevs.core.modeling.Component;
 import xdevs.core.modeling.Coupled;
 import xdevs.core.modeling.Port;
 
@@ -18,12 +17,12 @@ public class TestingWrapper extends Coupled {
         addComponent(model);
     }
 
-    public void addBuffer(Port port, Buffer buffer) {
+    public void addBuffer(Port port, Transducer transducer) {
         //addCoupling(port, buffer.iIn);
         //addComponent(buffer);
 
         Coupled comp = (Coupled) port.getParent().getParent();
-        comp.addComponent(buffer);
-        comp.addCoupling(port, buffer.iIn);
+        comp.addComponent(transducer);
+        comp.addCoupling(port, transducer.iIn);
     }
 }

@@ -26,7 +26,7 @@ import xdevs.core.modeling.Coupled;
 import xdevs.core.simulation.AbstractSimulator;
 import xdevs.core.simulation.Coordinator;
 import xdevs.core.simulation.SimulationClock;
-import xdevs.core.test.efp.Efp;
+import xdevs.core.examples.efp.Efp;
 import xdevs.core.util.DevsLogger;
 
 import java.util.logging.Level;

@@ -19,7 +19,7 @@
  * Contributors:
  *  - José Luis Risco Martín
  */
-package xdevs.core.test.efp;
+package xdevs.core.examples.efp;
 
 import xdevs.core.modeling.Coupled;
 import xdevs.core.modeling.Port;

@@ -24,7 +24,7 @@ package xdevs.core.simulation.chained;
 import xdevs.core.modeling.Coupled;
 import xdevs.core.simulation.SimulationClock;
 import xdevs.core.simulation.parallel.CoordinatorParallel;
-import xdevs.core.test.efp.Efp;
+import xdevs.core.examples.efp.Efp;
 import xdevs.core.util.DevsLogger;
 
 import java.util.logging.Level;
@@ -71,7 +71,7 @@ public class CoordinatorChainedParallel extends CoordinatorParallel {
 
     public static void main(String[] args) {
         DevsLogger.setup(Level.INFO);
-        Efp efp = new Efp("EFP", 1, 3, 1000000);
+        Efp efp = new Efp("EFP", 1, 3, 10000);
         CoordinatorChainedParallel coordinator = new CoordinatorChainedParallel(efp);
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
