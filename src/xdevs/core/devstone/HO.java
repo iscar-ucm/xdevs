@@ -1,6 +1,10 @@
 package xdevs.core.devstone;
 
 import xdevs.core.modeling.Port;
+import xdevs.core.simulation.Coordinator;
+import xdevs.core.util.DevsLogger;
+
+import java.util.logging.Level;
 
 public class HO extends DEVStoneWrapper {
 
@@ -38,5 +42,22 @@ public class HO extends DEVStoneWrapper {
     @Override
     DEVStoneWrapper genCoupled() {
         return new HO("Coupled_" + (this.depth - 1), this.depth - 1, this.width, this.intDelay, this.extDelay);
+    }
+
+    public static void main(String[] args) {
+        int depth = 10;
+        int width = 10;
+        if (args.length >= 2) {
+            depth = Integer.parseInt(args[0]);
+            width = Integer.parseInt(args[1]);
+        }
+        DevsLogger.setup(Level.SEVERE);
+        HO ho = new HO("HO", depth, width, 0, 0);
+
+        Coordinator coordinator = new Coordinator(ho, false);
+        coordinator.initialize();
+        coordinator.simInject(ho.iIn, 0);
+        coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
     }
 }

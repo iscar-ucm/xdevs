@@ -1,5 +1,12 @@
 package xdevs.core.devstone;
 
+import xdevs.core.simulation.Coordinator;
+import xdevs.core.test.TestingWrapper;
+import xdevs.core.test.Transducer;
+import xdevs.core.util.DevsLogger;
+
+import java.util.logging.Level;
+
 public class HI extends DEVStoneWrapper {
 
     public HI(String name, int depth, int width, int intDelay, int extDelay) {
@@ -22,5 +29,23 @@ public class HI extends DEVStoneWrapper {
     @Override
     DEVStoneWrapper genCoupled() {
         return new HI("Coupled_" + (this.depth - 1), this.depth - 1, this.width, this.intDelay, this.extDelay);
+    }
+
+    public static void main(String[] args) {
+        int depth = 10;
+        int width = 10;
+        if (args.length >= 2) {
+            depth = Integer.parseInt(args[0]);
+            width = Integer.parseInt(args[1]);
+        }
+
+        DevsLogger.setup(Level.SEVERE);
+        HI hi = new HI("HI", depth, width, 0, 0);
+
+        Coordinator coordinator = new Coordinator(hi, false);
+        coordinator.initialize();
+        coordinator.simInject(hi.iIn, 0);
+        coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
     }
 }

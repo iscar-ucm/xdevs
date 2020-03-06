@@ -17,6 +17,10 @@ abstract class DEVStoneWrapper extends Coupled {
     protected Port<Integer> iIn, oOut;
 
     public DEVStoneWrapper(String name, int depth, int width, int intDelay, int extDelay, boolean addAtomicOutPorts) {
+        this(name, depth, width, intDelay, extDelay, addAtomicOutPorts, false);
+    }
+
+    public DEVStoneWrapper(String name, int depth, int width, int intDelay, int extDelay, boolean addAtomicOutPorts, boolean stats) {
         super(name);
 
         if(depth < 1) throw new RuntimeException("Invalid depth");
@@ -37,7 +41,12 @@ abstract class DEVStoneWrapper extends Coupled {
         this.addOutPort(this.oOut);
 
         if(depth == 1) {
-            DummyAtomic atomic = new DummyAtomic("Atomic_0_0", intDelay, extDelay);
+            DummyAtomic atomic;
+            if (stats) {
+                atomic = new DummyAtomicStats("Atomic_0_0", intDelay, extDelay);
+            } else {
+                atomic = new DummyAtomic("Atomic_0_0", intDelay, extDelay);
+            }
             this.addComponent(atomic);
 
             this.addCoupling(this.iIn, atomic.iIn);
@@ -50,7 +59,12 @@ abstract class DEVStoneWrapper extends Coupled {
             this.addCoupling(coupled.oOut, this.oOut);
 
             for (int i = 0; i < width - 1; i++) {
-                DummyAtomic atomic= new DummyAtomic("Atomic_" + (depth - 1) + "_" + i, intDelay, extDelay, addAtomicOutPorts);
+                DummyAtomic atomic;
+                if (stats) {
+                    atomic = new DummyAtomicStats("Atomic_" + (depth - 1) + "_" + i, intDelay, extDelay, addAtomicOutPorts);
+                } else {
+                    atomic = new DummyAtomic("Atomic_" + (depth - 1) + "_" + i, intDelay, extDelay, addAtomicOutPorts);
+                }
                 this.addComponent(atomic);
             }
         }

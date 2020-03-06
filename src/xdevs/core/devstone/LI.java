@@ -23,15 +23,21 @@ public class LI extends DEVStoneWrapper {
         return new LI("Coupled_" + (this.depth - 1), this.depth - 1, this.width, this.intDelay, this.extDelay);
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
+        int depth = 10;
+        int width = 10;
+        if (args.length >= 2) {
+            depth = Integer.parseInt(args[0]);
+            width = Integer.parseInt(args[1]);
+        }
         DevsLogger.setup(Level.SEVERE);
-        LI li = new LI("LI", 3, 2, 0, 0);
+        LI li = new LI("LI", depth, width, 0, 0);
 
         TestingWrapper wrapper = new TestingWrapper(li);
         Transducer<Integer> transducer = new Transducer<>("transducer");
         wrapper.addTransducer(li.oOut, transducer);
 
-        Coordinator coordinator = new Coordinator(wrapper, false);
+        Coordinator coordinator = new Coordinator(li, false);
         coordinator.initialize();
         coordinator.simInject(li.iIn, 0);
         coordinator.simulate(Long.MAX_VALUE);

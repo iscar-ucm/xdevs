@@ -7,7 +7,6 @@ public class DummyAtomic extends Atomic {
 
     private double intDelay, extDelay;
     private double prepTime;
-    private int intCount, extCount;
     protected Port<Integer> iIn, oOut;
 
     public DummyAtomic(String name, double intDelay, double extDelay) {
@@ -24,9 +23,6 @@ public class DummyAtomic extends Atomic {
         this.extDelay = extDelay;
         this.prepTime = prepTime;
 
-        this.intCount = 0;
-        this.extCount = 0;
-
         this.iIn = new Port<>("iIn");
         this.addInPort(this.iIn);
 
@@ -38,8 +34,6 @@ public class DummyAtomic extends Atomic {
 
     @Override
     public void deltint() {
-        this.intCount += 1;
-
         // TODO: Add Dhrystone
         //if(this.intDelay != 0) {
         //    // Dhrystone code
@@ -50,8 +44,6 @@ public class DummyAtomic extends Atomic {
 
     @Override
     public void deltext(double e) {
-        this.extCount += 1;
-
         // TODO: Add Dhrystone
         //if(this.extDelay != 0) {
         //    // Dhrystone code
@@ -75,13 +67,5 @@ public class DummyAtomic extends Atomic {
     @Override
     public void exit() {
 
-    }
-
-    public int getIntCount() {
-        return intCount;
-    }
-
-    public int getExtCount() {
-        return extCount;
     }
 }

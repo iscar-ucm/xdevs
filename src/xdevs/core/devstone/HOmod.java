@@ -2,11 +2,14 @@ package xdevs.core.devstone;
 
 import xdevs.core.modeling.Coupled;
 import xdevs.core.modeling.Port;
+import xdevs.core.simulation.Coordinator;
+import xdevs.core.util.DevsLogger;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class HOmod extends Coupled {
 
@@ -17,6 +20,10 @@ public class HOmod extends Coupled {
     protected Port<Integer> iIn, iIn2, oOut;
 
     public HOmod(String name, int depth, int width, int intDelay, int extDelay) {
+        this(name, depth, width, intDelay, extDelay, false);
+    }
+
+    public HOmod(String name, int depth, int width, int intDelay, int extDelay, boolean stats) {
         super(name);
 
         if(depth < 1) throw new RuntimeException("Invalid depth");
@@ -39,7 +46,12 @@ public class HOmod extends Coupled {
         this.addOutPort(this.oOut);
 
         if(depth == 1) {
-            DummyAtomic atomic = new DummyAtomic("Atomic_0_0", intDelay, extDelay);
+            DummyAtomic atomic;
+            if (stats) {
+                atomic = new DummyAtomicStats("Atomic_0_0", intDelay, extDelay);
+            } else {
+                atomic = new DummyAtomic("Atomic_0_0", intDelay, extDelay);
+            }
             this.addComponent(atomic);
 
             this.addCoupling(this.iIn, atomic.iIn);
@@ -58,7 +70,12 @@ public class HOmod extends Coupled {
                 for (int i = 0; i < width; i++) {
                     int minRowIdx = (i < 2) ? 0 : (i-1);
                     for (int j = minRowIdx; j < width - 1; j++) {
-                        DummyAtomic atomic = new DummyAtomic("Atomic_" + (depth - 1) + "_" + i + "_" + j, intDelay, extDelay);
+                        DummyAtomic atomic;
+                        if (stats) {
+                            atomic = new DummyAtomicStats("Atomic_" + (depth - 1) + "_" + i + "_" + j, intDelay, extDelay);
+                        } else {
+                            atomic = new DummyAtomic("Atomic_" + (depth - 1) + "_" + i + "_" + j, intDelay, extDelay);
+                        }
                         this.addComponent(atomic);
 
                         if(!atomics.containsKey(i))
@@ -73,7 +90,7 @@ public class HOmod extends Coupled {
                 }
 
                 for (int i = 1; i < width; i++) {
-                    this.addCoupling(this.iIn2, atomics.get(1).get(i).iIn);
+                    this.addCoupling(this.iIn2, atomics.get(i).get(0).iIn);
                 }
 
                 // Connect IC
@@ -92,5 +109,22 @@ public class HOmod extends Coupled {
                 }
             }
         }
+    }
+
+    public static void main(String[] args) {
+        int depth = 3;
+        int width = 4;
+        if (args.length >= 2) {
+            depth = Integer.parseInt(args[0]);
+            width = Integer.parseInt(args[1]);
+        }
+        DevsLogger.setup(Level.SEVERE);
+        HOmod homod = new HOmod("HOmod", depth, width, 0, 0);
+
+        Coordinator coordinator = new Coordinator(homod, false);
+        coordinator.initialize();
+        coordinator.simInject(homod.iIn, 0);
+        coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
     }
 }
