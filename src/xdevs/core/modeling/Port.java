@@ -22,9 +22,10 @@
  */
 package xdevs.core.modeling;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
+import xdevs.core.util.IteratorOfIterators;
+
+import java.util.*;
+
 
 public class Port<E> {
     public enum Direction {NA, IN, OUT, INOUT};
@@ -89,6 +90,21 @@ public class Port<E> {
                 vals.addAll(coup.getPortFrom().getValues());
             }
             return vals;
+        }
+    }
+
+    public Iterator<E> getValuesIterator() {
+        if (!chained || direction == Direction.OUT) {
+            return values.iterator();
+        } else {
+            List<Iterator<E>> iterators= new ArrayList<>();
+            for (Coupling<E> coup: couplingsIn) {
+                Iterator<E> i = coup.getPortFrom().getValuesIterator();
+                if (i.hasNext()) {
+                   iterators.add(i);
+                }
+            }
+            return new IteratorOfIterators<>(iterators);
         }
     }
 
