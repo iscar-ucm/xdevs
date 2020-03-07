@@ -1,6 +1,5 @@
 package xdevs.core.devstone;
 
-import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Coupled;
 import xdevs.core.modeling.Port;
 

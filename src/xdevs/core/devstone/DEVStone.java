@@ -44,7 +44,7 @@ public class DEVStone {
         String coordType = args[5];
         boolean flatten = Boolean.parseBoolean(args[6]);
 
-        // TODO start counting time now
+        long modelStart = System.nanoTime();
         Coupled model;
         switch (modelType) {
             case "LI":
@@ -64,9 +64,10 @@ public class DEVStone {
                 printUsage();
                 throw new RuntimeException();
         }
-        // TODO stop counting time now
+        long modelStop = System.nanoTime();
+        System.out.println("Model created. Elapsed time: " + (modelStop - modelStart));
 
-        // TODO start counting time now
+        long coordStart = System.nanoTime();
         Coordinator coord;
         switch (coordType) {
             case "coord":
@@ -87,12 +88,15 @@ public class DEVStone {
                 throw new RuntimeException();
         }
         coord.initialize();
-        // TODO stop counting time now
+        long coordStop = System.nanoTime();
+        System.out.println("Coordinator created. Elapsed time: " + (coordStop - coordStart));
 
-        // TODO start counting time now
+        long simulationStart = System.nanoTime();
         //coord.simInject(model.iIn, 0);
         coord.simulate(Long.MAX_VALUE);
-        // TODO stop counting time now
+        long simulationStop = System.nanoTime();
+        System.out.println("Simulation finished. Elapsed time: " + (simulationStop - simulationStart));
+
         coord.exit();
     }
 }

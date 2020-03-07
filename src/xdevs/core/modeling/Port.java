@@ -35,9 +35,16 @@ public class Port<E> {
     protected Direction direction = Direction.NA;
     protected LinkedList<E> values = new LinkedList<>();
 
+    /**
+     * The following attributes are related to the chained simulation algorihtm
+     *
+     * They are only used
+     */
     protected Boolean chained = false;
     protected LinkedList<Coupling<E>> couplingsIn = null;
     protected LinkedList<Coupling<E>> couplingsOut = null;
+    protected LinkedList<E> valuesMulticast = null;
+    protected boolean multicasted = false;
 
     public Port(String name) {
         this.name = name;
@@ -57,11 +64,15 @@ public class Port<E> {
 
     public void clear() {
         values.clear();
+        if (chained) {
+            valuesMulticast.clear();
+            multicasted = false;
+        }
     }
 
     public boolean isEmpty() {
         try {
-            getSingleValue();
+            getSingleValue();  // TODO careful: you are triggering multicasting
             return false;
         } catch (Exception e) {
             return true;
@@ -72,12 +83,10 @@ public class Port<E> {
         if (!chained || direction == Direction.OUT) {
             return values.element();
         } else {
-            for (Coupling<E> coup: couplingsIn) {
-                try {
-                    return coup.getPortFrom().getSingleValue();
-                } catch (NoSuchElementException ignored) { }
+            if (!multicasted) {  // TODO in theory, this is triggered in isEmpty before -> It could be simplified
+                fillMulticast();
             }
-            throw new NoSuchElementException();
+            return valuesMulticast.element();
         }
     }
 
@@ -85,11 +94,17 @@ public class Port<E> {
         if (!chained || direction == Direction.OUT) {
             return values;
         } else {
-            LinkedList<E> vals = new LinkedList<>();
-            for (Coupling<E> coup: couplingsIn) {
-                vals.addAll(coup.getPortFrom().getValues());
+            if (!multicasted) {  // TODO in theory, this is triggered in isEmpty before -> It could be simplified
+                fillMulticast();
             }
-            return vals;
+            return valuesMulticast;
+        }
+    }
+
+    private void fillMulticast() {
+        multicasted = true;
+        for (Coupling<E> coup: couplingsIn) {
+            valuesMulticast.addAll(coup.getPortFrom().getValues());
         }
     }
 
@@ -124,6 +139,7 @@ public class Port<E> {
         chained = true;
         couplingsIn = new LinkedList<>();
         couplingsOut = new LinkedList<>();
+        valuesMulticast = new LinkedList<>();
     }
 
     @SuppressWarnings({"unchecked"})
