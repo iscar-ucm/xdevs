@@ -29,7 +29,7 @@ import java.util.*;
 
 public class Port<E> {
 
-    public enum Direction {NA, IN, OUT, INOUT};
+    public enum Direction {NA, IN, OUT, INOUT}
 
     protected Component parent = null;
     protected String name;
@@ -42,8 +42,6 @@ public class Port<E> {
 
     protected LinkedList<E> valuesMulticast = null;  // to cache all the elements in chained simulator
     protected boolean multicasted = false;
-    protected E singleValue = null;  // to cache the first element in chained simulator
-    protected boolean singleValueValid = false;
 
     public Port(String name) {
         this.name = name;
@@ -57,17 +55,11 @@ public class Port<E> {
         return name;
     }
 
-    public Direction getDirection() {
-        return direction;
-    }
-
     public void clear() {
         values.clear();
         if (chained) {
             valuesMulticast.clear();
             multicasted = false;
-            singleValue = null;
-            singleValueValid = false;
         }
     }
 
@@ -83,12 +75,8 @@ public class Port<E> {
     public E getSingleValue() {
         if (!chained || direction == Direction.OUT) {
             return values.element();
-        } else if (singleValueValid) {
-            return singleValue;
         } else {
-            singleValue = (multicasted)? valuesMulticast.element() : getValuesIterator().next();
-            singleValueValid = true;
-            return singleValue;
+            return (multicasted)? valuesMulticast.element() : getValuesIterator().next();
         }
     }
 
