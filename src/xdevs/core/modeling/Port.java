@@ -28,6 +28,7 @@ import java.util.*;
 
 
 public class Port<E> {
+
     public enum Direction {NA, IN, OUT, INOUT};
 
     protected Component parent = null;
@@ -35,16 +36,14 @@ public class Port<E> {
     protected Direction direction = Direction.NA;
     protected LinkedList<E> values = new LinkedList<>();
 
-    /**
-     * The following attributes are related to the chained simulation algorihtm
-     *
-     * They are only used
-     */
     protected Boolean chained = false;
     protected LinkedList<Coupling<E>> couplingsIn = null;
     protected LinkedList<Coupling<E>> couplingsOut = null;
-    protected LinkedList<E> valuesMulticast = null;
+
+    protected LinkedList<E> valuesMulticast = null;  // to cache all the elements in chained simulator
     protected boolean multicasted = false;
+    protected E singleValue = null;  // to cache the first element in chained simulator
+    protected boolean singleValueValid = false;
 
     public Port(String name) {
         this.name = name;
@@ -67,14 +66,16 @@ public class Port<E> {
         if (chained) {
             valuesMulticast.clear();
             multicasted = false;
+            singleValue = null;
+            singleValueValid = false;
         }
     }
 
     public boolean isEmpty() {
         try {
-            getSingleValue();  // TODO careful: you are triggering multicasting
+            getSingleValue();
             return false;
-        } catch (Exception e) {
+        } catch (NoSuchElementException | IndexOutOfBoundsException Ignored) {
             return true;
         }
     }
@@ -82,41 +83,42 @@ public class Port<E> {
     public E getSingleValue() {
         if (!chained || direction == Direction.OUT) {
             return values.element();
+        } else if (singleValueValid) {
+            return singleValue;
         } else {
-            if (!multicasted) {  // TODO in theory, this is triggered in isEmpty before -> It could be simplified
-                fillMulticast();
-            }
-            return valuesMulticast.element();
+            singleValue = (multicasted)? valuesMulticast.element() : getValuesIterator().next();
+            singleValueValid = true;
+            return singleValue;
         }
     }
 
     public Collection<E> getValues() {
         if (!chained || direction == Direction.OUT) {
             return values;
-        } else {
-            if (!multicasted) {  // TODO in theory, this is triggered in isEmpty before -> It could be simplified
-                fillMulticast();
-            }
-            return valuesMulticast;
+        } else if (!multicasted) {
+            fillMulticast();
         }
+        return valuesMulticast;
     }
 
     private void fillMulticast() {
-        multicasted = true;
         for (Coupling<E> coup: couplingsIn) {
             valuesMulticast.addAll(coup.getPortFrom().getValues());
         }
+        multicasted = true;
     }
 
     public Iterator<E> getValuesIterator() {
         if (!chained || direction == Direction.OUT) {
             return values.iterator();
-        } else {
+        } else if (multicasted) {  // if multicasted, we can just return an iterator of the local copy
+            return valuesMulticast.iterator();
+        } else {  // Otherwise, we return the corresponding the iterator of iterators
             List<Iterator<E>> iterators= new ArrayList<>();
             for (Coupling<E> coup: couplingsIn) {
                 Iterator<E> i = coup.getPortFrom().getValuesIterator();
                 if (i.hasNext()) {
-                   iterators.add(i);
+                    iterators.add(i);
                 }
             }
             return new IteratorOfIterators<>(iterators);

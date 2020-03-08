@@ -17,7 +17,8 @@
  * http://www.gnu.org/licenses/
  *
  * Contributors:
- *  - José Luis Risco Martín
+ *  - José Luis Risco Martín <jlrisco@ucm.es>
+ *  - Román Cárdenas Rodríguez <r.cardenas@upm.es>
  */
 package xdevs.core.modeling;
 
@@ -30,6 +31,12 @@ public class Coupling<E> {
     protected Port<E> portTo;
 
     public Coupling(Port<E> portFrom, Port<E> portTo) {
+        if (portFrom.direction == Port.Direction.IN) {
+            throw new RuntimeException("Port From cannot be the input of an atomic model");
+        }
+        if (portTo.direction == Port.Direction.OUT) {
+            throw new RuntimeException("Port To cannot be the output of an atomic model");
+        }
         this.portFrom = portFrom;
         this.portTo = portTo;
     }

@@ -23,9 +23,7 @@ package xdevs.core.modeling;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.logging.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -316,14 +314,18 @@ public class Coupled extends Component {
      * @return The new DEVS coupled model
      */
     public Coupled flatten() {
-        for (int i = 0; i < components.size(); ++i) {
-            Component component = components.get(i);
+        List<Coupled> toFlatten = new ArrayList<>();
+        for (Component component : components) {
             if (component instanceof Coupled) {
-                ((Coupled) component).flatten();
-                removePortsAndCouplings(component);
-                components.remove(i--);
+                toFlatten.add((Coupled) component);
             }
         }
+        for (Coupled coupled : toFlatten) {
+            coupled.flatten();
+            removePortsAndCouplings(coupled);
+            components.remove(coupled);
+        }
+        toFlatten.clear();
 
         if (parent == null) {
             return this;
