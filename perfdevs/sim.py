@@ -67,7 +67,7 @@ class Simulator(AbstractSimulator):
         self.model.exit()
 
     def deltfcn(self):
-        logger.debug("Deltfcn %s (empty: %s, t: %d)" % (self.model.name, self.model.in_empty(), self.clock.time))
+        logger.debug("Deltfcn %s (empty: %s, t: %d), pid: %d" % (self.model.name, self.model.in_empty(), self.clock.time, os.getpid()))
         t = self.clock.time
         in_empty = self.model.in_empty()
 
@@ -91,6 +91,7 @@ class Simulator(AbstractSimulator):
 
     def lambdaf(self):
         if self.clock.time == self.time_next:
+            logger.debug("Lambda %s, pid: %d" % (self.model.name, os.getpid()))
             self.model.lambdaf()
             return self
 
@@ -326,8 +327,8 @@ executor_futures = dict()
 class ParallelProcessCoordinator(Coordinator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
-                 unroll: bool = True, master=True):
-        super().__init__(model, clock, flatten, chain, unroll)
+                 master=True):
+        super().__init__(model, clock, flatten, chain)
         self.master = master
 
     def _add_coordinator(self, coupled: Coupled):
@@ -370,11 +371,11 @@ class ParallelProcessCoordinator(Coordinator):
         if self.master:
             self.propagate_input()
 
-        for sim in self.simulators:
-            executor_futures[executor.submit(sim.deltfcn)] = (self, sim)
-
         for coord in self.coordinators:
             coord.deltfcn()
+
+        for sim in self.simulators:
+            executor_futures[executor.submit(sim.deltfcn)] = (self, sim)
 
         if self.master:
             for i, future in enumerate(executor_futures):
@@ -388,16 +389,15 @@ class ParallelProcessCoordinator(Coordinator):
                     new_sim = future.result()
                     new_model = new_sim.model
 
-                    new_model.in_ports = model.in_ports
-                    new_model.out_ports = model.out_ports
+                    # Copy new state
+                    if hasattr(new_model, "__state__"):
+                        for state_att in new_model.__state__:
+                            setattr(model, state_att, getattr(new_model, state_att))
 
-                    #new_model.i_in = model.i_in  # TODO Fix these two lines (hardcoded)
-                    #new_model.o_out = model.o_out
-                    sim.model = new_model
+                    # Update simulator info
+                    sim.model = model
                     sim.time_last = new_sim.time_last
                     sim.time_next = new_sim.time_next
-
-                    #coord.replace_sim(sim, future.result())
 
             executor_futures.clear()
             self.update_times()
@@ -423,12 +423,12 @@ class ParallelProcessCoordinator(Coordinator):
         logger.debug({proc.model.name:proc.time_next for proc in self.processors})
         logger.debug("Deltfcn %s: TL: %s, TN: %s" % (self.model.name, self.time_last, self.time_next))
 
-    def replace_sim(self, old_sim, new_sim):
+    """    def replace_sim(self, old_sim, new_sim):
         self.simulators.remove(old_sim)
         self.simulators.append(new_sim)
 
 
-"""class ParallelProcessSimulator(Simulator):
+class ParallelProcessSimulator(Simulator):
     def __init__(self, model: Atomic, clock: SimulationClock):
         super().__init__(model, clock)
 

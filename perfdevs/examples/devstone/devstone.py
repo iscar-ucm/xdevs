@@ -213,42 +213,43 @@ class HOmod(Coupled):
             self.add_coupling(self.i_in, coupled.get_in_port("i_in"))
             self.add_coupling(coupled.get_out_port("o_out"), self.o_out)
 
-            atomics = defaultdict(list)
+            if width >= 2:
+                atomics = defaultdict(list)
 
-            # Generate atomic components
-            for i in range(width):
-                min_row_idx = 0 if i < 2 else i - 1
-                for j in range(min_row_idx, width - 1):
-                    atomic = DelayedAtomic("Atomic_%d_%d_%d" % (depth - 1, i, j), int_delay, ext_delay, add_out_port=True)
-                    self.add_component(atomic)
-                    atomics[i].append(atomic)
+                # Generate atomic components
+                for i in range(width):
+                    min_row_idx = 0 if i < 2 else i - 1
+                    for j in range(min_row_idx, width - 1):
+                        atomic = DelayedAtomic("Atomic_%d_%d_%d" % (depth - 1, i, j), int_delay, ext_delay, add_out_port=True)
+                        self.add_component(atomic)
+                        atomics[i].append(atomic)
 
-            # Connect EIC
-            for atomic in atomics[0]:
-                self.add_coupling(self.i_in2, atomic.i_in)
-            for i in range(1, width):
-                atomic_set = atomics[i]
-                self.add_coupling(self.i_in2, atomic_set[0].i_in)
+                # Connect EIC
+                for atomic in atomics[0]:
+                    self.add_coupling(self.i_in2, atomic.i_in)
+                for i in range(1, width):
+                    atomic_set = atomics[i]
+                    self.add_coupling(self.i_in2, atomic_set[0].i_in)
 
-            # Connect IC
-            for atomic in atomics[0]:  # First row to coupled component
-                self.add_coupling(atomic.o_out, coupled.i_in2)
-            for i in range(len(atomics[1])):  # Second to first rows
-                self.add_coupling(atomics[1][i].o_out, atomics[0][i].i_in)
-            for i in range(2, width):  # Rest of rows
-                for j in range(len(atomics[i])):
-                    self.add_coupling(atomics[i][j].o_out, atomics[i-1][j+1].i_in)
+                # Connect IC
+                for atomic in atomics[0]:  # First row to coupled component
+                    self.add_coupling(atomic.o_out, coupled.i_in2)
+                for i in range(len(atomics[1])):  # Second to first rows
+                    self.add_coupling(atomics[1][i].o_out, atomics[0][i].i_in)
+                for i in range(2, width):  # Rest of rows
+                    for j in range(len(atomics[i])):
+                        self.add_coupling(atomics[i][j].o_out, atomics[i-1][j+1].i_in)
 
 
 if __name__ == '__main__':
     import sys
     sys.setrecursionlimit(10000)
-    root = HO("HO_root", 100, 30, 0, 0)
+    root = HO("HO_root", 10, 10, 100000, 100000)
     flatten = False
     chain = True
-    parallel = False
+    parallel = True
     if parallel:
-        coord = ParallelThreadCoordinator(root, flatten=flatten, chain=chain)
+        coord = ParallelProcessCoordinator(root, flatten=flatten, chain=chain)
     else:
         coord = Coordinator(root, flatten=flatten, chain=chain)
     coord.initialize()
