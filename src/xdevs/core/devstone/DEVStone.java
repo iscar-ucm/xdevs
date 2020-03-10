@@ -87,7 +87,7 @@ public class DEVStone extends Coupled {
 
         DEVStone devstone = new DEVStone("devstone", modelType, depth, width, intDelay, extDelay);
         long modelStop = System.nanoTime();
-        System.out.println("Model created. Elapsed time: " + (modelStop - modelStart));
+        System.out.println("Model creation time: " + ((modelStop - modelStart) / 1e9));
 
         long coordStart = System.nanoTime();
         Coordinator coord;
@@ -111,13 +111,13 @@ public class DEVStone extends Coupled {
         }
         coord.initialize();
         long coordStop = System.nanoTime();
-        System.out.println("Coordinator created. Elapsed time: " + (coordStop - coordStart));
+        System.out.println("Engine setup time: " + ((coordStop - coordStart) / 1e9));
 
         long simulationStart = System.nanoTime();
         //coord.simInject(model.iIn, 0);
         coord.simulate(Long.MAX_VALUE);
         long simulationStop = System.nanoTime();
-        System.out.println("Simulation finished. Elapsed time: " + (simulationStop - simulationStart));
+        System.out.println("Simulation time: " + ((simulationStop - simulationStart) / 1e9));
 
         coord.exit();
     }
