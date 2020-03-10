@@ -314,35 +314,25 @@ class ParallelThreadCoordinator(Coordinator):
         self.executor.submit(task)
 
 
-executor = futures.ProcessPoolExecutor(max_workers=8)
-executor_futures = dict()
-
-
-"""def execute_and_return(model, method, *args, **kwargs):
-    logger.debug("Running task (pid: %d)" % os.getpid())
-    method(*args, **kwargs)
-    return None"""
-
-
 class ParallelProcessCoordinator(Coordinator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
-                 master=True):
+                 master=True, executor=None, executor_futures=None):
         super().__init__(model, clock, flatten, chain)
         self.master = master
 
+        if master:
+            self.executor = futures.ProcessPoolExecutor(max_workers=8)
+            self.executor_futures = dict()
+        else:
+            self.executor = executor
+            self.executor_futures = executor_futures
+
     def _add_coordinator(self, coupled: Coupled):
-        coord = ParallelProcessCoordinator(coupled, self.clock, master=False)
+        coord = ParallelProcessCoordinator(coupled, self.clock, master=False, executor=self.executor,
+                                           executor_futures=self.executor_futures)
         self.coordinators.append(coord)
         self.ports_to_serve.update(coord.ports_to_serve)
-
-        """def _add_simulator(self, atomic: Atomic):
-        sim = ParallelProcessSimulator(atomic, self.clock)
-        self.simulators.append(sim)
-        for pts in sim.model.in_ports:
-            if pts.serve:
-                port_name = "%s.%s" % (pts.parent.name, pts.name)
-                self.ports_to_serve[port_name] = pts"""
 
     def lambdaf(self):
 
@@ -350,21 +340,20 @@ class ParallelProcessCoordinator(Coordinator):
             coord.lambdaf()
 
         for sim in self.simulators:
-            executor_futures[executor.submit(sim.lambdaf)] = (self, sim)
+            self.executor_futures[self.executor.submit(sim.lambdaf)] = (self, sim)
 
         if self.master:
-            for i, future in enumerate(executor_futures):
-                logger.debug("D: Waiting... (%d/%d)" % (i+1, len(executor_futures)))
+            for i, future in enumerate(self.executor_futures):
+                logger.debug("D: Waiting... (%d/%d)" % (i+1, len(self.executor_futures)))
                 futures.wait((future,))
 
                 res = future.result()
                 if isinstance(res, Simulator):
-                    coord, sim = executor_futures[future]
-                    # coord.replace_sim(sim, future.result())
+                    coord, sim = self.executor_futures[future]
                     for model_port, new_model_port in zip(sim.model.out_ports, future.result().model.out_ports):
                         model_port.extend(list(new_model_port.values))
 
-            executor_futures.clear()
+            self.executor_futures.clear()
             self.propagate_output()
 
     def deltfcn(self):
@@ -375,16 +364,16 @@ class ParallelProcessCoordinator(Coordinator):
             coord.deltfcn()
 
         for sim in self.simulators:
-            executor_futures[executor.submit(sim.deltfcn)] = (self, sim)
+            self.executor_futures[self.executor.submit(sim.deltfcn)] = (self, sim)
 
         if self.master:
-            for i, future in enumerate(executor_futures):
-                logger.debug("D: Waiting... (%d/%d)" % (i+1, len(executor_futures)))
+            for i, future in enumerate(self.executor_futures):
+                logger.debug("D: Waiting... (%d/%d)" % (i+1, len(self.executor_futures)))
                 futures.wait((future,))
 
                 res = future.result()
                 if isinstance(res, Simulator):
-                    coord, sim = executor_futures[future]
+                    coord, sim = self.executor_futures[future]
                     model = sim.model
                     new_sim = future.result()
                     new_model = new_sim.model
@@ -399,7 +388,7 @@ class ParallelProcessCoordinator(Coordinator):
                     sim.time_last = new_sim.time_last
                     sim.time_next = new_sim.time_next
 
-            executor_futures.clear()
+            self.executor_futures.clear()
             self.update_times()
 
     def propagate_output(self):
@@ -422,39 +411,3 @@ class ParallelProcessCoordinator(Coordinator):
         self.time_next = self.time_last + self.ta()
         logger.debug({proc.model.name:proc.time_next for proc in self.processors})
         logger.debug("Deltfcn %s: TL: %s, TN: %s" % (self.model.name, self.time_last, self.time_next))
-
-    """    def replace_sim(self, old_sim, new_sim):
-        self.simulators.remove(old_sim)
-        self.simulators.append(new_sim)
-
-
-class ParallelProcessSimulator(Simulator):
-    def __init__(self, model: Atomic, clock: SimulationClock):
-        super().__init__(model, clock)
-
-    def deltfcn(self):
-        logger.debug("Deltfcn %s (empty: %s, t: %d)" % (self.model.name, self.model.in_empty(), self.clock.time))
-        t = self.clock.time
-        in_empty = self.model.in_empty()
-
-        if in_empty:
-            if t != self.time_next:
-                return
-            executor_futures.append(executor.submit(self.model, self.model.deltint))
-        else:
-            e = t - self.time_last
-            self.model.sigma -= e
-
-            if t == self.time_next:
-                executor_futures.append(executor.submit(self.model, self.model.deltcon, e))
-            else:
-                executor_futures.append(executor.submit(self.model, self.model.deltext, e))
-
-    def lambdaf(self):
-        if self.clock.time == self.time_next:
-            executor_futures.append(executor.submit(self.model, self.model.lambdaf))
-
-    def update_times(self):
-        self.time_last = self.clock.time
-        self.time_next = self.time_last + self.model.ta
-        logger.debug("Deltfcn %s: TL: %s, TN: %s" % (self.model.name, self.time_last, self.time_next))"""
