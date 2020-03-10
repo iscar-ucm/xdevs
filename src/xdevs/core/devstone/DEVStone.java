@@ -7,7 +7,46 @@ import xdevs.core.simulation.chained.CoordinatorChainedParallel;
 import xdevs.core.simulation.parallel.CoordinatorParallel;
 
 
-public class DEVStone {
+public class DEVStone extends Coupled {
+
+    public DEVStone(String name, String modelType, int depth, int width, int intDelay, int extDelay) {
+        super(name);
+
+        Coupled model;
+        switch (modelType) {
+            case "LI":
+                model = new LI(name + "_li", depth, width, intDelay, extDelay);
+                break;
+            case "HI":
+                model = new HI(name + "_hi", depth, width, intDelay, extDelay);
+                break;
+            case "HO":
+                model = new HO(name + "_ho", depth, width, intDelay, extDelay);
+                break;
+            case "HOmod":
+                model = new HOmod(name + "_homod", depth, width, intDelay, extDelay);
+                break;
+            default:
+                System.out.println("DEVStone model not found");
+                printUsage();
+                throw new RuntimeException();
+        }
+        this.addComponent(model);
+
+        Seeder seeder = new Seeder(name + "_seeder", 30);
+        this.addComponent(seeder);
+
+        if (model instanceof DEVStoneWrapper) {
+            this.addCoupling(seeder.oOut,((DEVStoneWrapper)model).iIn);
+            if (model instanceof HO) {
+                this.addCoupling(seeder.oOut,((HO)model).iIn2);
+            }
+        } else {
+            this.addCoupling(seeder.oOut,((HOmod)model).iIn);
+            this.addCoupling(seeder.oOut,((HOmod)model).iIn2);
+        }
+
+    }
 
     public static void printUsage() {
         System.out.println("Usage: java DEVStone.java <MODEL> <DEPTH> <WIDTH> <INTERNAL DELAY> <EXTERNAL DELAY> <COORDINATOR> <FLATTEN>");
@@ -45,25 +84,8 @@ public class DEVStone {
         boolean flatten = Boolean.parseBoolean(args[6]);
 
         long modelStart = System.nanoTime();
-        Coupled model;
-        switch (modelType) {
-            case "LI":
-                model = new LI("li", depth, width, intDelay, extDelay);
-                break;
-            case "HI":
-                model = new HI("hi", depth, width, intDelay, extDelay);
-                break;
-            case "HO":
-                model = new HO("ho", depth, width, intDelay, extDelay);
-                break;
-            case "HOmod":
-                model = new HOmod("homod", depth, width, intDelay, extDelay);
-                break;
-            default:
-                System.out.println("DEVStone model not found");
-                printUsage();
-                throw new RuntimeException();
-        }
+
+        DEVStone devstone = new DEVStone("devstone", modelType, depth, width, intDelay, extDelay);
         long modelStop = System.nanoTime();
         System.out.println("Model created. Elapsed time: " + (modelStop - modelStart));
 
@@ -71,16 +93,16 @@ public class DEVStone {
         Coordinator coord;
         switch (coordType) {
             case "coord":
-                coord = new Coordinator(model, flatten);
+                coord = new Coordinator(devstone, flatten);
                 break;
             case "chained":
-                coord = new CoordinatorChained(model, flatten);
+                coord = new CoordinatorChained(devstone, flatten);
                 break;
             case "parallel":
-                coord = new CoordinatorParallel(model);
+                coord = new CoordinatorParallel(devstone);
                 break;
             case "chainedparallel":
-                coord = new CoordinatorChainedParallel(model);
+                coord = new CoordinatorChainedParallel(devstone);
                 break;
             default:
                 System.out.println("xDEVS coordinator type not found");

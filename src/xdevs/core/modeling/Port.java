@@ -75,9 +75,10 @@ public class Port<E> {
     public E getSingleValue() {
         if (!chained || direction == Direction.OUT) {
             return values.element();
-        } else {
-            return (multicasted)? valuesMulticast.element() : getValuesIterator().next();
+        } else if (!multicasted) {
+            fillMulticast();
         }
+        return valuesMulticast.element();
     }
 
     public Collection<E> getValues() {
@@ -90,27 +91,10 @@ public class Port<E> {
     }
 
     private void fillMulticast() {
-        for (Coupling<E> coup: couplingsIn) {
-            valuesMulticast.addAll(coup.getPortFrom().getValues());
-        }
+        couplingsIn.forEach((c)-> {
+            valuesMulticast.addAll(c.getPortFrom().getValues());
+        });
         multicasted = true;
-    }
-
-    public Iterator<E> getValuesIterator() {
-        if (!chained || direction == Direction.OUT) {
-            return values.iterator();
-        } else if (multicasted) {  // if multicasted, we can just return an iterator of the local copy
-            return valuesMulticast.iterator();
-        } else {  // Otherwise, we return the corresponding the iterator of iterators
-            List<Iterator<E>> iterators= new ArrayList<>();
-            for (Coupling<E> coup: couplingsIn) {
-                Iterator<E> i = coup.getPortFrom().getValuesIterator();
-                if (i.hasNext()) {
-                    iterators.add(i);
-                }
-            }
-            return new IteratorOfIterators<>(iterators);
-        }
     }
 
     public void addValue(E value) {

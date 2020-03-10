@@ -3,10 +3,16 @@ package xdevs.core.devstone;
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import static xdevs.core.util.Constants.INFINITY;
+
 public class DummyAtomic extends Atomic {
 
     private double intDelay, extDelay;
     private double prepTime;
+    private List<Integer> values;
     protected Port<Integer> iIn, oOut;
 
     public DummyAtomic(String name, double intDelay, double extDelay) {
@@ -22,6 +28,7 @@ public class DummyAtomic extends Atomic {
         this.intDelay = intDelay;
         this.extDelay = extDelay;
         this.prepTime = prepTime;
+        this.values = new LinkedList<>();
 
         this.iIn = new Port<>("iIn");
         this.addInPort(this.iIn);
@@ -48,14 +55,17 @@ public class DummyAtomic extends Atomic {
         //if(this.extDelay != 0) {
         //    // Dhrystone code
         //}
+        if (this.sigma == INFINITY) {
+            this.values.addAll(this.iIn.getValues());
 
-        this.holdIn("active", prepTime);
+            this.holdIn("active", prepTime);
+        }
     }
 
     @Override
     public void lambda() {
         if(this.oOut != null) {
-            this.oOut.addValue(0);
+            this.oOut.addValues(this.values);
         }
     }
 

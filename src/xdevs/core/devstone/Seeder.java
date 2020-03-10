@@ -6,9 +6,11 @@ import xdevs.core.modeling.Port;
 public class Seeder extends Atomic {
 
     protected Port<Integer> oOut;
+    protected int nMessages;
 
-    public Seeder(String name) {
+    public Seeder(String name, int nMessages) {
         super(name);
+        this.nMessages = nMessages;
         this.oOut = new Port<>("oOut");
         this.addOutPort(this.oOut);
     }
@@ -23,7 +25,9 @@ public class Seeder extends Atomic {
 
     @Override
     public void lambda() {
-        this.oOut.addValue(0);
+        for (int i = 0; i < this.nMessages; i++) {
+            this.oOut.addValue(i);
+        }
     }
 
     @Override
