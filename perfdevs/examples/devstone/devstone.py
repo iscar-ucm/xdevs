@@ -3,7 +3,7 @@ from typing import Any
 
 from perfdevs.examples.devstone.pystone import pystones
 from perfdevs.models import Atomic, Coupled, Port
-from perfdevs.sim import Coordinator, ParallelThreadCoordinator, ParallelProcessCoordinator
+from perfdevs.sim import Coordinator, ParallelProcessCoordinator
 from perfdevs import PHASE_ACTIVE, get_logger
 from _collections import defaultdict
 
