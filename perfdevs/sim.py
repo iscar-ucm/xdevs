@@ -90,10 +90,11 @@ class Simulator(AbstractSimulator):
         return self
 
     def lambdaf(self):
-        if self.clock.time == self.time_next:
-            logger.debug("Lambda %s, pid: %d" % (self.model.name, os.getpid()))
-            self.model.lambdaf()
-            return self
+        assert self.clock.time == self.time_next
+
+        logger.debug("Lambda %s, pid: %d" % (self.model.name, os.getpid()))
+        self.model.lambdaf()
+        return self
 
     def clear(self):
         for in_port in self.model.in_ports:
@@ -169,7 +170,8 @@ class Coordinator(AbstractSimulator):
 
     def lambdaf(self):
         for proc in self.processors:
-            proc.lambdaf()
+            if proc.clock.time == proc.time_next:
+                proc.lambdaf()
 
         self.propagate_output()
 
@@ -267,13 +269,14 @@ class Coordinator(AbstractSimulator):
             self.clock.time = self.time_next
 
 
+"""
 class ParallelThreadCoordinator(Coordinator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
                  executor: futures.ThreadPoolExecutor = None):
         super().__init__(model, clock, flatten, chain)
 
-        self.executor = executor or futures.ThreadPoolExecutor(max_workers=8)  # TODO calc max workers
+        self.executor = executor or futures.ThreadPoolExecutor(max_workers=8)
 
     def _add_coordinator(self, coupled: Coupled):
         coord = ParallelThreadCoordinator(coupled, self.clock, executor=None)
@@ -281,10 +284,6 @@ class ParallelThreadCoordinator(Coordinator):
         self.ports_to_serve.update(coord.ports_to_serve)
 
     def _lambdaf(self):
-        """
-        for coord in self.coordinators:
-            coord.lambdaf()
-        """
         ex_futures = []
         for proc in self.processors:
             self.add_task_to_pool(proc.lambdaf)
@@ -296,10 +295,7 @@ class ParallelThreadCoordinator(Coordinator):
 
     def deltfcn(self):
         self.propagate_input()
-        """
-        for coord in self.coordinators:
-            coord.deltfcn()
-       """
+        
         ex_futures = []
         for proc in self.processors:
             self.add_task_to_pool(proc.deltfcn)
@@ -312,6 +308,7 @@ class ParallelThreadCoordinator(Coordinator):
 
     def add_task_to_pool(self, task):
         self.executor.submit(task)
+"""
 
 
 class ParallelProcessCoordinator(Coordinator):
@@ -322,7 +319,7 @@ class ParallelProcessCoordinator(Coordinator):
         self.master = master
 
         if master:
-            self.executor = futures.ProcessPoolExecutor(max_workers=8)
+            self.executor = futures.ProcessPoolExecutor()
             self.executor_futures = dict()
         else:
             self.executor = executor
@@ -337,10 +334,12 @@ class ParallelProcessCoordinator(Coordinator):
     def lambdaf(self):
 
         for coord in self.coordinators:
-            coord.lambdaf()
+            if coord.clock.time == coord.time_next:
+                coord.lambdaf()
 
         for sim in self.simulators:
-            self.executor_futures[self.executor.submit(sim.lambdaf)] = (self, sim)
+            if sim.clock.time == sim.time_next:
+                self.executor_futures[self.executor.submit(sim.lambdaf)] = (self, sim)
 
         if self.master:
             for i, future in enumerate(self.executor_futures):
