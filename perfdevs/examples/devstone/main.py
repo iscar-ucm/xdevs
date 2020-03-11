@@ -1,4 +1,5 @@
 import argparse
+import sys
 import time
 
 from perfdevs.sim import Coordinator
@@ -6,6 +7,8 @@ from perfdevs.sim import Coordinator
 from perfdevs.examples.devstone.devstone import LI, HO, HI, HOmod
 from perfdevs.models import Coupled
 from perfdevs.utils.Generator import Generator
+
+sys.setrecursionlimit(10000)
 
 
 class DEVStoneEnvironment(Coupled):
