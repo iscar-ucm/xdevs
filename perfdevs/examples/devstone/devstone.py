@@ -235,7 +235,8 @@ class HOmod(Coupled):
                 for atomic in atomics[0]:  # First row to coupled component
                     self.add_coupling(atomic.o_out, coupled.i_in2)
                 for i in range(len(atomics[1])):  # Second to first rows
-                    self.add_coupling(atomics[1][i].o_out, atomics[0][i].i_in)
+                    for j in range(len(atomics[0])):
+                        self.add_coupling(atomics[1][i].o_out, atomics[0][j].i_in)
                 for i in range(2, width):  # Rest of rows
                     for j in range(len(atomics[i])):
                         self.add_coupling(atomics[i][j].o_out, atomics[i-1][j+1].i_in)
