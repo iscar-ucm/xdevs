@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from unittest import TestCase
 
-from perfdevs.sim import Coordinator, ParallelThreadCoordinator, ParallelProcessCoordinator
-from perfdevs.examples.devstone.devstone import LI, HI, HO, DelayedAtomic
+from perfdevs.sim import Coordinator, ParallelProcessCoordinator
+from perfdevs.examples.devstone.devstone import LI, HI, HO, DelayedAtomic, HOmod
 from perfdevs.models import Atomic, Coupled
 
 import random
@@ -262,7 +262,69 @@ class TestHO(DevstoneUtilsTestCase):
                 self.assertEqual(int_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
                 self.assertEqual(ext_count, (((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
 
-
-
     def test_invalid_inputs(self):
         super().check_invalid_inputs(HO)
+
+
+class TestHOmod(DevstoneUtilsTestCase):
+
+    def test_structure(self):
+        """
+        Check structure params: atomic modules, ic's, eic's and eoc's.
+        """
+        for params_tuple in self.valid_low_params:
+            params = dict(zip(("depth", "width", "int_delay", "ext_delay"), params_tuple))
+
+            with self.subTest(**params):
+                self._check_structure(**params)
+
+    def test_structure_corner_cases(self):
+        params = {"depth": 10, "width": 1, "int_delay": 1, "ext_delay": 1}
+        self._check_structure(**params)
+        params["depth"] = 1
+        self._check_structure(**params)
+
+    def _check_structure(self, **params):
+        ho_mod_root = HOmod("HOmod_root", **params)
+        self.assertEqual(Utils.count_atomics(ho_mod_root), ((params["width"] - 1) + ((params["width"] - 1) * params["width"]) / 2) * (params["depth"] - 1) + 1)
+        self.assertEqual(Utils.count_eic(ho_mod_root), (2*(params["width"] - 1) + 1) * (params["depth"] - 1) + 1)
+        self.assertEqual(Utils.count_eoc(ho_mod_root), params["depth"])
+        # ICs relative to the "triangular" section
+        exp_ic = (((params["width"] - 2) * (params["width"] - 1)) / 2) if params["width"] > 1 else 0
+        # Plus the ones relative to the connection from the 2nd to 1st row...
+        exp_ic += (params["width"] - 1) ** 2
+        # ...and from the 1st to the couple component
+        exp_ic += params["width"] - 1
+        # Multiplied by the number of layers (except the deepest one, that doesn't have ICs)
+        exp_ic *= (params["depth"] - 1)
+        self.assertEqual(Utils.count_ic(ho_mod_root), exp_ic)
+
+    def _test_behavior(self, coord_type):
+        """
+        Check behaviour params: number of int and ext transitions.
+        """
+        for params_tuple in self.valid_low_params:
+            params = dict(zip(("depth", "width", "int_delay", "ext_delay"), params_tuple))
+
+            with self.subTest(**params):
+                ho_mod_root = HOmod("HOmod_root", **params)
+                coord = coord_type(ho_mod_root, flatten=False, chain=False)
+                coord.initialize()
+                coord.inject(ho_mod_root.i_in, 0)
+                coord.inject(ho_mod_root.i_in2, 0)
+                coord.simulate()
+
+                calc_in = lambda x, w: 1 + (x - 1)*(w - 1)
+                exp_trans = 1
+                tr_atomics = sum(range(1, params["width"]))
+                for i in range(1, params["depth"]):
+                    num_inputs = calc_in(i, params["width"])
+                    trans_first_row = (params["width"] - 1) * (num_inputs + params["width"] - 1)
+                    exp_trans += num_inputs * tr_atomics + trans_first_row
+
+                int_count, ext_count = Utils.count_transitions(ho_mod_root)
+                self.assertEqual(int_count, exp_trans)
+                self.assertEqual(ext_count, exp_trans)
+
+    def test_invalid_inputs(self):
+        super().check_invalid_inputs(HOmod)
