@@ -12,7 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-class LITest extends DevstoneUtilsTestCase {
+class HITest extends DevstoneUtilsTestCase {
 
     @Test
     void testStructure() {
@@ -22,12 +22,17 @@ class LITest extends DevstoneUtilsTestCase {
     }
 
     void testStructure(int depth, int width, int int_cycles, int ext_cycles) {
-        LI LIRoot = new LI("LI_root", depth, width, int_cycles, ext_cycles);
+        HI HIRoot = new HI("HI_root", depth, width, int_cycles, ext_cycles);
 
-        assertEquals((width - 1) * (depth - 1) + 1, DevstoneUtilsTestCase.countAtomics(LIRoot));
-        assertEquals(0, DevstoneUtilsTestCase.countIC(LIRoot));
-        assertEquals(width * (depth - 1) + 1, DevstoneUtilsTestCase.countEIC(LIRoot));
-        assertEquals(depth, DevstoneUtilsTestCase.countEOC(LIRoot));
+        int expectedIC = 0;
+        if(width > 2) {
+            expectedIC = (width - 2) * (depth - 1);
+        }
+
+        assertEquals((width - 1) * (depth - 1) + 1, DevstoneUtilsTestCase.countAtomics(HIRoot));
+        assertEquals(expectedIC, DevstoneUtilsTestCase.countIC(HIRoot));
+        assertEquals(width * (depth - 1) + 1, DevstoneUtilsTestCase.countEIC(HIRoot));
+        assertEquals(depth, DevstoneUtilsTestCase.countEOC(HIRoot));
     }
 
     @Test
@@ -38,15 +43,15 @@ class LITest extends DevstoneUtilsTestCase {
 
     @Override
     protected void testBehavior(Class<?> coordClass, int depth, int width, int int_cycles, int ext_cycles) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        DEVStone LIEnv = new DEVStone("root", "LI", depth, width, int_cycles, ext_cycles, true);
+        DEVStone HIEnv = new DEVStone("root", "HI", depth, width, int_cycles, ext_cycles, true);
         Constructor<?> cons = coordClass.getConstructor(Coupled.class);
-        Coordinator coordinator = (Coordinator) cons.newInstance(LIEnv);
+        Coordinator coordinator = (Coordinator) cons.newInstance(HIEnv);
         coordinator.initialize();
         coordinator.simulate(Double.MAX_VALUE);
-        Coupled LIRoot = (Coupled) LIEnv.getComponentByName("root_li");
-        int intTrans = DevstoneUtilsTestCase.countInternalTransitions(LIRoot);
-        int extTrans = DevstoneUtilsTestCase.countExternalTransitions(LIRoot);
-        int expectedTrans = (width - 1) * (depth - 1) + 1;
+        Coupled HIRoot = (Coupled) HIEnv.getComponentByName("root_hi");
+        int intTrans = DevstoneUtilsTestCase.countInternalTransitions(HIRoot);
+        int extTrans = DevstoneUtilsTestCase.countExternalTransitions(HIRoot);
+        int expectedTrans = (((width - 1) * width) / 2) * (depth - 1) + 1;
         assertEquals(expectedTrans, intTrans);
         assertEquals(expectedTrans, extTrans);
     }
@@ -61,7 +66,7 @@ class LITest extends DevstoneUtilsTestCase {
     @Test
     @Override
     protected void testInvalidInputs() throws NoSuchMethodException {
-        this.checkInvalidInputs(LI.class);
+        this.checkInvalidInputs(HI.class);
     }
 
 

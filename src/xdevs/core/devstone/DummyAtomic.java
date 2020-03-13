@@ -56,8 +56,6 @@ public class DummyAtomic extends Atomic {
         //    // Dhrystone code
         //}
         if (this.sigma == INFINITY) {
-            this.values.addAll(this.iIn.getValues());
-
             this.holdIn("active", prepTime);
         }
     }
@@ -65,7 +63,7 @@ public class DummyAtomic extends Atomic {
     @Override
     public void lambda() {
         if(this.oOut != null) {
-            this.oOut.addValues(this.values);
+            this.oOut.addValue(0);
         }
     }
 
