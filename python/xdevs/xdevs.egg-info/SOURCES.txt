@@ -1,9 +1,0 @@
-setup.py
-xdevs/__init__.py
-xdevs/models.py
-xdevs/sim.py
-xdevs.egg-info/PKG-INFO
-xdevs.egg-info/SOURCES.txt
-xdevs.egg-info/dependency_links.txt
-xdevs.egg-info/not-zip-safe
-xdevs.egg-info/top_level.txt
