@@ -10,21 +10,25 @@ import xdevs.core.simulation.parallel.CoordinatorParallel;
 public class DEVStone extends Coupled {
 
     public DEVStone(String name, String modelType, int depth, int width, int intDelay, int extDelay) {
+        this(name, modelType, depth, width, intDelay, extDelay, false);
+    }
+
+    public DEVStone(String name, String modelType, int depth, int width, int intDelay, int extDelay, boolean debug) {
         super(name);
 
         Coupled model;
         switch (modelType) {
             case "LI":
-                model = new LI(name + "_li", depth, width, intDelay, extDelay);
+                model = new LI(name + "_li", depth, width, intDelay, extDelay, debug);
                 break;
             case "HI":
-                model = new HI(name + "_hi", depth, width, intDelay, extDelay);
+                model = new HI(name + "_hi", depth, width, intDelay, extDelay, debug);
                 break;
             case "HO":
-                model = new HO(name + "_ho", depth, width, intDelay, extDelay);
+                model = new HO(name + "_ho", depth, width, intDelay, extDelay, debug);
                 break;
             case "HOmod":
-                model = new HOmod(name + "_homod", depth, width, intDelay, extDelay);
+                model = new HOmod(name + "_homod", depth, width, intDelay, extDelay, debug);
                 break;
             default:
                 System.out.println("DEVStone model not found");

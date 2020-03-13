@@ -10,8 +10,12 @@ public class HO extends DEVStoneWrapper {
 
     protected Port<Integer> iIn2, oOut2;
 
-    public HO(String name, int depth, int width, int intDelay, int extDelay) {
-        super(name, depth, width, intDelay, extDelay, true);
+    public HO(String name, Integer depth, Integer width, Integer intDelay, Integer extDelay) {
+        this(name, depth, width, intDelay, extDelay, false);
+    }
+
+    public HO(String name, Integer depth, Integer width, Integer intDelay, Integer extDelay, boolean stats) {
+        super(name, depth, width, intDelay, extDelay, true, stats);
 
         this.iIn2 = new Port<>("iIn2");
         this.addInPort(this.iIn2);
@@ -41,7 +45,7 @@ public class HO extends DEVStoneWrapper {
 
     @Override
     DEVStoneWrapper genCoupled() {
-        return new HO("Coupled_" + (this.depth - 1), this.depth - 1, this.width, this.intDelay, this.extDelay);
+        return new HO("Coupled_" + (this.depth - 1), this.depth - 1, this.width, this.intDelay, this.extDelay, this.stats);
     }
 
     public static void main(String[] args) {

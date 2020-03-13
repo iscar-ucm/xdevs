@@ -7,9 +7,12 @@ import java.util.logging.Level;
 
 public class HI extends DEVStoneWrapper {
 
-    public HI(String name, int depth, int width, int intDelay, int extDelay) {
-        super(name, depth, width, intDelay, extDelay, true);
+    public HI(String name, Integer depth, Integer width, Integer intDelay, Integer extDelay) {
+        this(name, depth, width, intDelay, extDelay, false);
+    }
 
+    public HI(String name, Integer depth, Integer width, Integer intDelay, Integer extDelay, boolean stats) {
+        super(name, depth, width, intDelay, extDelay, true, stats);
 
         if(this.components.size() > 1) {
             DummyAtomic atomic = ((DummyAtomic) this.components.get(this.components.size()-1));
@@ -26,7 +29,7 @@ public class HI extends DEVStoneWrapper {
 
     @Override
     DEVStoneWrapper genCoupled() {
-        return new HI("Coupled_" + (this.depth - 1), this.depth - 1, this.width, this.intDelay, this.extDelay);
+        return new HI("Coupled_" + (this.depth - 1), this.depth - 1, this.width, this.intDelay, this.extDelay, this.stats);
     }
 
     public static void main(String[] args) {

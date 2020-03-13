@@ -68,7 +68,7 @@ public class Coordinator extends AbstractSimulator {
     }
 
     public Coordinator(Coupled model) {
-        this(model, true);
+        this(model, false);
     }
     
     protected void buildHierarchy() {

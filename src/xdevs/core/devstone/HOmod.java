@@ -20,11 +20,11 @@ public class HOmod extends Coupled {
     protected int extDelay;
     protected Port<Integer> iIn, iIn2, oOut;
 
-    public HOmod(String name, int depth, int width, int intDelay, int extDelay) {
+    public HOmod(String name, Integer depth, Integer width, Integer intDelay, Integer extDelay) {
         this(name, depth, width, intDelay, extDelay, false);
     }
 
-    public HOmod(String name, int depth, int width, int intDelay, int extDelay, boolean stats) {
+    public HOmod(String name, Integer depth, Integer width, Integer intDelay, Integer extDelay, boolean stats) {
         super(name);
 
         if(depth < 1) throw new RuntimeException("Invalid depth");

@@ -14,6 +14,7 @@ abstract class DEVStoneWrapper extends Coupled {
     protected int extDelay;
     protected boolean addAtomicOutPorts;
     protected Port<Integer> iIn, oOut;
+    protected boolean stats;
 
     public DEVStoneWrapper(String name, int depth, int width, int intDelay, int extDelay, boolean addAtomicOutPorts) {
         this(name, depth, width, intDelay, extDelay, addAtomicOutPorts, false);
@@ -21,6 +22,7 @@ abstract class DEVStoneWrapper extends Coupled {
 
     public DEVStoneWrapper(String name, int depth, int width, int intDelay, int extDelay, boolean addAtomicOutPorts, boolean stats) {
         super(name);
+        this.stats = stats;
 
         if(depth < 1) throw new RuntimeException("Invalid depth");
         else if(width < 1) throw new RuntimeException("Invalid width");
