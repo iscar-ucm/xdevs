@@ -24,8 +24,8 @@ public class HO extends DEVStoneWrapper {
         this.addOutPort(this.oOut2);
 
         if(depth != 1) {
-            DEVStoneWrapper coupled = (DEVStoneWrapper) this.components.get(0);
-            this.addCoupling(this.iIn, coupled.iIn);
+            HO coupled = (HO) this.components.get(0);
+            this.addCoupling(this.iIn, coupled.iIn2);
         }
 
         if(this.components.size() > 1) {
@@ -49,18 +49,19 @@ public class HO extends DEVStoneWrapper {
     }
 
     public static void main(String[] args) {
-        int depth = 10;
-        int width = 10;
+        int depth = 3;
+        int width = 3;
         if (args.length >= 2) {
             depth = Integer.parseInt(args[0]);
             width = Integer.parseInt(args[1]);
         }
-        DevsLogger.setup(Level.SEVERE);
+        DevsLogger.setup(Level.INFO);
         HO ho = new HO("HO", depth, width, 0, 0);
 
         Coordinator coordinator = new Coordinator(ho, false);
         coordinator.initialize();
         coordinator.simInject(ho.iIn, 0);
+        coordinator.simInject(ho.iIn2, 0);
         coordinator.simulate(Long.MAX_VALUE);
         coordinator.exit();
     }
