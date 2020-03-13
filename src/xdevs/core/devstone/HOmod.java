@@ -58,7 +58,7 @@ public class HOmod extends Coupled {
             this.addCoupling(this.iIn, atomic.iIn);
             this.addCoupling(atomic.oOut, this.oOut);
         } else {
-            HOmod coupled = new HOmod("Coupled_" + (depth - 1), depth - 1, width, intDelay, extDelay);
+            HOmod coupled = new HOmod("Coupled_" + (depth - 1), depth - 1, width, intDelay, extDelay, stats);
             this.addComponent(coupled);
 
             this.addCoupling(this.iIn, coupled.iIn);
@@ -99,9 +99,11 @@ public class HOmod extends Coupled {
                     this.addCoupling(atomic.oOut, coupled.iIn2);
                 }
                 for (int i = 0; i < atomics.get(1).size(); i++) {
-                    DummyAtomic atomic = atomics.get(1).get(i);
-                    DummyAtomic topAtomic = atomics.get(0).get(i);
-                    this.addCoupling(atomic.oOut, topAtomic.iIn);
+                    for (int j = 0; j < atomics.get(0).size(); j++) {
+                        DummyAtomic atomic = atomics.get(1).get(i);
+                        DummyAtomic topAtomic = atomics.get(0).get(j);
+                        this.addCoupling(atomic.oOut, topAtomic.iIn);
+                    }
                 }
                 for (int i = 2; i < width; i++) {
                     for (int j = 0; j < atomics.get(i).size(); j++) {
