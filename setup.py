@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='perfdevs',
       version='0.1',
@@ -6,5 +6,5 @@ setup(name='perfdevs',
       url='https://github.com/jlrisco/xdevs/tree/master/perfdevs',
       author='Kevin Henares, Román Cárdenas',
       author_email='khenares@ucm.es, r.cardenas@upm.es',
-      packages=['perfdevs'],
+      packages=find_packages(),
       zip_safe=False)
