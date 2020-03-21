@@ -57,7 +57,6 @@ public abstract class Component {
     public void addInPort(Port<?> port) {
         inPorts.add(port);
         port.parent = this;
-        port.direction = Port.Direction.IN;
     }
     
     public Port<?> getInPort(String portName) {
@@ -76,7 +75,6 @@ public abstract class Component {
     public void addOutPort(Port<?> port) {
         outPorts.add(port);
         port.parent = this;
-        port.direction = Port.Direction.OUT;
     }
 
     public Port<?> getOutPort(String portName) {
@@ -98,16 +96,6 @@ public abstract class Component {
 
     public void setParent(Component parent) {
         this.parent = parent;
-    }
-
-    public void toChain() {
-        for (Port<?> port: inPorts) {
-            port.toChain();
-        }
-        for (Port<?> port: outPorts) {
-            port.toChain();
-        }
-        chained = true;
     }
 
     @Override

@@ -146,13 +146,11 @@ public class Coupled extends Component {
     @Override
     public void addInPort(Port<?> port) {
         super.addInPort(port);
-        port.direction = Port.Direction.INOUT;
     }
 
     @Override
     public void addOutPort(Port<?> port) {
         super.addOutPort(port);
-        port.direction = Port.Direction.INOUT;
     }
 
     /**
@@ -218,7 +216,7 @@ public class Coupled extends Component {
      * @param pFrom Port at the beginning of the connection
      * @param pTo Port at the end of the connection
      */
-    public void addCoupling(Port<?> pFrom, Port<?> pTo) {                
+    public void addCoupling(Port<?> pFrom, Port<?> pTo) {
         if (pFrom.getParent() == null) {
             LOGGER.severe("Port " + pFrom.getName() + " does not have a parent component. Maybe the port was not added to the component?");
             return;
@@ -279,35 +277,6 @@ public class Coupled extends Component {
 
     public LinkedList<Coupling<?>> getEOC() {
         return eoc;
-    }
-
-    @Override
-    public void toChain() {
-        for (Component component: components) {
-            component.toChain();
-        }
-        super.toChain();
-
-        for (Coupling<?> coupling: ic) {
-            chainPorts(coupling);
-        }
-        for (Coupling<?> coupling: eic) {
-            chainPorts(coupling);
-        }
-        for (Coupling<?> coupling: eoc) {
-            chainPorts(coupling);
-        }
-    }
-
-    public static void chainPorts(Coupling<?> coupling) {
-        coupling.portFrom.addCouplingOut(coupling);
-        coupling.portTo.addCouplingIn(coupling);
-    }
-
-    public void in2Out() {
-        for (Port<?> port: inPorts) {
-            port.direction = Port.Direction.OUT;
-        }
     }
 
     /**

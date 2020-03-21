@@ -7,3 +7,7 @@ target
 xdevs.iml
 out/
 *.iml
+
+# Apache netbeans
+nb-configuration.xml
+nbactions.xml

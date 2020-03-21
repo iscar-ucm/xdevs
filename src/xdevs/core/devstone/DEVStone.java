@@ -2,8 +2,6 @@ package xdevs.core.devstone;
 
 import xdevs.core.modeling.Coupled;
 import xdevs.core.simulation.Coordinator;
-import xdevs.core.simulation.chained.CoordinatorChained;
-import xdevs.core.simulation.chained.CoordinatorChainedParallel;
 import xdevs.core.simulation.parallel.CoordinatorParallel;
 
 
@@ -59,7 +57,7 @@ public class DEVStone extends Coupled {
         System.out.println("    - <WIDTH>: DEVStone model's width (it must be an integer)");
         System.out.println("    - <INTERNAL_DELAY>: DEVStone model's internal transition delay in ms (it must be an integer)");
         System.out.println("    - <EXTERNAL_DELAY>: DEVStone model's external transition delay in ms (it must be an integer)");
-        System.out.println("    - <COORDINATOR>: Desired xDEVS coordinator type for simulating the model (coord, chained, parallel, or chainedparallel)");
+        System.out.println("    - <COORDINATOR>: Desired xDEVS coordinator type for simulating the model (coord, parallel)");
         System.out.println("    - <FLATTEN>: Flag for flattening the model before simulation (true or false)");
     }
 
@@ -99,14 +97,8 @@ public class DEVStone extends Coupled {
             case "coord":
                 coord = new Coordinator(devstone, flatten);
                 break;
-            case "chained":
-                coord = new CoordinatorChained(devstone, flatten);
-                break;
             case "parallel":
                 coord = new CoordinatorParallel(devstone);
-                break;
-            case "chainedparallel":
-                coord = new CoordinatorChainedParallel(devstone);
                 break;
             default:
                 System.out.println("xDEVS coordinator type not found");

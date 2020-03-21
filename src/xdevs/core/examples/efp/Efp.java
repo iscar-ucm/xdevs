@@ -26,8 +26,6 @@ import java.util.logging.Level;
 import xdevs.core.modeling.Coupled;
 import xdevs.core.modeling.Port;
 import xdevs.core.simulation.Coordinator;
-import xdevs.core.simulation.chained.CoordinatorChained;
-import xdevs.core.simulation.chained.CoordinatorChainedParallel;
 import xdevs.core.util.DevsLogger;
 
 /**
@@ -55,7 +53,7 @@ public class Efp extends Coupled {
     public static void main(String args[]) {
         DevsLogger.setup(Level.FINE);
         Efp efp = new Efp("efp", 1, 3, 100000);
-        Coordinator coordinator = new CoordinatorChainedParallel(efp);
+        Coordinator coordinator = new Coordinator(efp);
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
         coordinator.exit();
