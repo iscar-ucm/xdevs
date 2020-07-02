@@ -1,12 +1,11 @@
-
-from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
+from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, get_logger
 from xdevs.models import Atomic, Coupled, Port
-from xdevs.sim import Coordinator
-import logging
+from xdevs.sim import Coordinator, ParallelCoordinator
 
-logging.basicConfig(level=logging.DEBUG)
+logger = get_logger(__name__)
 
 PHASE_DONE = "done"
+
 
 class Job:
 	
@@ -106,8 +105,6 @@ class Transducer(Atomic):
 		
 	def deltint(self):
 		self.clock += self.sigma
-		throughput = 0
-		avg_ta = 0
 		
 		if self.phase == PHASE_ACTIVE:
 			if self.jobs_solved:
@@ -117,13 +114,13 @@ class Transducer(Atomic):
 				avg_ta = 0
 				throughput = 0
 				
-			logging.info("End time: %d" % self.clock)
-			logging.info("Jobs arrived: %d" % len(self.jobs_arrived))
-			logging.info("Jobs solved: %d" % len(self.jobs_solved))
-			logging.info("Average TA: %d" % avg_ta)
-			logging.info("Throughput: %d\n" % throughput)
+			logger.info("End time: %f" % self.clock)
+			logger.info("Jobs arrived: %d" % len(self.jobs_arrived))
+			logger.info("Jobs solved: %d" % len(self.jobs_solved))
+			logger.info("Average TA: %f" % avg_ta)
+			logger.info("Throughput: %f\n" % throughput)
 			
-			self.hold_in(PHASE_DONE, 0);
+			self.hold_in(PHASE_DONE, 0)
 		else:
 			self.passivate()
 			
@@ -131,18 +128,16 @@ class Transducer(Atomic):
 		self.clock += e
 		
 		if self.phase == PHASE_ACTIVE:
-			job = None
-			
 			if self.i_arrived:
 				job = self.i_arrived.get()
-				logging.info("Starting job %s @ t = %d" % (job.name, self.clock))
+				logger.info("Starting job %s @ t = %d" % (job.name, self.clock))
 				job.time = self.clock
 				self.jobs_arrived.append(job)
 				
 			if self.i_solved:
 				job = self.i_solved.get()
-				logging.info("Job %s finished @ t = %d" % (job.name, self.clock))
-				job.time = self.clock
+				logger.info("Job %s finished @ t = %d" % (job.name, self.clock))
+				self.total_ta += self.clock - job.time
 				self.jobs_solved.append(job)
 	
 	def lambdaf(self):
@@ -151,25 +146,44 @@ class Transducer(Atomic):
 		
 
 class Gpt(Coupled):
-
 	def __init__(self, name, period, obs_time):
 		super().__init__(name)
-		
+
+		if period < 1:
+			raise ValueError("period has to be greater than 0")
+
+		if obs_time < 0:
+			raise ValueError("obs_time has to be greater or equal than 0")
+
 		gen = Generator("generator", period)
 		proc = Processor("processor", 3*period)
 		trans = Transducer("transducer", obs_time)
-		
+
 		self.add_component(gen)
 		self.add_component(proc)
 		self.add_component(trans)
-		
+
 		self.add_coupling(gen.o_out, proc.i_in)
 		self.add_coupling(gen.o_out, trans.i_arrived)
 		self.add_coupling(proc.o_out, trans.i_solved)
 		self.add_coupling(trans.o_out, gen.i_stop)
-		
-	
-gpt = Gpt("gpt", 1, 100)
-coord = Coordinator(gpt)
-coord.initialize()
-coord.simulate()
+
+
+class Wrap(Coupled):
+	def __init__(self, name, period, obs_time):
+		super().__init__("wrap")
+
+		gpt = Gpt(name, period, obs_time)
+
+		self.add_component(gpt)
+
+
+if __name__ == '__main__':
+	wrap = Wrap("gpt", 3, 1000)
+	parallel = False
+	if parallel:
+		coord = ParallelCoordinator(wrap, flatten=False, chain=False)
+	else:
+		coord = Coordinator(wrap, flatten=False, chain=False)
+	coord.initialize()
+	coord.simulate()
