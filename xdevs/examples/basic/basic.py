@@ -1,11 +1,11 @@
 from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, get_logger
 from xdevs.models import Atomic, Coupled, Port
 from xdevs.sim import Coordinator, ParallelCoordinator
+import logging
 
-logger = get_logger(__name__)
+logger = get_logger(__name__, logging.DEBUG)
 
 PHASE_DONE = "done"
-
 
 class Job:
 	

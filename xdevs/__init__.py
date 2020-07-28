@@ -9,16 +9,15 @@ PHASE_ACTIVE = "active"
 DEBUG_LEVEL = None
 loggers = dict()
 
-def get_logger(name):
-    raise RuntimeError()
+def get_logger(name, dl=None):
     if name in loggers:
         return loggers[name]
     else:
         logger = logging.getLogger(name)
 
-        if DEBUG_LEVEL:
+        if dl or DEBUG_LEVEL:
             handler = logging.StreamHandler(sys.stdout)
-            handler.setLevel(DEBUG_LEVEL)
+            handler.setLevel(dl or DEBUG_LEVEL)
             logger.addHandler(handler)
             logger.setLevel(logging.DEBUG)
         else:
@@ -26,4 +25,3 @@ def get_logger(name):
 
         loggers[name] = logger
         return logger
-
