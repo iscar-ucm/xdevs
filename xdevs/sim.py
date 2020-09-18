@@ -75,7 +75,6 @@ class Simulator(AbstractSimulator):
             self.model.deltint()
         else:
             e = t - self.time_last
-            self.model.sigma -= e
 
             if t == self.time_next:
                 self.model.deltcon(e)

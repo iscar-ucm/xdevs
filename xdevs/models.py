@@ -256,6 +256,11 @@ class Atomic(Component, ABC):
         """
         self.deltint()
         self.deltext(0)
+        """
+        The other alternative would be this:
+            self.deltext(e)
+            self.deltint()
+        """
 
     def hold_in(self, phase: Any, sigma: Any):
         """
