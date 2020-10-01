@@ -3,13 +3,13 @@ package modeling
 type Coupled interface {
 	Component
 	AddCoupling(pFrom *Port, pTo *Port)
+	GetComponent() *Component
 	GetComponents() []*Component
 	GetComponentByName(name string) *Component
 	AddComponent(comp *Component)
 	GetIC() []*Coupling
 	GetEIC() []*Coupling
 	GetEOC() []*Coupling
-	RemovePortsAndCouplings(child *Component)
 }
 
 func NewCoupled(name string) Coupled {
@@ -22,6 +22,10 @@ type coupled struct {
 	components []*Component
 	ic, eic, eoc []*Coupling
 }
+
+func (c *coupled) Initialize() { }
+
+func (c *coupled) Exit() { }
 
 func (c *coupled) AddCoupling(pFrom *Port, pTo *Port) {
 	for _, p := range []*Port{pFrom, pTo} {
@@ -37,6 +41,10 @@ func (c *coupled) AddCoupling(pFrom *Port, pTo *Port) {
 	} else {
 		c.ic = append(c.ic, &coup)
 	}
+}
+
+func (c *coupled) GetComponent() *Component {
+	return &c.Component
 }
 
 func (c *coupled) GetComponents() []*Component {
@@ -67,8 +75,4 @@ func (c *coupled) GetEIC() []*Coupling {
 
 func (c *coupled) GetEOC() []*Coupling {
 	return c.eoc
-}
-
-func (c *coupled) RemovePortsAndCouplings(child *Component) {
-	panic("implement me")
 }

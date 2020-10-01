@@ -38,7 +38,6 @@ func (s *simulator) DeltFcn() {
 			(*s.model).DeltInt()
 		} else {
 			e := t - s.GetTL()
-			(*s.model).SetSigma((*s.model).GetSigma() - e)
 			// CASE 2: both atomic model timed out and messages were received -> confluent delta
 			if t == s.GetTN() {
 				(*s.model).DeltCon(e)
@@ -58,7 +57,7 @@ func (s *simulator) Lambda() {
 	}
 }
 
-func (s *simulator) Clear() {  // TODO
+func (s *simulator) Clear() {
 	for _, port := range (*s.model).GetInPorts() {
 		(*port).Clear()
 	}

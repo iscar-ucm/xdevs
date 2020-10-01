@@ -67,7 +67,7 @@ func (p *port) GetParent() *Component {
 	return p.parent
 }
 
-func (p *port) String() string { // TODO implement this function
+func (p *port) String() string {
 	name := p.Name
 	auxComponent := p.parent
 	for auxComponent != nil {
