@@ -4,8 +4,9 @@ import "reflect"
 
 type Port interface {
 	GetName() string
-	Clear()
+	Length() int
 	IsEmpty() bool
+	Clear()
 	AddValue(val interface{})
 	AddValues(val interface{})
 	GetSingleValue() interface{}
@@ -18,7 +19,7 @@ type Port interface {
 func NewPort(name string, portValue interface{}) Port {
 	switch reflect.ValueOf(portValue).Kind() {
 	case reflect.Slice:
-		p := port{Name: name, parent:nil, values:portValue}
+		p := port{name: name, parent:nil, values:portValue}
 		p.Clear()
 		return &p
 	default:
@@ -27,13 +28,25 @@ func NewPort(name string, portValue interface{}) Port {
 }
 
 type port struct {
-	Name   string
+	name   string
 	parent *Component
 	values interface{}
 }
 
+func (p *port) GetName() string {
+	return p.name
+}
+
+func (p *port) Length() int {
+	return reflect.ValueOf(p.values).Len()
+}
+
 func (p *port) IsEmpty() bool {
-	return reflect.ValueOf(p.values).Len() == 0
+	return p.Length() == 0
+}
+
+func (p *port) Clear() {
+	p.values = reflect.MakeSlice(reflect.TypeOf(p.values), 0, 0).Interface()
 }
 
 func (p *port) AddValue(val interface{}) {
@@ -68,19 +81,11 @@ func (p *port) GetParent() *Component {
 }
 
 func (p *port) String() string {
-	name := p.Name
+	name := p.name
 	auxComponent := p.parent
 	for auxComponent != nil {
 		name = (*auxComponent).GetName() + "." + name
 		auxComponent = (*auxComponent).GetParent()
 	}
 	return name
-}
-
-func (p *port) GetName() string {
-	return p.Name
-}
-
-func (p *port) Clear() {
-	p.values = reflect.MakeSlice(reflect.TypeOf(p.values), 0, 0).Interface()
 }
