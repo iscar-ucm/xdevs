@@ -1,34 +1,32 @@
 package modeling
 
-type Coupling interface {
-	String() string
-	PropagateValues()
-	GetPortFrom() *Port
-	getPortTo() *Port
-}
+import "reflect"
 
-func NewCoupling(portFrom *Port, portTo *Port) Coupling {
-	c := coupling{portFrom, portTo}
-	return &c
-}
-
-type coupling struct {
+type Coupling struct {
 	portFrom *Port
 	portTo *Port
 }
 
-func (c *coupling) String() string {
-	return "(" + (*c.portFrom).GetName() + "->" + (*c.portTo).GetName() + ")"
+func NewCoupling(portFrom *Port, portTo *Port) *Coupling {
+	if reflect.TypeOf(portFrom.GetValues()) != reflect.TypeOf(portTo.GetValues()) {
+		panic("Both ports of a coupling must be of the same type")
+	}
+	c := Coupling{portFrom, portTo}
+	return &c
 }
 
-func (c *coupling) PropagateValues() {
-	(*c.portTo).AddValues((*c.portFrom).GetValues())
+func (c *Coupling) String() string {
+	return "(" + c.portFrom.GetName() + "->" + c.portTo.GetName() + ")"
 }
 
-func (c *coupling) GetPortFrom() *Port {
+func (c *Coupling) PropagateValues() {
+	c.portTo.AddValues(c.portFrom.GetValues())
+}
+
+func (c *Coupling) GetPortFrom() *Port {
 	return c.portFrom
 }
 
-func (c *coupling) getPortTo() *Port {
+func (c *Coupling) GetPortTo() *Port {
 	return c.portTo
 }

@@ -1,7 +1,6 @@
 package modeling
 
 import (
-	"fmt"
 	"github.com/pointlesssoft/godevs/modeling"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -13,23 +12,35 @@ func TestPort(t *testing.T) {
 	assert.True(t, port1.IsEmpty(), "Initially, port should be empty")
 	port2 := modeling.NewPort("string_port", []string{"hello", "world"})
 	assert.True(t, port2.IsEmpty(), "Initially, port should be empty")
-	fmt.Printf("Port 1: %s\n", port1.String())
-	fmt.Printf("Port 2: %s\n", port2.String())
+
 	/* 2. Check that ports do not accept new values of a different type */
 	assert.Panics(t, func() {port1.AddValue("invalid")}, "Port of type %T should not admit values of type ", 0, "invalid")
 	assert.Panics(t, func() {port2.AddValue(0)}, "Port of type %T should not admit values of type ", "invalid", 0)
+
 	/* 3. Check that ports accept new values of their corresponding type */
 	port1.AddValue(1)
 	port1.AddValues([]int{2, 3, 4})
-	assert.Equal(t, 4, port1.Length())
+	assert.Equal(t, 4, port1.Length(), "Port size should be 4")
 	port2.AddValue("Hello")
 	port2.AddValues([]string{"World", "!"})
-	assert.Equal(t, 3, port2.Length())
+	assert.Equal(t, 3, port2.Length(), "Port size should be 3")
+
+	/* 3. Check that the GetSingleValue and GetValue functions works */
+	assert.EqualValues(t, 1, port1.GetSingleValue().(int), "First element should be 1")
+	assert.EqualValues(t, port1.Length(), len(port1.GetValues().([]int)), "Length should be the same")
+	assert.EqualValues(t, "Hello", port2.GetSingleValue().(string), "First element should be \"Hello\"")
+	assert.EqualValues(t, port2.Length(), len(port2.GetValues().([]string)), "Length should be the same")
+
 	/* 4. Check that the Clear function works */
 	port1.Clear()
 	assert.True(t, port1.IsEmpty(), "After clearing it, port should be empty")
+	assert.Panics(t, func() {port1.GetSingleValue()}, "As port is empty, it should panic")
+	assert.Equal(t, 0, len(port1.GetValues().([]int)), "Slice should be empty")
 	port2.Clear()
 	assert.True(t, port2.IsEmpty(), "After clearing it, port should be empty")
+	assert.Panics(t, func() { port2.GetSingleValue() }, "As port is empty, it should panic")
+	assert.Equal(t, 0, len(port2.GetValues().([]string)), "Slice should be empty")
+
 	/* 5. Check that the initial parent of ports is nil */
 	assert.Nil(t, port1.GetParent(), "If port was not created by atomic model, parent should be nil")
 	assert.Nil(t, port2.GetParent(), "If port was not created by atomic model, parent should be nil")
