@@ -4,14 +4,14 @@ import "github.com/pointlesssoft/godevs/modeling"
 
 type EF struct {
 	modeling.Coupled
-	iStart *modeling.Port
-	iIn *modeling.Port
-	oOut *modeling.Port
+	iStart modeling.Port
+	iIn modeling.Port
+	oOut modeling.Port
 }
 
 func NewEF(name string, period float64, observationTime float64) *EF {
 	ef := EF{
-		*modeling.NewCoupled(name),
+		modeling.NewCoupled(name),
 		modeling.NewPort("iStart", make([]Job, 0)),
 		modeling.NewPort("iIn", make([]Job, 0)),
 		modeling.NewPort("oOut", make([]Job, 0)),

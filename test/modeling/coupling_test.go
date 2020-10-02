@@ -15,7 +15,7 @@ func TestCoupling(t *testing.T) {
 	port2To := modeling.NewPort("string_port_from", make([]string, 0))
 
 	/* 2. Check that couplings between ports of same value type are created with no problems */
-	var coupling1, coupling2 *modeling.Coupling
+	var coupling1, coupling2 modeling.Coupling
 	assert.NotPanics(t, func() { coupling1 = modeling.NewCoupling(port1From, port1To) })
 	assert.NotPanics(t, func() { coupling2 = modeling.NewCoupling(port2From, port2To) })
 

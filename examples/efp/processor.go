@@ -7,15 +7,15 @@ import (
 
 type Processor struct {
 	modeling.Atomic
-	iIn *modeling.Port
-	oOut *modeling.Port
+	iIn modeling.Port
+	oOut modeling.Port
 	currentJob Job
 	processingTime float64
 }
 
 func NewProcessor(name string, processingTime float64) *Processor {
 	p := Processor{
-		*modeling.NewAtomic(name),
+		modeling.NewAtomic(name),
 		modeling.NewPort("iIn", make([]Job, 0)),
 		modeling.NewPort("oOut", make([]Job, 0)),
 		Job{},
@@ -37,11 +37,11 @@ func (p *Processor) DeltInt() {
 }
 
 func (p *Processor) DeltExt(e float64) {
-	if p.GetPhase() == util.PhasePassive {
+	if p.GetPhase() == util.PASSIVE {
 		p.currentJob = p.iIn.GetSingleValue().(Job)
-		p.HoldIn(util.PhaseActive, p.processingTime)
+		p.HoldIn(util.ACTIVE, p.processingTime)
 	} else {
-		p.HoldIn(util.PhaseActive, p.GetSigma() - e)
+		p.HoldIn(util.ACTIVE, p.GetSigma() - e)
 	}
 }
 

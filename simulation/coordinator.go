@@ -8,29 +8,29 @@ import (
 
 type Coordinator struct {
 	AbstractSimulator
-	model modeling.CoupledInterface
-	simulators []AbstractSimulatorInterface
+	model modeling.Coupled
+	simulators []AbstractSimulator
 	totalIterations int
 }
 
-func NewRootCoordinator(initialTime float64, model modeling.CoupledInterface) *Coordinator {
-	return NewCoordinator(NewSimulationClock(initialTime), model)
+func NewRootCoordinator(initialTime float64, model modeling.Coupled) *Coordinator {
+	return NewCoordinator(NewClock(initialTime), model)
 }
 
-func NewCoordinator(clock *Clock, model modeling.CoupledInterface) *Coordinator {
-	c := Coordinator{*NewAbstractSimulator(clock), model, nil, 0}
+func NewCoordinator(clock Clock, model modeling.Coupled) *Coordinator {
+	c := Coordinator{NewAbstractSimulator(clock), model, nil, 0}
 	return &c
 }
 
 func (c *Coordinator) buildHierarchy() {
 	components := c.model.GetComponents()
 	for _, component := range components {
-		var simulator AbstractSimulatorInterface
-		_, ok := interface{}(component).(modeling.CoupledInterface)
+		var simulator AbstractSimulator
+		_, ok := interface{}(component).(modeling.Coupled)
 		if ok {
-			simulator = NewCoordinator(c.clock, component.(modeling.CoupledInterface))
+			simulator = NewCoordinator(c.GetClock(), component.(modeling.Coupled))
 		} else {
-			simulator = NewSimulator(c.clock, component.(modeling.AtomicInterface))
+			simulator = NewSimulator(c.GetClock(), component.(modeling.Atomic))
 		}
 		c.simulators = append(c.simulators, simulator)
 	}
@@ -51,7 +51,7 @@ func (c *Coordinator) Exit() {
 	}
 }
 
-func (c *Coordinator) GetSimulators() []AbstractSimulatorInterface {
+func (c *Coordinator) GetSimulators() []AbstractSimulator {
 	return c.simulators
 }
 
@@ -69,16 +69,15 @@ func (c *Coordinator) TA() float64 {
 func (c *Coordinator) Lambda() {
 	for _, sim := range c.simulators {  // TODO parallelize
 		sim.Lambda()
-		c.PropagateOutput()
 	}
+	c.PropagateOutput()
 }
 
 func (c *Coordinator) PropagateOutput() {  // TODO parallelize
-	for _, coup := range c.model.GetIC() {
-		coup.PropagateValues()
-	}
-	for _, coup := range c.model.GetEOC() {
-		coup.PropagateValues()
+	for _, coups := range [][]modeling.Coupling{c.model.GetIC(), c.model.GetEOC()} {
+		for _, coup := range coups {
+			coup.PropagateValues()
+		}
 	}
 }
 
@@ -101,14 +100,14 @@ func (c *Coordinator) Clear() {
 	for _, sim := range c.simulators {
 		sim.Clear()
 	}
-	for _, ports := range [][]*modeling.Port{c.model.GetInPorts(), c.model.GetOutPorts()} {
+	for _, ports := range [][]modeling.Port{c.model.GetInPorts(), c.model.GetOutPorts()} {
 		for _, port := range ports {
 			port.Clear()
 		}
 	}
 }
 
-func (c *Coordinator) SimInject(e float64, port *modeling.Port, values interface{}) {
+func (c *Coordinator) SimInject(e float64, port modeling.Port, values interface{}) {
 	time := c.GetClock().GetTime() + e
 	if time <= c.GetTN() {
 		port.AddValues(values)
@@ -122,10 +121,7 @@ func (c *Coordinator) SimInject(e float64, port *modeling.Port, values interface
 
 func (c *Coordinator) SimulateIterations(numIterations int) {
 	for numIterations > 0 && c.GetTN() < util.INFINITY {
-		c.GetClock().SetTime(c.GetTN())
-		c.Lambda()
-		c.DeltFcn()
-		c.Clear()
+		c.simulateSingleCycle()
 		c.totalIterations++
 		numIterations--
 	}
@@ -134,14 +130,18 @@ func (c *Coordinator) SimulateIterations(numIterations int) {
 func (c *Coordinator) SimulateTime(timeInterval float64) {
 	tF := c.GetClock().GetTime() + timeInterval
 	for c.GetClock().GetTime() < util.INFINITY && c.GetTN() < tF {
-		c.GetClock().SetTime(c.GetTN())
-		c.Lambda()
-		c.DeltFcn()
-		c.Clear()
+		c.simulateSingleCycle()
 	}
 	c.GetClock().SetTime(tF)
 }
 
-func (c *Coordinator) GetModel() modeling.ComponentInterface {
-	return c.model.GetComponent()
+func (c *Coordinator) GetModel() modeling.Component {
+	return c.model
+}
+
+func (c *Coordinator) simulateSingleCycle() {
+	c.GetClock().SetTime(c.GetTN())
+	c.Lambda()
+	c.DeltFcn()
+	c.Clear()
 }

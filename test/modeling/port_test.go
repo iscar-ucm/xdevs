@@ -14,16 +14,16 @@ func TestPort(t *testing.T) {
 	assert.True(t, port2.IsEmpty(), "Initially, port should be empty")
 
 	/* 2. Check that ports do not accept new values of a different type */
-	assert.Panics(t, func() {port1.AddValue("invalid")}, "Port of type %T should not admit values of type ", 0, "invalid")
-	assert.Panics(t, func() {port2.AddValue(0)}, "Port of type %T should not admit values of type ", "invalid", 0)
+	assert.Panics(t, func() {port1.AddValue("invalid")}, "port of type %T should not admit values of type ", 0, "invalid")
+	assert.Panics(t, func() {port2.AddValue(0)}, "port of type %T should not admit values of type ", "invalid", 0)
 
 	/* 3. Check that ports accept new values of their corresponding type */
 	port1.AddValue(1)
 	port1.AddValues([]int{2, 3, 4})
-	assert.Equal(t, 4, port1.Length(), "Port size should be 4")
+	assert.Equal(t, 4, port1.Length(), "port size should be 4")
 	port2.AddValue("Hello")
 	port2.AddValues([]string{"World", "!"})
-	assert.Equal(t, 3, port2.Length(), "Port size should be 3")
+	assert.Equal(t, 3, port2.Length(), "port size should be 3")
 
 	/* 3. Check that the GetSingleValue and GetValue functions works */
 	assert.EqualValues(t, 1, port1.GetSingleValue().(int), "First element should be 1")

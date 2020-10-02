@@ -6,12 +6,12 @@ import (
 
 type EFP struct {
 	modeling.Coupled
-	iStart *modeling.Port
+	iStart modeling.Port
 }
 
 func NewEFP(name string, generatorPeriod float64, processorPeriod float64, transducerPeriod float64) *EFP {
 	efp := EFP {
-		*modeling.NewCoupled(name),
+		modeling.NewCoupled(name),
 		modeling.NewPort("iStart", make([]Job, 0)),
 	}
 	efp.AddInPort(efp.iStart)

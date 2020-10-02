@@ -7,10 +7,10 @@ import (
 )
 
 type Transducer struct {
-	modeling.AtomicInterface
-	iArrived *modeling.Port
-	iSolved *modeling.Port
-	oOut *modeling.Port
+	modeling.Atomic
+	iArrived modeling.Port
+	iSolved modeling.Port
+	oOut modeling.Port
 	jobsArrived []Job
 	jobsSolved []Job
 	observationTime float64
@@ -37,7 +37,7 @@ func NewTransducer(name string, observationTime float64) *Transducer {
 }
 
 func (t *Transducer) Initialize() {
-	t.HoldIn(util.PhaseActive, t.observationTime)
+	t.HoldIn(util.ACTIVE, t.observationTime)
 }
 
 func (t *Transducer) Exit() {}
@@ -45,7 +45,7 @@ func (t *Transducer) Exit() {}
 func (t *Transducer) DeltInt() {
 	t.clock += t.GetSigma()
 	throughput, avgTaTime := 0.0, 0.0
-	if t.GetPhase() == util.PhaseActive {
+	if t.GetPhase() == util.ACTIVE {
 		if len(t.jobsSolved) > 0 {
 			avgTaTime = t.totalTA / float64(len(t.jobsSolved))
 			if t.clock > 0 {
@@ -65,7 +65,7 @@ func (t *Transducer) DeltInt() {
 
 func (t *Transducer) DeltExt(e float64) {
 	t.clock += e
-	if t.PhaseIs(util.PhaseActive) {
+	if t.PhaseIs(util.ACTIVE) {
 		job := Job{}
 		if !t.iArrived.IsEmpty() {
 			job = t.iArrived.GetSingleValue().(Job)

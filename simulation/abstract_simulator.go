@@ -2,76 +2,76 @@ package simulation
 
 import "github.com/pointlesssoft/godevs/modeling"
 
-type AbstractSimulatorInterface interface {
+type AbstractSimulator interface {
 	Initialize()
 	Exit()
 	TA() float64
 	Lambda()
 	DeltFcn()
 	Clear()
-	GetModel() modeling.ComponentInterface
+	GetModel() modeling.Component
 	GetTL() float64
 	SetTL(tl float64)
 	GetTN() float64
 	SetTN(tn float64)
-	GetClock() *Clock
+	GetClock() Clock
 }
 
-type AbstractSimulator struct {
-	clock *Clock
+func NewAbstractSimulator(clock Clock) AbstractSimulator {
+	s := abstractSimulator{clock, 0, 0}
+	return &s
+}
+
+type abstractSimulator struct {
+	clock Clock
 	tL float64  // Time of last event
 	tN float64  // Time of next event
 }
 
-func NewAbstractSimulator(clock *Clock) *AbstractSimulator {
-	s := AbstractSimulator{clock, 0, 0}
-	return &s
-}
-
-func (a *AbstractSimulator) Initialize() {
+func (a *abstractSimulator) Initialize() {
 	panic("implement me")
 }
 
-func (a *AbstractSimulator) Exit() {
+func (a *abstractSimulator) Exit() {
 	panic("implement me")
 }
 
-func (a *AbstractSimulator) TA() float64 {
+func (a *abstractSimulator) TA() float64 {
 	panic("implement me")
 }
 
-func (a *AbstractSimulator) Lambda() {
+func (a *abstractSimulator) Lambda() {
 	panic("implement me")
 }
 
-func (a *AbstractSimulator) DeltFcn() {
+func (a *abstractSimulator) DeltFcn() {
 	panic("implement me")
 }
 
-func (a *AbstractSimulator) Clear() {
+func (a *abstractSimulator) Clear() {
 	panic("implement me")
 }
 
-func (a *AbstractSimulator) GetModel() modeling.ComponentInterface {
+func (a *abstractSimulator) GetModel() modeling.Component {
 	panic("implement me")
 }
 
-func (a *AbstractSimulator) GetTL() float64 {
+func (a *abstractSimulator) GetTL() float64 {
 	return a.tL
 }
 
-func (a *AbstractSimulator) SetTL(tL float64) {
+func (a *abstractSimulator) SetTL(tL float64) {
 	a.tL = tL
 }
 
-func (a *AbstractSimulator) GetTN() float64 {
+func (a *abstractSimulator) GetTN() float64 {
 	return a.tN
 }
 
-func (a *AbstractSimulator) SetTN(tN float64) {
+func (a *abstractSimulator) SetTN(tN float64) {
 	a.tN = tN
 }
 
-func (a *AbstractSimulator) GetClock() *Clock {
+func (a *abstractSimulator) GetClock() Clock {
 	return a.clock
 }

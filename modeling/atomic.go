@@ -5,8 +5,8 @@ import (
 	"github.com/pointlesssoft/godevs/util"
 )
 
-type AtomicInterface interface {
-	ComponentInterface
+type Atomic interface {
+	Component
 	TA() float64
 	DeltInt()
 	DeltExt(e float64)
@@ -17,7 +17,6 @@ type AtomicInterface interface {
 	Passivate()
 	PassivateIn(phase string)
 	PhaseIs(phase string) bool
-	GetComponent() *Component
 	GetPhase() string
 	SetPhase(phase string)
 	GetSigma() float64
@@ -25,83 +24,79 @@ type AtomicInterface interface {
 	ShowState() string
 }
 
-type Atomic struct {
+func NewAtomic(name string) Atomic {
+	a := atomic{NewComponent(name), util.PASSIVE, util.INFINITY}
+	return &a
+}
+
+type atomic struct {
 	Component
 	phase string
 	sigma float64
 }
 
-func NewAtomic(name string) *Atomic {
-	a := Atomic{*NewComponent(name), util.PhasePassive, util.INFINITY}
-	return &a
-}
-
-func (a *Atomic) TA() float64 {
+func (a *atomic) TA() float64 {
 	return a.sigma
 }
 
-func (a *Atomic) DeltInt() {
+func (a *atomic) DeltInt() {
 	panic("implement me")
 }
 
-func (a *Atomic) DeltExt(e float64) {
+func (a *atomic) DeltExt(e float64) {
 	panic("implement me")
 }
 
-func (a *Atomic) DeltCon(e float64) {
+func (a *atomic) DeltCon(e float64) {
 	a.DeltInt()
 	a.DeltExt(0)
 }
 
-func (a *Atomic) Lambda() {
+func (a *atomic) Lambda() {
 	panic("implement me")
 }
 
-func (a *Atomic) HoldIn(phase string, sigma float64) {
+func (a *atomic) HoldIn(phase string, sigma float64) {
 	a.phase = phase
 	a.sigma = sigma
 }
 
-func (a *Atomic) Activate() {
-	a.phase = util.PhaseActive
+func (a *atomic) Activate() {
+	a.phase = util.ACTIVE
 	a.sigma = 0
 }
 
-func (a *Atomic) Passivate() {
-	a.phase = util.PhasePassive
+func (a *atomic) Passivate() {
+	a.phase = util.PASSIVE
 	a.sigma = util.INFINITY
 }
 
-func (a *Atomic) PassivateIn(phase string) {
+func (a *atomic) PassivateIn(phase string) {
 	a.phase = phase
 	a.sigma = util.INFINITY
 }
 
-func (a *Atomic) PhaseIs(phase string) bool {
+func (a *atomic) PhaseIs(phase string) bool {
 	return a.phase == phase
 }
 
-func (a *Atomic) GetComponent() *Component {
-	return &a.Component
-}
-
-func (a *Atomic) GetPhase() string {
+func (a *atomic) GetPhase() string {
 	return a.phase
 }
 
-func (a *Atomic) SetPhase(phase string) {
+func (a *atomic) SetPhase(phase string) {
 	a.phase = phase
 }
 
-func (a *Atomic) GetSigma() float64 {
+func (a *atomic) GetSigma() float64 {
 	return a.sigma
 }
 
-func (a *Atomic) SetSigma(sigma float64) {
+func (a *atomic) SetSigma(sigma float64) {
 	a.sigma = sigma
 }
 
-func (a *Atomic) ShowState() string {
+func (a *atomic) ShowState() string {
 	state := a.GetName() + " [ "
 	state += "\tstate: " + a.phase
 	state += "\tsigma: " + fmt.Sprintf("%f", a.sigma)

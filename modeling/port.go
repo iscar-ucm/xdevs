@@ -2,48 +2,60 @@ package modeling
 
 import "reflect"
 
-type Port struct {
-	name   string
-	parent ComponentInterface
-	values interface{}
+type Port interface {
+	GetName() string
+	Length() int
+	IsEmpty() bool
+	Clear()
+	AddValue(val interface{})
+	AddValues(val interface{})
+	GetSingleValue() interface{}
+	GetValues() interface{}
+	setParent(c Component)
+	GetParent() Component
+	String() string
 }
 
-func NewPort(name string, portValue interface{}) *Port {
+func NewPort(name string, portValue interface{}) Port {
 	switch reflect.ValueOf(portValue).Kind() {
 	case reflect.Slice:
-		p := Port{name, nil, portValue}
+		p := port{name, nil, portValue}
 		p.Clear()
 		return &p
 	default:
-		panic("Port Value must be of kind reflect.Slice")
+		panic("port Value must be of kind reflect.Slice")
 	}
 }
 
+type port struct {
+	name   string
+	parent Component
+	values interface{}
+}
 
-
-func (p *Port) GetName() string {
+func (p *port) GetName() string {
 	return p.name
 }
 
-func (p *Port) Length() int {
+func (p *port) Length() int {
 	return reflect.ValueOf(p.values).Len()
 }
 
-func (p *Port) IsEmpty() bool {
+func (p *port) IsEmpty() bool {
 	return p.Length() == 0
 }
 
-func (p *Port) Clear() {
+func (p *port) Clear() {
 	p.values = reflect.MakeSlice(reflect.TypeOf(p.values), 0, 0).Interface()
 }
 
-func (p *Port) AddValue(val interface{}) {
+func (p *port) AddValue(val interface{}) {
 	value := reflect.ValueOf(&p.values).Elem()
 	value.Set(reflect.Append(reflect.ValueOf(p.values), reflect.ValueOf(val)))
 	p.values = value.Interface()
 }
 
-func (p *Port) AddValues(val interface{}) {
+func (p *port) AddValues(val interface{}) {
 	value := reflect.ValueOf(&p.values).Elem()
 	add := reflect.ValueOf(val)
 	for i := 0; i < add.Len(); i++ {
@@ -52,23 +64,23 @@ func (p *Port) AddValues(val interface{}) {
 	p.values = value.Interface()
 }
 
-func (p *Port) GetSingleValue() interface{} {
+func (p *port) GetSingleValue() interface{} {
 	return reflect.ValueOf(p.values).Index(0).Interface()
 }
 
-func (p *Port) GetValues() interface{} {
+func (p *port) GetValues() interface{} {
 	return p.values
 }
 
-func (p *Port) setParent(c ComponentInterface)  {
+func (p *port) setParent(c Component)  {
 	p.parent = c
 }
 
-func (p *Port) GetParent() ComponentInterface {
+func (p *port) GetParent() Component {
 	return p.parent
 }
 
-func (p *Port) String() string {
+func (p *port) String() string {
 	name := p.name
 	auxComponent := p.parent
 	for auxComponent != nil {

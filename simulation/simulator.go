@@ -4,17 +4,17 @@ import "github.com/pointlesssoft/godevs/modeling"
 
 type Simulator struct {
 	AbstractSimulator
-	model modeling.AtomicInterface
+	model modeling.Atomic
 }
 
-func NewSimulator(clock *Clock, model modeling.AtomicInterface) *Simulator {
-	s := Simulator{*NewAbstractSimulator(clock), model}
+func NewSimulator(clock Clock, model modeling.Atomic) *Simulator {
+	s := Simulator{NewAbstractSimulator(clock), model}
 	return &s
 }
 
 func (s *Simulator) Initialize() {
 	s.model.Initialize()
-	s.SetTL((*s.GetClock()).GetTime())
+	s.SetTL(s.GetClock().GetTime())
 	s.SetTN(s.GetTL() + s.model.TA())
 }
 
@@ -27,7 +27,7 @@ func (s *Simulator) TA() float64 {
 }
 
 func (s *Simulator) DeltFcn() {
-	t := (*s.GetClock()).GetTime()
+	t := s.GetClock().GetTime()
 	isInputEmpty := s.model.IsInputEmpty()
 	if !isInputEmpty || t == s.GetTN() {
 		// CASE 1: atomic model timed out and no messages were received -> internal delta
@@ -49,7 +49,7 @@ func (s *Simulator) DeltFcn() {
 }
 
 func (s *Simulator) Clear() {
-	for _, ports := range [][]*modeling.Port{s.model.GetInPorts(), s.model.GetOutPorts()} {
+	for _, ports := range [][]modeling.Port{s.model.GetInPorts(), s.model.GetOutPorts()} {
 		for _, port := range ports {
 			port.Clear()
 		}
@@ -62,6 +62,6 @@ func (s *Simulator) Lambda() {
 	}
 }
 
-func (s *Simulator) GetModel() modeling.ComponentInterface {
-	return s.model.GetComponent()
+func (s *Simulator) GetModel() modeling.Component {
+	return s.model
 }

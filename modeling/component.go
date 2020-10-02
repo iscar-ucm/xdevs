@@ -1,46 +1,46 @@
 package modeling
 
-type ComponentInterface interface {
+type Component interface {
 	GetName() string
 	Initialize()
 	Exit()
 	IsInputEmpty() bool
-	AddInPort(port *Port)
-	GetInPort(portName string) *Port
-	GetInPorts() []*Port
-	AddOutPort(port *Port)
-	GetOutPort(portName string) *Port
-	GetOutPorts() []*Port
-	GetParent() ComponentInterface
-	setParent(component ComponentInterface)
+	AddInPort(port Port)
+	GetInPort(portName string) Port
+	GetInPorts() []Port
+	AddOutPort(port Port)
+	GetOutPort(portName string) Port
+	GetOutPorts() []Port
+	GetParent() Component
+	setParent(component Component)
 	String() string
 }
 
-type Component struct {
-	name     string
-	parent   ComponentInterface
-	inPorts  []*Port  	// TODO map?
-	outPorts []*Port  	// TODO map?
-}
-
-func NewComponent(name string) *Component {
-	c := Component{name, nil, nil, nil}
+func NewComponent(name string) Component {
+	c := component{name, nil, nil, nil}
 	return &c
 }
 
-func (c *Component) GetName() string {
+type component struct {
+	name     string
+	parent   Component
+	inPorts  []Port // TODO map?
+	outPorts []Port // TODO map?
+}
+
+func (c *component) GetName() string {
 	return c.name
 }
 
-func (c *Component) Initialize() {
+func (c *component) Initialize() {
 	panic("This method is abstract and must be implemented")
 }
 
-func (c *Component) Exit() {
+func (c *component) Exit() {
 	panic("This method is abstract and must be implemented")
 }
 
-func (c *Component) IsInputEmpty() bool {
+func (c *component) IsInputEmpty() bool {
 	for _, inPort := range c.inPorts {
 		if ! inPort.IsEmpty() {
 			return false
@@ -49,12 +49,12 @@ func (c *Component) IsInputEmpty() bool {
 	return true
 }
 
-func (c *Component) AddInPort(port *Port) {
+func (c *component) AddInPort(port Port) {
 	port.setParent(c)
 	c.inPorts = append(c.inPorts, port)
 }
 
-func (c *Component) GetInPort(portName string) *Port {
+func (c *component) GetInPort(portName string) Port {
 	for _, inPort := range c.inPorts {
 		if inPort.GetName() == portName {
 			return inPort
@@ -63,16 +63,16 @@ func (c *Component) GetInPort(portName string) *Port {
 	panic("port name was not found within the input ports list")
 }
 
-func (c *Component) GetInPorts() []*Port {
+func (c *component) GetInPorts() []Port {
 	return c.inPorts
 }
 
-func (c *Component) AddOutPort(port *Port) {
+func (c *component) AddOutPort(port Port) {
 	port.setParent(c)
 	c.outPorts = append(c.outPorts, port)
 }
 
-func (c *Component) GetOutPort(portName string) *Port {
+func (c *component) GetOutPort(portName string) Port {
 	for _, outPort := range c.outPorts {
 		if outPort.GetName() == portName {
 			return outPort
@@ -81,19 +81,19 @@ func (c *Component) GetOutPort(portName string) *Port {
 	panic("port name was not found within the output ports list")
 }
 
-func (c *Component) GetOutPorts() []*Port {
+func (c *component) GetOutPorts() []Port {
 	return c.outPorts
 }
 
-func (c *Component) GetParent() ComponentInterface {
+func (c *component) GetParent() Component {
 	return c.parent
 }
 
-func (c *Component) setParent(component ComponentInterface) {
+func (c *component) setParent(component Component) {
 	c.parent = component
 }
 
-func (c *Component) String() string {
+func (c *component) String() string {
 	name := c.name + ": "
 	name += "Inports [ "
 	for _, inPort := range c.inPorts {

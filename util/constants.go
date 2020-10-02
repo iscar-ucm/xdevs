@@ -7,6 +7,6 @@ var (
 )
 
 const (
-	PhasePassive = "passive"
-	PhaseActive  = "active"
+	PASSIVE = "passive"
+	ACTIVE  = "active"
 )
