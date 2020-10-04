@@ -2,17 +2,17 @@ package efp
 
 import (
 	"fmt"
-	"github.com/pointlesssoft/godevs/modeling"
-	"github.com/pointlesssoft/godevs/util"
+	"github.com/pointlesssoft/godevs/pkg/modeling"
+	"github.com/pointlesssoft/godevs/pkg/util"
 )
 
 type Generator struct {
 	modeling.Atomic
-	iStart modeling.Port
-	iStop modeling.Port
-	oOut modeling.Port
+	iStart     modeling.Port
+	iStop      modeling.Port
+	oOut       modeling.Port
 	jobCounter int
-	period float64
+	period     float64
 }
 
 func NewGenerator(name string, period float64) *Generator {

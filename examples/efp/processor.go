@@ -1,15 +1,15 @@
 package efp
 
 import (
-	"github.com/pointlesssoft/godevs/modeling"
-	"github.com/pointlesssoft/godevs/util"
+	"github.com/pointlesssoft/godevs/pkg/modeling"
+	"github.com/pointlesssoft/godevs/pkg/util"
 )
 
 type Processor struct {
 	modeling.Atomic
-	iIn modeling.Port
-	oOut modeling.Port
-	currentJob Job
+	iIn            modeling.Port
+	oOut           modeling.Port
+	currentJob     Job
 	processingTime float64
 }
 

@@ -2,20 +2,20 @@ package efp
 
 import (
 	"fmt"
-	"github.com/pointlesssoft/godevs/modeling"
-	"github.com/pointlesssoft/godevs/util"
+	"github.com/pointlesssoft/godevs/pkg/modeling"
+	"github.com/pointlesssoft/godevs/pkg/util"
 )
 
 type Transducer struct {
 	modeling.Atomic
-	iArrived modeling.Port
-	iSolved modeling.Port
-	oOut modeling.Port
-	jobsArrived []Job
-	jobsSolved []Job
+	iArrived        modeling.Port
+	iSolved         modeling.Port
+	oOut            modeling.Port
+	jobsArrived     []Job
+	jobsSolved      []Job
 	observationTime float64
-	totalTA float64
-	clock float64
+	totalTA         float64
+	clock           float64
 }
 
 func NewTransducer(name string, observationTime float64) *Transducer {

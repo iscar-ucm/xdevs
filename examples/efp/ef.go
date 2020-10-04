@@ -1,12 +1,12 @@
 package efp
 
-import "github.com/pointlesssoft/godevs/modeling"
+import "github.com/pointlesssoft/godevs/pkg/modeling"
 
 type EF struct {
 	modeling.Coupled
 	iStart modeling.Port
-	iIn modeling.Port
-	oOut modeling.Port
+	iIn    modeling.Port
+	oOut   modeling.Port
 }
 
 func NewEF(name string, period float64, observationTime float64) *EF {

@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/pointlesssoft/godevs/examples/efp"
-	"github.com/pointlesssoft/godevs/simulation"
-	"github.com/pointlesssoft/godevs/util"
+	"github.com/pointlesssoft/godevs/pkg/simulation"
+	"github.com/pointlesssoft/godevs/pkg/util"
 )
 
 func main() {

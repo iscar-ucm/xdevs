@@ -2,26 +2,29 @@ package simulation
 
 import (
 	"fmt"
-	"github.com/pointlesssoft/godevs/modeling"
-	"github.com/pointlesssoft/godevs/util"
+	"github.com/pointlesssoft/godevs/pkg/modeling"
+	"github.com/pointlesssoft/godevs/pkg/util"
 )
 
 type Coordinator struct {
-	AbstractSimulator
-	model modeling.Coupled
-	simulators []AbstractSimulator
-	totalIterations int
+	AbstractSimulator						// It complies the AbstractSimulator interface.
+	model           modeling.Coupled		// Coupled Model associated to the Coordinator.
+	simulators      []AbstractSimulator		// Slice containing all the children simulators of the Coordinator.
+	totalIterations int						// Number of iterations simulated so far.
 }
 
-func NewRootCoordinator(initialTime float64, model modeling.Coupled) *Coordinator {
-	return NewCoordinator(NewClock(initialTime), model)
-}
-
+// NewCoordinator returns a pointer to a Coordinator.
 func NewCoordinator(clock Clock, model modeling.Coupled) *Coordinator {
 	c := Coordinator{NewAbstractSimulator(clock), model, nil, 0}
 	return &c
 }
 
+// NewRootCoordinator creates a new simulation Clock and returns a pointer to a Coordinator.
+func NewRootCoordinator(initialTime float64, model modeling.Coupled) *Coordinator {
+	return NewCoordinator(NewClock(initialTime), model)
+}
+
+// buildHierarchy creates all the children components and adds their corresponding simulator to the simulators list.
 func (c *Coordinator) buildHierarchy() {
 	components := c.model.GetComponents()
 	for _, component := range components {
@@ -36,6 +39,7 @@ func (c *Coordinator) buildHierarchy() {
 	}
 }
 
+// Initialize builds the coordinator hierarchy and initializes all the children simulators.
 func (c *Coordinator) Initialize() {
 	c.buildHierarchy()
 	for _, sim := range c.simulators {
@@ -45,16 +49,19 @@ func (c *Coordinator) Initialize() {
 	c.SetTN(c.GetTL() + c.TA())
 }
 
+// Exit calls to the Exit function of all the children simulators.
 func (c *Coordinator) Exit() {
 	for _, sim := range c.simulators {
 		sim.Exit()
 	}
 }
 
+// GetSimulators return a slice with all the children simulators.
 func (c *Coordinator) GetSimulators() []AbstractSimulator {
 	return c.simulators
 }
 
+// TA returns the minimum time advance of all the children simulators.
 func (c *Coordinator) TA() float64 {
 	tn := util.INFINITY
 	for _, sim := range c.simulators {
@@ -66,14 +73,16 @@ func (c *Coordinator) TA() float64 {
 	return tn - c.GetClock().GetTime()
 }
 
-func (c *Coordinator) Lambda() {
+// Collect triggers the collection function of all children simulators and propagate the output events.
+func (c *Coordinator) Collect() {
 	for _, sim := range c.simulators {  // TODO parallelize
-		sim.Lambda()
+		sim.Collect()
 	}
 	c.PropagateOutput()
 }
 
-func (c *Coordinator) PropagateOutput() {  // TODO parallelize
+// PropagateOutput propagates output events according to the coupling map.
+func (c *Coordinator) PropagateOutput() { // TODO parallelize
 	for _, coups := range [][]modeling.Coupling{c.model.GetIC(), c.model.GetEOC()} {
 		for _, coup := range coups {
 			coup.PropagateValues()
@@ -81,21 +90,24 @@ func (c *Coordinator) PropagateOutput() {  // TODO parallelize
 	}
 }
 
-func (c *Coordinator) DeltFcn() {  // TODO parallelize
+// Transition propagates input events and calls to the transition function of the children simulators.
+func (c *Coordinator) Transition() { // TODO parallelize
 	c.PropagateInput()
 	for _, sim := range c.simulators {
-		sim.DeltFcn()
+		sim.Transition()
 	}
 	c.SetTL(c.GetClock().GetTime())
 	c.SetTN(c.GetTL() + c.TA())
 }
 
-func (c *Coordinator) PropagateInput() {  // TODO parallelize
+// PropagateInput propagates input events.
+func (c *Coordinator) PropagateInput() { // TODO parallelize
 	for _, coup := range c.model.GetEIC() {
 		coup.PropagateValues()
 	}
 }
 
+// Clear calls to the Clear function of children simulators and cleans the ports of the associated coupled model.
 func (c *Coordinator) Clear() {
 	for _, sim := range c.simulators {
 		sim.Clear()
@@ -107,41 +119,47 @@ func (c *Coordinator) Clear() {
 	}
 }
 
+// SimInject injects values to a port after waiting an elapsed time e.
+// It panics if the elapsed time is out of bounds.
 func (c *Coordinator) SimInject(e float64, port modeling.Port, values interface{}) {
 	time := c.GetClock().GetTime() + e
 	if time <= c.GetTN() {
 		port.AddValues(values)
 		c.GetClock().SetTime(time)
-		c.DeltFcn()
+		c.Transition()
 		c.Clear()
 	} else {
 		panic(fmt.Sprintf("Time: %v - ERROR input rejected: elapsed time %v is not in bounds.", c.GetTL(), e))
 	}
 }
 
+// simulateIteration runs a single simulation cycle.
+func (c *Coordinator) simulateIteration() {
+	c.GetClock().SetTime(c.GetTN())
+	c.Collect()
+	c.Transition()
+	c.Clear()
+	c.totalIterations++
+}
+
+// SimulateIterations runs numIterations iterations.
 func (c *Coordinator) SimulateIterations(numIterations int) {
 	for numIterations > 0 && c.GetTN() < util.INFINITY {
-		c.simulateSingleCycle()
-		c.totalIterations++
+		c.simulateIteration()
 		numIterations--
 	}
 }
 
+// SimulateTime runs as many simulation iterations as required until the simulation clock reaches the desired value.
 func (c *Coordinator) SimulateTime(timeInterval float64) {
 	tF := c.GetClock().GetTime() + timeInterval
 	for c.GetClock().GetTime() < util.INFINITY && c.GetTN() < tF {
-		c.simulateSingleCycle()
+		c.simulateIteration()
 	}
 	c.GetClock().SetTime(tF)
 }
 
+//GetModel returns the coupled model associated to the Coordinator.
 func (c *Coordinator) GetModel() modeling.Component {
 	return c.model
-}
-
-func (c *Coordinator) simulateSingleCycle() {
-	c.GetClock().SetTime(c.GetTN())
-	c.Lambda()
-	c.DeltFcn()
-	c.Clear()
 }

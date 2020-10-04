@@ -1,7 +1,7 @@
 package modeling
 
 import (
-	"github.com/pointlesssoft/godevs/modeling"
+	"github.com/pointlesssoft/godevs/pkg/modeling"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

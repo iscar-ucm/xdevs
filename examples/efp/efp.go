@@ -1,7 +1,7 @@
 package efp
 
 import (
-	"github.com/pointlesssoft/godevs/modeling"
+	"github.com/pointlesssoft/godevs/pkg/modeling"
 )
 
 type EFP struct {
