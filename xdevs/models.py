@@ -2,17 +2,20 @@ import inspect
 import pickle
 from abc import ABC, abstractmethod
 from collections import deque, defaultdict
-from typing import Any, Iterator, Tuple, List, Dict, Generator
+from typing import Any, Iterator, Tuple, List, Dict, Generator, Type, TypeVar, Generic
 
 from . import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
 
-class Port:
+T = TypeVar('T')
+
+
+class Port(Generic[T]):
 
     IN = "in"
     OUT = "out"
 
-    def __init__(self, p_type: type, name: str = None, serve: bool = False):
+    def __init__(self, p_type: Type[T], name: str = None, serve: bool = False):
         """
         xDEVS implementation of DEVS Port.
         :param p_type: data type of messages to be sent/received via the new port instance.
@@ -54,7 +57,7 @@ class Port:
         self._values.clear()
 
     @property
-    def values(self) -> Generator[Any, None, None]:
+    def values(self) -> Generator[T, None, None]:
         """:return: Generator function that returns all the messages in the port."""
         for val in self._values:
             yield val
@@ -63,14 +66,14 @@ class Port:
             for val in port._values:
                 yield val
 
-    def get(self) -> Any:
+    def get(self) -> T:
         """
         :return: first message from port.
         :raises StopIteration: if port is empty.
         """
         return next(self.values)
 
-    def add(self, val: Any):
+    def add(self, val: T):
         """
         Adds a new value to the local message bag of the port.
         :param val: message to be added.
@@ -80,7 +83,7 @@ class Port:
             raise TypeError("Value type is %s (%s expected)" % (type(val).__name__, self.p_type.__name__))
         self._values.append(val)
 
-    def extend(self, vals: Iterator[Any]):
+    def extend(self, vals: Iterator[T]):
         """
         Adds a set of new values to the local message bag of the port.
         :param vals: list containing all the messages to be added.
@@ -88,6 +91,7 @@ class Port:
         """
         for val in vals:
             self.add(val)
+
 
 class Component(ABC):
     def __init__(self, name: str = None):
@@ -256,6 +260,12 @@ class Atomic(Component, ABC):
         """
         self.deltint()
         self.deltext(0)
+        """
+        The other alternative would be this:
+            self.deltext(e)
+            if self.ta == 0:
+                self.deltint()
+        """
 
     def hold_in(self, phase: Any, sigma: Any):
         """
