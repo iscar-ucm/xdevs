@@ -13,3 +13,4 @@ manifest.mf
 Debug*
 __pycache__
 .idea/
+xdevs.iml

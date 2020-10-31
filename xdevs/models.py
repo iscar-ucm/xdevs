@@ -94,6 +94,9 @@ class Port(Generic[T]):
 
 
 class Component(ABC):
+
+    name: str
+
     def __init__(self, name: str = None):
         """
         Abstract Base Class for an xDEVS model.
@@ -216,6 +219,10 @@ class Coupling:
 
 
 class Atomic(Component, ABC):
+
+    phase: str
+    sigma: float
+
     def __init__(self, name: str = None):
         """
         xDEVS implementation of DEVS Atomic Model.
@@ -228,7 +235,7 @@ class Atomic(Component, ABC):
         self.sigma = INFINITY
 
     @property
-    def ta(self) -> Any:
+    def ta(self) -> float:
         """:return: remaining time for the atomic model's internal transition."""
         return self.sigma
 
@@ -241,7 +248,7 @@ class Atomic(Component, ABC):
         pass
 
     @abstractmethod
-    def deltext(self, e: Any):
+    def deltext(self, e: float):
         """
         Describes the external transitions of the atomic model.
         :param e: elapsed time between last transition and the external transition.
@@ -253,7 +260,7 @@ class Atomic(Component, ABC):
         """Describes the output function of the atomic model."""
         pass
 
-    def deltcon(self, e: Any):
+    def deltcon(self, e: float):
         """
         Describes the confluent transitions of the atomic model. By default, the internal transition is triggered first.
         :param e: elapsed time between last transition and the confluent transition.
@@ -267,7 +274,7 @@ class Atomic(Component, ABC):
                 self.deltint()
         """
 
-    def hold_in(self, phase: Any, sigma: Any):
+    def hold_in(self, phase: Any, sigma: float):
         """
         Change atomic model's phase and next timeout.
         :param phase: atomic model's new phase.
@@ -285,6 +292,9 @@ class Atomic(Component, ABC):
         """Sets phase to PHASE_PASSIVE and next timeout to INFINITY"""
         self.phase = phase
         self.sigma = INFINITY
+
+    def continuef(self, e: float):
+        self.sigma -= e
 
 
 class Coupled(Component, ABC):
