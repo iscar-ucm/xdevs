@@ -247,12 +247,11 @@ if __name__ == '__main__':
     sys.setrecursionlimit(10000)
     root = HO("HO_root", 10, 10, 100000, 100000)
     flatten = False
-    chain = True
     parallel = True
     if parallel:
-        coord = ParallelProcessCoordinator(root, flatten=flatten, chain=chain)
+        coord = ParallelProcessCoordinator(root, flatten=flatten)
     else:
-        coord = Coordinator(root, flatten=flatten, chain=chain)
+        coord = Coordinator(root, flatten=flatten)
     coord.initialize()
     coord.inject(root.i_in, 0)
     coord.simulate()

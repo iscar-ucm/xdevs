@@ -35,7 +35,7 @@ class Port(Generic[T]):
         self._bag = list()
 
     def __bool__(self) -> bool:
-        return not self.empty()
+        return bool(self._values or self._bag)
 
     def __len__(self) -> int:
         return sum(1 for _ in self.values)
@@ -47,7 +47,7 @@ class Port(Generic[T]):
         return str(self)
 
     def empty(self) -> bool:
-        return not bool(self._values or self._bag)
+        return not (self._values or self._bag)
 
     def clear(self):
         self._values.clear()
