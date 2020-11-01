@@ -99,18 +99,13 @@ class Simulator(AbstractSimulator):
 
 
 class Coordinator(AbstractSimulator):
-    def __init__(self, model: Coupled, clock: SimulationClock = None,
-                 flatten: bool = False, chain: bool = False, unroll: bool = True):
+    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False):
         super().__init__(clock or SimulationClock())
 
-        self.coordinators = []
-        self.simulators = []
+        self.coordinators = list()
+        self.simulators = list()
         self.model = model
-        if chain:
-            if not unroll:
-                raise NotImplementedError
-            self.model.chain_components(unroll or flatten)
-        elif flatten:
+        if flatten:
             self.model.flatten()
         self.ports_to_serve = dict()
 
@@ -169,14 +164,13 @@ class Coordinator(AbstractSimulator):
         self.propagate_output()
 
     def propagate_output(self):
-        if not self.model.chain:
-            for _, coups in self.model.ic.items():
-                for coup in coups:
-                    coup.propagate()
+        for coups in self.model.ic.values():
+            for coup in coups.values():
+                coup.propagate()
 
-            for _, coups in self.model.eoc.items():
-                for coup in coups:
-                    coup.propagate()
+        for coups in self.model.eoc.values():
+            for coup in coups.values():
+                coup.propagate()
 
     def deltfcn(self):
         self.propagate_input()
@@ -188,10 +182,9 @@ class Coordinator(AbstractSimulator):
         self.time_next = self.time_last + self.ta()
 
     def propagate_input(self):
-        if not self.model.chain:
-            for _, coups in self.model.eic.items():
-                for coup in coups:
-                    coup.propagate()
+        for coups in self.model.eic.values():
+            for coup in coups.values():
+                coup.propagate()
 
     def clear(self):
         for proc in self.processors:
@@ -264,9 +257,8 @@ class Coordinator(AbstractSimulator):
 
 class ParallelCoordinator(Coordinator):
 
-    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
-                 unroll: bool = True, executor=None):
-        super().__init__(model, clock, flatten, chain, unroll)
+    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, executor=None):
+        super().__init__(model, clock, flatten)
 
         self.executor = executor or futures.ThreadPoolExecutor(max_workers=8)  # TODO calc max workers
 
@@ -308,9 +300,9 @@ class ParallelCoordinator(Coordinator):
 
 class ParallelProcessCoordinator(Coordinator):
 
-    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
-                 master=True, executor=None, executor_futures=None):
-        super().__init__(model, clock, flatten, chain)
+    def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, master=True,
+                 executor=None, executor_futures=None):
+        super().__init__(model, clock, flatten)
         self.master = master
 
         if master:

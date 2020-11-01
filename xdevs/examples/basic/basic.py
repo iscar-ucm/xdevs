@@ -182,8 +182,8 @@ if __name__ == '__main__':
 	wrap = Wrap("gpt", 3, 1000)
 	parallel = False
 	if parallel:
-		coord = ParallelCoordinator(wrap, flatten=False, chain=False)
+		coord = ParallelCoordinator(wrap, flatten=False)
 	else:
-		coord = Coordinator(wrap, flatten=False, chain=False)
+		coord = Coordinator(wrap, flatten=False)
 	coord.initialize()
 	coord.simulate()
