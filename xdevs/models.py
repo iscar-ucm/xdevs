@@ -24,7 +24,7 @@ class Port(Generic[T]):
         """
         self.name = name if name else self.__class__.__name__
 
-        if p_type is None or type(p_type) is not type:
+        if p_type is None:
             raise TypeError("Invalid p_type")
 
         self.p_type = p_type

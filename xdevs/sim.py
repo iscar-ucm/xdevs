@@ -160,7 +160,7 @@ class Coordinator(AbstractSimulator):
             proc.exit()
 
     def ta(self):
-        return min([proc.time_next for proc in self.processors], default=0) - self.clock.time
+        return min([proc.time_next for proc in self.processors], default=INFINITY) - self.clock.time
 
     def lambdaf(self):
         for proc in self.processors:
