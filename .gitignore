@@ -11,6 +11,7 @@ manifest.mf
 *.log.*
 .cproject
 Debug*
+*.egg-info/
 __pycache__
 .idea/
 xdevs.iml
