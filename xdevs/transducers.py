@@ -1,10 +1,22 @@
 import pkg_resources
-from abc import ABC
-from typing import Dict, NoReturn, Type
+from abc import ABC, abstractmethod
+from typing import Dict, List, NoReturn, Type
+from .sim import SimulationClock
+from .models import Atomic, Port
 
 
 class Transducer(ABC):
-    def __init__(self, **kwargs):  # TODO
+
+    transducer_id: str
+    targets: List[Atomic]  # TODO more generic approach for ports (maybe we need two abstract classes that inherit this)
+
+    def __init__(self, **kwargs):
+        self.transducer_id = kwargs.get('transducer_id')
+        self.targets = kwargs.get('models', list())
+        # TODO callables for subtracting data in a (field_id, field_value) fashion
+
+    @abstractmethod
+    def bulk_data(self, clock: SimulationClock):
         pass
 
 
