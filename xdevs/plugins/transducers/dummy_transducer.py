@@ -1,4 +1,4 @@
-from .transducers import Transducer
+from ...transducers import Transducer
 
 
 class DummyTransducer(Transducer):

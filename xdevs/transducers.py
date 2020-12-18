@@ -10,7 +10,7 @@ class Transducer(ABC):
 
 class Transducers:
     _plugins: Dict[str, Type[Transducer]] = {ep.name: ep.load()
-                                             for ep in pkg_resources.iter_entry_points('xdevs.transducers.plugins')}
+                                             for ep in pkg_resources.iter_entry_points('xdevs.plugins.transducers')}
 
     @staticmethod
     def add_plugin(name: str, plugin: Type[Transducer]) -> NoReturn:

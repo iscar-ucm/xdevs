@@ -1,4 +1,4 @@
-from xdevs.transducers.transducers import Transducer, Transducers
+from xdevs.transducers import Transducer, Transducers
 
 
 class AnotherDummyTransducer(Transducer):

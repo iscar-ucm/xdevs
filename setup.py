@@ -8,8 +8,8 @@ setup(name='xdevs',
       author_email='khenares@ucm.es, r.cardenas@upm.es',
       packages=['xdevs'],
       entry_points={
-        'xdevs.transducers.plugins': [
-              'dummy = xdevs.transducers.dummy_transducer:DummyTransducer',
-              'broken = xdevs.transducers.broken_transducer:BrokenTransducer',
+        'xdevs.plugins.transducers': [
+              'dummy = xdevs.plugins.transducers.dummy_transducer:DummyTransducer',
+              'broken = xdevs.plugins.transducers.broken_transducer:BrokenTransducer',
         ]},
       zip_safe=False)

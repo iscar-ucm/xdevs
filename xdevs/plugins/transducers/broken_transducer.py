@@ -1,10 +1,9 @@
+from ...transducers import Transducer
 try:
     import broken  # This will fail -> we have a flag to avoid
     _dependencies_ok = True
 except ModuleNotFoundError:
     _dependencies_ok = False
-
-from .transducers import Transducer
 
 
 class BrokenTransducer(Transducer):
