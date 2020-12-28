@@ -169,28 +169,30 @@ public class SimulatorProfile extends Simulator {
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("Statistics for ").append(super.getModel().getName()).append(":\n");
-        buffer.append("----------------------------------------------------------------------\n");
-        buffer.append("numCallsToTa = ").append(numCallsToTa).append("\n");
-        buffer.append("timeUsedByTa = ").append(timeUsedByTa).append(" ms\n");
-        buffer.append("numCallsToDeltFcn = ").append(numCallsToDeltFcn).append("\n");
-        buffer.append("timeUsedByDeltFcn = ").append(timeUsedByDeltFcn).append(" ms\n");
-        buffer.append("numCallsToLambda = ").append(numCallsToLambda).append("\n");
-        buffer.append("timeUsedByLambda = ").append(timeUsedByLambda).append(" ms\n");
-        buffer.append("numCallsToClear = ").append(numCallsToClear).append("\n");
-        buffer.append("timeUsedByClear = ").append(timeUsedByClear).append(" ms\n");
-        buffer.append("numCallsToInitialize = ").append(numCallsToInitialize).append("\n");
-        buffer.append("timeUsedByInitialize = ").append(timeUsedByInitialize).append(" ms\n");
-        buffer.append("numCallsToGetTN = ").append(numCallsToGetTN).append("\n");
-        buffer.append("timeUsedByGetTN = ").append(timeUsedByGetTN).append(" ms\n");
-        buffer.append("numCallsToGetTL = ").append(numCallsToGetTL).append("\n");
-        buffer.append("timeUsedByGetTL = ").append(timeUsedByGetTL).append(" ms\n");
-        buffer.append("numCallsToSetTN = ").append(numCallsToSetTN).append("\n");
-        buffer.append("timeUsedBySetTN = ").append(timeUsedBySetTN).append(" ms\n");
-        buffer.append("numCallsToSetTL = ").append(numCallsToSetTL).append("\n");
-        buffer.append("timeUsedBySetTL = ").append(timeUsedBySetTL).append(" ms\n");
-        buffer.append("numCallsToGetClock = ").append(numCallsToGetClock).append("\n");
-        buffer.append("timeUsedByGetClock = ").append(timeUsedByGetClock).append(" ms\n");
+        buffer.append(super.getModel().getName()).append(";");
+        buffer.append(super.getModel().getClass().getSimpleName()).append(";");
+        buffer.append("Atomic;");
+        buffer.append(numCallsToTa).append(";");
+        buffer.append(timeUsedByTa / 1000.0).append(";");
+        buffer.append(numCallsToDeltFcn).append(";");
+        buffer.append(timeUsedByDeltFcn / 1000.0).append(";");
+        buffer.append(numCallsToLambda).append(";");
+        buffer.append(timeUsedByLambda / 1000.0).append(";");
+        buffer.append(numCallsToClear).append(";");
+        buffer.append(timeUsedByClear / 1000.0).append(";");
+        buffer.append(numCallsToInitialize).append(";");
+        buffer.append(timeUsedByInitialize / 1000.0).append(";");
+        buffer.append(numCallsToGetTN).append(";");
+        buffer.append(timeUsedByGetTN / 1000.0).append(";");
+        buffer.append(numCallsToGetTL).append(";");
+        buffer.append(timeUsedByGetTL / 1000.0).append(";");
+        buffer.append(numCallsToSetTN).append(";");
+        buffer.append(timeUsedBySetTN / 1000.0).append(";");
+        buffer.append(numCallsToSetTL).append(";");
+        buffer.append(timeUsedBySetTL / 1000.0).append(";");
+        buffer.append(numCallsToGetClock).append(";");
+        buffer.append(timeUsedByGetClock / 1000.0).append(";");
+        buffer.append("0;0;0;0;0;0;0\n");
         return buffer.toString();
     }
 
