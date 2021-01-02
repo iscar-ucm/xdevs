@@ -1,9 +1,9 @@
+from __future__ import annotations
 import inspect
 import pickle
 from abc import ABC, abstractmethod
 from collections import deque, defaultdict
-from typing import Any, Iterator, Tuple, List, Dict, Generator, Type, TypeVar, Generic
-
+from typing import Any, Iterator, List, Dict, Generator, Tuple, Type, TypeVar, Generic, Optional, Deque
 from . import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
 
@@ -15,7 +15,16 @@ class Port(Generic[T]):
     IN = "in"
     OUT = "out"
 
-    def __init__(self, p_type: Type[T], name: str = None, serve: bool = False):
+    name: str
+    p_type: Type
+    serve: bool
+    parent: Optional[Component]
+    direction: Optional[str]
+    _values: Deque[T]
+    links_to: List[Port]
+    links_from: List[Port]
+
+    def __init__(self, p_type: Type[T], name: Optional[str] = None, serve: bool = False):
         """
         xDEVS implementation of DEVS Port.
         :param p_type: data type of messages to be sent/received via the new port instance.
@@ -96,8 +105,11 @@ class Port(Generic[T]):
 class Component(ABC):
 
     name: str
+    parent: Optional[Coupled]
+    in_ports: List[Port]
+    out_ports: List[Port]
 
-    def __init__(self, name: str = None):
+    def __init__(self, name: Optional[str] = None):
         """
         Abstract Base Class for an xDEVS model.
         :param name: name of the xDEVS model. If no name is provided, it will take the class's name by default.
@@ -181,7 +193,12 @@ class Component(ABC):
 
 
 class Coupling:
-    def __init__(self, port_from: Port, port_to: Port, host=None):  # TODO identify host's variable type
+
+    port_from: Port
+    port_to: Port
+    host: Any  # TODO identify host's variable type
+
+    def __init__(self, port_from: Port, port_to: Port, host=None):
         """
         xDEVS implementation of DEVS couplings.
         :param port_from: DEVS transmitter port.
@@ -228,7 +245,6 @@ class Atomic(Component, ABC):
         xDEVS implementation of DEVS Atomic Model.
         :param name: name of the Atomic Model. If no name is provided, it will take the class's name by default.
         """
-        self.name = name if name else self.__class__.__name__
         super().__init__(name)
 
         self.phase = PHASE_PASSIVE
@@ -274,7 +290,7 @@ class Atomic(Component, ABC):
                 self.deltint()
         """
 
-    def hold_in(self, phase: Any, sigma: float):
+    def hold_in(self, phase: str, sigma: float):
         """
         Change atomic model's phase and next timeout.
         :param phase: atomic model's new phase.
@@ -283,9 +299,9 @@ class Atomic(Component, ABC):
         self.phase = phase
         self.sigma = sigma
 
-    def activate(self):
-        """Sets phase to PHASE_ACTIVE and next timeout to 0"""
-        self.phase = PHASE_ACTIVE
+    def activate(self, phase=PHASE_ACTIVE):
+        """Sets phase to phase and next timeout to 0"""
+        self.phase = phase
         self.sigma = 0
 
     def passivate(self, phase=PHASE_PASSIVE):
@@ -298,12 +314,18 @@ class Atomic(Component, ABC):
 
 
 class Coupled(Component, ABC):
+
+    chain: bool
+    components: List[Component]
+    ic: Dict[Port, List[Coupling]]
+    eic: Dict[Port, List[Coupling]]
+    eoc: Dict[Port, List[Coupling]]
+
     def __init__(self, name: str = None):
         """
         xDEVS implementation of DEVS Coupled Model.
         :param name: name of the Atomic Model. If no name is provided, it will take the class's name by default.
         """
-        self.name = name if name else self.__class__.__name__
         super().__init__(name)
         self.chain = False
 
@@ -407,7 +429,7 @@ class Coupled(Component, ABC):
         coup.port_from.links_to.append(coup.port_to)
         coup.port_to.links_from.append(coup.port_from)
 
-    def flatten(self) -> Tuple[List[Atomic], List[Coupling]]:
+    def flatten(self) -> Tuple[List[Component], List[Coupling]]:
         """
         Flattens coupled model (i.e., parent coupled model inherits the connection of the model).
         :return: Components and couplings to be transferred to parent

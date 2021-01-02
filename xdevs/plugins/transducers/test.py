@@ -1,8 +1,22 @@
+from typing import NoReturn
+
+from xdevs.models import Port, Atomic
+from xdevs.sim import SimulationClock
 from xdevs.transducers import Transducer, Transducers
 
 
 class AnotherDummyTransducer(Transducer):
-    pass
+    def set_up_transducer(self) -> NoReturn:
+        pass
+
+    def tear_down_transducer(self) -> NoReturn:
+        pass
+
+    def bulk_model_data(self, clock: SimulationClock, model: Atomic) -> NoReturn:
+        pass
+
+    def bulk_port_data(self, clock: SimulationClock, port: Port) -> NoReturn:
+        pass
 
 
 if __name__ == '__main__':

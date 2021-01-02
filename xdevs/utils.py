@@ -1,5 +1,4 @@
 from typing import Any
-
 from xdevs.models import Atomic, Port
 
 
@@ -14,10 +13,7 @@ class Generator(Atomic):
         self.add_out_port(self.o_out)
 
     def deltint(self):
-        if self.period:
-            self.hold_in("active", self.period)
-        else:
-            self.passivate()
+        self.hold_in("active", self.period) if self.period else self.passivate()
 
     def deltext(self, e: Any):
         pass
@@ -26,7 +22,7 @@ class Generator(Atomic):
         self.o_out.extend(range(self.num_outputs))
 
     def initialize(self):
-        self.hold_in("active", 0)
+        self.activate()
 
     def exit(self):
         pass
