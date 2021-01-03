@@ -1,21 +1,21 @@
 from typing import NoReturn
-
-from ...models import Port, Atomic
-from ...sim import SimulationClock
 from ...transducers import Transducer
 
 
 class DummyTransducer(Transducer):
-    '''Dummy transducer. It will be loaded automatically to the Transducers factory'''
+    """Dummy transducer. It will be loaded automatically to the Transducers factory"""
+
+    def initialize_transducer(self) -> NoReturn:
+        pass
+
+    def bulk_state_data(self, time: float, name: str, phase: str, sigma: float, **kwargs) -> NoReturn:
+        pass
+
+    def bulk_event_data(self, time: float, model_name: str, port_name: str, **kwargs) -> NoReturn:
+        pass
 
     def set_up_transducer(self) -> NoReturn:
         pass
 
     def tear_down_transducer(self) -> NoReturn:
-        pass
-
-    def bulk_model_data(self, clock: SimulationClock, model: Atomic) -> NoReturn:
-        pass
-
-    def bulk_port_data(self, clock: SimulationClock, port: Port) -> NoReturn:
         pass
