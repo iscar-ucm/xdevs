@@ -9,31 +9,34 @@ class Transducer(ABC):
 
     T = TypeVar('T')
     transducer_id: str
+    target_components: Set[Atomic]
+    target_ports: Set[Port]
     state_mapper: Dict[str, Tuple[Type[T], Callable[[Atomic], T]]]
-    message_mapper: Dict[str, Tuple[Type[T], Callable[[Any], T]]]
-
-    _target_components: Set[Atomic]
-    _target_ports: Dict[Component, Set[Port]]
+    event_mapper: Dict[str, Tuple[Type[T], Callable[[Any], T]]]
 
     def __init__(self, **kwargs):
+        """
+        Transducer for the xDEVS M&S tool.
+        :param transducer_id: ID of the transducer.
+        """
         self.transducer_id = kwargs.get('transducer_id')
-        self._target_components = kwargs.get('target_models', set())
-        self._target_ports = kwargs.get('target_ports', dict())
-        self.state_mapper = kwargs.get('state_mapper', dict())
-        self.message_mapper = kwargs.get('message_mapper', {'value': (str, lambda x: str(x))})
+        self.target_components = set()
+        self.target_ports = set()
+        self.state_mapper = dict()
+        self.event_mapper = {'value': (str, lambda x: str(x))}
 
     def add_target_component(self, component: Atomic) -> NoReturn:
-        self._target_components.add(component)
+        self.target_components.add(component)
 
     def add_target_port(self, port: Port) -> NoReturn:
         parent: Optional[Component] = port.parent
         if parent is None:
             raise ValueError('Port {} does not have a parent component', port.name)
-        if parent not in self._target_ports:
-            self._target_ports[parent] = set()
-        self._target_ports[parent].add(port)
+        self.target_ports.add(port)
 
     # TODO methods for adding models and ports according to regular expressions, type matching, etc.
+
+    # TODO methods for adding/removing mappings
 
     @abstractmethod
     def initialize_transducer(self) -> NoReturn:
@@ -73,10 +76,16 @@ class Transducer(ABC):
         """
         pass
 
-    def activate_transducer(self, time: float, imminent_components: List[Component]):
+    def activate_transducer(self, time: float, components: List[Atomic], ports: List[Port]) -> NoReturn:
+        """
+        Activates transducer and stores any state change or new event.
+        :param time: current simulation time.
+        :param components: list of components that have changed their state.
+        :param ports: list of ports that contain new events.
+        """
         self.set_up_transducer()
-        for component in imminent_components:
-            if component in self._target_components and isinstance(component, Atomic):
+        for component in components:
+            if component in self.target_components:
                 try:
                     fields: Dict[str, Any] = {key: value[1](component) for key, value in self.state_mapper.items()}
                 except:
@@ -85,16 +94,17 @@ class Transducer(ABC):
                     continue
                 else:
                     self.bulk_state_data(time, component.name, component.phase, component.sigma, **fields)
-            for port in self._target_ports.get(component, set()):
+        for port in ports:
+            if port in self.target_ports:
                 for event in port.values:
                     try:
-                        fields: Dict[str, Any] = {key: value[1](event) for key, value in self.message_mapper.items()}
+                        fields: Dict[str, Any] = {key: value[1](event) for key, value in self.event_mapper.items()}
                     except:
                         logging.warning('Transducer {} failed when mapping '
                                         'extra event values of event {}.'.format(self.transducer_id, str(event)))
                         continue
                     else:
-                        self.bulk_event_data(time, component.name, port.name, **fields)
+                        self.bulk_event_data(time, port.parent.name, port.name, **fields)
         self.tear_down_transducer()
 
 

@@ -9,7 +9,7 @@ setup(name='xdevs',
       packages=['xdevs'],
       entry_points={
         'xdevs.plugins.transducers': [
-              'dummy = xdevs.plugins.transducers.dummy_transducer:DummyTransducer',
+              'csv = xdevs.plugins.transducers.csv_transducer:CSVTransducer',
               'broken = xdevs.plugins.transducers.broken_transducer:BrokenTransducer',
         ]},
       zip_safe=False)
