@@ -1,7 +1,7 @@
 import csv
 import errno
 import os
-from typing import Any, IO, List, NoReturn, Optional
+from typing import IO, List, NoReturn, Optional
 from ...transducers import Transducer
 
 
@@ -25,13 +25,16 @@ class CSVTransducer(Transducer):
 
     def initialize_transducer(self) -> NoReturn:
         if self.target_components:
-            header: List[str] = ['time', 'name', 'phase', 'sigma']
+            header: List[str] = ['sim_time', 'model_name']
             header.extend(self.state_mapper)
             self.create_csv_file(self.state_filename, header)
         if self.target_ports:
-            header: List[str] = ['time', 'model_name', 'port_name']
+            header: List[str] = ['sim_time', 'model_name', 'port_name']
             header.extend(self.event_mapper)
             self.create_csv_file(self.event_filename, header)
+
+    def remove_transducer(self) -> NoReturn:
+        pass
 
     def set_up_transducer(self) -> NoReturn:
         if self.target_components:
@@ -42,20 +45,17 @@ class CSVTransducer(Transducer):
             self.event_writer = csv.writer(self.event_file, delimiter=self.delimiter)
 
     def tear_down_transducer(self) -> NoReturn:
-        if self.state_file is not None and not self.state_file.closed:
-            self.state_writer = None
-            self.state_file.close()
-        if self.event_file is not None and not self.event_file.closed:
-            self.event_writer = None
-            self.event_file.close()
+        for file in [self.state_file, self.event_file]:
+            if file is not None:
+                file.close()
 
-    def bulk_state_data(self, time: float, name: str, phase: str, sigma: float, **kwargs) -> NoReturn:
-        row: List[Any] = [time, name, phase, sigma]
+    def bulk_state_data(self, sim_time: float, model_name: str, **kwargs) -> NoReturn:
+        row: list = [sim_time, model_name]
         row.extend(kwargs.values())
         self.state_writer.writerow(row)
 
-    def bulk_event_data(self, time: float, model_name: str, port_name: str, **kwargs) -> NoReturn:
-        row: List[Any] = [time, model_name, port_name]
+    def bulk_event_data(self, sim_time: float, model_name: str, port_name: str, **kwargs) -> NoReturn:
+        row: list = [sim_time, model_name, port_name]
         row.extend(kwargs.values())
         self.event_writer.writerow(row)
 

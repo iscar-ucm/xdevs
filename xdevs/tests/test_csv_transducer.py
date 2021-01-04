@@ -10,8 +10,9 @@ if __name__ == '__main__':
     csv.add_target_port(model.o_out)
 
     # Try to comment and uncomment the mapper lines to see the effect on the output file
-    csv.state_mapper = {'current_job': (str, lambda x: str(x.current_job))}
-    csv.event_mapper = {'name': (int, lambda x: x.name), 't': (int, lambda x: x.time)}
+    # csv.state_mapper = {'current_job': (str, lambda x: str(x.current_job))}
+    csv.state_mapper['current_job'] = (str, lambda x: str(x.current_job))
+    csv.event_mapper = {'name': (int, lambda x: x.name), 'time': (int, lambda x: x.time)}
 
     csv.initialize_transducer()
     clock = 0

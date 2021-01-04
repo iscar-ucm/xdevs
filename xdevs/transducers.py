@@ -22,7 +22,7 @@ class Transducer(ABC):
         self.transducer_id = kwargs.get('transducer_id')
         self.target_components = set()
         self.target_ports = set()
-        self.state_mapper = dict()
+        self.state_mapper = {'phase': (str, lambda x: x.phase), 'sigma': (float, lambda x: x.sigma)}
         self.event_mapper = {'value': (str, lambda x: str(x))}
 
     def add_target_component(self, component: Atomic) -> NoReturn:
@@ -44,6 +44,11 @@ class Transducer(ABC):
         pass
 
     @abstractmethod
+    def remove_transducer(self) -> NoReturn:
+        """Executes any required action before stopping simulation (e.g., removing incomplete output files)."""
+        pass
+
+    @abstractmethod
     def set_up_transducer(self) -> NoReturn:
         """Executes any required action before bulking new data to the destination (e.g., opening files for writing)."""
         pass
@@ -54,58 +59,58 @@ class Transducer(ABC):
         pass
 
     @abstractmethod
-    def bulk_state_data(self, time: float, name: str, phase: str, sigma: float, **kwargs) -> NoReturn:
+    def bulk_state_data(self, sim_time: float, model_name: str, **kwargs) -> NoReturn:
         """
         Executes any required action for bulking the new state of a model to the destination (e.g., writing a file).
-        :param time: simulation time that indicates when the state changed.
-        :param name: name of the atomic model that (potentially) changed its state.
-        :param phase: new phase of the atomic model.
-        :param sigma: new timeout of the new phase of the atomic model.
+        :param sim_time: simulation time that indicates when the state changed.
+        :param model_name: name of the atomic model that (potentially) changed its state.
         :param kwargs: any additional parameter that may be stored by the transducer.
         """
         pass
 
     @abstractmethod
-    def bulk_event_data(self, time: float, model_name: str, port_name: str, **kwargs) -> NoReturn:
+    def bulk_event_data(self, sim_time: float, model_name: str, port_name: str, **kwargs) -> NoReturn:
         """
         Executes any required action for bulking new messages in a port to the destination (e.g., writing a file).
-        :param time: simulation time that indicates when the new messages were created.
+        :param sim_time: simulation time that indicates when the new messages were created.
         :param model_name: name of the model that contains the port with the event(s).
         :param port_name: name of the port that contains the event(s).
         :param kwargs: any additional parameter that may be stored by the transducer.
         """
         pass
 
-    def activate_transducer(self, time: float, components: List[Atomic], ports: List[Port]) -> NoReturn:
+    def activate_transducer(self, sim_time: float, components: List[Atomic], ports: List[Port]) -> NoReturn:
         """
         Activates transducer and stores any state change or new event.
-        :param time: current simulation time.
+        :param sim_time: current simulation time.
         :param components: list of components that have changed their state.
         :param ports: list of ports that contain new events.
         """
-        self.set_up_transducer()
-        for component in components:
-            if component in self.target_components:
-                try:
-                    fields: Dict[str, Any] = {key: value[1](component) for key, value in self.state_mapper.items()}
-                except:
-                    logging.warning('Transducer {} failed when mapping '
-                                    'extra state values of model {}.'.format(self.transducer_id, component.name))
-                    continue
-                else:
-                    self.bulk_state_data(time, component.name, component.phase, component.sigma, **fields)
-        for port in ports:
-            if port in self.target_ports:
-                for event in port.values:
+        try:
+            self.set_up_transducer()
+            for component in components:
+                if component in self.target_components:
                     try:
-                        fields: Dict[str, Any] = {key: value[1](event) for key, value in self.event_mapper.items()}
+                        fields: Dict[str, Any] = {key: value[1](component) for key, value in self.state_mapper.items()}
                     except:
                         logging.warning('Transducer {} failed when mapping '
-                                        'extra event values of event {}.'.format(self.transducer_id, str(event)))
+                                        'extra state values of model {}.'.format(self.transducer_id, component.name))
                         continue
                     else:
-                        self.bulk_event_data(time, port.parent.name, port.name, **fields)
-        self.tear_down_transducer()
+                        self.bulk_state_data(sim_time, component.name, **fields)
+            for port in ports:
+                if port in self.target_ports:
+                    for event in port.values:
+                        try:
+                            fields: Dict[str, Any] = {key: value[1](event) for key, value in self.event_mapper.items()}
+                        except:
+                            logging.warning('Transducer {} failed when mapping '
+                                            'extra event values of event {}.'.format(self.transducer_id, str(event)))
+                            continue
+                        else:
+                            self.bulk_event_data(sim_time, port.parent.name, port.name, **fields)
+        finally:
+            self.tear_down_transducer()
 
 
 class Transducers:

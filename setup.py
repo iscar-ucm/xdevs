@@ -1,15 +1,18 @@
 from setuptools import setup
 
 setup(name='xdevs',
-      version='1.2',
+      version='2.1',
       description='xDEVS M&S framework',
       url='https://github.com/dacya/xdevs',
       author='Kevin Henares, Román Cárdenas',
       author_email='khenares@ucm.es, r.cardenas@upm.es',
       packages=['xdevs'],
       entry_points={
-        'xdevs.plugins.transducers': [
+          'xdevs.plugins.transducers': [
               'csv = xdevs.plugins.transducers.csv_transducer:CSVTransducer',
-              'broken = xdevs.plugins.transducers.broken_transducer:BrokenTransducer',
-        ]},
+              'sql = xdevs.plugins.transducers.sql_transducer:SQLTransducer',
+          ]},
+      extra_require={
+          'sql': ['sqlalchemy==1.3.22']
+      },
       zip_safe=False)
