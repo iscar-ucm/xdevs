@@ -1,9 +1,21 @@
 import logging
 import pkg_resources
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar
+from math import isinf, isnan
+from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar, Union
 from .models import Atomic, Component, Port
 
+
+def unknown_field_to_string(x: Any) -> str:
+    """Modifies field of unknown type to string"""
+    return str(x)
+
+
+def remove_special_numbers(x: Union[int, float]) -> Optional[Union[int, float]]:
+    """Modifies integer and float types to avoid infinity and NaNs (DBs usually are not able to deal with them)"""
+    if not (x is None or isnan(x) or isinf(x)):
+        return x
+    return None
 
 class Transducer(ABC):
 
@@ -24,6 +36,14 @@ class Transducer(ABC):
         self.target_ports = set()
         self.state_mapper = {'phase': (str, lambda x: x.phase), 'sigma': (float, lambda x: x.sigma)}
         self.event_mapper = {'value': (str, lambda x: str(x))}
+        self.state_inserts: List[Dict] = list()
+        self.event_inserts: List[Dict] = list()
+        self._remove_special_numbers: bool = False
+
+    def activate_remove_special_numbers(self):
+        logging.warning('Transducer {} does not support special number values (e.g., infinity). '
+                        'It will automatically substitute these values by None'.format(self.transducer_id))
+        self._remove_special_numbers = True
 
     def add_target_component(self, component: Atomic) -> NoReturn:
         self.target_components.add(component)
@@ -36,7 +56,14 @@ class Transducer(ABC):
 
     # TODO methods for adding models and ports according to regular expressions, type matching, etc.
 
-    # TODO methods for adding/removing mappings
+    @abstractmethod
+    def is_data_type_unknown(self, field_type) -> bool:
+        """
+        Returns whether or not the data type is known by the transducer.
+        :param field_type: data type
+        :return: True if data type is known.
+        """
+        pass
 
     @abstractmethod
     def initialize_transducer(self) -> NoReturn:
@@ -44,39 +71,8 @@ class Transducer(ABC):
         pass
 
     @abstractmethod
-    def remove_transducer(self) -> NoReturn:
-        """Executes any required action before stopping simulation (e.g., removing incomplete output files)."""
-        pass
-
-    @abstractmethod
-    def set_up_transducer(self) -> NoReturn:
-        """Executes any required action before bulking new data to the destination (e.g., opening files for writing)."""
-        pass
-
-    @abstractmethod
-    def tear_down_transducer(self) -> NoReturn:
-        """Executes any required action after bulking new data to the destination (e.g., closing a written files)."""
-        pass
-
-    @abstractmethod
-    def bulk_state_data(self, sim_time: float, model_name: str, **kwargs) -> NoReturn:
-        """
-        Executes any required action for bulking the new state of a model to the destination (e.g., writing a file).
-        :param sim_time: simulation time that indicates when the state changed.
-        :param model_name: name of the atomic model that (potentially) changed its state.
-        :param kwargs: any additional parameter that may be stored by the transducer.
-        """
-        pass
-
-    @abstractmethod
-    def bulk_event_data(self, sim_time: float, model_name: str, port_name: str, **kwargs) -> NoReturn:
-        """
-        Executes any required action for bulking new messages in a port to the destination (e.g., writing a file).
-        :param sim_time: simulation time that indicates when the new messages were created.
-        :param model_name: name of the model that contains the port with the event(s).
-        :param port_name: name of the port that contains the event(s).
-        :param kwargs: any additional parameter that may be stored by the transducer.
-        """
+    def bulk_data(self, state_inserts: List[Dict[str, Any]], event_inserts: List[Dict[str, Any]]) -> NoReturn:
+        """Executes any required action for bulking new data to the destination."""
         pass
 
     def activate_transducer(self, sim_time: float, components: List[Atomic], ports: List[Port]) -> NoReturn:
@@ -86,31 +82,38 @@ class Transducer(ABC):
         :param components: list of components that have changed their state.
         :param ports: list of ports that contain new events.
         """
-        try:
-            self.set_up_transducer()
-            for component in components:
-                if component in self.target_components:
-                    try:
-                        fields: Dict[str, Any] = {key: value[1](component) for key, value in self.state_mapper.items()}
-                    except:
-                        logging.warning('Transducer {} failed when mapping '
-                                        'extra state values of model {}.'.format(self.transducer_id, component.name))
-                        continue
-                    else:
-                        self.bulk_state_data(sim_time, component.name, **fields)
-            for port in ports:
-                if port in self.target_ports:
-                    for event in port.values:
-                        try:
-                            fields: Dict[str, Any] = {key: value[1](event) for key, value in self.event_mapper.items()}
-                        except:
-                            logging.warning('Transducer {} failed when mapping '
-                                            'extra event values of event {}.'.format(self.transducer_id, str(event)))
-                            continue
-                        else:
-                            self.bulk_event_data(sim_time, port.parent.name, port.name, **fields)
-        finally:
-            self.tear_down_transducer()
+        for component in components:
+            if component in self.target_components:
+                extra_fields = self.map_extra_fields(component, self.state_mapper)
+                self.state_inserts.append({'sim_time': sim_time, 'model_name': component.name, **extra_fields})
+        for port in ports:
+            if port in self.target_ports:
+                for event in port.values:
+                    extra_fields = self.map_extra_fields(event, self.event_mapper)
+                    self.event_inserts.append({'sim_time': sim_time, 'model_name': port.parent.name,
+                                               'port_name': port.name, **extra_fields})
+        if self.state_inserts or self.event_inserts:
+            self.bulk_data(self.state_inserts, self.event_inserts)
+            self.state_inserts.clear()
+            self.event_inserts.clear()
+
+    def map_extra_fields(self, target: Any, field_mapper: dict) -> Dict[str, Any]:
+        """
+        Maps fields from target object according to a field mapper.
+        :param target: target object that contains the additional data.
+        :param field_mapper: field mapper. It has the following structure: {'field_id': (data_type, getter_function)}.
+        :return: dictionary with the values to be bulked to the destination.
+        """
+        extra_fields: Dict[str, Any] = dict()
+        for field_id, (field_type, field_mapper) in field_mapper.items():
+            field_value = field_mapper(target)  # subtract extra field from target
+            if self.is_data_type_unknown(field_type):
+                field_value = str(field_value)  # unknown data types are automatically converted to string
+            elif field_type in [int, float] and self._remove_special_numbers:
+                if field_value is not None and (isnan(field_value) or isinf(field_value)):
+                    field_value = None  # special numeric values are changed to None when required
+            extra_fields[field_id] = field_value
+        return extra_fields
 
 
 class Transducers:

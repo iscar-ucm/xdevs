@@ -1,7 +1,7 @@
 import csv
 import errno
 import os
-from typing import IO, List, NoReturn, Optional
+from typing import Any, Dict, List, NoReturn
 from ...transducers import Transducer
 
 
@@ -18,46 +18,29 @@ class CSVTransducer(Transducer):
         output_dir = output_dir if output_dir[-1] == '/' else output_dir + '/'
         self.state_filename = output_dir + self.transducer_id + '_states.csv'
         self.event_filename = output_dir + self.transducer_id + '_events.csv'
-        self.state_file: Optional[IO] = None
-        self.event_file: Optional[IO] = None
-        self.state_writer = None
-        self.event_writer = None
+
+        self.state_header: List[str] = ['sim_time', 'model_name']
+        self.event_header: List[str] = ['sim_time', 'model_name', 'port_name']
+
+    def is_data_type_unknown(self, field_type) -> bool:
+        return field_type in [str, int, float, bool]
 
     def initialize_transducer(self) -> NoReturn:
         if self.target_components:
-            header: List[str] = ['sim_time', 'model_name']
-            header.extend(self.state_mapper)
-            self.create_csv_file(self.state_filename, header)
+            self.state_header.extend(self.state_mapper)
+            self.create_csv_file(self.state_filename, self.state_header)
         if self.target_ports:
-            header: List[str] = ['sim_time', 'model_name', 'port_name']
-            header.extend(self.event_mapper)
-            self.create_csv_file(self.event_filename, header)
+            self.event_header.extend(self.event_mapper)
+            self.create_csv_file(self.event_filename, self.event_header)
 
-    def remove_transducer(self) -> NoReturn:
-        pass
-
-    def set_up_transducer(self) -> NoReturn:
-        if self.target_components:
-            self.state_file = open(self.state_filename, 'a', newline='')
-            self.state_writer = csv.writer(self.state_file, delimiter=self.delimiter)
-        if self.target_ports:
-            self.event_file = open(self.event_filename, 'a', newline='')
-            self.event_writer = csv.writer(self.event_file, delimiter=self.delimiter)
-
-    def tear_down_transducer(self) -> NoReturn:
-        for file in [self.state_file, self.event_file]:
-            if file is not None:
-                file.close()
-
-    def bulk_state_data(self, sim_time: float, model_name: str, **kwargs) -> NoReturn:
-        row: list = [sim_time, model_name]
-        row.extend(kwargs.values())
-        self.state_writer.writerow(row)
-
-    def bulk_event_data(self, sim_time: float, model_name: str, port_name: str, **kwargs) -> NoReturn:
-        row: list = [sim_time, model_name, port_name]
-        row.extend(kwargs.values())
-        self.event_writer.writerow(row)
+    def bulk_data(self, state_inserts: List[Dict[str, Any]], event_inserts: List[Dict[str, Any]]) -> NoReturn:
+        for (inserts, filename, header) in [(state_inserts, self.state_filename, self.state_header),
+                                            (event_inserts, self.event_filename, self.event_header)]:
+            if inserts:
+                with open(filename, 'a', newline='') as csv_file:
+                    writer = csv.writer(csv_file, delimiter=self.delimiter)
+                    for insert in inserts:
+                        writer.writerow([insert[field] for field in header])
 
     def create_csv_file(self, filename: str, header: List[str]):
         # 1. If output file already exist, we ask the use if he/she wants to overwrite it.

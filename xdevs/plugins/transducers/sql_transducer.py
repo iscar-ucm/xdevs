@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, NoReturn, Optional
+from typing import Any, Dict, List, NoReturn, Optional
 from ...transducers import Transducer
 try:
     from sqlalchemy import create_engine, text, Column, Float, Integer, MetaData, String, Table
@@ -14,6 +14,7 @@ class SQLTransducer(Transducer):
         if not _dependencies_ok:
             raise ImportError('Dependencies are not imported')
         super().__init__(**kwargs)
+        self.activate_remove_special_numbers()
 
         url: str = kwargs.get('url')
         echo: bool = kwargs.get('echo', False)
@@ -21,9 +22,10 @@ class SQLTransducer(Transducer):
         self.string_length: int = kwargs.get('string_length', 128)
         self.state_table: Optional[Table] = None
         self.event_table: Optional[Table] = None
+        self.supported_data_types = {str: String(self.string_length), int: Integer, float: Float}
 
-        self.state_inserts: List[Dict] = list()
-        self.event_inserts: List[Dict] = list()
+    def is_data_type_unknown(self, field_type) -> bool:
+        return field_type not in self.supported_data_types
 
     def initialize_transducer(self) -> NoReturn:
         if self.target_components:
@@ -40,27 +42,15 @@ class SQLTransducer(Transducer):
                        Column('port_name', String(self.string_length), nullable=False)]
             self.event_table = self.create_table(table_name, columns, self.event_mapper)
 
-    def remove_transducer(self) -> NoReturn:
-        pass
-
-    def set_up_transducer(self) -> NoReturn:
-        pass
-
-    def tear_down_transducer(self) -> NoReturn:
+    def bulk_data(self, state_inserts: List[Dict[str, Any]], event_inserts: List[Dict[str, Any]]) -> NoReturn:
         conn = self.engine.connect()
-        if self.state_inserts:
-            conn.execute(self.state_table.insert(), self.state_inserts)
-            self.state_inserts = list()
-        if self.event_inserts:
-            conn.execute(self.event_table.insert(), self.event_inserts)
-            self.event_inserts = list()
-        conn.close()
-
-    def bulk_state_data(self, sim_time: float, model_name: str, **kwargs) -> NoReturn:
-        self.state_inserts.append({'sim_time': sim_time, 'model_name': model_name, **kwargs})
-
-    def bulk_event_data(self, sim_time: float, model_name: str, port_name: str, **kwargs) -> NoReturn:
-        self.event_inserts.append({'sim_time': sim_time, 'model_name': model_name, 'port_name': port_name, **kwargs})
+        try:
+            if state_inserts:
+                conn.execute(self.state_table.insert(), state_inserts)
+            if event_inserts:
+                conn.execute(self.event_table.insert(), event_inserts)
+        finally:
+            conn.close()
 
     def create_table(self, table_name: str, columns: List[Column], columns_mapper: Dict[str, tuple]) -> Table:
         # 1. When table exist, we ask the user if he/she wants to overwrite it
@@ -77,15 +67,12 @@ class SQLTransducer(Transducer):
 
         # 2. Deduce the columns of the table and their corresponding data type
         for state_field, (field_type, field_getter) in columns_mapper.items():
-            column_type = String(self.string_length)
-            if field_type == int:
-                column_type = Integer
-            elif field_type == float:
-                column_type = Float
-            elif field_type != str:  # Unknown types are forced to be strings
+            column_type = self.supported_data_types.get(field_type, None)
+            if column_type is None:
+                column_type = self.supported_data_types[str]
+                # TODO move this warning to parent class
                 logging.warning('SQL transducer {} will cast type of column {} to string'.format(self.transducer_id,
                                                                                                  state_field))
-                columns_mapper[state_field] = (str, lambda x: str(field_getter(x)))
             columns.append(Column(state_field, column_type))
         # 3. Create the table
         metadata = MetaData()

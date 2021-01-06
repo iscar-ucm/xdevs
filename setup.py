@@ -11,8 +11,10 @@ setup(name='xdevs',
           'xdevs.plugins.transducers': [
               'csv = xdevs.plugins.transducers.csv_transducer:CSVTransducer',
               'sql = xdevs.plugins.transducers.sql_transducer:SQLTransducer',
+              'elasticsearch = xdevs.plugins.transducers.elasticsearch_transducer:ElasticsearchTransducer',
           ]},
       extra_require={
-          'sql': ['sqlalchemy==1.3.22']
+          'sql': ['sqlalchemy==1.3.22'],
+          'elasticsearch': ['elasticsearch==7.10.1'],
       },
       zip_safe=False)

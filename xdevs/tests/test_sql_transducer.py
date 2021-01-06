@@ -15,7 +15,6 @@ if __name__ == '__main__':
     # Try to comment and uncomment the mapper lines to see the effect on the output file
     # csv.state_mapper = {'current_job': (str, lambda x: str(x.current_job))}
     sql.state_mapper['current_job'] = (Job, lambda x: x.current_job)
-    sql.state_mapper['sigma'] = (float, lambda x: x.sigma if x.sigma != inf else None)  # infinity is not compatible with most SQL engines
     sql.event_mapper = {'name': (int, lambda x: x.name), 'time': (int, lambda x: x.time)}
 
     sql.initialize_transducer()
