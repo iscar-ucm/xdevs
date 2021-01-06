@@ -24,7 +24,7 @@ class SQLTransducer(Transducer):
         self.event_table: Optional[Table] = None
         self.supported_data_types = {str: String(self.string_length), int: Integer, float: Float}
 
-    def is_data_type_unknown(self, field_type) -> bool:
+    def _is_data_type_unknown(self, field_type) -> bool:
         return field_type not in self.supported_data_types
 
     def initialize_transducer(self) -> NoReturn:

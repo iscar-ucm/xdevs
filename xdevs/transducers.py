@@ -57,7 +57,7 @@ class Transducer(ABC):
     # TODO methods for adding models and ports according to regular expressions, type matching, etc.
 
     @abstractmethod
-    def is_data_type_unknown(self, field_type) -> bool:
+    def _is_data_type_unknown(self, field_type) -> bool:
         """
         Returns whether or not the data type is known by the transducer.
         :param field_type: data type
@@ -107,9 +107,9 @@ class Transducer(ABC):
         extra_fields: Dict[str, Any] = dict()
         for field_id, (field_type, field_mapper) in field_mapper.items():
             field_value = field_mapper(target)  # subtract extra field from target
-            if self.is_data_type_unknown(field_type):
+            if self._is_data_type_unknown(field_type):
                 field_value = str(field_value)  # unknown data types are automatically converted to string
-            elif field_type in [int, float] and self._remove_special_numbers:
+            elif self._remove_special_numbers and field_type in (int, float):
                 if field_value is not None and (isnan(field_value) or isinf(field_value)):
                     field_value = None  # special numeric values are changed to None when required
             extra_fields[field_id] = field_value
