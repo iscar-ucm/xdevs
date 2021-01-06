@@ -1,5 +1,8 @@
+
+import inspect
 import logging
 import pkg_resources
+import re
 from abc import ABC, abstractmethod
 from math import isinf, isnan
 from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar, Union
@@ -58,7 +61,18 @@ class Transducer(ABC):
             raise ValueError('Port {} does not have a parent component', port.name)
         self.target_ports.add(port)
 
-    # TODO methods for adding models and ports according to regular expressions, type matching, etc.
+    def filter_components(self, comp_filter):
+        """
+        Filter current target components.
+        :param comp_filter: it can be a callable (lambda model: condition(model)) a
+        regex (to filter based on the components name), or a type (to keep instances of a specific name)
+        """
+        if inspect.isfunction(comp_filter):
+            self.target_components = set(filter(comp_filter, self.target_components))
+        elif type(comp_filter) is str:
+            self.target_components = set((c for c in self.target_components if re.match(comp_filter, c.name)))
+        else:
+            self.target_components = set((c for c in self.target_components if isinstance(c, comp_filter)))
 
     @abstractmethod
     def _is_data_type_unknown(self, field_type) -> bool:
