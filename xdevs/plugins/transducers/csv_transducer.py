@@ -21,25 +21,28 @@ class CSVTransducer(Transducer):
         self.state_header: List[str] = ['sim_time', 'model_name']
         self.event_header: List[str] = ['sim_time', 'model_name', 'port_name']
 
+        self.state_csv_file = None
+        self.event_csv_file = None
+        self.state_csv_writer = None
+        self.event_csv_writer = None
+
     def _is_data_type_unknown(self, field_type) -> bool:
         return field_type in [str, int, float, bool]
 
     def initialize_transducer(self) -> NoReturn:
         if self.target_components:
             self.state_header.extend(self.state_mapper)
-            self._create_csv_file(self.state_filename, self.state_header)
+            self.state_csv_file, self.state_csv_writer = self._create_csv_file(self.state_filename, self.state_header)
         if self.target_ports:
             self.event_header.extend(self.event_mapper)
-            self._create_csv_file(self.event_filename, self.event_header)
+            self.event_csv_file, self.event_csv_writer = self._create_csv_file(self.event_filename, self.event_header)
 
     def bulk_data(self, state_inserts: List[Dict[str, Any]], event_inserts: List[Dict[str, Any]]) -> NoReturn:
-        for (inserts, filename, header) in [(state_inserts, self.state_filename, self.state_header),
-                                            (event_inserts, self.event_filename, self.event_header)]:
-            if inserts:
-                with open(filename, 'a', newline='') as csv_file:
-                    writer = csv.writer(csv_file, delimiter=self.delimiter)
-                    for insert in inserts:
-                        writer.writerow([insert[field] for field in header])
+        for state_insert in state_inserts:
+            self.state_csv_writer.writerow([state_insert[field] for field in self.state_header])
+
+        for event_insert in event_inserts:
+            self.event_csv_writer.writerow([event_insert[field] for field in self.event_header])
 
     def _create_csv_file(self, filename: str, header: List[str]):
         # 1. If output file already exist, we ask the use if he/she wants to overwrite it.
@@ -52,6 +55,8 @@ class CSVTransducer(Transducer):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
         # 3. Create output CSV file and write the header row.
-        with open(filename, 'w', newline='') as csv_file:
-            writer = csv.writer(csv_file, delimiter=self.delimiter)
-            writer.writerow(header)
+        csv_file = open(filename, 'w')
+        writer = csv.writer(csv_file, delimiter=self.delimiter)
+        writer.writerow(header)
+
+        return csv_file, writer
