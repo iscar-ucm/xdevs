@@ -3,7 +3,7 @@ import pkg_resources
 from abc import ABC, abstractmethod
 from math import isinf, isnan
 from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar, Union
-from .models import Atomic, Component, Port
+from .models import Atomic, Component, Coupled, Port
 
 
 def unknown_field_to_string(x: Any) -> str:
@@ -45,8 +45,12 @@ class Transducer(ABC):
                         'It will automatically substitute these values by None'.format(self.transducer_id))
         self._remove_special_numbers = True
 
-    def add_target_component(self, component: Atomic) -> NoReturn:
-        self.target_components.add(component)
+    def add_target_component(self, component: Atomic or Coupled) -> NoReturn:
+        if isinstance(component, Atomic):
+            self.target_components.add(component)
+        else:  # Coupled
+            for child_comp in component.components:
+                self.add_target_component(child_comp)
 
     def add_target_port(self, port: Port) -> NoReturn:
         parent: Optional[Component] = port.parent
