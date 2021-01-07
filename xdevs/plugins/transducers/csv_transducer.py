@@ -27,7 +27,7 @@ class CSVTransducer(Transducer):
         self.event_csv_writer = None
 
     def _is_data_type_unknown(self, field_type) -> bool:
-        return field_type in [str, int, float, bool]
+        return field_type not in [str, int, float, bool]
 
     def initialize_transducer(self) -> NoReturn:
         if self.target_components:
