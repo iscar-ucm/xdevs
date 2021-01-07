@@ -3,7 +3,7 @@ from xdevs.transducers import Transducer, Transducers
 
 
 class AnotherDummyTransducer(Transducer):
-    def initialize_transducer(self) -> NoReturn:
+    def initialize(self) -> NoReturn:
         pass
 
     def bulk_state_data(self, time: float, name: str, phase: str, sigma: float, **kwargs) -> NoReturn:

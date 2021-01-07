@@ -27,7 +27,7 @@ class SQLTransducer(Transducer):
     def _is_data_type_unknown(self, field_type) -> bool:
         return field_type not in self.supported_data_types
 
-    def initialize_transducer(self) -> NoReturn:
+    def initialize(self) -> NoReturn:
         if self.target_components:
             table_name: str = self.transducer_id + '_states'
             columns = [Column('id', Integer, primary_key=True, autoincrement=True),

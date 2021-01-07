@@ -17,7 +17,7 @@ if __name__ == '__main__':
     es.state_mapper['current_job'] = (str, lambda x: str(x.current_job))
     es.event_mapper = {'name': (int, lambda x: x.name), 'time': (int, lambda x: x.time)}
 
-    es.initialize_transducer()
+    es.initialize()
     clock = 0
     es.activate_transducer(clock, [model], [])
 

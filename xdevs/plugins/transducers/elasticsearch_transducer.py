@@ -25,7 +25,7 @@ class ElasticsearchTransducer(Transducer):
     def _is_data_type_unknown(self, field_type) -> bool:
         return field_type not in self.supported_data_types
 
-    def initialize_transducer(self) -> NoReturn:
+    def initialize(self) -> NoReturn:
         if self.target_components:
             fields = {
                 'sim_time': {'type': 'double'},

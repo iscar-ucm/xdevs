@@ -14,7 +14,7 @@ class CSVTransducer(Transducer):
         """
         super().__init__(**kwargs)
         self.delimiter: str = kwargs.get('delimiter', ',')
-        output_dir: str = kwargs.get('output_dir', './')
+        output_dir: str = kwargs.get('output_dir', '.')
         self.state_filename = os.path.join(output_dir, self.transducer_id + '_states.csv')
         self.event_filename = os.path.join(output_dir, self.transducer_id + '_events.csv')
 
@@ -29,7 +29,7 @@ class CSVTransducer(Transducer):
     def _is_data_type_unknown(self, field_type) -> bool:
         return field_type not in [str, int, float, bool]
 
-    def initialize_transducer(self) -> NoReturn:
+    def initialize(self) -> NoReturn:
         if self.target_components:
             self.state_header.extend(self.state_mapper)
             self.state_csv_file, self.state_csv_writer = self._create_csv_file(self.state_filename, self.state_header)
@@ -37,11 +37,17 @@ class CSVTransducer(Transducer):
             self.event_header.extend(self.event_mapper)
             self.event_csv_file, self.event_csv_writer = self._create_csv_file(self.event_filename, self.event_header)
 
-    def bulk_data(self, state_inserts: List[Dict[str, Any]], event_inserts: List[Dict[str, Any]]) -> NoReturn:
-        for state_insert in state_inserts:
+    def exit(self):
+        if self.state_csv_file:
+            self.state_csv_file.close()
+        if self.event_csv_file:
+            self.event_csv_file.close()
+
+    def bulk_data(self, sim_time: float):
+        for state_insert in self._iterate_state_inserts(sim_time):
             self.state_csv_writer.writerow([state_insert[field] for field in self.state_header])
 
-        for event_insert in event_inserts:
+        for event_insert in self._iterate_event_inserts(sim_time):
             self.event_csv_writer.writerow([event_insert[field] for field in self.event_header])
 
     def _create_csv_file(self, filename: str, header: List[str]):

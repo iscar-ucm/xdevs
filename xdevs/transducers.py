@@ -5,8 +5,8 @@ import pkg_resources
 import re
 from abc import ABC, abstractmethod
 from math import isinf, isnan
-from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar, Union
-from .models import Atomic, Component, Coupled, Port
+from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar, Union, Iterable
+from xdevs.models import Atomic, Component, Coupled, Port
 
 
 def unknown_field_to_string(x: Any) -> str:
@@ -84,36 +84,38 @@ class Transducer(ABC):
         pass
 
     @abstractmethod
-    def initialize_transducer(self) -> NoReturn:
+    def initialize(self) -> NoReturn:
         """Executes any required action before starting simulation (e.g., creating output file)."""
         pass
 
     @abstractmethod
-    def bulk_data(self, state_inserts: List[Dict[str, Any]], event_inserts: List[Dict[str, Any]]) -> NoReturn:
+    def exit(self) -> NoReturn:
+        """Executes any required action after complete simulation (e.g., close output file)."""
+        pass
+
+    @abstractmethod
+    def bulk_data(self, sim_time: float):
         """Executes any required action for bulking new data to the destination."""
         pass
 
-    def activate_transducer(self, sim_time: float, components: List[Atomic], ports: List[Port]) -> NoReturn:
-        """
-        Activates transducer and stores any state change or new event.
-        :param sim_time: current simulation time.
-        :param components: list of components that have changed their state.
-        :param ports: list of ports that contain new events.
-        """
+    def _iterate_state_inserts(self, sim_time: float, components: Iterable[Atomic] = None):
+        if components is None:
+            components = self.target_components
+
+        # TODO: filter actually changed states
         for component in components:
-            if component in self.target_components:
-                extra_fields = self.map_extra_fields(component, self.state_mapper)
-                self.state_inserts.append({'sim_time': sim_time, 'model_name': component.name, **extra_fields})
+            extra_fields = self.map_extra_fields(component, self.state_mapper)
+            yield {'sim_time': sim_time, 'model_name': component.name, **extra_fields}
+
+    def _iterate_event_inserts(self, sim_time: float, ports: Iterable[Port] = None):
+        if ports is None:
+            ports = self.target_ports
+
         for port in ports:
-            if port in self.target_ports:
-                for event in port.values:
-                    extra_fields = self.map_extra_fields(event, self.event_mapper)
-                    self.event_inserts.append({'sim_time': sim_time, 'model_name': port.parent.name,
-                                               'port_name': port.name, **extra_fields})
-        if self.state_inserts or self.event_inserts:
-            self.bulk_data(self.state_inserts, self.event_inserts)
-            self.state_inserts.clear()
-            self.event_inserts.clear()
+            for event in port.values:
+                extra_fields = self.map_extra_fields(event, self.event_mapper)
+                yield{'sim_time': sim_time, 'model_name': port.parent.name,
+                                           'port_name': port.name, **extra_fields}
 
     def map_extra_fields(self, target: Any, field_mapper: dict) -> Dict[str, Any]:
         """
