@@ -5,6 +5,7 @@ from xmlrpc.server import SimpleXMLRPCServer
 
 from concurrent import futures
 
+from xdevs.transducers import Transducer
 from . import INFINITY, get_logger
 from .models import Atomic, Coupled
 
@@ -105,6 +106,7 @@ class Coordinator(AbstractSimulator):
 
         self.coordinators = []
         self.simulators = []
+        self.transducers = []
         self.model = model
         if chain:
             if not unroll:
@@ -130,6 +132,9 @@ class Coordinator(AbstractSimulator):
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.ta()
 
+        for transducer in self.transducers:
+            transducer.initialize()
+
     def _build_hierarchy(self):
         for comp in self.model.components:
             if isinstance(comp, Coupled):
@@ -150,14 +155,20 @@ class Coordinator(AbstractSimulator):
                 port_name = "%s.%s" % (pts.parent.name, pts.name)
                 self.ports_to_serve[port_name] = pts
 
+    def add_transducer(self, transducer: Transducer):
+        self.transducers.append(transducer)
+
     def serve(self, host="localhost", port=8000):
         server = SimpleXMLRPCServer((host, port))
         server.register_function(self.inject)
         _thread.start_new_thread(server.serve_forever, ())
 
     def exit(self):
-        for proc in self.processors:
-            proc.exit()
+        for processor in self.processors:
+            processor.exit()
+
+        for transducer in self.transducers:
+            transducer.exit()
 
     def ta(self):
         return min([proc.time_next for proc in self.processors], default=INFINITY) - self.clock.time
@@ -250,6 +261,10 @@ class Coordinator(AbstractSimulator):
         while self.clock.time < tf:
             self.lambdaf()
             self.deltfcn()
+
+            for tranducer in self.transducers:
+                tranducer.bulk_data(self.clock.time)
+
             self.clear()
             self.clock.time = self.time_next
 
