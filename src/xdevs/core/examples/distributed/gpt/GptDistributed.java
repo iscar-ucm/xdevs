@@ -60,9 +60,12 @@ public class GptDistributed extends Coupled implements DistributedInterface{
     }
     private static final Logger LOGGER = Logger.getLogger(GptDistributed.class.getName());
     public static void main(String[] args) {
+        if(args.length==0) {
+            args = new String[]{"5.0", "100.0", "tmp" + File.separator + "gpt.xml"};
+        }
         DevsLogger.setup(Level.INFO);
         System.out.println("Run Coordinator Atomic....");
-        GptDistributed gpt = new GptDistributed("GPT", 5, 100, File.separator + "tmp" + File.separator + "example.xml"); 
+        GptDistributed gpt = new GptDistributed(Double.valueOf(args[0]), Double.valueOf(args[1]), args[2]);
         CoordinatorDistributed coordinator = new CoordinatorDistributed(gpt);
         long start = System.currentTimeMillis();
         coordinator.initialize();

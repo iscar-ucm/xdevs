@@ -5,11 +5,7 @@
  */
 package xdevs.core.examples.distributed.gpt;
 
-import java.util.logging.Level;
 import java.util.regex.Pattern;
-import xdevs.core.simulation.distributed.CoordinatorDistributed;
-import xdevs.core.simulation.distributed.SimulatorDistributed;
-import xdevs.core.util.DevsLogger;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -26,7 +22,7 @@ import java.io.FileWriter;
  *
  * (*) = Required for all (-) = Optional for Simulator
  */
-public class Node {
+public class CoupledToDistributedFactory {
 
     public static void createXmlFile(String importantData, String XMLName) {
         // Get data
@@ -61,7 +57,7 @@ public class Node {
                     + "    <connection atomicFrom=\"Generator\" classFrom=\"xdevs.core.test.efp.Generator\" portFrom=\"oOut\" atomicTo=\"Processor\" classTo=\"xdevs.core.test.efp.Processor\" portTo=\"iIn\"/>\n"
                     + "    <connection atomicFrom=\"Generator\" classFrom=\"xdevs.core.test.efp.Generator\" portFrom=\"oOut\" atomicTo=\"Transducer\" classTo=\"xdevs.core.test.efp.Transducer\" portTo=\"iArrived\"/>\n"
                     + "    <connection atomicFrom=\"Transducer\" classFrom=\"xdevs.core.test.efp.Transducer\" portFrom=\"oOut\" atomicTo=\"Generator\" classTo=\"xdevs.core.test.efp.Generator\" portTo=\"iStop\"/>\n"
-                    + "</simulation>";
+                    + "</simulation>\n";
             File file = new File(XMLName);
             if (!file.exists()) {
                 file.createNewFile();
@@ -76,11 +72,16 @@ public class Node {
     }
 
     public static void main(String[] args) {
-        DevsLogger.setup(Level.INFO);
+        /*DevsLogger.setup(Level.INFO);
         GptDistributed gpt = new GptDistributed("GPT", 5, 100, File.separator + "tmp" + File.separator + "example.xml");
         CoordinatorDistributed coordinator = new CoordinatorDistributed(gpt);
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
-        coordinator.exit();
+        coordinator.exit();*/
+        String xmlContent = "GPT;127.0.0.1;0000;0000#";
+        xmlContent += "Generator;127.0.0.1;5001;6001#";
+        xmlContent += "Processor;127.0.0.1;5002;6002#";
+        xmlContent += "Transducer;127.0.0.1;5003;6003";
+        CoupledToDistributedFactory.createXmlFile(xmlContent, "tmp" + File.separator + "gpt.xml");
     }
 }

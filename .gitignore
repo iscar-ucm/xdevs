@@ -1,6 +1,8 @@
 target
+tmp
 *.swp
 *.log
+*.log.*
 
 # IntelliJ stuff
 .idea/

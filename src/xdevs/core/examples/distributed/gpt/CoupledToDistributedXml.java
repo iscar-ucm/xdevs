@@ -15,11 +15,11 @@ import xdevs.core.modeling.Coupled;
  *
  * @author Almendras
  */
-public class Test {
+public class CoupledToDistributedXml {
     public static void main(String[] args) throws Exception {
         Coupled efp = new Efp("GPT", 1, 3, 100);
         Coupled newEfp = efp.flatten();
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(File.separator + "tmp" + File.separator + "example.xml")))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File("tmp" + File.separator + "example.xml")))) {
             writer.write(newEfp.getDistributedModel());
         }
     } 

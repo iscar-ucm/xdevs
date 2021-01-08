@@ -21,11 +21,13 @@
  */
 package xdevs.core.examples.efp;
 
+import java.io.Serializable;
+
 /**
  *
  * @author jlrisco
  */
-public class Job {
+public class Job implements Serializable {
 
   protected String id;
   protected double time;

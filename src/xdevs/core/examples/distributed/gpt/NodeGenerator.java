@@ -14,10 +14,13 @@ import xdevs.core.util.DevsLogger;
  *
  * @author Almendras
  */
-public class Node1 {
+public class NodeGenerator {
     public static void main(String[] args) {
+        if(args.length==0) {
+            args = new String[]{"5.0", "100.0", "tmp" + File.separator + "gpt.xml"};
+        }
         DevsLogger.setup(Level.INFO);
-        GptDistributed gpt = new GptDistributed(5, 100, File.separator + "tmp" + File.separator + "example.xml");
+        GptDistributed gpt = new GptDistributed(Double.valueOf(args[0]), Double.valueOf(args[1]), args[2]);
         //SimulatorDistributed p = new SimulatorDistributed(gpt, "172.17.0.3",5001,6001);
         System.out.println("Run Generator Atomic....");
         SimulatorDistributed p = new SimulatorDistributed(gpt, "127.0.0.1", 5001, 6001);  
