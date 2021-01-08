@@ -249,6 +249,7 @@ class Coordinator(AbstractSimulator):
         while cont < num_iters and self.clock.time < INFINITY:
             self.lambdaf()
             self.deltfcn()
+            self._execute_transducers()
             self.clear()
             self.clock.time = self.time_next
             cont += 1
@@ -261,10 +262,7 @@ class Coordinator(AbstractSimulator):
         while self.clock.time < tf:
             self.lambdaf()
             self.deltfcn()
-
-            for tranducer in self.transducers:
-                tranducer.bulk_data(self.clock.time)
-
+            self._execute_transducers()
             self.clear()
             self.clock.time = self.time_next
 
@@ -273,8 +271,14 @@ class Coordinator(AbstractSimulator):
         while True:
             self.lambdaf()
             self.deltfcn()
+            self._execute_transducers()
             self.clear()
             self.clock.time = self.time_next
+
+    def _execute_transducers(self):
+        for tranducer in self.transducers:
+            if tranducer.active:
+                tranducer.bulk_data(self.clock.time)
 
 
 class ParallelCoordinator(Coordinator):

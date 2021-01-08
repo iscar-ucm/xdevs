@@ -42,6 +42,7 @@ class Transducer(ABC):
         self.state_inserts: List[Dict] = list()
         self.event_inserts: List[Dict] = list()
         self._remove_special_numbers: bool = False
+        self.active = True
 
     def activate_remove_special_numbers(self):
         logging.warning('Transducer {} does not support special number values (e.g., infinity). '
@@ -73,6 +74,12 @@ class Transducer(ABC):
             self.target_components = set((c for c in self.target_components if re.match(comp_filter, c.name)))
         else:
             self.target_components = set((c for c in self.target_components if isinstance(c, comp_filter)))
+
+    def pause(self):
+        self.active = False
+
+    def resume(self):
+        self.active = True
 
     @abstractmethod
     def _is_data_type_unknown(self, field_type) -> bool:
