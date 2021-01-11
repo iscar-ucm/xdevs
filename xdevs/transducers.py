@@ -5,7 +5,7 @@ import pkg_resources
 import re
 from abc import ABC, abstractmethod
 from math import isinf, isnan
-from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar, Union, Iterable
+from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar, Union
 from xdevs.models import Atomic, Component, Coupled, Port
 
 
@@ -20,6 +20,7 @@ def remove_special_numbers(x: Union[int, float]) -> Optional[Union[int, float]]:
         return x
     return None
 
+
 class Transducer(ABC):
 
     T = TypeVar('T')
@@ -32,9 +33,14 @@ class Transducer(ABC):
     def __init__(self, **kwargs):
         """
         Transducer for the xDEVS M&S tool.
-        :param transducer_id: ID of the transducer.
+        :param str transducer_id: ID of the transducer.
+        :param bool exhaustive: determines if the output contains the state of the target components for each iteration
+        (True) or only includes the change states (False).
         """
-        self.transducer_id = kwargs.get('transducer_id')
+        self.transducer_id = kwargs.get('transducer_id', None)
+        if self.transducer_id is None:
+            raise AttributeError("You must specify a transducer ID.")
+        self.exhaustive = kwargs.get('exhaustive', False)
         self.target_components = set()
         self.target_ports = set()
         self.state_mapper = {'phase': (str, lambda x: x.phase), 'sigma': (float, lambda x: x.sigma)}
@@ -43,6 +49,9 @@ class Transducer(ABC):
         self.event_inserts: List[Dict] = list()
         self._remove_special_numbers: bool = False
         self.active = True
+
+        self.imminent_components = None if self.exhaustive else []
+        self.imminent_ports = None if self.exhaustive else []
 
     def activate_remove_special_numbers(self):
         logging.warning('Transducer {} does not support special number values (e.g., infinity). '
@@ -66,13 +75,21 @@ class Transducer(ABC):
             raise ValueError('Port {} does not have a parent component', port.name)
         self.target_ports.add(port)
 
+    def add_imminent_model(self, component):
+        if not self.exhaustive and self.active:
+            self.imminent_components.append(component)
+
+    def add_imminent_port(self, port):
+        if not self.exhaustive and self.active:
+            self.imminent_ports.append(port)
+
     def filter_components(self, *filters):
         self.target_components = self._filter_components(filters)
 
     def _filter_components(self, comp_filters, components=None):
         """
         Filter current target components.
-        :param comp_filter: it can be a callable (lambda model: condition(model)) a
+        :param comp_filters: it can be a callable (lambda model: condition(model)) a
         regex (to filter based on the components name), or a type (to keep instances of a specific name)
         """
         if components is None:
@@ -120,24 +137,23 @@ class Transducer(ABC):
         pass
 
     def trigger(self, sim_time: float):
-        if not self.active:
-            return
+        if self.active:
+            self.bulk_data(sim_time)
 
-        self.bulk_data(sim_time)
+            if not self.exhaustive:
+                self.imminent_components.clear()
+                self.imminent_ports.clear()
 
-
-    def _iterate_state_inserts(self, sim_time: float, components: Iterable[Atomic] = None):
-        if components is None:
-            components = self.target_components
+    def _iterate_state_inserts(self, sim_time: float):
+        components = self.target_components if self.exhaustive else self.imminent_components
 
         # TODO: filter actually changed states
         for component in components:
             extra_fields = self.map_extra_fields(component, self.state_mapper)
             yield {'sim_time': sim_time, 'model_name': component.name, **extra_fields}
 
-    def _iterate_event_inserts(self, sim_time: float, ports: Iterable[Port] = None):
-        if ports is None:
-            ports = self.target_ports
+    def _iterate_event_inserts(self, sim_time: float):
+        ports = self.target_ports if self.exhaustive else self.imminent_ports
 
         for port in ports:
             for event in port.values:

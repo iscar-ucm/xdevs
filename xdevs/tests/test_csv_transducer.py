@@ -52,7 +52,7 @@ class TestCsvTransducer(TestCase):
 
     def test_basic_behavior(self):
         trans_id = "%s_test_basic_behavior" % self.__class__.__name__
-        csv = Transducers.create_transducer('csv', transducer_id=trans_id)
+        csv = Transducers.create_transducer('csv', transducer_id=trans_id, exhaustive=True)
 
         model = Processor('processor', 100)
         csv.add_target_component(model)
@@ -102,7 +102,7 @@ class TestCsvTransducer(TestCase):
 
     def test_behavior(self):
         trans_id = "%s_test_behavior" % self.__class__.__name__
-        csv_transducer = Transducers.create_transducer('csv', transducer_id=trans_id)
+        csv_transducer = Transducers.create_transducer('csv', transducer_id=trans_id, exhaustive=True)
 
         gpt = Gpt("gpt", 3, 1000)
         csv_transducer.add_target_component(gpt)

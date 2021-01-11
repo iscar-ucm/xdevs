@@ -1,15 +1,18 @@
 import _thread
+import itertools
 import pickle
+
 from abc import ABC, abstractmethod
+from collections import defaultdict
+from concurrent import futures
+from typing import Tuple, Optional
+
+from xdevs import INFINITY
+from xdevs.models import Atomic, Coupled, Component
+from xdevs.transducers import Transducer
 from xmlrpc.server import SimpleXMLRPCServer
 
-from concurrent import futures
-
-from xdevs.transducers import Transducer
-from . import INFINITY, get_logger
-from .models import Atomic, Coupled
-
-#logger = get_#logger(__name__)
+# logger = get_#logger(__name__)
 
 
 class SimulationClock:
@@ -18,7 +21,8 @@ class SimulationClock:
 
 
 class AbstractSimulator(ABC):
-    def __init__(self, clock: SimulationClock):
+    def __init__(self, model: Component, clock: SimulationClock):
+        self.model = model
         self.clock = clock
         self.time_last = 0
         self.time_next = 0
@@ -49,9 +53,20 @@ class AbstractSimulator(ABC):
 
 
 class Simulator(AbstractSimulator):
-    def __init__(self, model: Atomic, clock: SimulationClock):
-        super().__init__(clock)
-        self.model = model
+    model: Atomic
+
+    def __init__(self, model: Atomic, clock: SimulationClock,
+                 transducers_mapping: Optional[Tuple[defaultdict, defaultdict]] = None):
+        super().__init__(model, clock)
+
+        if transducers_mapping:
+            self.state_transducers = transducers_mapping[0].get(self.model, None)
+
+            self.port_transducers = {}
+            for port in itertools.chain(self.model.in_ports, self.model.out_ports):
+                transducers = transducers_mapping[1].get(port, None)
+                if transducers:
+                    self.port_transducers[port] = transducers
 
     @property
     def ta(self):
@@ -82,6 +97,15 @@ class Simulator(AbstractSimulator):
             else:
                 self.model.deltext(e)
 
+        if self.state_transducers is not None:
+            for trans in self.state_transducers:
+                trans.add_imminent_model(self.model)
+                
+        if self.port_transducers is not None:
+            for port, transducers in self.port_transducers.items():
+                for trans in transducers:
+                    trans.add_imminent_port(port)
+
         self.time_last = t
         self.time_next = self.time_last + self.model.ta
         ##logger.debug("Deltfcn %s: TL: %s, TN: %s" % (self.model.name, self.time_last, self.time_next))
@@ -100,14 +124,24 @@ class Simulator(AbstractSimulator):
 
 
 class Coordinator(AbstractSimulator):
+    model: Coupled
+
     def __init__(self, model: Coupled, clock: SimulationClock = None,
-                 flatten: bool = False, chain: bool = False, unroll: bool = True):
-        super().__init__(clock or SimulationClock())
+                 flatten: bool = False, chain: bool = False, unroll: bool = True,
+                 transducers_mapping: Optional[Tuple[defaultdict, defaultdict]] = None):
+        super().__init__(model, clock or SimulationClock())
 
         self.coordinators = []
         self.simulators = []
         self.transducers = []
-        self.model = model
+
+        if transducers_mapping:
+            self.port_transducers = {}
+            for port in itertools.chain(self.model.in_ports, self.model.out_ports):
+                transducers = transducers_mapping[1].get(port, None)
+                if transducers:
+                    self.port_transducers[port] = transducers
+
         if chain:
             if not unroll:
                 raise NotImplementedError
@@ -136,24 +170,32 @@ class Coordinator(AbstractSimulator):
             transducer.initialize()
 
     def _build_hierarchy(self):
+
+        if self.transducers:
+            models_to_transducers = defaultdict(list)
+            ports_to_transducers = defaultdict(list)
+            for transducer in self.transducers:
+                for model in transducer.target_components:
+                    models_to_transducers[model].append(transducer)
+                for port in transducer.target_ports:
+                    ports_to_transducers[port].append(transducer)
+
+            transducers = (models_to_transducers, ports_to_transducers)
+        else:
+            transducers = None
+
         for comp in self.model.components:
             if isinstance(comp, Coupled):
-                self._add_coordinator(comp)
+                coord = Coordinator(comp, self.clock, transducers_mapping=transducers)
+                self.coordinators.append(coord)
+                self.ports_to_serve.update(coord.ports_to_serve)
             elif isinstance(comp, Atomic):
-                self._add_simulator(comp)
-
-    def _add_coordinator(self, coupled: Coupled):
-        coord = Coordinator(coupled, self.clock)
-        self.coordinators.append(coord)
-        self.ports_to_serve.update(coord.ports_to_serve)
-
-    def _add_simulator(self, atomic: Atomic):
-        sim = Simulator(atomic, self.clock)
-        self.simulators.append(sim)
-        for pts in sim.model.in_ports:
-            if pts.serve:
-                port_name = "%s.%s" % (pts.parent.name, pts.name)
-                self.ports_to_serve[port_name] = pts
+                sim = Simulator(comp, self.clock, transducers_mapping=transducers)
+                self.simulators.append(sim)
+                for pts in sim.model.in_ports:
+                    if pts.serve:
+                        port_name = "%s.%s" % (pts.parent.name, pts.name)
+                        self.ports_to_serve[port_name] = pts
 
     def add_transducer(self, transducer: Transducer):
         self.transducers.append(transducer)
@@ -194,6 +236,11 @@ class Coordinator(AbstractSimulator):
 
         for proc in self.processors:
             proc.deltfcn()
+
+        if self.port_transducers is not None:
+            for port, transducers in self.port_transducers.items():
+                for trans in transducers:
+                    trans.add_imminent_port(port)
 
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.ta()
