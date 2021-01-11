@@ -49,12 +49,16 @@ class Transducer(ABC):
                         'It will automatically substitute these values by None'.format(self.transducer_id))
         self._remove_special_numbers = True
 
-    def add_target_component(self, component: Atomic or Coupled) -> NoReturn:
-        if isinstance(component, Atomic):
-            self.target_components.add(component)
+    def add_target_component(self, component: Atomic or Coupled, *filters) -> NoReturn:
+        components = self._iterate_components(component)
+        self.target_components |= self._filter_components(filters, components)
+
+    def _iterate_components(self, root_comp):
+        if isinstance(root_comp, Atomic):
+            yield root_comp
         else:  # Coupled
-            for child_comp in component.components:
-                self.add_target_component(child_comp)
+            for child_comp in root_comp.components:
+                yield from self._iterate_components(child_comp)
 
     def add_target_port(self, port: Port) -> NoReturn:
         parent: Optional[Component] = port.parent
@@ -62,18 +66,28 @@ class Transducer(ABC):
             raise ValueError('Port {} does not have a parent component', port.name)
         self.target_ports.add(port)
 
-    def filter_components(self, comp_filter):
+    def filter_components(self, *filters):
+        self.target_components = self._filter_components(filters)
+
+    def _filter_components(self, comp_filters, components=None):
         """
         Filter current target components.
         :param comp_filter: it can be a callable (lambda model: condition(model)) a
         regex (to filter based on the components name), or a type (to keep instances of a specific name)
         """
-        if inspect.isfunction(comp_filter):
-            self.target_components = set(filter(comp_filter, self.target_components))
-        elif type(comp_filter) is str:
-            self.target_components = set((c for c in self.target_components if re.match(comp_filter, c.name)))
-        else:
-            self.target_components = set((c for c in self.target_components if isinstance(c, comp_filter)))
+        if components is None:
+            components = self.target_components
+
+        filtered_comp = components
+        for comp_filter in comp_filters:
+            if inspect.isfunction(comp_filter):
+                filtered_comp = filter(comp_filter, filtered_comp)
+            elif type(comp_filter) is str:
+                filtered_comp = (c for c in filtered_comp if re.match(comp_filter, c.name))
+            else:
+                filtered_comp = (c for c in filtered_comp if isinstance(c, comp_filter))
+
+        return set(filtered_comp)
 
     def pause(self):
         self.active = False
