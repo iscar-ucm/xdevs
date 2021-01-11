@@ -45,8 +45,6 @@ class Transducer(ABC):
         self.target_ports = set()
         self.state_mapper = {'phase': (str, lambda x: x.phase), 'sigma': (float, lambda x: x.sigma)}
         self.event_mapper = {'value': (str, lambda x: str(x))}
-        self.state_inserts: List[Dict] = list()
-        self.event_inserts: List[Dict] = list()
         self._remove_special_numbers: bool = False
         self.active = True
 

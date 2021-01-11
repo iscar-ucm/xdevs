@@ -23,6 +23,7 @@ class SQLTransducer(Transducer):
         self.state_table: Optional[Table] = None
         self.event_table: Optional[Table] = None
         self.supported_data_types = {str: String(self.string_length), int: Integer, float: Float}
+        self.conn = self.engine.connect()
 
     def _is_data_type_unknown(self, field_type) -> bool:
         return field_type not in self.supported_data_types
@@ -42,15 +43,9 @@ class SQLTransducer(Transducer):
                        Column('port_name', String(self.string_length), nullable=False)]
             self.event_table = self.create_table(table_name, columns, self.event_mapper)
 
-    def bulk_data(self, state_inserts: List[Dict[str, Any]], event_inserts: List[Dict[str, Any]]) -> NoReturn:
-        conn = self.engine.connect()
-        try:
-            if state_inserts:
-                conn.execute(self.state_table.insert(), state_inserts)
-            if event_inserts:
-                conn.execute(self.event_table.insert(), event_inserts)
-        finally:
-            conn.close()
+    def bulk_data(self, sim_time: float) -> NoReturn:
+        self.conn.execute(self.state_table.insert(), self._iterate_state_inserts(sim_time))
+        self.conn.execute(self.event_table.insert(), self._iterate_event_inserts(sim_time))
 
     def create_table(self, table_name: str, columns: List[Column], columns_mapper: Dict[str, tuple]) -> Table:
         # 1. When table exist, we ask the user if he/she wants to overwrite it
@@ -61,9 +56,8 @@ class SQLTransducer(Transducer):
                                                                              self.engine.url))
             if input('Do you want to overwrite it? [Y/n] >').lower() in ['n', 'no']:
                 raise FileExistsError('table already exists on DB and user does not want to overwrite it')
-            conn = self.engine.connect()
-            conn.execute(text('DROP TABLE IF EXISTS {};'.format(table_name)))
-            conn.close()
+
+            self.conn.execute(text('DROP TABLE IF EXISTS {};'.format(table_name)))
 
         # 2. Deduce the columns of the table and their corresponding data type
         for state_field, (field_type, field_getter) in columns_mapper.items():
