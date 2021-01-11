@@ -277,8 +277,7 @@ class Coordinator(AbstractSimulator):
 
     def _execute_transducers(self):
         for tranducer in self.transducers:
-            if tranducer.active:
-                tranducer.bulk_data(self.clock.time)
+            tranducer.trigger(self.clock.time)
 
 
 class ParallelCoordinator(Coordinator):

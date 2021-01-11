@@ -119,6 +119,13 @@ class Transducer(ABC):
         """Executes any required action for bulking new data to the destination."""
         pass
 
+    def trigger(self, sim_time: float):
+        if not self.active:
+            return
+
+        self.bulk_data(sim_time)
+
+
     def _iterate_state_inserts(self, sim_time: float, components: Iterable[Atomic] = None):
         if components is None:
             components = self.target_components
