@@ -1,6 +1,6 @@
 import logging
-from typing import Any, Dict, List, NoReturn, Optional
-from ...transducers import Transducer
+from typing import Dict, List, NoReturn, Optional
+from xdevs.transducers import Transducer
 try:
     from sqlalchemy import create_engine, text, Column, Float, Integer, MetaData, String, Table
     _dependencies_ok = True
@@ -10,54 +10,68 @@ except ModuleNotFoundError:
 
 class SQLTransducer(Transducer):
     def __init__(self, **kwargs):
-        """xDEVS transducer for relational databases. It uses the SQLAlchemy driver"""
+        """
+        xDEVS transducer for relational databases. It uses the SQLAlchemy driver.
+        :param str url: URL of the database. It must follow the scheme required by the SQLAlchemy driver.
+        :param bool echo: If set to True, transducer will log the interactions with the database. Defaults to False.
+        :param bool pool_pre_ping: If set to True, transducer ensures that connections are open before
+        executing any operation. If needed, connections will be re-opened. Defaults to True.
+        :param int pool_recycle: If set to non -1, number of seconds between connection recycling. Defaults to -1.
+        :param int string_length: Maximum number of characters per string entries on the database. Defaults to 128.
+        """
         if not _dependencies_ok:
             raise ImportError('Dependencies are not imported')
         super().__init__(**kwargs)
         self.activate_remove_special_numbers()
 
         url: str = kwargs.get('url')
+        if url is None:
+            raise AttributeError('You must specify a database URL.')
         echo: bool = kwargs.get('echo', False)
-        self.engine = create_engine(url, echo=echo)
+        pool_pre_ping: bool = kwargs.get('pool_pre_ping', True)
+        pool_recycle: int = kwargs.get('pool_recycle', -1)
+        self.engine = create_engine(url, echo=echo, pool_pre_ping=pool_pre_ping, pool_recycle=pool_recycle)
+
         self.string_length: int = kwargs.get('string_length', 128)
         self.state_table: Optional[Table] = None
         self.event_table: Optional[Table] = None
         self.supported_data_types = {str: String(self.string_length), int: Integer, float: Float}
-        self.conn = self.engine.connect()
 
     def _is_data_type_unknown(self, field_type) -> bool:
         return field_type not in self.supported_data_types
 
     def initialize(self) -> NoReturn:
+        metadata = MetaData()
         if self.target_components:
             table_name: str = self.transducer_id + '_states'
-            columns = [Column('id', Integer, primary_key=True, autoincrement=True),
-                       Column('sim_time', Float, nullable=False),
-                       Column('model_name', String(self.string_length), nullable=False)]
-            self.state_table = self.create_table(table_name, columns, self.state_mapper)
+            columns = [Column('id', self.supported_data_types[int], primary_key=True, autoincrement=True),
+                       Column('sim_time', self.supported_data_types[float], nullable=False),
+                       Column('model_name', self.supported_data_types[str], nullable=False)]
+            self.state_table = self.create_table(table_name, columns, self.state_mapper, metadata)
         if self.target_ports:
             table_name: str = self.transducer_id + '_events'
-            columns = [Column('id', Integer, primary_key=True, autoincrement=True),
-                       Column('sim_time', Float, nullable=False),
-                       Column('model_name', String(self.string_length), nullable=False),
-                       Column('port_name', String(self.string_length), nullable=False)]
-            self.event_table = self.create_table(table_name, columns, self.event_mapper)
+            columns = [Column('id', self.supported_data_types[int], primary_key=True, autoincrement=True),
+                       Column('sim_time', self.supported_data_types[float], nullable=False),
+                       Column('model_name', self.supported_data_types[str], nullable=False),
+                       Column('port_name', self.supported_data_types[str], nullable=False)]
+            self.event_table = self.create_table(table_name, columns, self.event_mapper, metadata)
+        metadata.create_all(self.engine)
 
     def bulk_data(self, sim_time: float) -> NoReturn:
-        self.conn.execute(self.state_table.insert(), self._iterate_state_inserts(sim_time))
-        self.conn.execute(self.event_table.insert(), self._iterate_event_inserts(sim_time))
+        with self.engine.connect() as conn:
+            for insertion in self._iterate_state_inserts(sim_time):
+                conn.execute(self.state_table.insert().values(**insertion))
+            for insertion in self._iterate_event_inserts(sim_time):
+                conn.execute(self.event_table.insert().values(**insertion))
 
-    def create_table(self, table_name: str, columns: List[Column], columns_mapper: Dict[str, tuple]) -> Table:
-        # 1. When table exist, we ask the user if he/she wants to overwrite it
-        metadata = MetaData(self.engine, reflect=True)
-        table = metadata.tables.get(table_name)
-        if table is not None:
-            print('SQL transducer {}: table {} already exists on {}.'.format(self.transducer_id, table_name,
-                                                                             self.engine.url))
-            if input('Do you want to overwrite it? [Y/n] >').lower() in ['n', 'no']:
-                raise FileExistsError('table already exists on DB and user does not want to overwrite it')
+    def exit(self) -> NoReturn:
+        self.engine.dispose()
 
-            self.conn.execute(text('DROP TABLE IF EXISTS {};'.format(table_name)))
+    def create_table(self, table_name: str, columns: List[Column],
+                     columns_mapper: Dict[str, tuple], metadata: MetaData) -> Table:
+        # 1. Remove table if already exists
+        with self.engine.connect() as conn:
+            conn.execute('DROP TABLE IF EXISTS {}'.format(table_name))
 
         # 2. Deduce the columns of the table and their corresponding data type
         for state_field, (field_type, field_getter) in columns_mapper.items():
@@ -69,7 +83,4 @@ class SQLTransducer(Transducer):
                                                                                                  state_field))
             columns.append(Column(state_field, column_type))
         # 3. Create the table
-        metadata = MetaData()
-        table = Table(table_name, metadata, *columns)
-        table.create(self.engine)
-        return table
+        return Table(table_name, metadata, *columns)

@@ -6,6 +6,7 @@ from xdevs.examples.basic.basic import Job, Processor
 if __name__ == '__main__':
     sql = Transducers.create_transducer('sql',
                                         transducer_id='transducer_test',
+                                        exhaustive=True,
                                         url='mysql+pymysql://root@localhost/test')
 
     model = Processor('processor', 100)
@@ -19,16 +20,16 @@ if __name__ == '__main__':
 
     sql.initialize()
     clock = 0
-    sql.activate_transducer(clock, [model], [])
+    sql.bulk_data(clock)
 
     model.i_in.add(Job(0))
     model.deltext(1)
     clock += 1
     model.i_in.clear()
-    sql.activate_transducer(1, [model], [])
+    sql.bulk_data(1)
     clock += model.sigma
     model.lambdaf()
     model.deltint()
-    sql.activate_transducer(clock, [model], [model.o_out])
+    sql.bulk_data(clock)
 
     print('done')
