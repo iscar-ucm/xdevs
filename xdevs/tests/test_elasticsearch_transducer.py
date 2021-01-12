@@ -6,6 +6,7 @@ from xdevs.examples.basic.basic import Job, Processor
 if __name__ == '__main__':
     es = Transducers.create_transducer('elasticsearch',
                                        transducer_id='transducer_test',
+                                       exhaustive=True,
                                        url='http://localhost:9200')
 
     model = Processor('processor', 100)
@@ -19,16 +20,16 @@ if __name__ == '__main__':
 
     es.initialize()
     clock = 0
-    es.activate_transducer(clock, [model], [])
+    es.bulk_data(clock)
 
     model.i_in.add(Job(0))
     model.deltext(1)
     clock += 1
     model.i_in.clear()
-    es.activate_transducer(1, [model], [])
+    es.bulk_data(1)
     clock += model.sigma
     model.lambdaf()
     model.deltint()
-    es.activate_transducer(clock, [model], [model.o_out])
+    es.bulk_data(clock)
 
     print('done')

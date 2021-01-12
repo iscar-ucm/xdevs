@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, NoReturn
+from typing import Dict, NoReturn
 from ...transducers import Transducer
 try:
     from elasticsearch import Elasticsearch
@@ -10,17 +10,26 @@ except ModuleNotFoundError:
 
 class ElasticsearchTransducer(Transducer):
     def __init__(self, **kwargs):
-        """xDEVS transducer for Elasticsearch databases."""
+        """
+        xDEVS transducer for Elasticsearch databases.
+        :param str url: URL of one of the nodes of the Elasticsearch database.
+        :param int number_of_shards: Number of shards to be used for each Elasticsearch index. Defaults to 1.
+        :param int number_of_replicas: Number of replicas to be used for each Elasticsearch index. Defaults to 1.
+        """
         if not _dependencies_ok:
             raise ImportError('Dependencies are not imported')
         super().__init__(**kwargs)
 
         self.url: str = kwargs.get('url')
+        if self.url is None:
+            raise AttributeError('You must specify an Elasticsearch URL.')
         self.number_of_shards: int = kwargs.get('number_of_shards', 1)
         self.number_of_replicas: int = kwargs.get('number_of_replicas', 1)
 
         self.supported_data_types = {str: 'text', int: 'integer', float: 'double', bool: 'boolean'}
         self.activate_remove_special_numbers()
+
+        self.es = None
 
     def _is_data_type_unknown(self, field_type) -> bool:
         return field_type not in self.supported_data_types
@@ -39,23 +48,25 @@ class ElasticsearchTransducer(Transducer):
                 'port_name': {'type': 'text'},
             }
             self.create_index(self.transducer_id + '_events', fields, self.event_mapper)
+        if self.target_components or self.target_ports:
+            self.es = Elasticsearch([self.url])
 
-    def bulk_data(self, state_inserts: List[Dict[str, Any]], event_inserts: List[Dict[str, Any]]) -> NoReturn:
-        es = Elasticsearch([self.url])
-        for inserts, target in [(state_inserts, self.transducer_id + '_states'),
-                                (event_inserts, self.transducer_id + '_events')]:
-            for insert in inserts:
-                es.index(index=target, body=insert)
+    def bulk_data(self, sim_time: float) -> NoReturn:
+        for insertion in self._iterate_state_inserts(sim_time):
+            self.es.index(index=self.transducer_id + '_states', body=insertion)
+        for insertion in self._iterate_event_inserts(sim_time):
+            self.es.index(index=self.transducer_id + '_events', body=insertion)
+
+    def exit(self) -> NoReturn:
+        pass
 
     def create_index(self, index_name: str, field_properties: Dict[str, Dict[str, str]], others: Dict[str, tuple]):
         es = Elasticsearch([self.url])
-        # 1. When index exist, we ask the user if he/she wants to overwrite it
+        # 1. When index exist, we overwrite it
         if es.indices.exists(index=index_name):
-            print('ES transducer {}: index {} already exists on {}.'.format(self.transducer_id, index_name, self.url))
-            if input('Do you want to overwrite it? [Y/n] >').lower() in ['n', 'no']:
-                raise FileExistsError('index already exists on DB and user does not want to overwrite it')
-            else:
-                es.indices.delete(index=index_name, ignore=[400, 404])
+            logging.warning('ES transducer {}: index {} already exists on {}. '
+                            'It will be overwritten.'.format(self.transducer_id, index_name, self.url))
+            es.indices.delete(index=index_name, ignore=[400, 404])
         # 2, Create field mapping
         for field_name, (field_type, field_getter) in others.items():
             es_type = self.supported_data_types.get(field_type, None)
