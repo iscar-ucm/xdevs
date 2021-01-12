@@ -59,6 +59,8 @@ class Simulator(AbstractSimulator):
                  transducers_mapping: Optional[Tuple[defaultdict, defaultdict]] = None):
         super().__init__(model, clock)
 
+        self.state_transducers = None
+        self.port_transducers = None
         if transducers_mapping:
             self.state_transducers = transducers_mapping[0].get(self.model, None)
 
@@ -135,6 +137,7 @@ class Coordinator(AbstractSimulator):
         self.simulators = []
         self.transducers = []
 
+        self.port_transducers = None
         if transducers_mapping:
             self.port_transducers = {}
             for port in itertools.chain(self.model.in_ports, self.model.out_ports):
