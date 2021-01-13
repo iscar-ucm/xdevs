@@ -2,6 +2,8 @@ import os
 import sys
 from unittest import TestCase
 
+from xdevs.models import Port
+
 from xdevs.sim import Coordinator
 
 from xdevs.examples.devstone.devstone import LI, DelayedAtomic
@@ -15,6 +17,8 @@ class TestCsvTransducer(TestCase):
         csv = Transducers.create_transducer('csv', transducer_id='tt')
         gpt = Gpt("gpt", 3, 100)
         csv.add_target_component(gpt)
+        # csv.add_target_port()
+        # csv.add_target_port_by_components(gpt, component_filter=[Coupled, "coupled_.*"], port_filter=OutPort)
         csv.filter_components(Processor)
         self.assertEqual(len(csv.target_components), 1)
 
@@ -42,13 +46,62 @@ class TestCsvTransducer(TestCase):
         gpt = Gpt("gpt", 3, 100)
         csv.add_target_component(gpt)
         csv.filter_components(lambda comp: hasattr(comp, "proc_time"))
-        self.assertEqual(len(csv.target_components), 1)
+        self.assertEqual(1, len(csv.target_components))
 
         csv = Transducers.create_transducer('csv', transducer_id='tt')
         li = LI("HI_root", depth=10, width=10, int_delay=0, ext_delay=0)
         csv.add_target_component(li)
         csv.filter_components(lambda comp: isinstance(comp, DelayedAtomic) and comp.name[-1] == "0")
         self.assertEqual(10, len(csv.target_components))
+
+    def test_ports_filtering_by_type(self):
+        csv = Transducers.create_transducer('csv', transducer_id='tt')
+        gpt = Gpt("gpt", 3, 100)
+        csv.add_target_component(gpt)
+
+        csv.add_target_ports_by_component(gpt, port_filters=Port)
+        self.assertEqual(8, len(csv.target_ports))
+
+    def test_ports_filtering_by_regex(self):
+        csv = Transducers.create_transducer('csv', transducer_id='tt')
+        gpt = Gpt("gpt", 3, 100)
+        csv.add_target_component(gpt)
+
+        csv.add_target_ports_by_component(gpt, port_filters="i_.*")
+        self.assertEqual(5, len(csv.target_ports))
+        csv.target_ports.clear()
+
+        csv.add_target_ports_by_component(gpt, port_filters="[io]_.{3,5}ed")
+        self.assertEqual(2, len(csv.target_ports))
+        csv.target_ports.clear()
+
+        csv.add_target_ports_by_component(gpt, port_filters=".*start.*")
+        self.assertEqual(1, len(csv.target_ports))
+        csv.target_ports.clear()
+
+    def test_ports_filtering_by_callable(self):
+        csv = Transducers.create_transducer('csv', transducer_id='tt')
+        gpt = Gpt("gpt", 3, 100)
+        csv.add_target_component(gpt)
+
+        filter_func = lambda port: port.name.startswith("i_") and port.name.endswith("ed")
+        csv.add_target_ports_by_component(gpt, port_filters=filter_func)
+        self.assertEqual(2, len(csv.target_ports))
+
+    def test_ports_filtering_mixed(self):
+        csv = Transducers.create_transducer('csv', transducer_id='tt')
+        gpt = Gpt("gpt", 3, 100)
+        csv.add_target_component(gpt)
+
+        csv.add_target_ports_by_component(gpt)
+        self.assertEqual(8, len(csv.target_ports))
+        csv.target_ports.clear()
+
+        input_ports_filter = lambda port: port.name.startswith("i_")
+        port_filters = (input_ports_filter, Port, ".*ed")
+        csv.add_target_ports_by_component(gpt, port_filters=port_filters)
+        self.assertEqual(2, len(csv.target_ports))
+        csv.target_ports.clear()
 
     def test_basic_behavior(self):
         trans_id = "%s_test_basic_behavior" % self.__class__.__name__
@@ -115,3 +168,6 @@ class TestCsvTransducer(TestCase):
 
         self.assertTrue(os.path.exists(csv_transducer.state_filename))
         #self.assertTrue(os.path.exists(csv_transducer.event_filename))
+        # TODO: continue when state changes are register appropiately
+
+    # TODO: def test_pause_resume(self):
