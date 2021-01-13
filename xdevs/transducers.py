@@ -1,5 +1,6 @@
 
 import inspect
+import itertools
 import logging
 import pkg_resources
 import re
@@ -58,12 +59,14 @@ class Transducer(ABC):
 
     def add_target_component(self, component: Atomic or Coupled, *filters) -> NoReturn:
         components = self._iterate_components(component)
-        self.target_components |= self._filter_components(filters, components)
+        self.target_components |= self._apply_filters(filters, components)
 
-    def _iterate_components(self, root_comp):
+    def _iterate_components(self, root_comp, include_coupled=False):
         if isinstance(root_comp, Atomic):
             yield root_comp
         else:  # Coupled
+            if include_coupled:
+                yield root_comp
             for child_comp in root_comp.components:
                 yield from self._iterate_components(child_comp)
 
@@ -72,6 +75,14 @@ class Transducer(ABC):
         if parent is None:
             raise ValueError('Port {} does not have a parent component', port.name)
         self.target_ports.add(port)
+
+    def add_target_ports_by_component(self, component, component_filters=None, port_filters=None):
+        components = self._iterate_components(component, include_coupled=True)
+        filtered_components = Transducer._apply_filters(component_filters, components)
+        for comp in filtered_components:
+            comp_ports = itertools.chain(comp.in_ports, comp.out_ports)
+            filtered_comp_ports = Transducer._apply_filters(port_filters, comp_ports)
+            self.target_ports |= filtered_comp_ports
 
     def add_imminent_model(self, component):
         if not self.exhaustive and self.active:
@@ -82,27 +93,29 @@ class Transducer(ABC):
             self.imminent_ports.append(port)
 
     def filter_components(self, *filters):
-        self.target_components = self._filter_components(filters)
+        self.target_components = self._apply_filters(filters, self.target_components)
 
-    def _filter_components(self, comp_filters, components=None):
+    @staticmethod
+    def _apply_filters(filters, entities):
         """
-        Filter current target components.
-        :param comp_filters: it can be a callable (lambda model: condition(model)) a
+        Filter target components or ports.
+        :param filters: it can be a callable (lambda model: condition(model)) a
         regex (to filter based on the components name), or a type (to keep instances of a specific name)
+        :param entities: components or ports to filter
         """
-        if components is None:
-            components = self.target_components
+        filtered_entities = set(entities)
+        if filters is not None:
+            if type(filters) not in (tuple, list):
+                filters = (filters,)
+            for entity_filter in filters:
+                if inspect.isfunction(entity_filter):
+                    filtered_entities = set(filter(entity_filter, filtered_entities))
+                elif type(entity_filter) is str:
+                    filtered_entities = set(filter(lambda c: re.match(entity_filter, c.name), filtered_entities))
+                else:
+                    filtered_entities = set(filter(lambda c: isinstance(c, entity_filter), filtered_entities))
 
-        filtered_comp = components
-        for comp_filter in comp_filters:
-            if inspect.isfunction(comp_filter):
-                filtered_comp = filter(comp_filter, filtered_comp)
-            elif type(comp_filter) is str:
-                filtered_comp = (c for c in filtered_comp if re.match(comp_filter, c.name))
-            else:
-                filtered_comp = (c for c in filtered_comp if isinstance(c, comp_filter))
-
-        return set(filtered_comp)
+        return filtered_entities
 
     def pause(self):
         self.active = False
