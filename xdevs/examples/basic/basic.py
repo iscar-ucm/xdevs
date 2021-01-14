@@ -7,8 +7,8 @@ logger = get_logger(__name__, logging.DEBUG)
 
 PHASE_DONE = "done"
 
+
 class Job:
-	
 	def __init__(self, name):
 		self.name = name
 		self.time = 0

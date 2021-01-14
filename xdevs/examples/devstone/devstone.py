@@ -7,8 +7,9 @@ from xdevs.sim import Coordinator, ParallelProcessCoordinator
 from xdevs import PHASE_ACTIVE, get_logger
 from collections import defaultdict
 
-#logger = get_#logger(__name__)
-#logger.disabled = False
+# logger = get_logger(__name__)
+# logger.disabled = False
+
 
 class DelayedAtomic(Atomic):
 

@@ -24,6 +24,7 @@ class Employee(Atomic):
         self.mean = mean
         self.stddev = stddev
         self.clock = 0
+        self.state = EmployeeState()
 
         self.input_client = Port(ClientToEmployee)
         self.add_in_port(self.input_client)
@@ -35,31 +36,31 @@ class Employee(Atomic):
 
     def deltint(self):
         self.clock += self.sigma
-        self.phase.client = None
-        self.phase.time_remaining = INFINITY
-        self.hold_in(self.phase, self.phase.time_remaining)
+        self.state.client = None
+        self.state.time_remaining = INFINITY
+        self.hold_in(self.phase, self.state.time_remaining)
 
     def deltext(self, e):
         self.clock += e
-        if self.phase.client is not None:
-            self.phase.time_remaining -= e
+        if self.state.client is not None:
+            self.state.time_remaining -= e
         else:
             for pairing in self.input_client.values:
                 if pairing.employee_id == self.employee_id:
-                    self.phase.clients_so_far += 1
-                    self.phase.client = pairing.client
-                    self.phase.time_remaining = max(gauss(self.mean, self.stddev), 0)
-                    logging.debug('({}) [{}]-> {}'.format(self.clock, self.name, str(self.phase)))
-        self.hold_in(self.phase, self.phase.time_remaining)
+                    self.state.clients_so_far += 1
+                    self.state.client = pairing.client
+                    self.state.time_remaining = max(gauss(self.mean, self.stddev), 0)
+                    logging.debug('({}) [{}]-> {}'.format(self.clock, self.name, str(self.state)))
+        self.hold_in(self.phase, self.state.time_remaining)
 
     def lambdaf(self):
-        clock = self.clock + self.phase.time_remaining
-        if self.phase.client is not None:
-            self.output_client.add(LeavingClient(self.phase.client.client_id, self.phase.client.t_entered, clock))
+        clock = self.clock + self.state.time_remaining
+        if self.state.client is not None:
+            self.output_client.add(LeavingClient(self.state.client.client_id, self.state.client.t_entered, clock))
         self.output_ready.add(self.employee_id)
 
     def initialize(self):
-        self.hold_in(EmployeeState(), 0)
+        self.activate(0)
 
     def exit(self):
         pass
