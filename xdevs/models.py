@@ -3,8 +3,8 @@ import inspect
 import pickle
 from abc import ABC, abstractmethod
 from collections import deque, defaultdict
-from typing import Any, Iterator, List, Dict, Generator, Tuple, Type, TypeVar, Generic, Optional, Deque
-from . import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
+from typing import Deque, Dict, Generator, Generic, Iterator, NoReturn, Optional, List, Tuple, Type, TypeVar
+from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
 
 T = TypeVar('T')
@@ -15,34 +15,23 @@ class Port(Generic[T]):
     IN = "in"
     OUT = "out"
 
-    name: str
-    p_type: Type
-    serve: bool
-    parent: Optional[Component]
-    direction: Optional[str]
-    _values: Deque[T]
-    links_to: List[Port]
-    links_from: List[Port]
-
     def __init__(self, p_type: Type[T], name: Optional[str] = None, serve: bool = False):
         """
         xDEVS implementation of DEVS Port.
-        :param p_type: data type of messages to be sent/received via the new port instance.
-        :param name: name of the new port instance.
-        :param serve: set to True if the port is going to be accessible via RPC server.
+        :param p_type: data type of events to be sent/received via the new port instance.
+        :param name: name of the new port instance. Defaults to the name of the port's class.
+        :param serve: set to True if the port is going to be accessible via RPC server. Defaults to False.
         """
-        self.name = name if name else self.__class__.__name__
-
+        self.name: str = name if name else self.__class__.__name__
         if p_type is None:
             raise TypeError("Invalid p_type")
-
-        self.p_type = p_type
-        self.serve = serve
-        self.parent = None  # xDEVS Component that owns the port
-        self.direction = None  # Message flow direction of the port. It is either PORT_IN or PORT_OUT
-        self._values = deque()  # Bag containing messages directly written to the port
-        self.links_to = list()  # List of ports that receive data from the port (only used by output ports)
-        self.links_from = list()  # List of ports that inject data to the port (only used by input ports)
+        self.p_type: Type = p_type
+        self.serve: bool = serve
+        self.parent: Optional[Component] = None  # xDEVS Component that owns the port
+        self.direction: Optional[str] = None  # Message flow direction of the port. It is either PORT_IN or PORT_OUT
+        self._values: Deque[T] = deque()  # Bag containing messages directly written to the port
+        self.links_to: List[Port] = list()  # List of ports that receive data from the port (only used by output ports)
+        self.links_from: List[Port] = list()  # List of ports that inject data to the port (only used by input ports)
 
     def __bool__(self) -> bool:
         return not self.empty()
@@ -57,17 +46,16 @@ class Port(Generic[T]):
         return str(self)
 
     def empty(self) -> bool:
-        """:return: True if port does not contain any message"""
         for _ in self.values:
             return False
         return True
 
-    def clear(self):
+    def clear(self) -> NoReturn:
         self._values.clear()
 
     @property
     def values(self) -> Generator[T, None, None]:
-        """:return: Generator function that returns all the messages in the port."""
+        """:return: Generator function that can iterate over all the values contained in the port."""
         for val in self._values:
             yield val
 
@@ -77,47 +65,41 @@ class Port(Generic[T]):
 
     def get(self) -> T:
         """
-        :return: first message from port.
+        :return: first value in the port.
         :raises StopIteration: if port is empty.
         """
         return next(self.values)
 
-    def add(self, val: T):
+    def add(self, val: T) -> NoReturn:
         """
-        Adds a new value to the local message bag of the port.
-        :param val: message to be added.
-        :raises TypeError: If message is not instance of port type.
+        Adds a new value to the local value bag of the port.
+        :param val: event to be added.
+        :raises TypeError: If event is not instance of port type.
         """
         if not isinstance(val, self.p_type):
             raise TypeError("Value type is %s (%s expected)" % (type(val).__name__, self.p_type.__name__))
         self._values.append(val)
 
-    def extend(self, vals: Iterator[T]):
+    def extend(self, vals: Iterator[T]) -> NoReturn:
         """
-        Adds a set of new values to the local message bag of the port.
-        :param vals: list containing all the messages to be added.
-        :raises TypeError: If one of the messages is not instance of port type.
+        Adds a set of new values to the local value bag of the port.
+        :param vals: list containing all the values to be added.
+        :raises TypeError: If one of the values is not instance of port type.
         """
         for val in vals:
             self.add(val)
 
 
 class Component(ABC):
-
-    name: str
-    parent: Optional[Coupled]
-    in_ports: List[Port]
-    out_ports: List[Port]
-
     def __init__(self, name: Optional[str] = None):
         """
         Abstract Base Class for an xDEVS model.
-        :param name: name of the xDEVS model. If no name is provided, it will take the class's name by default.
+        :param name: name of the xDEVS model. Defaults to the name of the component's class.
         """
-        self.name = name if name else self.__class__.__name__
-        self.parent = None  # Parent component of this component
-        self.in_ports = list()  # List containing all the component's input ports
-        self.out_ports = list()  # List containing all the component's output ports
+        self.name: str = name if name else self.__class__.__name__
+        self.parent: Optional[Coupled] = None  # Parent component of this component
+        self.in_ports: List[Port] = list()  # List containing all the component's input ports
+        self.out_ports: List[Port] = list()  # List containing all the component's output ports
 
     def __str__(self) -> str:
         in_str = " ".join([p.name for p in self.in_ports])
@@ -128,11 +110,11 @@ class Component(ABC):
         return self.name
 
     @abstractmethod
-    def initialize(self):
+    def initialize(self) -> NoReturn:
         pass
 
     @abstractmethod
-    def exit(self):
+    def exit(self) -> NoReturn:
         pass
 
     def in_empty(self) -> bool:
@@ -161,7 +143,7 @@ class Component(ABC):
                 return False
         return True
 
-    def add_in_port(self, port: Port):
+    def add_in_port(self, port: Port) -> NoReturn:
         """
         Adds an input port to the xDEVS model.
         :param port: port to be added to the model.
@@ -170,7 +152,7 @@ class Component(ABC):
         port.direction = Port.IN
         self.in_ports.append(port)
 
-    def add_out_port(self, port: Port):
+    def add_out_port(self, port: Port) -> NoReturn:
         """
         Adds an output port to the xDEVS model
         :param port: port to be added to the model.
@@ -179,26 +161,21 @@ class Component(ABC):
         port.direction = Port.OUT
         self.out_ports.append(port)
 
-    def get_in_port(self, name):
+    def get_in_port(self, name) -> Optional[Port]:
         for port in self.in_ports:
             if port.name == name:
                 return port
         return None
 
-    def get_out_port(self, name):
+    def get_out_port(self, name) -> Optional[Port]:
         for port in self.out_ports:
             if port.name == name:
                 return port
         return None
 
 
-class Coupling:
-
-    port_from: Port
-    port_to: Port
-    host: Any  # TODO identify host's variable type
-
-    def __init__(self, port_from: Port, port_to: Port, host=None):
+class Coupling(Generic[T]):
+    def __init__(self, port_from: Port[T], port_to: Port[T], host=None):
         """
         xDEVS implementation of DEVS couplings.
         :param port_from: DEVS transmitter port.
@@ -207,17 +184,17 @@ class Coupling:
         :raises ValueError: if coupling direction is incompatible with the target ports.
         """
         # Check that couplings are valid
-        comp_from = port_from.parent
-        comp_to = port_to.parent
+        comp_from: Component = port_from.parent
+        comp_to: Component = port_to.parent
         if isinstance(comp_from, Atomic) and port_from.direction == Port.IN:
             raise ValueError("Input ports whose parent is an Atomic model can not be coupled to any other port")
         if isinstance(comp_to, Atomic) and port_to.direction == Port.OUT:
             raise ValueError("Output ports whose parent is an Atomic model can not be recipient of any other port")
         if port_to in inspect.getmro(port_from.p_type):
             raise ValueError("Ports don't share the same port type")
-        self.port_from = port_from
-        self.port_to = port_to
-        self.host = host
+        self.port_from: Port = port_from
+        self.port_to: Port = port_to
+        self.host = host  # TODO identify host's variable type
 
     def __str__(self) -> str:
         return "(%s -> %s)" % (self.port_from, self.port_to)
@@ -225,7 +202,7 @@ class Coupling:
     def __repr__(self) -> str:
         return str(self)
 
-    def propagate(self):
+    def propagate(self) -> NoReturn:
         """Copies messages from the transmitter port to the receiver port"""
         if self.host:
             if self.port_from:
@@ -236,19 +213,15 @@ class Coupling:
 
 
 class Atomic(Component, ABC):
-
-    phase: str
-    sigma: float
-
     def __init__(self, name: str = None):
         """
         xDEVS implementation of DEVS Atomic Model.
-        :param name: name of the Atomic Model. If no name is provided, it will take the class's name by default.
+        :param name: name of the atomic model. If no name is provided, it will take the class's name by default.
         """
         super().__init__(name)
 
-        self.phase = PHASE_PASSIVE
-        self.sigma = INFINITY
+        self.phase: str = PHASE_PASSIVE
+        self.sigma: float = INFINITY
 
     @property
     def ta(self) -> float:
@@ -259,12 +232,12 @@ class Atomic(Component, ABC):
         return "%s(%s, %s)" % (self.name, str(self.phase), self.sigma)
 
     @abstractmethod
-    def deltint(self):
+    def deltint(self) -> NoReturn:
         """Describes the internal transitions of the atomic model."""
         pass
 
     @abstractmethod
-    def deltext(self, e: float):
+    def deltext(self, e: float) -> NoReturn:
         """
         Describes the external transitions of the atomic model.
         :param e: elapsed time between last transition and the external transition.
@@ -272,25 +245,19 @@ class Atomic(Component, ABC):
         pass
 
     @abstractmethod
-    def lambdaf(self):
+    def lambdaf(self) -> NoReturn:
         """Describes the output function of the atomic model."""
         pass
 
-    def deltcon(self, e: float):
+    def deltcon(self, e: float) -> NoReturn:
         """
         Describes the confluent transitions of the atomic model. By default, the internal transition is triggered first.
         :param e: elapsed time between last transition and the confluent transition.
         """
         self.deltint()
         self.deltext(0)
-        """
-        The other alternative would be this:
-            self.deltext(e)
-            if self.ta == 0:
-                self.deltint()
-        """
 
-    def hold_in(self, phase: str, sigma: float):
+    def hold_in(self, phase: str, sigma: float) -> NoReturn:
         """
         Change atomic model's phase and next timeout.
         :param phase: atomic model's new phase.
@@ -299,50 +266,53 @@ class Atomic(Component, ABC):
         self.phase = phase
         self.sigma = sigma
 
-    def activate(self, phase=PHASE_ACTIVE):
-        """Sets phase to phase and next timeout to 0"""
+    def activate(self, phase=PHASE_ACTIVE) -> NoReturn:
+        """
+        Sets next timeout to 0.
+        :param phase: New phase. Defaults to "PHASE_ACTIVE".
+        """
         self.phase = phase
         self.sigma = 0
 
-    def passivate(self, phase=PHASE_PASSIVE):
-        """Sets phase to PHASE_PASSIVE and next timeout to INFINITY"""
+    def passivate(self, phase=PHASE_PASSIVE) -> NoReturn:
+        """
+        Sets next timeout to 0 infinity.
+        :param phase: New phase. Defaults to "PHASE_PASSIVE".
+        """
         self.phase = phase
         self.sigma = INFINITY
 
-    def continuef(self, e: float):
+    def continuef(self, e: float) -> NoReturn:
+        """
+        Reduces the next timeout by e time units.
+        :param e: elapsed time to be subtracted from sigma.
+        """
         self.sigma -= e
 
 
 class Coupled(Component, ABC):
-
-    chain: bool
-    components: List[Component]
-    ic: Dict[Port, List[Coupling]]
-    eic: Dict[Port, List[Coupling]]
-    eoc: Dict[Port, List[Coupling]]
-
     def __init__(self, name: str = None):
         """
         xDEVS implementation of DEVS Coupled Model.
-        :param name: name of the Atomic Model. If no name is provided, it will take the class's name by default.
+        :param name: name of the coupled model. If no name is provided, it will take the class's name by default.
         """
         super().__init__(name)
-        self.chain = False
+        self.chain: bool = False
 
-        self.components = []
-        self.ic = dict()
-        self.eic = dict()
-        self.eoc = dict()
+        self.components: List[Component] = list()
+        self.ic: Dict[Port, List[Coupling]] = dict()
+        self.eic: Dict[Port, List[Coupling]] = dict()
+        self.eoc: Dict[Port, List[Coupling]] = dict()
 
-    def initialize(self):
+    def initialize(self) -> NoReturn:
         pass
 
-    def exit(self):
+    def exit(self) -> NoReturn:
         pass
 
-    def add_coupling(self, p_from: Port, p_to: Port, host=None):
+    def add_coupling(self, p_from: Port, p_to: Port, host=None) -> NoReturn:
         """
-        Adds coupling betweem two submodules of the coupled model.
+        Adds coupling between two submodules of the coupled model.
         :param p_from: DEVS transmitter port.
         :param p_to: DEVS receiver port.
         :param host: TODO documentation
@@ -359,15 +329,15 @@ class Coupled(Component, ABC):
             raise ValueError("Components that compose the coupling are not submodules of coupled model")
 
     @staticmethod
-    def _safe_coup_add(dct: Dict[Port, List[Coupling]], coup: Coupling):
+    def _safe_coup_add(dct: Dict[Port, List[Coupling]], coup: Coupling) -> NoReturn:
         if coup.port_from not in dct:
             dct[coup.port_from] = [coup]
         else:
             dct[coup.port_from].append(coup)
 
-    def remove_coupling(self, coupling: Coupling):
+    def remove_coupling(self, coupling: Coupling) -> NoReturn:
         """
-        Removes coupling betweem two submodules of the coupled model.
+        Removes coupling between two submodules of the coupled model.
         :param coupling: Couplings to be removed.
         :raises ValueError: if coupling is not found.
         """
@@ -391,7 +361,7 @@ class Coupled(Component, ABC):
 
         raise ValueError("Coupling was not found in model definition")
 
-    def add_component(self, component: Component):
+    def add_component(self, component: Component) -> NoReturn:
         """
         Adds component to coupled model.
         :param component: component to be added to the Coupled model.
@@ -399,7 +369,7 @@ class Coupled(Component, ABC):
         component.parent = self
         self.components.append(component)
 
-    def chain_components(self, unroll: bool = True):
+    def chain_components(self, unroll: bool = True) -> NoReturn:
         """
         Chains submodules to enhance sequential execution performance.
         """
@@ -425,7 +395,7 @@ class Coupled(Component, ABC):
         # self.ic.clear()
 
     @staticmethod
-    def _chain_from_coupling(coup: Coupling):
+    def _chain_from_coupling(coup: Coupling) -> NoReturn:
         coup.port_from.links_to.append(coup.port_to)
         coup.port_to.links_from.append(coup.port_from)
 
@@ -470,7 +440,7 @@ class Coupled(Component, ABC):
 
         return new_comps_up, new_coups_up
 
-    def _remove_couplings_of_child(self, child):
+    def _remove_couplings_of_child(self, child: Component) -> NoReturn:
         for in_port in child.in_ports:
             self._remove_couplings(in_port, self.eic)
             self._remove_couplings(in_port, self.ic)
@@ -479,7 +449,7 @@ class Coupled(Component, ABC):
             self._remove_couplings(out_port, self.eoc)
 
     @staticmethod
-    def _remove_couplings(port: Port, couplings: Dict[Port, List[Coupling]]):
+    def _remove_couplings(port: Port, couplings: Dict[Port, List[Coupling]]) -> NoReturn:
         # Remove port from couplings list
         couplings.pop(port, None)
         # For remaining ports, remove couplings which source is the port to be removed
@@ -491,7 +461,7 @@ class Coupled(Component, ABC):
         for coup in to_remove:
             couplings[coup.port_from].remove(coup)
 
-    def _create_left_bridge(self, pc):
+    def _create_left_bridge(self, pc) -> Dict[Port, List[Port]]:
         bridge = defaultdict(list)
         for in_port in self.in_ports:
             for coup_list in pc.values():
@@ -500,7 +470,7 @@ class Coupled(Component, ABC):
                         bridge[in_port].append(coup.port_from)
         return bridge
 
-    def _create_right_bridge(self, pc):
+    def _create_right_bridge(self, pc) -> Dict[Port, List[Port]]:
         bridge = defaultdict(list)
         for out_port in self.out_ports:
             for coup_list in pc.values():
@@ -509,7 +479,7 @@ class Coupled(Component, ABC):
                         bridge[out_port].append(coup.port_to)
         return bridge
 
-    def _complete_left_bridge(self, bridge):
+    def _complete_left_bridge(self, bridge) -> List[Coupling]:
         couplings = list()
         for coup_list in self.eic.values():
             for coup in coup_list:
@@ -518,7 +488,7 @@ class Coupled(Component, ABC):
                     couplings.append(Coupling(port, coup.port_to))
         return couplings
 
-    def _complete_right_bridge(self, bridge):
+    def _complete_right_bridge(self, bridge) -> List[Coupling]:
         couplings = list()
         for coup_list in self.eoc.values():
             for coup in coup_list:

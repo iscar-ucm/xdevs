@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import _thread
 import itertools
 import pickle
@@ -5,85 +7,87 @@ import pickle
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from concurrent import futures
-from typing import Tuple, Optional
-
-from xdevs import INFINITY
-from xdevs.models import Atomic, Coupled, Component
-from xdevs.transducers import Transducer
+from typing import Dict, List, NoReturn, Optional
 from xmlrpc.server import SimpleXMLRPCServer
 
-# logger = get_#logger(__name__)
+from xdevs import INFINITY
+from xdevs.models import Atomic, Coupled, Component, Port
+from xdevs.transducers import Transducer
 
 
 class SimulationClock:
     def __init__(self, time: float = 0):
-        self.time = time
+        self.time: float = time
 
 
 class AbstractSimulator(ABC):
-    def __init__(self, model: Component, clock: SimulationClock):
-        self.model = model
-        self.clock = clock
-        self.time_last = 0
-        self.time_next = 0
+    def __init__(self, model: Component, clock: SimulationClock,
+                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None):
+        self.model: Component = model
+        self.clock: SimulationClock = clock
+        self.time_last: float = 0
+        self.time_next: float = 0
+
+        self.event_transducers: Optional[Dict[Port, List[Transducer]]] = None
+        if event_transducers_mapping:
+            port_transducers: Dict[Port, List[Transducer]] = dict()
+            for port in itertools.chain(self.model.in_ports, self.model.out_ports):
+                transducers = event_transducers_mapping.get(port, None)
+                if transducers:
+                    port_transducers[port] = transducers
+            if port_transducers:
+                self.event_transducers = port_transducers
 
     @abstractmethod
-    def initialize(self):
+    def initialize(self) -> NoReturn:
         pass
 
     @abstractmethod
-    def exit(self):
+    def exit(self) -> NoReturn:
         pass
 
     @abstractmethod
-    def ta(self):
+    def ta(self) -> float:
         pass
 
     @abstractmethod
-    def lambdaf(self):
+    def lambdaf(self) -> NoReturn:
         pass
 
     @abstractmethod
-    def deltfcn(self):
+    def deltfcn(self) -> Optional[AbstractSimulator]:
         pass
 
     @abstractmethod
-    def clear(self):
+    def clear(self) -> NoReturn:
         pass
 
 
 class Simulator(AbstractSimulator):
+
     model: Atomic
 
     def __init__(self, model: Atomic, clock: SimulationClock,
-                 transducers_mapping: Optional[Tuple[defaultdict, defaultdict]] = None):
-        super().__init__(model, clock)
-
-        self.state_transducers = None
-        self.port_transducers = None
-        if transducers_mapping:
-            self.state_transducers = transducers_mapping[0].get(self.model, None)
-
-            self.port_transducers = {}
-            for port in itertools.chain(self.model.in_ports, self.model.out_ports):
-                transducers = transducers_mapping[1].get(port, None)
-                if transducers:
-                    self.port_transducers[port] = transducers
+                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None,
+                 state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]] = None):
+        super().__init__(model, clock, event_transducers_mapping)
+        self.state_transducers: Optional[List[Transducer]] = None
+        if state_transducers_mapping:
+            self.state_transducers = state_transducers_mapping.get(self.model, None)
 
     @property
-    def ta(self):
+    def ta(self) -> float:
         return self.model.ta
 
-    def initialize(self):
+    def initialize(self) -> NoReturn:
         self.model.initialize()
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.model.ta
 
-    def exit(self):
+    def exit(self) -> NoReturn:
         self.model.exit()
 
-    def deltfcn(self):
-        #logger.debug("Deltfcn %s (empty: %s, t: %d)" % (self.model.name, self.model.in_empty(), self.clock.time))
+    def deltfcn(self) -> Optional[Simulator]:
         t = self.clock.time
         in_empty = self.model.in_empty()
 
@@ -103,26 +107,23 @@ class Simulator(AbstractSimulator):
             for trans in self.state_transducers:
                 trans.add_imminent_model(self.model)
                 
-        if self.port_transducers is not None:
-            for port, transducers in self.port_transducers.items():
-                for trans in transducers:
-                    trans.add_imminent_port(port)
+        if self.event_transducers is not None:
+            for port, transducers in self.event_transducers.items():
+                if port:  # Only for ports with messages
+                    for trans in transducers:
+                        trans.add_imminent_port(port)
 
         self.time_last = t
         self.time_next = self.time_last + self.model.ta
-        ##logger.debug("Deltfcn %s: TL: %s, TN: %s" % (self.model.name, self.time_last, self.time_next))
         return self
 
-    def lambdaf(self):
+    def lambdaf(self) -> NoReturn:
         if self.clock.time == self.time_next:
             self.model.lambdaf()
 
-    def clear(self):
-        for in_port in self.model.in_ports:
-            in_port.clear()
-
-        for out_port in self.model.out_ports:
-            out_port.clear()
+    def clear(self) -> NoReturn:
+        for port in itertools.chain(self.model.in_ports, self.model.out_ports):
+            port.clear()
 
 
 class Coordinator(AbstractSimulator):
@@ -130,20 +131,12 @@ class Coordinator(AbstractSimulator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None,
                  flatten: bool = False, chain: bool = False, unroll: bool = True,
-                 transducers_mapping: Optional[Tuple[defaultdict, defaultdict]] = None):
-        super().__init__(model, clock or SimulationClock())
+                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None):
+        super().__init__(model, clock or SimulationClock(), event_transducers_mapping)
 
-        self.coordinators = []
-        self.simulators = []
-        self.transducers = []
-
-        self.port_transducers = None
-        if transducers_mapping:
-            self.port_transducers = {}
-            for port in itertools.chain(self.model.in_ports, self.model.out_ports):
-                transducers = transducers_mapping[1].get(port, None)
-                if transducers:
-                    self.port_transducers[port] = transducers
+        self.coordinators: List[Coordinator] = []
+        self.simulators: List[Simulator] = []
+        self.transducers: List[Transducer] = []
 
         if chain:
             if not unroll:
@@ -173,8 +166,9 @@ class Coordinator(AbstractSimulator):
             transducer.initialize()
 
     def _build_hierarchy(self):
-
-        if self.transducers:
+        ports_to_transducers: Optional[Dict[Port, List[Transducer]]] = None
+        models_to_transducers: Optional[Dict[Atomic, List[Transducer]]] = None
+        if self.transducers:  # Esto solo lo tiene el root, no? Si tenemos coupleds anidados no sé si funcionará
             models_to_transducers = defaultdict(list)
             ports_to_transducers = defaultdict(list)
             for transducer in self.transducers:
@@ -183,17 +177,14 @@ class Coordinator(AbstractSimulator):
                 for port in transducer.target_ports:
                     ports_to_transducers[port].append(transducer)
 
-            transducers = (models_to_transducers, ports_to_transducers)
-        else:
-            transducers = None
-
         for comp in self.model.components:
             if isinstance(comp, Coupled):
-                coord = Coordinator(comp, self.clock, transducers_mapping=transducers)
+                coord = Coordinator(comp, self.clock, event_transducers_mapping=ports_to_transducers)
                 self.coordinators.append(coord)
                 self.ports_to_serve.update(coord.ports_to_serve)
             elif isinstance(comp, Atomic):
-                sim = Simulator(comp, self.clock, transducers_mapping=transducers)
+                sim = Simulator(comp, self.clock, event_transducers_mapping=ports_to_transducers,
+                                state_transducers_mapping=models_to_transducers)
                 self.simulators.append(sim)
                 for pts in sim.model.in_ports:
                     if pts.serve:
@@ -240,8 +231,8 @@ class Coordinator(AbstractSimulator):
         for proc in self.processors:
             proc.deltfcn()
 
-        if self.port_transducers is not None:
-            for port, transducers in self.port_transducers.items():
+        if self.event_transducers is not None:
+            for port, transducers in self.event_transducers.items():
                 for trans in transducers:
                     trans.add_imminent_port(port)
 
@@ -333,8 +324,9 @@ class Coordinator(AbstractSimulator):
 class ParallelCoordinator(Coordinator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
-                 unroll: bool = True, executor=None):
-        super().__init__(model, clock, flatten, chain, unroll)
+                 unroll: bool = True, event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None,
+                 executor=None):
+        super().__init__(model, clock, flatten, chain, unroll, event_transducers_mapping=event_transducers_mapping)
 
         self.executor = executor or futures.ThreadPoolExecutor(max_workers=8)  # TODO calc max workers
 
@@ -376,9 +368,12 @@ class ParallelCoordinator(Coordinator):
 
 class ParallelProcessCoordinator(Coordinator):
 
+    coordinators: List[ParallelProcessCoordinator]
+
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
+                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None,
                  master=True, executor=None, executor_futures=None):
-        super().__init__(model, clock, flatten, chain)
+        super().__init__(model, clock, flatten, chain, event_transducers_mapping=event_transducers_mapping)
         self.master = master
 
         if master:
@@ -406,7 +401,7 @@ class ParallelProcessCoordinator(Coordinator):
 
         if self.master:
             for i, future in enumerate(self.executor_futures):
-                #logger.debug("D: Waiting... (%d/%d)" % (i+1, len(self.executor_futures)))
+                # logger.debug("D: Waiting... (%d/%d)" % (i+1, len(self.executor_futures)))
                 futures.wait((future,))
 
                 res = future.result()
@@ -430,7 +425,7 @@ class ParallelProcessCoordinator(Coordinator):
 
         if self.master:
             for i, future in enumerate(self.executor_futures):
-                #logger.debug("D: Waiting... (%d/%d)" % (i+1, len(self.executor_futures)))
+                # logger.debug("D: Waiting... (%d/%d)" % (i+1, len(self.executor_futures)))
                 futures.wait((future,))
 
                 res = future.result()
@@ -471,5 +466,5 @@ class ParallelProcessCoordinator(Coordinator):
 
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.ta()
-        #logger.debug({proc.model.name:proc.time_next for proc in self.processors})
-        #logger.debug("Deltfcn %s: TL: %s, TN: %s" % (self.model.name, self.time_last, self.time_next))
+        # logger.debug({proc.model.name:proc.time_next for proc in self.processors})
+        # logger.debug("Deltfcn %s: TL: %s, TN: %s" % (self.model.name, self.time_last, self.time_next))
