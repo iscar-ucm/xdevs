@@ -1,4 +1,3 @@
-
 import inspect
 import itertools
 import logging
@@ -6,28 +5,13 @@ import pkg_resources
 import re
 from abc import ABC, abstractmethod
 from math import isinf, isnan
-from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar, Iterable
 from xdevs.models import Atomic, Component, Coupled, Port
-
-
-def unknown_field_to_string(x: Any) -> str:
-    """Modifies field of unknown type to string"""
-    return str(x)
-
-
-def remove_special_numbers(x: Union[int, float]) -> Optional[Union[int, float]]:
-    """Modifies integer and float types to avoid infinity and NaNs (DBs usually are not able to deal with them)"""
-    if not (x is None or isnan(x) or isinf(x)):
-        return x
-    return None
 
 
 class Transducer(ABC):
 
     T = TypeVar('T')
-    transducer_id: str
-    target_components: Set[Atomic]
-    target_ports: Set[Port]
     state_mapper: Dict[str, Tuple[Type[T], Callable[[Atomic], T]]]
     event_mapper: Dict[str, Tuple[Type[T], Callable[[Any], T]]]
 
@@ -38,19 +22,22 @@ class Transducer(ABC):
         :param bool exhaustive: determines if the output contains the state of the target components for each iteration
         (True) or only includes the change states (False).
         """
-        self.transducer_id = kwargs.get('transducer_id', None)
+        self.active: bool = True
+        self.transducer_id: str = kwargs.get('transducer_id', None)
         if self.transducer_id is None:
             raise AttributeError("You must specify a transducer ID.")
-        self.exhaustive = kwargs.get('exhaustive', False)
-        self.target_components = set()
-        self.target_ports = set()
+
+        self.exhaustive: bool = kwargs.get('exhaustive', False)
+        self.target_components: Set[Atomic] = set()
+        self.target_ports: Set[Port] = set()
+        self.imminent_components: Optional[List[Atomic]] = None if self.exhaustive else []
+        self.imminent_ports: Optional[List[Port]] = None if self.exhaustive else []
+
         self.state_mapper = {'phase': (str, lambda x: x.phase), 'sigma': (float, lambda x: x.sigma)}
         self.event_mapper = {'value': (str, lambda x: str(x))}
-        self._remove_special_numbers: bool = False
-        self.active = True
 
-        self.imminent_components = None if self.exhaustive else []
-        self.imminent_ports = None if self.exhaustive else []
+        self.supported_data_types: Iterable[type] = self.create_known_data_types_map()
+        self._remove_special_numbers: bool = False
 
     def activate_remove_special_numbers(self):
         logging.warning('Transducer {} does not support special number values (e.g., infinity). '
@@ -124,11 +111,10 @@ class Transducer(ABC):
         self.active = True
 
     @abstractmethod
-    def _is_data_type_unknown(self, field_type) -> bool:
+    def create_known_data_types_map(self) -> Iterable[type]:
         """
-        Returns whether or not the data type is known by the transducer.
-        :param field_type: data type
-        :return: True if data type is known.
+        To do.
+        :return:
         """
         pass
 
@@ -169,8 +155,7 @@ class Transducer(ABC):
         for port in ports:
             for event in port.values:
                 extra_fields = self.map_extra_fields(event, self.event_mapper)
-                yield{'sim_time': sim_time, 'model_name': port.parent.name,
-                                           'port_name': port.name, **extra_fields}
+                yield {'sim_time': sim_time, 'model_name': port.parent.name, 'port_name': port.name, **extra_fields}
 
     def map_extra_fields(self, target: Any, field_mapper: dict) -> Dict[str, Any]:
         """
@@ -182,7 +167,7 @@ class Transducer(ABC):
         extra_fields: Dict[str, Any] = dict()
         for field_id, (field_type, field_mapper) in field_mapper.items():
             field_value = field_mapper(target)  # subtract extra field from target
-            if self._is_data_type_unknown(field_type):
+            if field_type not in self.supported_data_types:
                 field_value = str(field_value)  # unknown data types are automatically converted to string
             elif self._remove_special_numbers and field_type in (int, float):
                 if field_value is not None and (isnan(field_value) or isinf(field_value)):

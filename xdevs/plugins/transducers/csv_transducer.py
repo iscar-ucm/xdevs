@@ -1,7 +1,6 @@
 import csv
-import errno
 import os
-from typing import Any, Dict, List, NoReturn
+from typing import Any, List, NoReturn, Iterable, Type
 from ...transducers import Transducer
 
 
@@ -26,8 +25,8 @@ class CSVTransducer(Transducer):
         self.state_csv_writer = None
         self.event_csv_writer = None
 
-    def _is_data_type_unknown(self, field_type) -> bool:
-        return field_type not in [str, int, float, bool]
+    def create_known_data_types_map(self) -> Iterable[Type[Any]]:
+        return [str, int, float, bool]
 
     def initialize(self) -> NoReturn:
         if self.target_components:

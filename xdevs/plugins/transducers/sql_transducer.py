@@ -3,12 +3,16 @@ from typing import Dict, List, NoReturn, Optional
 from xdevs.transducers import Transducer
 try:
     from sqlalchemy import create_engine, text, Column, Float, Integer, MetaData, String, Table
+    from sqlalchemy.sql.type_api import TypeEngine
     _dependencies_ok = True
 except ModuleNotFoundError:
     _dependencies_ok = False
 
 
 class SQLTransducer(Transducer):
+
+    supported_data_types: Dict[type, TypeEngine]
+
     def __init__(self, **kwargs):
         """
         xDEVS transducer for relational databases. It uses the SQLAlchemy driver.
@@ -21,6 +25,7 @@ class SQLTransducer(Transducer):
         """
         if not _dependencies_ok:
             raise ImportError('Dependencies are not imported')
+        self.string_length: int = kwargs.get('string_length', 128)
         super().__init__(**kwargs)
         self.activate_remove_special_numbers()
 
@@ -32,13 +37,11 @@ class SQLTransducer(Transducer):
         pool_recycle: int = kwargs.get('pool_recycle', -1)
         self.engine = create_engine(url, echo=echo, pool_pre_ping=pool_pre_ping, pool_recycle=pool_recycle)
 
-        self.string_length: int = kwargs.get('string_length', 128)
         self.state_table: Optional[Table] = None
         self.event_table: Optional[Table] = None
-        self.supported_data_types = {str: String(self.string_length), int: Integer, float: Float}
 
-    def _is_data_type_unknown(self, field_type) -> bool:
-        return field_type not in self.supported_data_types
+    def create_known_data_types_map(self) -> Dict[type, TypeEngine]:
+        return {str: String(self.string_length), int: Integer, float: Float}
 
     def initialize(self) -> NoReturn:
         metadata = MetaData()

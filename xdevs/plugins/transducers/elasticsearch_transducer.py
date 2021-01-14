@@ -9,6 +9,9 @@ except ModuleNotFoundError:
 
 
 class ElasticsearchTransducer(Transducer):
+
+    supported_data_types: Dict[type, str]
+
     def __init__(self, **kwargs):
         """
         xDEVS transducer for Elasticsearch databases.
@@ -25,14 +28,12 @@ class ElasticsearchTransducer(Transducer):
             raise AttributeError('You must specify an Elasticsearch URL.')
         self.number_of_shards: int = kwargs.get('number_of_shards', 1)
         self.number_of_replicas: int = kwargs.get('number_of_replicas', 1)
-
-        self.supported_data_types = {str: 'text', int: 'integer', float: 'double', bool: 'boolean'}
         self.activate_remove_special_numbers()
 
         self.es = None
 
-    def _is_data_type_unknown(self, field_type) -> bool:
-        return field_type not in self.supported_data_types
+    def create_known_data_types_map(self) -> Dict[type, str]:
+        return {str: 'text', int: 'integer', float: 'double', bool: 'boolean'}
 
     def initialize(self) -> NoReturn:
         if self.target_components:
