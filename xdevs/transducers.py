@@ -113,8 +113,9 @@ class Transducer(ABC):
     @abstractmethod
     def create_known_data_types_map(self) -> Iterable[type]:
         """
-        To do.
-        :return:
+        Returns an iterable (e.g., a list, a dictionary, etc.) of data types that are known by the transducer.
+        Unknown data types will be automatically transformed to string.
+        :return: Iterable of known/supported data types.
         """
         pass
 

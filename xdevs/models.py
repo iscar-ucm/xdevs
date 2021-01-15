@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 import inspect
 import pickle
 from abc import ABC, abstractmethod
 from collections import deque, defaultdict
 from typing import Deque, Dict, Generator, Generic, Iterator, NoReturn, Optional, List, Tuple, Type, TypeVar
+
 from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
 
@@ -25,13 +27,13 @@ class Port(Generic[T]):
         self.name: str = name if name else self.__class__.__name__
         if p_type is None:
             raise TypeError("Invalid p_type")
-        self.p_type: Type = p_type
+        self.p_type: Type[T] = p_type
         self.serve: bool = serve
         self.parent: Optional[Component] = None  # xDEVS Component that owns the port
-        self.direction: Optional[str] = None  # Message flow direction of the port. It is either PORT_IN or PORT_OUT
-        self._values: Deque[T] = deque()  # Bag containing messages directly written to the port
-        self.links_to: List[Port] = list()  # List of ports that receive data from the port (only used by output ports)
-        self.links_from: List[Port] = list()  # List of ports that inject data to the port (only used by input ports)
+        self.direction: Optional[str] = None     # Message flow direction of the port. It is either PORT_IN or PORT_OUT
+        self._values: Deque[T] = deque()         # Bag containing messages directly written to the port
+        self.links_to: List[Port] = list()       # Ports that receive data from the port (only used by output ports)
+        self.links_from: List[Port] = list()     # Ports that inject data to the port (only used by input ports)
 
     def __bool__(self) -> bool:
         return not self.empty()
@@ -127,18 +129,6 @@ class Component(ABC):
     def out_empty(self) -> bool:
         """:return: True if model has not any message in all its output ports."""
         for port in self.out_ports:
-            if port:
-                return False
-        return True
-
-    @staticmethod
-    def _ports_empty(ports: List[Port]) -> bool:
-        """
-        Checks if all the ports of a given list are empty
-        :param ports: list of ports to be checked
-        :return: True if all the ports are empty
-        """
-        for port in ports:
             if port:
                 return False
         return True
