@@ -2,11 +2,11 @@ import os
 import sys
 from unittest import TestCase
 
-from xdevs.models import Port
+from xdevs.models import Port, Coupled
 
 from xdevs.sim import Coordinator
 
-from xdevs.examples.devstone.devstone import LI, DelayedAtomic
+from xdevs.examples.devstone.devstone import LI, DelayedAtomic, HI
 from xdevs.transducers import Transducers
 from xdevs.examples.basic.basic import Job, Processor, Gpt
 
@@ -23,7 +23,7 @@ class TestCsvTransducer(TestCase):
         self.assertEqual(len(csv.target_components), 1)
 
         csv = Transducers.create_transducer('csv', transducer_id='tt')
-        li = LI("HI_root", depth=10, width=10, int_delay=0, ext_delay=0)
+        li = LI("LI_root", depth=10, width=10, int_delay=0, ext_delay=0)
         csv.add_target_component(li)
         csv.filter_components(DelayedAtomic)
         self.assertEqual(82, len(csv.target_components))
@@ -36,7 +36,7 @@ class TestCsvTransducer(TestCase):
         self.assertEqual(len(csv.target_components), 2)
 
         csv = Transducers.create_transducer('csv', transducer_id='tt')
-        li = LI("HI_root", depth=10, width=10, int_delay=0, ext_delay=0)
+        li = LI("LI_root", depth=10, width=10, int_delay=0, ext_delay=0)
         csv.add_target_component(li)
         csv.filter_components("Atomic_[1-3]_[157]")
         self.assertEqual(9, len(csv.target_components))
@@ -49,7 +49,7 @@ class TestCsvTransducer(TestCase):
         self.assertEqual(1, len(csv.target_components))
 
         csv = Transducers.create_transducer('csv', transducer_id='tt')
-        li = LI("HI_root", depth=10, width=10, int_delay=0, ext_delay=0)
+        li = LI("LI_root", depth=10, width=10, int_delay=0, ext_delay=0)
         csv.add_target_component(li)
         csv.filter_components(lambda comp: isinstance(comp, DelayedAtomic) and comp.name[-1] == "0")
         self.assertEqual(10, len(csv.target_components))
@@ -102,6 +102,23 @@ class TestCsvTransducer(TestCase):
         csv.add_target_ports_by_component(gpt, port_filters=port_filters)
         self.assertEqual(2, len(csv.target_ports))
         csv.target_ports.clear()
+
+    def test_ports_filtering_mixed2(self):
+        csv = Transducers.create_transducer('csv', transducer_id='tt')
+        hi = HI("HI_root", depth=10, width=10, int_delay=0, ext_delay=0)
+
+        comp_filters = (lambda comp: isinstance(comp, DelayedAtomic), ".*[0-2]$")
+        csv.add_target_component(hi, *comp_filters)
+
+        print(csv.target_components)
+        self.assertEqual(28, len(csv.target_components))
+
+        comp_filters2 = (DelayedAtomic, "Atomic_[35]_.*")
+        csv.add_target_ports_by_component(hi, component_filters=comp_filters2, port_filters=("i_.*",))
+        self.assertEqual(18, len(csv.target_ports))
+
+        csv.add_target_ports_by_component(hi, component_filters=(Coupled,), port_filters=(Port, "o_.*"))
+        self.assertEqual(18+10, len(csv.target_ports))
 
     def test_basic_behavior(self):
         trans_id = "%s_test_basic_behavior" % self.__class__.__name__

@@ -227,7 +227,7 @@ class Coordinator(AbstractSimulator):
 
     def add_transducer(self, transducer: Transducer):
         if not self.root_coordinator:
-            raise Exception('Only the root coordinator can contain transducers')  # TODO choose a better exception type
+            raise RuntimeError('Only the root coordinator can contain transducers')
         self._transducers.append(transducer)
 
     def serve(self, host="localhost", port=8000):
@@ -350,8 +350,8 @@ class Coordinator(AbstractSimulator):
             self.clock.time = self.time_next
 
     def _execute_transducers(self):
-        for tranducer in self._transducers:
-            tranducer.trigger(self.clock.time)
+        for transducer in self._transducers:
+            transducer.trigger(self.clock.time)
 
 
 class ParallelCoordinator(Coordinator):
