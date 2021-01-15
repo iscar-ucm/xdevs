@@ -82,6 +82,49 @@ class Transducer(ABC):
     def filter_components(self, *filters):
         self.target_components = self._apply_filters(filters, self.target_components)
 
+    def add_event_field(self, field_name: str, field_type: Type[T], field_getter: Callable[[Any], T]) -> NoReturn:
+        """
+        Adds new event field to the event mapper.
+        :param field_name: name of the new field.
+        :param field_type: data type of the new field.
+        :param field_getter: function that takes an event as input and returns the value of the new event field.
+        :raise KeyError: if field name is already in event mapper.
+        """
+        self._add_field(self.event_mapper, field_name, field_type, field_getter)
+
+    def add_state_field(self, field_name: str, field_type: Type[T], field_getter: Callable[[Atomic], T]) -> NoReturn:
+        """
+        Adds new state field to the state mapper.
+        :param field_name: name of the new field.
+        :param field_type: data type of the new field.
+        :param field_getter: function that takes an atomic model as input and returns the value of the new event field.
+        :raise KeyError: if field name is already in state mapper.
+        """
+        self._add_field(self.state_mapper, field_name, field_type, field_getter)
+
+    @staticmethod
+    def _add_field(field_mapper: Dict[str, Tuple[Type[T], Callable[[Any], T]]],
+                   field_name: str, field_type: Type[T], field_getter: Callable[[Any], T]):
+        if field_name in field_mapper:
+            raise KeyError('Field name {} is already included in field mapper'.format(field_name))
+        field_mapper[field_name] = (field_type, field_getter)
+
+    def drop_event_field(self, field_name: str) -> NoReturn:
+        """
+        Drops a field from the event mapper.
+        :param field_name: name of the field to be removed.
+        :raise KeyError: if field name is not in state mapper.
+        """
+        self.event_mapper.pop(field_name)
+
+    def drop_state_field(self, field_name: str):
+        """
+        Drops a field from the state mapper.
+        :param field_name: name of the field to be removed.
+        :raise KeyError: if field name is not in state mapper.
+        """
+        self.state_mapper.pop(field_name)
+
     @staticmethod
     def _apply_filters(filters, entities):
         """
