@@ -131,12 +131,13 @@ class Coordinator(AbstractSimulator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None,
                  flatten: bool = False, chain: bool = False, unroll: bool = True,
-                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None):
+                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None,
+                 state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]] = None):
         super().__init__(model, clock or SimulationClock(), event_transducers_mapping)
 
         self.coordinators: List[Coordinator] = []
         self.simulators: List[Simulator] = []
-        self.transducers: List[Transducer] = []
+        self._transducers: Optional[List[Transducer]] = [] if self.root_coordinator else None
 
         if chain:
             if not unroll:
@@ -145,6 +146,36 @@ class Coordinator(AbstractSimulator):
         elif flatten:
             self.model.flatten()
         self.ports_to_serve = dict()
+
+        self.__event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None
+        self.__state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]] = None
+        if not self.root_coordinator:
+            # Only non-root coordinators will load the transducers mapping in the constructor.
+            # Root coordinator ignores them, as it is in charge of building them in _build_hierarchy
+            self.event_transducers_mapping = event_transducers_mapping
+            self.state_transducers_mapping = state_transducers_mapping
+
+    @property
+    def root_coordinator(self) -> bool:
+        return self.model.parent is None
+
+    @property
+    def event_transducers_mapping(self) -> Optional[Dict[Port, List[Transducer]]]:
+        return self.__event_transducers_mapping
+
+    @property
+    def state_transducers_mapping(self) -> Optional[Dict[Atomic, List[Transducer]]]:
+        return self.__state_transducers_mapping
+
+    @event_transducers_mapping.setter
+    def event_transducers_mapping(self, event_transducers_mapping: Optional[Dict[Port, List[Transducer]]]):
+        if event_transducers_mapping:
+            self.__event_transducers_mapping = event_transducers_mapping
+
+    @state_transducers_mapping.setter
+    def state_transducers_mapping(self, state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]]):
+        if state_transducers_mapping:
+            self.__state_transducers_mapping = state_transducers_mapping
 
     @property
     def processors(self):
@@ -162,29 +193,32 @@ class Coordinator(AbstractSimulator):
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.ta()
 
-        for transducer in self.transducers:
-            transducer.initialize()
+        if self.root_coordinator:
+            for transducer in self._transducers:
+                transducer.initialize()
 
     def _build_hierarchy(self):
-        ports_to_transducers: Optional[Dict[Port, List[Transducer]]] = None
-        models_to_transducers: Optional[Dict[Atomic, List[Transducer]]] = None
-        if self.transducers:  # Esto solo lo tiene el root, no? Si tenemos coupleds anidados no sé si funcionará
-            models_to_transducers = defaultdict(list)
-            ports_to_transducers = defaultdict(list)
-            for transducer in self.transducers:
+        if self.root_coordinator and self._transducers:
+            # The root coordinator is in charge of
+            ports_to_transducers: Dict[Port, List[Transducer]] = defaultdict(list)
+            models_to_transducers: Dict[Atomic, List[Transducer]] = defaultdict(list)
+            for transducer in self._transducers:
                 for model in transducer.target_components:
                     models_to_transducers[model].append(transducer)
                 for port in transducer.target_ports:
                     ports_to_transducers[port].append(transducer)
+            self.event_transducers_mapping = ports_to_transducers
+            self.state_transducers_mapping = models_to_transducers
 
         for comp in self.model.components:
             if isinstance(comp, Coupled):
-                coord = Coordinator(comp, self.clock, event_transducers_mapping=ports_to_transducers)
+                coord = Coordinator(comp, self.clock, event_transducers_mapping=self.event_transducers_mapping,
+                                    state_transducers_mapping=self.state_transducers_mapping)
                 self.coordinators.append(coord)
                 self.ports_to_serve.update(coord.ports_to_serve)
             elif isinstance(comp, Atomic):
-                sim = Simulator(comp, self.clock, event_transducers_mapping=ports_to_transducers,
-                                state_transducers_mapping=models_to_transducers)
+                sim = Simulator(comp, self.clock, event_transducers_mapping=self.event_transducers_mapping,
+                                state_transducers_mapping=self.state_transducers_mapping)
                 self.simulators.append(sim)
                 for pts in sim.model.in_ports:
                     if pts.serve:
@@ -192,7 +226,9 @@ class Coordinator(AbstractSimulator):
                         self.ports_to_serve[port_name] = pts
 
     def add_transducer(self, transducer: Transducer):
-        self.transducers.append(transducer)
+        if not self.root_coordinator:
+            raise Exception('Only the root coordinator can contain transducers')  # TODO choose a better exception type
+        self._transducers.append(transducer)
 
     def serve(self, host="localhost", port=8000):
         server = SimpleXMLRPCServer((host, port))
@@ -203,7 +239,7 @@ class Coordinator(AbstractSimulator):
         for processor in self.processors:
             processor.exit()
 
-        for transducer in self.transducers:
+        for transducer in self._transducers:
             transducer.exit()
 
     def ta(self):
@@ -256,7 +292,7 @@ class Coordinator(AbstractSimulator):
             out_port.clear()
 
     def inject(self, port, values, e=0):
-        #logger.debug("INJECTING")
+        # logger.debug("INJECTING")
         time = self.time_last + e
 
         if type(values) is not list:
@@ -267,7 +303,7 @@ class Coordinator(AbstractSimulator):
             if port in self.ports_to_serve:
                 port = self.ports_to_serve[port]
             else:
-                #logger.error("Port '%s' not found" % port)
+                # logger.error("Port '%s' not found" % port)
                 return True
 
         if time <= self.time_next or time != time:
@@ -279,14 +315,13 @@ class Coordinator(AbstractSimulator):
             self.clock.time = self.time_next
             return True
         else:
-            #logger.error("Time %d - Input rejected: elapsed time %d is not in bounds" % (self.time_last, e))
+            # logger.error("Time %d - Input rejected: elapsed time %d is not in bounds" % (self.time_last, e))
             return False
 
     def simulate(self, num_iters=10000):
-        #logger.debug("STARTING SIMULATION...")
         self.clock.time = self.time_next
-
         cont = 0
+
         while cont < num_iters and self.clock.time < INFINITY:
             self.lambdaf()
             self.deltfcn()
@@ -296,7 +331,6 @@ class Coordinator(AbstractSimulator):
             cont += 1
 
     def simulate_time(self, time_interv=10000):
-        #logger.debug("STARTING SIMULATION...")
         self.clock.time = self.time_next
         tf = self.clock.time + time_interv
 
@@ -308,7 +342,6 @@ class Coordinator(AbstractSimulator):
             self.clock.time = self.time_next
 
     def simulate_inf(self):
-
         while True:
             self.lambdaf()
             self.deltfcn()
@@ -317,16 +350,16 @@ class Coordinator(AbstractSimulator):
             self.clock.time = self.time_next
 
     def _execute_transducers(self):
-        for tranducer in self.transducers:
+        for tranducer in self._transducers:
             tranducer.trigger(self.clock.time)
 
 
 class ParallelCoordinator(Coordinator):
-
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
                  unroll: bool = True, event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None,
-                 executor=None):
-        super().__init__(model, clock, flatten, chain, unroll, event_transducers_mapping=event_transducers_mapping)
+                 state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]] = None, executor=None):
+        super().__init__(model, clock, flatten, chain, unroll, event_transducers_mapping=event_transducers_mapping,
+                         state_transducers_mapping=state_transducers_mapping)
 
         self.executor = executor or futures.ThreadPoolExecutor(max_workers=8)  # TODO calc max workers
 
@@ -372,8 +405,10 @@ class ParallelProcessCoordinator(Coordinator):
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False, chain: bool = False,
                  event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None,
+                 state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]] = None,
                  master=True, executor=None, executor_futures=None):
-        super().__init__(model, clock, flatten, chain, event_transducers_mapping=event_transducers_mapping)
+        super().__init__(model, clock, flatten, chain, event_transducers_mapping=event_transducers_mapping,
+                         state_transducers_mapping=state_transducers_mapping)
         self.master = master
 
         if master:
