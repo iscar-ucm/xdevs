@@ -55,7 +55,7 @@ class Transducer(ABC):
             if include_coupled:
                 yield root_comp
             for child_comp in root_comp.components:
-                yield from self._iterate_components(child_comp)
+                yield from self._iterate_components(child_comp, include_coupled=include_coupled)
 
     def add_target_port(self, port: Port) -> NoReturn:
         parent: Optional[Component] = port.parent
