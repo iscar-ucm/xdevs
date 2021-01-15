@@ -72,10 +72,8 @@ class ElasticsearchTransducer(Transducer):
         for field_name, (field_type, field_getter) in others.items():
             es_type = self.supported_data_types.get(field_type, None)
             if es_type is None:
+                self._log_unknown_data(field_type, field_name)
                 es_type = self.supported_data_types[str]
-                # TODO move this warning to parent class
-                logging.warning('Elasticsearch transducer {} will cast field {} to string'.format(self.transducer_id,
-                                                                                                  field_name))
             field_properties[field_name] = {'type': es_type}
         mapping = {
             'settings': {

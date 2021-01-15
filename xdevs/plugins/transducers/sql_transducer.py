@@ -1,4 +1,3 @@
-import logging
 from typing import Dict, List, NoReturn, Optional
 from xdevs.transducers import Transducer
 try:
@@ -77,13 +76,11 @@ class SQLTransducer(Transducer):
             conn.execute('DROP TABLE IF EXISTS {}'.format(table_name))
 
         # 2. Deduce the columns of the table and their corresponding data type
-        for state_field, (field_type, field_getter) in columns_mapper.items():
+        for field_name, (field_type, field_getter) in columns_mapper.items():
             column_type = self.supported_data_types.get(field_type, None)
             if column_type is None:
+                self._log_unknown_data(field_type, field_name)
                 column_type = self.supported_data_types[str]
-                # TODO move this warning to parent class
-                logging.warning('SQL transducer {} will cast type of column {} to string'.format(self.transducer_id,
-                                                                                                 state_field))
-            columns.append(Column(state_field, column_type))
+            columns.append(Column(field_name, column_type))
         # 3. Create the table
         return Table(table_name, metadata, *columns)

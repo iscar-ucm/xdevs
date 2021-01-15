@@ -175,8 +175,13 @@ class Transducer(ABC):
             extra_fields[field_id] = field_value
         return extra_fields
 
+    def _log_unknown_data(self, data_type: type, field_name: str) -> NoReturn:
+        logging.warning('Transducer {} do not support data type {} of field {}. '
+                        'It will cast it to string'.format(self.transducer_id, data_type, field_name))
+
 
 class Transducers:
+
     _plugins: Dict[str, Type[Transducer]] = {ep.name: ep.load()
                                              for ep in pkg_resources.iter_entry_points('xdevs.plugins.transducers')}
 
