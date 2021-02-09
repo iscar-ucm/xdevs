@@ -3,7 +3,7 @@ package efp
 import "fmt"
 
 type Job struct {
-	Id string
+	Id   string
 	Time float64
 }
 

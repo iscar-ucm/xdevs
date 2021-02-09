@@ -10,7 +10,7 @@ type EFP struct {
 }
 
 func NewEFP(name string, generatorPeriod float64, processorPeriod float64, transducerPeriod float64) *EFP {
-	efp := EFP {
+	efp := EFP{
 		modeling.NewCoupled(name),
 		modeling.NewPort("iStart", make([]Job, 0)),
 	}

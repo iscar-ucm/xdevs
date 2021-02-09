@@ -81,7 +81,7 @@ func (t *Transducer) DeltExt(e float64) {
 			t.jobsSolved = append(t.jobsSolved, job)
 		}
 	}
-	t.HoldIn(t.GetPhase(), t.GetSigma() - e)
+	t.HoldIn(t.GetPhase(), t.GetSigma()-e)
 }
 
 func (t *Transducer) DeltCon(e float64) {
@@ -94,4 +94,3 @@ func (t *Transducer) Lambda() {
 		t.oOut.AddValue(Job{})
 	}
 }
-

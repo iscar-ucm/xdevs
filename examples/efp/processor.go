@@ -20,7 +20,7 @@ func NewProcessor(name string, processingTime float64) *Processor {
 		modeling.NewPort("oOut", make([]Job, 0)),
 		Job{},
 		processingTime,
-		}
+	}
 	p.AddInPort(p.iIn)
 	p.AddOutPort(p.oOut)
 	return &p
@@ -41,7 +41,7 @@ func (p *Processor) DeltExt(e float64) {
 		p.currentJob = p.iIn.GetSingleValue().(Job)
 		p.HoldIn(util.ACTIVE, p.processingTime)
 	} else {
-		p.HoldIn(util.ACTIVE, p.GetSigma() - e)
+		p.HoldIn(util.ACTIVE, p.GetSigma()-e)
 	}
 }
 
