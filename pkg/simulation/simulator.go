@@ -3,8 +3,8 @@ package simulation
 import "github.com/pointlesssoft/godevs/pkg/modeling"
 
 type Simulator struct {
-	AbstractSimulator		// It complies the AbstractSimulator interface.
-	model modeling.Atomic	// Atomic Model associated to the Simulator.
+	AbstractSimulator                 // It complies the AbstractSimulator interface.
+	model             modeling.Atomic // Atomic Model associated to the Simulator.
 }
 
 // NewSimulator returns a pointer to a new Simulator.
@@ -43,7 +43,7 @@ func (s *Simulator) Transition() {
 			// CASE 2: both atomic model timed out and messages were received -> confluent delta
 			if t == s.GetTN() {
 				s.model.DeltCon(e)
-			// CASE 3: only messages were received -> external delta
+				// CASE 3: only messages were received -> external delta
 			} else {
 				s.model.DeltExt(e)
 			}

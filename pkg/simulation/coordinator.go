@@ -7,10 +7,10 @@ import (
 )
 
 type Coordinator struct {
-	AbstractSimulator						// It complies the AbstractSimulator interface.
-	model           modeling.Coupled		// Coupled Model associated to the Coordinator.
-	simulators      []AbstractSimulator		// Slice containing all the children simulators of the Coordinator.
-	totalIterations int						// Number of iterations simulated so far.
+	AbstractSimulator                     // It complies the AbstractSimulator interface.
+	model             modeling.Coupled    // Coupled Model associated to the Coordinator.
+	simulators        []AbstractSimulator // Slice containing all the children simulators of the Coordinator.
+	totalIterations   int                 // Number of iterations simulated so far.
 }
 
 // NewCoordinator returns a pointer to a Coordinator.
@@ -66,7 +66,7 @@ func (c *Coordinator) TA() float64 {
 	tn := util.INFINITY
 	for _, sim := range c.simulators {
 		simTn := sim.GetTN()
-		if  simTn < tn {
+		if simTn < tn {
 			tn = simTn
 		}
 	}
@@ -75,7 +75,7 @@ func (c *Coordinator) TA() float64 {
 
 // Collect triggers the collection function of all children simulators and propagate the output events.
 func (c *Coordinator) Collect() {
-	for _, sim := range c.simulators {  // TODO parallelize
+	for _, sim := range c.simulators { // TODO parallelize
 		sim.Collect()
 	}
 	c.PropagateOutput()

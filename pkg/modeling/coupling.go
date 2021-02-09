@@ -6,10 +6,10 @@ import (
 )
 
 type Coupling interface {
-	GetPortFrom() Port		// returns source Port.
-	GetPortTo() Port		// returns destination Port.
-	PropagateValues()		// copies values from source Port to destination Port.
-	String() string			// returns a string representation of the Coupling.
+	GetPortFrom() Port // returns source Port.
+	GetPortTo() Port   // returns destination Port.
+	PropagateValues()  // copies values from source Port to destination Port.
+	String() string    // returns a string representation of the Coupling.
 }
 
 // NewCoupling returns a pointer to a structure that complies the Coupling interface.
@@ -25,8 +25,8 @@ func NewCoupling(portFrom Port, portTo Port) Coupling {
 }
 
 type coupling struct {
-	portFrom Port		// source Port.
-	portTo   Port		// destination Port.
+	portFrom Port // source Port.
+	portTo   Port // destination Port.
 }
 
 // GetPortFrom returns source Port of the coupling.

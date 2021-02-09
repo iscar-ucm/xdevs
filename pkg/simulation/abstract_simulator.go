@@ -3,18 +3,18 @@ package simulation
 import "github.com/pointlesssoft/godevs/pkg/modeling"
 
 type AbstractSimulator interface {
-	Initialize()					// performs all the required operations before starting a simulation.
-	Exit()							// performs all the required operations to exit after a simulation.
-	TA() float64					// time advance function.
-	Collect()						// collection function.
-	Transition()					// transition function.
-	Clear()							// clear function.
-	GetModel() modeling.Component	// returns the Component attached to the simulator.
-	GetTL() float64					// returns simulator's last simulation time.
-	SetTL(tl float64)				// sets simulator's last simulation time.
-	GetTN() float64					// returns simulator's next timeout.
-	SetTN(tn float64)				// sets simulator's next timeout.
-	GetClock() Clock				// returns abstract simulator's simulation Clock.
+	Initialize()                  // performs all the required operations before starting a simulation.
+	Exit()                        // performs all the required operations to exit after a simulation.
+	TA() float64                  // time advance function.
+	Collect()                     // collection function.
+	Transition()                  // transition function.
+	Clear()                       // clear function.
+	GetModel() modeling.Component // returns the Component attached to the simulator.
+	GetTL() float64               // returns simulator's last simulation time.
+	SetTL(tl float64)             // sets simulator's last simulation time.
+	GetTN() float64               // returns simulator's next timeout.
+	SetTN(tn float64)             // sets simulator's next timeout.
+	GetClock() Clock              // returns abstract simulator's simulation Clock.
 }
 
 func NewAbstractSimulator(clock Clock) AbstractSimulator {
@@ -23,9 +23,9 @@ func NewAbstractSimulator(clock Clock) AbstractSimulator {
 }
 
 type abstractSimulator struct {
-	clock Clock		// Simulation Clock.
-	tL    float64  	// Time of last event
-	tN    float64  	// Time of next event
+	clock Clock   // Simulation Clock.
+	tL    float64 // Time of last event
+	tN    float64 // Time of next event
 }
 
 // Initialize performs all the required operations before starting a simulation.
@@ -52,7 +52,6 @@ func (a *abstractSimulator) Collect() {
 func (a *abstractSimulator) Transition() {
 	panic("implement me")
 }
-
 
 // Clear performs all the required operation to clear the simulation state.
 func (a *abstractSimulator) Clear() {

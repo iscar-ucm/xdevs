@@ -6,22 +6,22 @@ import (
 )
 
 type Atomic interface {
-	Component								// Atomic interface complies with the Component interface.
-	TA() float64							// Returns time to be elapsed until next internal transition is triggered.
-	DeltInt()								// Internal transition function.
-	DeltExt(e float64)						// External transition function.
-	DeltCon(e float64)						// Confluent transition function.
-	Lambda()								// Output function.
-	HoldIn(phase string, sigma float64)		// Sets Atomic model's phase and sigma.
-	Activate()								// Sets Atomic model's phase to "active" and sigma to 0.
-	Passivate()								// Sets Atomic model's phase to "passive" and sigma to Infinity.
-	PassivateIn(phase string)				// Sets Atomic model's phase and sigma to Infinity.
-	PhaseIs(phase string) bool				// Returns true if Atomic model's phase is phase.
-	GetPhase() string						// Returns the current phase of the model.
-	SetPhase(phase string)					// Sets Atomic model's phase.
-	GetSigma() float64						// Returns Atomic model's current sigma.
-	SetSigma(sigma float64)					// Sets Atomic model's current sigma.
-	ShowState() string						// Returns a string that represents Atomic model's state.
+	Component                           // Atomic interface complies with the Component interface.
+	TA() float64                        // Returns time to be elapsed until next internal transition is triggered.
+	DeltInt()                           // Internal transition function.
+	DeltExt(e float64)                  // External transition function.
+	DeltCon(e float64)                  // Confluent transition function.
+	Lambda()                            // Output function.
+	HoldIn(phase string, sigma float64) // Sets Atomic model's phase and sigma.
+	Activate()                          // Sets Atomic model's phase to "active" and sigma to 0.
+	Passivate()                         // Sets Atomic model's phase to "passive" and sigma to Infinity.
+	PassivateIn(phase string)           // Sets Atomic model's phase and sigma to Infinity.
+	PhaseIs(phase string) bool          // Returns true if Atomic model's phase is phase.
+	GetPhase() string                   // Returns the current phase of the model.
+	SetPhase(phase string)              // Sets Atomic model's phase.
+	GetSigma() float64                  // Returns Atomic model's current sigma.
+	SetSigma(sigma float64)             // Sets Atomic model's current sigma.
+	ShowState() string                  // Returns a string that represents Atomic model's state.
 }
 
 // NewComponent returns a pointer to a structure that complies the Atomic interface.
@@ -32,9 +32,9 @@ func NewAtomic(name string) Atomic {
 }
 
 type atomic struct {
-	Component		// It inherits Component.
-	phase string	// atomic model current phase.
-	sigma float64	// atomic model current sigma.
+	Component         // It inherits Component.
+	phase     string  // atomic model current phase.
+	sigma     float64 // atomic model current sigma.
 }
 
 // TA is the time advance function. It returns the time remaining until the next state timeout of the atomic model.
@@ -75,22 +75,26 @@ func (a *atomic) Lambda() {
 
 // HoldIn Sets Atomic model's phase and sigma.
 func (a *atomic) HoldIn(phase string, sigma float64) {
-	a.phase = phase; a.sigma = sigma
+	a.phase = phase
+	a.sigma = sigma
 }
 
 // Activate sets Atomic model's phase to "active" and sigma to 0.
 func (a *atomic) Activate() {
-	a.phase = util.ACTIVE; a.sigma = 0
+	a.phase = util.ACTIVE
+	a.sigma = 0
 }
 
 // Passivate sets Atomic model's phase to "passive" and sigma to Infinity.
 func (a *atomic) Passivate() {
-	a.phase = util.PASSIVE; a.sigma = util.INFINITY
+	a.phase = util.PASSIVE
+	a.sigma = util.INFINITY
 }
 
 // PassivateIn sets Atomic model's phase and sigma to Infinity.
 func (a *atomic) PassivateIn(phase string) {
-	a.phase = phase; a.sigma = util.INFINITY
+	a.phase = phase
+	a.sigma = util.INFINITY
 }
 
 // PhaseIs returns true if Atomic model's phase is phase.
