@@ -8,5 +8,5 @@ type Job struct {
 }
 
 func (j *Job) ToString() string {
-	return "(id,t)=(" + j.Id + "," + fmt.Sprintf("%v", j.Time) + ")"
+	return fmt.Sprintf("(id,t)=(%v,%v)", j.Id, j.Time)
 }

@@ -25,7 +25,7 @@ func (t Topology) IsValid() error {
 
 type DEVStone struct {
 	modeling.Coupled
-	subDEVStone					 *DEVStone
+	subDEVStone                  *DEVStone
 	topology                     Topology
 	Depth, Width                 uint64
 	intDelay, extDelay, prepTime float64
@@ -50,7 +50,7 @@ func NewDEVStone(name string, topology Topology, depth uint64, width uint64, int
 		}
 	}
 
-	if depth == 1 {  // innermost coupled model only contains an atomic model
+	if depth == 1 { // innermost coupled model only contains an atomic model
 		a := NewAtomicDEVStone("atomic_0_0", intDelay, extDelay, prepTime, true)
 		d.AddComponent(a)
 		d.AddCoupling(d.GetInPort("iIn"), a.iIn)
@@ -83,7 +83,7 @@ func (d *DEVStone) createSubDEVStone(name string) error {
 	d.AddCoupling(d.GetInPort("iIn"), d.subDEVStone.GetInPort("iIn"))
 	d.AddCoupling(d.GetOutPort("oOut"), d.subDEVStone.GetOutPort("oOut"))
 	if d.topology == HO {
-			d.AddCoupling(d.GetInPort("iIn2"), d.subDEVStone.GetInPort("iIn2"))
+		d.AddCoupling(d.GetInPort("iIn2"), d.subDEVStone.GetInPort("iIn2"))
 	}
 	return nil
 }
@@ -98,12 +98,12 @@ func (d *DEVStone) createSimpleDEVStoneAtomics() error {
 		return errors.New(fmt.Sprintf("the DEVStone model topology '%v' is not considered as simple", d.topology))
 	}
 
-	var aPrev *AtomicDEVStone = nil  // Atomic model created in the previous iteration of the next loop
+	var aPrev *AtomicDEVStone = nil // Atomic model created in the previous iteration of the next loop
 	for i := uint64(0); i < d.Width; i++ {
 		a := NewAtomicDEVStone(fmt.Sprintf("atomic_%v_%v", d.Depth-1, i), d.intDelay, d.extDelay, d.prepTime, useOut)
 		d.AddComponent(a)
 		d.AddCoupling(d.GetInPort("iIn"), a.iIn)
-		if d.topology != LI {  // LI models don't need any extra steps
+		if d.topology != LI { // LI models don't need any extra steps
 			if aPrev != nil {
 				d.AddCoupling(aPrev.oOut, a.iIn)
 			}
@@ -122,30 +122,30 @@ func (d *DEVStone) createHOmodDEVStoneAtomics() error {
 	} else if d.Width < 2 {
 		return errors.New(fmt.Sprintf("HOmod model width must be greater than or equal to 2, but is %v", d.Width))
 	}
-	var prevAtomicsRow []*AtomicDEVStone = nil  // Atomics created in the previous iteration of the next loop
+	var prevAtomicsRow []*AtomicDEVStone = nil // Atomics created in the previous iteration of the next loop
 	for i := uint64(0); i < d.Width; i++ {
 		initialJ := uint64(0)
 		if i > 1 {
 			initialJ = i - 1
 		}
-		atomicsRow := make([]*AtomicDEVStone, d.Width - 1 - initialJ)  // Atomics to be created in this iteration
-		for j := initialJ; j < d.Width - 1; j++ {
+		atomicsRow := make([]*AtomicDEVStone, d.Width-1-initialJ) // Atomics to be created in this iteration
+		for j := initialJ; j < d.Width-1; j++ {
 			a := NewAtomicDEVStone(fmt.Sprintf("atomic_%v_%v_%v", d.Depth-1, i, j), d.intDelay, d.extDelay, d.prepTime, true)
 			d.AddComponent(a)
 			atomicsRow[j-initialJ] = a
-			if i == 0 {  // First row of atomic models
+			if i == 0 { // First row of atomic models
 				d.AddCoupling(d.GetInPort("iIn2"), a.iIn)
 				d.AddCoupling(a.oOut, d.subDEVStone.GetInPort("iIn2"))
-			} else {  // Remaining rows of atomic models
-				if j == initialJ {  // First atomic of the row is coupled to the coupled input port
+			} else { // Remaining rows of atomic models
+				if j == initialJ { // First atomic of the row is coupled to the coupled input port
 					d.AddCoupling(d.GetInPort("iIn2"), a.iIn)
 				}
-				if i == 1 {  // Second row of atomic models
+				if i == 1 { // Second row of atomic models
 					for _, prevAtomic := range prevAtomicsRow {
 						d.AddCoupling(a.oOut, prevAtomic.iIn)
 					}
 				} else if prevAtomicsRow == nil {
-						return errors.New(fmt.Sprintf("row %v could not access to previous row, as it is nil", i))
+					return errors.New(fmt.Sprintf("row %v could not access to previous row, as it is nil", i))
 				} else { // Remaining rows
 					d.AddCoupling(a.oOut, prevAtomicsRow[j-initialJ+1].iIn)
 				}

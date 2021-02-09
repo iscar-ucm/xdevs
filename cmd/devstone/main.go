@@ -29,9 +29,9 @@ func main() {
 	flag.StringVar(&topology, "t", "", "topology of the DEVStone model (required)")
 	flag.Uint64Var(&depth, "d", 0, "depth of the top DEVStone model (required)")
 	flag.Uint64Var(&width, "w", 0, "width of the top DEVStone model (required)")
-	flag.Float64Var(&intDelay, "i", 0, "internal delay of atomic models")
-	flag.Float64Var(&extDelay, "e", 0, "external delay of atomic models")
-	flag.Float64Var(&prepTime, "p", 0, "preparation time of atomic models")
+	flag.Float64Var(&intDelay, "i", 0, "internal delay of atomic models (default 0)")
+	flag.Float64Var(&extDelay, "e", 0, "external delay of atomic models (default 0)")
+	flag.Float64Var(&prepTime, "p", 0, "preparation time of atomic models (default 0)")
 	flag.Parse()
 
 	if topology == "" || depth == 0 || width == 0 {
