@@ -126,13 +126,13 @@ func (d *DEVStone) createHOmodDEVStoneAtomics() error {
 	for i := uint64(0); i < d.Width; i++ {
 		initialJ := uint64(0)
 		if i > 1 {
-			initialJ = i - 2
+			initialJ = i - 1
 		}
 		atomicsRow := make([]*AtomicDEVStone, d.Width - 1 - initialJ)  // Atomics to be created in this iteration
 		for j := initialJ; j < d.Width - 1; j++ {
 			a := NewAtomicDEVStone(fmt.Sprintf("atomic_%v_%v_%v", d.Depth-1, i, j), d.intDelay, d.extDelay, d.prepTime, true)
 			d.AddComponent(a)
-			atomicsRow = append(atomicsRow, a)
+			atomicsRow[j-initialJ] = a
 			if i == 0 {  // First row of atomic models
 				d.AddCoupling(d.GetInPort("iIn2"), a.iIn)
 				d.AddCoupling(a.oOut, d.subDEVStone.GetInPort("iIn2"))
@@ -146,8 +146,8 @@ func (d *DEVStone) createHOmodDEVStoneAtomics() error {
 					}
 				} else if prevAtomicsRow == nil {
 						return errors.New(fmt.Sprintf("row %v could not access to previous row, as it is nil", i))
-				} else {  // Remaining rows
-					d.AddCoupling(a.oOut, prevAtomicsRow[j+1].iIn)
+				} else { // Remaining rows
+					d.AddCoupling(a.oOut, prevAtomicsRow[j-initialJ+1].iIn)
 				}
 			}
 		}
