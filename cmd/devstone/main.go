@@ -49,6 +49,7 @@ func main() {
 
 	coordinator := simulation.NewRootCoordinator(0, model)
 	coordinator.Initialize()
+	coordinator.SimInject(0, model.GetInPort("iIn"), []int{0})
 	elapsedEngine := time.Since(start) - elapsedModel
 	fmt.Printf("Engine setup time: %v\n", elapsedEngine)
 
