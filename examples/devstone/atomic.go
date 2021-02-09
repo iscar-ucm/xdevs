@@ -6,16 +6,24 @@ import (
 	"github.com/pointlesssoft/godevs/pkg/util"
 )
 
-type AtomicDEVStone struct {
+type AtomicDEVStone interface {
+	modeling.Atomic
+	GetIntCount() uint64
+	GetExtCount() uint64
+	getInPort() modeling.Port
+	getOutPort() modeling.Port
+}
+
+type atomicDEVStone struct {
 	modeling.Atomic
 	useOut                       bool
 	iIn, oOut                    modeling.Port
 	intDelay, extDelay, prepTime float64
-	IntCount, ExtCount           uint64
+	intCount, extCount           uint64
 }
 
-func NewAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime float64, useOut bool) *AtomicDEVStone {
-	a := AtomicDEVStone{modeling.NewAtomic(name), useOut,
+func NewAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime float64, useOut bool) AtomicDEVStone {
+	a := atomicDEVStone{modeling.NewAtomic(name), useOut,
 		modeling.NewPort("iIn", make([]int, 0)), modeling.NewPort("oOut", make([]int, 0)),
 		intDelay, extDelay, prepTime, 0, 0}
 	a.AddInPort(a.iIn)
@@ -26,29 +34,45 @@ func NewAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime
 	return &a
 }
 
-func (a *AtomicDEVStone) Initialize() {
+func (a *atomicDEVStone) Initialize() {
 	a.Passivate()
 }
 
-func (a *AtomicDEVStone) Exit() {}
+func (a *atomicDEVStone) Exit() {}
 
-func (a *AtomicDEVStone) DeltInt() {
-	a.IntCount++
+func (a *atomicDEVStone) DeltInt() {
+	a.intCount++
 	a.Passivate()
 }
 
-func (a *AtomicDEVStone) DeltExt(e float64) {
-	a.ExtCount++
+func (a *atomicDEVStone) DeltExt(e float64) {
+	a.extCount++
 	a.HoldIn(util.ACTIVE, a.prepTime)
 }
 
-func (a *AtomicDEVStone) DeltCon(e float64) {
+func (a *atomicDEVStone) DeltCon(e float64) {
 	a.DeltInt()
 	a.DeltExt(0)
 }
 
-func (a *AtomicDEVStone) Lambda() {
+func (a *atomicDEVStone) Lambda() {
 	if a.useOut {
 		a.oOut.AddValue(0)
 	}
+}
+
+func (a *atomicDEVStone) GetIntCount() uint64 {
+	return a.intCount
+}
+
+func (a *atomicDEVStone) GetExtCount() uint64 {
+	return a.intCount
+}
+
+func (a *atomicDEVStone) getInPort() modeling.Port {
+	return a.iIn
+}
+
+func (a *atomicDEVStone) getOutPort() modeling.Port {
+	return a.oOut
 }
