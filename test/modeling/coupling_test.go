@@ -50,8 +50,8 @@ func TestCoupling(t *testing.T) {
 	port2From.AddValues([]string{"world", "!"})
 	coupling1.PropagateValues()
 	coupling2.PropagateValues()
-	assert.Equal(t, 1 + port1From.Length(), port1To.Length())
-	assert.Equal(t, 1 + port2From.Length(), port2To.Length())
+	assert.Equal(t, 1+port1From.Length(), port1To.Length())
+	assert.Equal(t, 1+port2From.Length(), port2To.Length())
 
 	/* 7. Check that, when clearing destination ports, source ports keep the values */
 	port1To.Clear()
@@ -66,8 +66,8 @@ func TestCoupling(t *testing.T) {
 	coupling2.PropagateValues()
 	coupling1.PropagateValues()
 	coupling2.PropagateValues()
-	assert.Equal(t, 2 * port1From.Length(), port1To.Length())
-	assert.Equal(t, 2 * port2From.Length(), port2To.Length())
+	assert.Equal(t, 2*port1From.Length(), port1To.Length())
+	assert.Equal(t, 2*port2From.Length(), port2To.Length())
 
 	/* 9. Clear all ports and assert they are empty */
 	port1To.Clear()

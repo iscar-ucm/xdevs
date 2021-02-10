@@ -1,19 +1,19 @@
 package modeling
 
 type Component interface {
-	GetName() string                          // returns Component's name.
-	Initialize()                              // initializes the component before simulation.
-	Exit()                                    // performs a set of operations after simulation.
-	IsInputEmpty() bool                       // returns true if none of the input Ports contains any value.
-	AddInPort(port Port)                      // adds a new input Port.
-	GetInPort(portName string) Port  		  // returns one input Port with an specific name.
-	GetInPorts() []Port                       // returns a slice with all the input Ports.
-	AddOutPort(port Port)                     // adds a new output Port.
-	GetOutPort(portName string) Port 		  // returns one output Port with an specific name.
-	GetOutPorts() []Port                      // returns a slice with all the output Ports.
-	setParent(component Component)            // sets one Component as parent of the Component.
-	GetParent() Component                     // returns parent Component.
-	String() string                           // returns a string representation of the Component.
+	GetName() string                 // returns Component's name.
+	Initialize()                     // initializes the component before simulation.
+	Exit()                           // performs a set of operations after simulation.
+	IsInputEmpty() bool              // returns true if none of the input Ports contains any value.
+	AddInPort(port Port)             // adds a new input Port.
+	GetInPort(portName string) Port  // returns one input Port with an specific name.
+	GetInPorts() []Port              // returns a slice with all the input Ports.
+	AddOutPort(port Port)            // adds a new output Port.
+	GetOutPort(portName string) Port // returns one output Port with an specific name.
+	GetOutPorts() []Port             // returns a slice with all the output Ports.
+	setParent(component Component)   // sets one Component as parent of the Component.
+	GetParent() Component            // returns parent Component.
+	String() string                  // returns a string representation of the Component.
 }
 
 // NewComponent returns a pointer to a structure that complies the Component interface.

@@ -14,8 +14,8 @@ func TestPort(t *testing.T) {
 	assert.True(t, port2.IsEmpty(), "Initially, port should be empty")
 
 	/* 2. Check that ports do not accept new values of a different type */
-	assert.Panics(t, func() {port1.AddValue("invalid")}, "port of type %T should not admit values of type ", 0, "invalid")
-	assert.Panics(t, func() {port2.AddValue(0)}, "port of type %T should not admit values of type ", "invalid", 0)
+	assert.Panics(t, func() { port1.AddValue("invalid") }, "port of type %T should not admit values of type ", 0, "invalid")
+	assert.Panics(t, func() { port2.AddValue(0) }, "port of type %T should not admit values of type ", "invalid", 0)
 
 	/* 3. Check that ports accept new values of their corresponding type */
 	port1.AddValue(1)
@@ -34,7 +34,7 @@ func TestPort(t *testing.T) {
 	/* 4. Check that the Clear function works */
 	port1.Clear()
 	assert.True(t, port1.IsEmpty(), "After clearing it, port should be empty")
-	assert.Panics(t, func() {port1.GetSingleValue()}, "As port is empty, it should panic")
+	assert.Panics(t, func() { port1.GetSingleValue() }, "As port is empty, it should panic")
 	assert.Equal(t, 0, len(port1.GetValues().([]int)), "Slice should be empty")
 	port2.Clear()
 	assert.True(t, port2.IsEmpty(), "After clearing it, port should be empty")
