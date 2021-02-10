@@ -6,23 +6,15 @@ import (
 	"github.com/pointlesssoft/godevs/pkg/util"
 )
 
-type AtomicDEVStone interface {
-	modeling.Atomic
-	GetIntCount() uint64
-	GetExtCount() uint64
-	getInPort() modeling.Port
-	getOutPort() modeling.Port
-}
-
 type atomicDEVStone struct {
 	modeling.Atomic
 	useOut                       bool
 	iIn, oOut                    modeling.Port
 	intDelay, extDelay, prepTime float64
-	intCount, extCount           uint64
+	intCount, extCount           int
 }
 
-func NewAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime float64, useOut bool) AtomicDEVStone {
+func newAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime float64, useOut bool) DEVStone {
 	a := atomicDEVStone{modeling.NewAtomic(name), useOut,
 		modeling.NewPort("iIn", make([]int, 0)), modeling.NewPort("oOut", make([]int, 0)),
 		intDelay, extDelay, prepTime, 0, 0}
@@ -61,18 +53,22 @@ func (a *atomicDEVStone) Lambda() {
 	}
 }
 
-func (a *atomicDEVStone) GetIntCount() uint64 {
-	return a.intCount
-}
-
-func (a *atomicDEVStone) GetExtCount() uint64 {
-	return a.intCount
-}
-
 func (a *atomicDEVStone) getInPort() modeling.Port {
 	return a.iIn
 }
 
 func (a *atomicDEVStone) getOutPort() modeling.Port {
 	return a.oOut
+}
+
+func (a *atomicDEVStone) GetIntCount() int {
+	return a.intCount
+}
+
+func (a *atomicDEVStone) GetExtCount() int {
+	return a.extCount
+}
+
+func (a *atomicDEVStone) GetTotalCount() int {
+	return a.intCount + a.extCount
 }
