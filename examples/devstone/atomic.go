@@ -1,7 +1,6 @@
 package devstone
 
 import (
-	"fmt"
 	"github.com/pointlesssoft/godevs/pkg/modeling"
 	"github.com/pointlesssoft/godevs/pkg/util"
 )
@@ -15,8 +14,8 @@ type atomicDEVStone struct {
 }
 
 func newAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime float64, useOut bool) (DEVStone, error) {
-	if intDelay < 0 || extDelay < 0 || prepTime < 0 {
-		return nil, fmt.Errorf("delays (%v,%v,%v) must be greater than or equal to 0", intDelay, extDelay, prepTime)
+	if err := checkTiming(intDelay, extDelay, prepTime); err != nil {
+		return nil, err
 	}
 	a := atomicDEVStone{modeling.NewAtomic(name), useOut,
 		modeling.NewPort("iIn", make([]int, 0)), modeling.NewPort("oOut", make([]int, 0)),

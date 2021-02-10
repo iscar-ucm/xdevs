@@ -1,7 +1,6 @@
 package devstone
 
 import (
-	"errors"
 	"github.com/pointlesssoft/godevs/pkg/modeling"
 )
 
@@ -13,14 +12,6 @@ const (
 	HO             = "HO"
 	HOmod          = "HOmod"
 )
-
-func (t Topology) IsValid() error {
-	switch t {
-	case LI, HI, HO, HOmod:
-		return nil
-	}
-	return errors.New("invalid DEVStone topology type")
-}
 
 type DEVStone interface {
 	modeling.Component
