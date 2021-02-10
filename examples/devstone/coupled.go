@@ -14,12 +14,12 @@ type coupledDEVStone struct {
 	intDelay, extDelay, prepTime float64
 }
 
-func newCoupledDEVStone(name string, topology Topology, depth int, width int, intDelay float64, extDelay float64, prepTime float64) DEVStone {
+func newCoupledDEVStone(name string, topology Topology, depth int, width int, intDelay float64, extDelay float64, prepTime float64) (DEVStone, error) {
 	if topology.IsValid() != nil {
-		panic(fmt.Sprintf("the DEVStone topology '%v' is invalid", topology))
+		return nil, fmt.Errorf("the DEVStone topology '%v' is invalid", topology)
 	}
 	if depth < 1 || width < 1 {
-		panic(fmt.Sprintf("depth and width must be greater than or equal to 1, but are (%v,%v)", depth, width))
+		return nil, fmt.Errorf("depth and width must be greater than or equal to 1, but are (%v,%v)", depth, width)
 	}
 
 	d := coupledDEVStone{modeling.NewCoupled(fmt.Sprintf("%v_%v", name, depth-1)), nil, topology, depth, width, intDelay, extDelay, prepTime}
@@ -33,10 +33,13 @@ func newCoupledDEVStone(name string, topology Topology, depth int, width int, in
 	}
 
 	if depth == 1 { // innermost coupled model only contains an atomic model
-		a := newAtomicDEVStone("atomic_0_0", intDelay, extDelay, prepTime, true)
-		d.AddComponent(a)
-		d.AddCoupling(d.GetInPort("iIn"), a.GetInPort("iIn"))
-		d.AddCoupling(a.GetOutPort("oOut"), d.GetOutPort("oOut"))
+		if a, err := newAtomicDEVStone("atomic_0_0", intDelay, extDelay, prepTime, true); err != nil {
+			return nil, fmt.Errorf("newCoupledDEVStone: %v", err)
+		} else {
+			d.AddComponent(a)
+			d.AddCoupling(d.GetInPort("iIn"), a.GetInPort("iIn"))
+			d.AddCoupling(a.GetOutPort("oOut"), d.GetOutPort("oOut"))
+		}
 	} else {
 		if err := d.createSubDEVStone(name); err != nil {
 			panic(fmt.Sprintf("DEVStone createSubDEVStone: %v", err))
@@ -53,83 +56,93 @@ func newCoupledDEVStone(name string, topology Topology, depth int, width int, in
 			}
 		}
 	}
-	return &d
+	return &d, nil
 }
 
-func (d *coupledDEVStone) createSubDEVStone(name string) error {
-	if d.Depth <= 1 {
+func (c *coupledDEVStone) createSubDEVStone(name string) error {
+	if c.Depth <= 1 {
 		return errors.New("DEVStone model depth must be greater than 1 to have a coupled SubDEVStone")
 	}
-	d.subCoupledDEVStone = NewDEVStone(name, d.topology, d.Depth-1, d.Width, d.intDelay, d.extDelay, d.prepTime)
-	d.AddComponent(d.subCoupledDEVStone)
-	d.AddCoupling(d.GetInPort("iIn"), d.subCoupledDEVStone.GetInPort("iIn"))
-	d.AddCoupling(d.GetOutPort("oOut"), d.subCoupledDEVStone.GetOutPort("oOut"))
-	if d.topology == HO {
-		d.AddCoupling(d.GetInPort("iIn2"), d.subCoupledDEVStone.GetInPort("iIn2"))
+	d, err := NewDEVStone(name, c.topology, c.Depth-1, c.Width, c.intDelay, c.extDelay, c.prepTime)
+	if err != nil {
+		return fmt.Errorf("createSubDEVStone: %v", err)
+	}
+	c.subCoupledDEVStone = d
+	c.AddComponent(c.subCoupledDEVStone)
+	c.AddCoupling(c.GetInPort("iIn"), c.subCoupledDEVStone.GetInPort("iIn"))
+	c.AddCoupling(c.GetOutPort("oOut"), c.subCoupledDEVStone.GetOutPort("oOut"))
+	if c.topology == HO {
+		c.AddCoupling(c.GetInPort("iIn2"), c.subCoupledDEVStone.GetInPort("iIn2"))
 	}
 	return nil
 }
 
-func (d *coupledDEVStone) createSimpleDEVStoneAtomics() error {
+func (c *coupledDEVStone) createSimpleDEVStoneAtomics() error {
 	useOut := false
-	switch d.topology {
+	switch c.topology {
 	case LI:
 	case HI, HO:
 		useOut = true
 	default:
-		return errors.New(fmt.Sprintf("the DEVStone model topology '%v' is not considered as simple", d.topology))
+		return fmt.Errorf("createSimpleDEVStoneAtomics: model topology '%v' is not considered as simple", c.topology)
 	}
 
 	var aPrev DEVStone = nil // Atomic model created in the previous iteration of the next loop
-	for i := 0; i < d.Width; i++ {
-		a := newAtomicDEVStone(fmt.Sprintf("atomic_%v_%v", d.Depth-1, i), d.intDelay, d.extDelay, d.prepTime, useOut)
-		d.AddComponent(a)
-		d.AddCoupling(d.GetInPort("iIn"), a.GetInPort("iIn"))
-		if d.topology != LI { // LI models don't need any extra steps
-			if aPrev != nil {
-				d.AddCoupling(aPrev.GetOutPort("oOut"), a.GetInPort("iIn"))
+	for i := 0; i < c.Width; i++ {
+		if a, err := newAtomicDEVStone(fmt.Sprintf("atomic_%v_%v", c.Depth-1, i), c.intDelay, c.extDelay, c.prepTime, useOut); err != nil {
+			return fmt.Errorf("createSimpleDEVStoneAtomics: %v", err)
+		} else {
+			c.AddComponent(a)
+			c.AddCoupling(c.GetInPort("iIn"), a.GetInPort("iIn"))
+			if c.topology != LI { // LI models don't need any extra steps
+				if aPrev != nil {
+					c.AddCoupling(aPrev.GetOutPort("oOut"), a.GetInPort("iIn"))
+				}
+				if c.topology == HO {
+					c.AddCoupling(a.GetOutPort("oOut"), c.GetOutPort("oOut2"))
+				}
 			}
-			if d.topology == HO {
-				d.AddCoupling(a.GetOutPort("oOut"), d.GetOutPort("oOut2"))
-			}
+			aPrev = a
 		}
-		aPrev = a
 	}
 	return nil
 }
 
-func (d *coupledDEVStone) createHOmodDEVStoneAtomics() error {
-	if d.topology != HOmod {
-		return errors.New(fmt.Sprintf("DEVStone model topology '%v' is incompatible with HOmod", d.topology))
-	} else if d.Width < 2 {
-		return errors.New(fmt.Sprintf("HOmod model width must be greater than or equal to 2, but is %v", d.Width))
+func (c *coupledDEVStone) createHOmodDEVStoneAtomics() error {
+	if c.topology != HOmod {
+		return fmt.Errorf("createHOmodDEVStoneAtomics: topology '%v' is incompatible with HOmod", c.topology)
+	} else if c.Width < 2 {
+		return fmt.Errorf("createHOmodDEVStoneAtomics: width must be greater than or equal to 2, but is %v", c.Width)
 	}
 	var prevAtomicsRow []DEVStone = nil // Atomics created in the previous iteration of the next loop
-	for i := 0; i < d.Width; i++ {
+	for i := 0; i < c.Width; i++ {
 		initialJ := 0
 		if i > 1 {
 			initialJ = i - 1
 		}
-		atomicsRow := make([]DEVStone, d.Width-1-initialJ) // Atomics to be created in this iteration
-		for j := initialJ; j < d.Width-1; j++ {
-			a := newAtomicDEVStone(fmt.Sprintf("atomic_%v_%v_%v", d.Depth-1, i, j), d.intDelay, d.extDelay, d.prepTime, true)
-			d.AddComponent(a)
-			atomicsRow[j-initialJ] = a
-			if i == 0 { // First row of atomic models
-				d.AddCoupling(d.GetInPort("iIn2"), a.GetInPort("iIn"))
-				d.AddCoupling(a.GetOutPort("oOut"), d.subCoupledDEVStone.GetInPort("iIn2"))
-			} else { // Remaining rows of atomic models
-				if j == initialJ { // First atomic of the row is coupled to the coupled input port
-					d.AddCoupling(d.GetInPort("iIn2"), a.GetInPort("iIn"))
-				}
-				if i == 1 { // Second row of atomic models
-					for _, prevAtomic := range prevAtomicsRow {
-						d.AddCoupling(a.GetOutPort("oOut"), prevAtomic.GetInPort("iIn"))
+		atomicsRow := make([]DEVStone, c.Width-1-initialJ) // Atomics to be created in this iteration
+		for j := initialJ; j < c.Width-1; j++ {
+			if a, err := newAtomicDEVStone(fmt.Sprintf("atomic_%v_%v_%v", c.Depth-1, i, j), c.intDelay, c.extDelay, c.prepTime, true); err != nil {
+				return fmt.Errorf("createHOmodDEVStoneAtomics: %v", err)
+			} else {
+				c.AddComponent(a)
+				atomicsRow[j-initialJ] = a
+				if i == 0 { // First row of atomic models
+					c.AddCoupling(c.GetInPort("iIn2"), a.GetInPort("iIn"))
+					c.AddCoupling(a.GetOutPort("oOut"), c.subCoupledDEVStone.GetInPort("iIn2"))
+				} else { // Remaining rows of atomic models
+					if j == initialJ { // First atomic of the row is coupled to the coupled input port
+						c.AddCoupling(c.GetInPort("iIn2"), a.GetInPort("iIn"))
 					}
-				} else if prevAtomicsRow == nil {
-					return errors.New(fmt.Sprintf("row %v could not access to previous row, as it is nil", i))
-				} else { // Remaining rows
-					d.AddCoupling(a.GetOutPort("oOut"), prevAtomicsRow[j-initialJ+1].GetInPort("iIn"))
+					if i == 1 { // Second row of atomic models
+						for _, prevAtomic := range prevAtomicsRow {
+							c.AddCoupling(a.GetOutPort("oOut"), prevAtomic.GetInPort("iIn"))
+						}
+					} else if prevAtomicsRow == nil {
+						return errors.New(fmt.Sprintf("row %v could not access to previous row, as it is nil", i))
+					} else { // Remaining rows
+						c.AddCoupling(a.GetOutPort("oOut"), prevAtomicsRow[j-initialJ+1].GetInPort("iIn"))
+					}
 				}
 			}
 		}
@@ -138,9 +151,9 @@ func (d *coupledDEVStone) createHOmodDEVStoneAtomics() error {
 	return nil
 }
 
-func (d *coupledDEVStone) GetIntCount() int {
+func (c *coupledDEVStone) GetIntCount() int {
 	n := 0
-	for _, c := range d.GetComponents() {
+	for _, c := range c.GetComponents() {
 		if s, ok := c.(DEVStone); ok {
 			n += s.GetIntCount()
 		} else {
@@ -150,9 +163,9 @@ func (d *coupledDEVStone) GetIntCount() int {
 	return n
 }
 
-func (d *coupledDEVStone) GetExtCount() int {
+func (c *coupledDEVStone) GetExtCount() int {
 	n := 0
-	for _, c := range d.GetComponents() {
+	for _, c := range c.GetComponents() {
 		if s, ok := c.(DEVStone); ok {
 			n += s.GetExtCount()
 		} else {
@@ -162,9 +175,9 @@ func (d *coupledDEVStone) GetExtCount() int {
 	return n
 }
 
-func (d *coupledDEVStone) GetTotalCount() int {
+func (c *coupledDEVStone) GetTotalCount() int {
 	n := 0
-	for _, c := range d.GetComponents() {
+	for _, c := range c.GetComponents() {
 		if s, ok := c.(DEVStone); ok {
 			n += s.GetTotalCount()
 		} else {

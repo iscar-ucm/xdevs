@@ -14,16 +14,16 @@ type atomicDEVStone struct {
 	intCount, extCount           int
 }
 
-func newAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime float64, useOut bool) DEVStone {
+func newAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime float64, useOut bool) (DEVStone, error) {
+	if intDelay < 0 || extDelay < 0 || prepTime < 0 {
+		return nil, fmt.Errorf("delays (%v,%v,%v) must be greater than or equal to 0", intDelay, extDelay, prepTime)
+	}
 	a := atomicDEVStone{modeling.NewAtomic(name), useOut,
 		modeling.NewPort("iIn", make([]int, 0)), modeling.NewPort("oOut", make([]int, 0)),
 		intDelay, extDelay, prepTime, 0, 0}
 	a.AddInPort(a.iIn)
 	a.AddOutPort(a.oOut)
-	if intDelay < 0 || extDelay < 0 || prepTime < 0 {
-		panic(fmt.Sprintf("Delays (%v,%v,%v) must be greater than or equal to 0", intDelay, extDelay, prepTime))
-	}
-	return &a
+	return &a, nil
 }
 
 func (a *atomicDEVStone) Initialize() {

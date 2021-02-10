@@ -29,6 +29,6 @@ type DEVStone interface {
 	GetTotalCount() int
 }
 
-func NewDEVStone(name string, topology Topology, depth int, width int, intDelay float64, extDelay float64, prepTime float64) DEVStone {
+func NewDEVStone(name string, topology Topology, depth int, width int, intDelay float64, extDelay float64, prepTime float64) (DEVStone, error) {
 	return newCoupledDEVStone(name, topology, depth, width, intDelay, extDelay, prepTime)
 }
