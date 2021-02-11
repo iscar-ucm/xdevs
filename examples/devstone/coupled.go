@@ -43,13 +43,13 @@ func newCoupledDEVStone(name string, topology Topology, depth int, width int, in
 		return nil, err
 	}
 
-	d := coupledDEVStone{modeling.NewCoupled(fmt.Sprintf("%v_%v", name, depth-1)), nil, topology, depth, width, intDelay, extDelay, prepTime}
-	d.AddInPort(modeling.NewPort("iIn", make([]int, 0)))
-	d.AddOutPort(modeling.NewPort("oOut", make([]int, 0)))
+	c := coupledDEVStone{modeling.NewCoupled(fmt.Sprintf("%v_%v", name, depth-1)), nil, topology, depth, width, intDelay, extDelay, prepTime}
+	c.AddInPort(modeling.NewPort("iIn", make([]int, 0)))
+	c.AddOutPort(modeling.NewPort("oOut", make([]int, 0)))
 	if topology == HO || topology == HOmod {
-		d.AddInPort(modeling.NewPort("iIn2", make([]int, 0)))
+		c.AddInPort(modeling.NewPort("iIn2", make([]int, 0)))
 		if topology == HO {
-			d.AddOutPort(modeling.NewPort("oOut2", make([]int, 0)))
+			c.AddOutPort(modeling.NewPort("oOut2", make([]int, 0)))
 		}
 	}
 
@@ -58,18 +58,18 @@ func newCoupledDEVStone(name string, topology Topology, depth int, width int, in
 		if err != nil {
 			return nil, err
 		}
-		d.AddComponent(a)
-		d.AddCoupling(d.GetInPort("iIn"), a.GetInPort("iIn"))
-		d.AddCoupling(a.GetOutPort("oOut"), d.GetOutPort("oOut"))
+		c.AddComponent(a)
+		c.AddCoupling(c.GetInPort("iIn"), a.GetInPort("iIn"))
+		c.AddCoupling(a.GetOutPort("oOut"), c.GetOutPort("oOut"))
 	} else {
-		d.createSubDEVStone(name)
+		c.createSubDEVStone(name)
 		if topology == HOmod {
-			d.createHOmodDEVStoneAtomics()
+			c.createHOmodDEVStoneAtomics()
 		} else {
-			d.createSimpleDEVStoneAtomics()
+			c.createSimpleDEVStoneAtomics()
 		}
 	}
-	return &d, nil
+	return &c, nil
 }
 
 func (c *coupledDEVStone) createSubDEVStone(name string) {
@@ -80,19 +80,19 @@ func (c *coupledDEVStone) createSubDEVStone(name string) {
 	if err != nil {
 		panic(fmt.Sprintf("createSubDEVStone: %v", err))
 	}
-	c.subCoupledDEVStone = d
-	c.AddComponent(c.subCoupledDEVStone)
-	c.AddCoupling(c.GetInPort("iIn"), c.subCoupledDEVStone.GetInPort("iIn"))
-	c.AddCoupling(c.GetOutPort("oOut"), c.subCoupledDEVStone.GetOutPort("oOut"))
+	c.AddComponent(d)
+	c.AddCoupling(c.GetInPort("iIn"), d.GetInPort("iIn"))
+	c.AddCoupling(d.GetOutPort("oOut"), c.GetOutPort("oOut"))
 	if c.topology == HO {
-		c.AddCoupling(c.GetInPort("iIn2"), c.subCoupledDEVStone.GetInPort("iIn2"))
+		c.AddCoupling(c.GetInPort("iIn2"), d.GetInPort("iIn2"))
 	}
+	c.subCoupledDEVStone = d
 }
 
 func (c *coupledDEVStone) createSimpleDEVStoneAtomics() {
 	useOut := c.topology == HI || c.topology == HO
 	var aPrev DEVStone = nil // Atomic model created in the previous iteration of the next loop
-	for i := 0; i < c.Width; i++ {
+	for i := 0; i < c.Width-1; i++ {
 		a, err := newAtomicDEVStone(fmt.Sprintf("atomic_%v_%v", c.Depth-1, i), c.intDelay, c.extDelay, c.prepTime, useOut)
 		if err != nil {
 			panic(fmt.Sprintf("createSimpleDEVStoneAtomics: %v", err))
@@ -148,32 +148,12 @@ func (c *coupledDEVStone) createHOmodDEVStoneAtomics() {
 	}
 }
 
-func (c *coupledDEVStone) GetIntCount() int {
-	n := 0
+func (c *coupledDEVStone) GetEventCount() (intCount, extCount int) {
 	for _, c := range c.GetComponents() {
 		if s, ok := c.(DEVStone); ok {
-			n += s.GetIntCount()
+			x, y := s.GetEventCount()
+			intCount, extCount = intCount+x, extCount+y
 		}
 	}
-	return n
-}
-
-func (c *coupledDEVStone) GetExtCount() int {
-	n := 0
-	for _, c := range c.GetComponents() {
-		if s, ok := c.(DEVStone); ok {
-			n += s.GetExtCount()
-		}
-	}
-	return n
-}
-
-func (c *coupledDEVStone) GetTotalCount() int {
-	n := 0
-	for _, c := range c.GetComponents() {
-		if s, ok := c.(DEVStone); ok {
-			n += s.GetTotalCount()
-		}
-	}
-	return n
+	return
 }

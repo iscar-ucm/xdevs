@@ -82,14 +82,6 @@ func (a *atomicDEVStone) getOutPort() modeling.Port {
 	return a.oOut
 }
 
-func (a *atomicDEVStone) GetIntCount() int {
-	return a.intCount
-}
-
-func (a *atomicDEVStone) GetExtCount() int {
-	return a.extCount
-}
-
-func (a *atomicDEVStone) GetTotalCount() int {
-	return a.intCount + a.extCount
+func (a *atomicDEVStone) GetEventCount() (int, int) {
+	return a.intCount, a.extCount
 }
