@@ -50,12 +50,18 @@ func ComputeExpectedComponents(t devstone.Topology, depth, width int) (nAtomic, 
 
 func ComputeExpectedCouplings(t devstone.Topology, depth, width int) (nEIC, nIC, nEOC int) {
 	switch t {
-	case "LI", "HI":
-		nEIC = 1 + (depth-1)*width
-	case "HO":
-		nEIC = 1 + (depth-1)*(width+1)
+	/*
+		case "LI", "HI":
+			nEIC = 1 + (depth-1)*width
+		case "HO":
+			nEIC = 1 + (depth-1)*(width+1)
+		case "HOmod":
+			nEIC = 1 + (depth-1)*(1+2*(width-1))
+	*/
 	case "HOmod":
 		nEIC = 1 + (depth-1)*(1+2*(width-1))
+	default:
+		nEIC = 1 + (depth-1)*width
 	}
 
 	if width > 1 {
@@ -108,7 +114,7 @@ func TestDEVStone(t *testing.T) {
 		})
 		t.Run("HOmod", func(t *testing.T) {
 			t.Parallel()
-			//DEVStoneModelTest(t, "HOmod") TODO something is wrong with the events
+			DEVStoneModelTest(t, "HOmod") // TODO something is wrong with the events
 		})
 	})
 }
