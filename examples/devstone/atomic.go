@@ -32,7 +32,7 @@ type atomicDEVStone struct {
 	useOut                       bool
 	iIn, oOut                    modeling.Port
 	intDelay, extDelay, prepTime float64
-	intCount, extCount           int
+	eventCount                   int
 }
 
 func newAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime float64, useOut bool) (DEVStone, error) {
@@ -41,7 +41,7 @@ func newAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime
 	}
 	a := atomicDEVStone{modeling.NewAtomic(name), useOut,
 		modeling.NewPort("iIn", make([]int, 0)), modeling.NewPort("oOut", make([]int, 0)),
-		intDelay, extDelay, prepTime, 0, 0}
+		intDelay, extDelay, prepTime, 0}
 	a.AddInPort(a.iIn)
 	a.AddOutPort(a.oOut)
 	return &a, nil
@@ -54,12 +54,11 @@ func (a *atomicDEVStone) Initialize() {
 func (a *atomicDEVStone) Exit() {}
 
 func (a *atomicDEVStone) DeltInt() {
-	a.intCount++
 	a.Passivate()
 }
 
 func (a *atomicDEVStone) DeltExt(e float64) {
-	a.extCount++
+	a.eventCount++
 	a.HoldIn(util.ACTIVE, a.prepTime)
 }
 
@@ -82,6 +81,6 @@ func (a *atomicDEVStone) getOutPort() modeling.Port {
 	return a.oOut
 }
 
-func (a *atomicDEVStone) GetEventCount() (int, int) {
-	return a.intCount, a.extCount
+func (a *atomicDEVStone) GetEventCount() int {
+	return a.eventCount
 }

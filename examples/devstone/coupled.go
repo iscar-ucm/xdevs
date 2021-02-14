@@ -46,7 +46,7 @@ func newCoupledDEVStone(name string, topology Topology, depth int, width int, in
 	c := coupledDEVStone{modeling.NewCoupled(fmt.Sprintf("%v_%v", name, depth-1)), nil, topology, depth, width, intDelay, extDelay, prepTime}
 	c.AddInPort(modeling.NewPort("iIn", make([]int, 0)))
 	c.AddOutPort(modeling.NewPort("oOut", make([]int, 0)))
-	if topology == HO || topology == HOmod {
+	if topology == HO || topology == HOmod { // TODO remove these additional ports (and recompute the couplings)
 		c.AddInPort(modeling.NewPort("iIn2", make([]int, 0)))
 		if topology == HO {
 			c.AddOutPort(modeling.NewPort("oOut2", make([]int, 0)))
@@ -83,14 +83,14 @@ func (c *coupledDEVStone) createSubDEVStone(name string) {
 	c.AddComponent(d)
 	c.AddCoupling(c.GetInPort("iIn"), d.GetInPort("iIn"))
 	c.AddCoupling(d.GetOutPort("oOut"), c.GetOutPort("oOut"))
-	if c.topology == HO {
+	if c.topology == HO { // TODO remove this additional coupling (the second port is not necessary)
 		c.AddCoupling(c.GetInPort("iIn2"), d.GetInPort("iIn2"))
 	}
 	c.subCoupledDEVStone = d
 }
 
 func (c *coupledDEVStone) createSimpleDEVStoneAtomics() {
-	useOut := c.topology == HI || c.topology == HO
+	useOut := c.topology != LI
 	var aPrev DEVStone = nil // Atomic model created in the previous iteration of the next loop
 	for i := 0; i < c.Width-1; i++ {
 		a, err := newAtomicDEVStone(fmt.Sprintf("atomic_%v_%v", c.Depth-1, i), c.intDelay, c.extDelay, c.prepTime, useOut)
@@ -103,7 +103,7 @@ func (c *coupledDEVStone) createSimpleDEVStoneAtomics() {
 			if aPrev != nil {
 				c.AddCoupling(aPrev.GetOutPort("oOut"), a.GetInPort("iIn"))
 			}
-			if c.topology == HO {
+			if c.topology == HO { // TODO remove this coupling (the second port is not necessary)
 				c.AddCoupling(a.GetOutPort("oOut"), c.GetOutPort("oOut2"))
 			}
 		}
@@ -129,18 +129,22 @@ func (c *coupledDEVStone) createHOmodDEVStoneAtomics() {
 			if i == 0 { // First row of atomic models
 				c.AddCoupling(c.GetInPort("iIn2"), a.GetInPort("iIn"))
 				c.AddCoupling(a.GetOutPort("oOut"), c.subCoupledDEVStone.GetInPort("iIn2"))
+				// TODO change these couplings (the second port is not necessary)
+				//c.AddCoupling(c.GetInPort("iIn"), a.GetInPort("iIn"))
+				//c.AddCoupling(a.GetOutPort("oOut"), c.subCoupledDEVStone.GetInPort("iIn"))
 			} else { // Remaining rows of atomic models
 				if j == initialJ { // First atomic of the row is coupled to the coupled input port
-					c.AddCoupling(c.GetInPort("iIn2"), a.GetInPort("iIn"))
+					//c.AddCoupling(c.GetInPort("iIn2"), a.GetInPort("iIn"))
+					c.AddCoupling(c.GetInPort("iIn"), a.GetInPort("iIn"))
 				}
 				if i == 1 { // Second row of atomic models
 					for _, prevAtomic := range prevAtomicsRow {
 						c.AddCoupling(a.GetOutPort("oOut"), prevAtomic.GetInPort("iIn"))
 					}
-				} else if prevAtomicsRow == nil {
-					panic(fmt.Sprintf("row %v could not access to previous row, as it is nil", i))
-				} else { // Remaining rows
+				} else if prevAtomicsRow != nil { // Remaining rows
 					c.AddCoupling(a.GetOutPort("oOut"), prevAtomicsRow[j-initialJ+1].GetInPort("iIn"))
+				} else {
+					panic(fmt.Sprintf("row %v could not access to previous row, as it is nil", i))
 				}
 			}
 		}
@@ -148,11 +152,10 @@ func (c *coupledDEVStone) createHOmodDEVStoneAtomics() {
 	}
 }
 
-func (c *coupledDEVStone) GetEventCount() (intCount, extCount int) {
+func (c *coupledDEVStone) GetEventCount() (count int) {
 	for _, c := range c.GetComponents() {
 		if s, ok := c.(DEVStone); ok {
-			x, y := s.GetEventCount()
-			intCount, extCount = intCount+x, extCount+y
+			count += s.GetEventCount()
 		}
 	}
 	return

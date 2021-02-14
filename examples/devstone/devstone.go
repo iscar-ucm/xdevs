@@ -37,7 +37,7 @@ const (
 
 type DEVStone interface {
 	modeling.Component
-	GetEventCount() (intCount, extCount int)
+	GetEventCount() int
 }
 
 func NewDEVStone(name string, topology Topology, depth int, width int, intDelay float64, extDelay float64, prepTime float64) (DEVStone, error) {
