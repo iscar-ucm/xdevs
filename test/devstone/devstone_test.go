@@ -33,8 +33,8 @@ import (
 )
 
 const (
-	MaxDepth = 10 // TODO increase it later
-	MaxWidth = 10
+	MaxDepth = 20 // TODO increase it later
+	MaxWidth = 20
 )
 
 func ComputeExpectedComponents(t devstone.Topology, depth, width int) (nAtomic, nCoupled int) {
@@ -85,14 +85,17 @@ func ComputeExpectedCouplings(t devstone.Topology, depth, width int) (nEIC, nIC,
 func ComputeExpectedEvents(t devstone.Topology, depth, width int) (eventCount int) {
 	switch t {
 	case "LI":
-		eventCount = 1 + (depth-1)*(width-1)
+		eventCount = 1 + (depth - 1) * (width - 1)
 	case "HI", "HO":
-		eventCount = 1 + (depth-1)*(width-1)*width/2
+		eventCount = 1 + (depth - 1) * (width - 1)*width/2
 	case "HOmod":
-		eventCount = 1
-		for i := 1; i < depth; i++ {
-			eventCount += 1 + (i-1)*(width-1) + (width-1)*width/2 + (width-1)*(width+(i-1)*(width-1))
+		for i := 1; i < depth; i++ {  // Atomics that belong to top and intermediate coupled models
+			numInputs := 1 + (i - 1) * width
+			transFirstRow := (width - 1) * (numInputs + width - 1)
+			transOtherRows := numInputs * (width - 1)*width/2
+			eventCount += transFirstRow + transOtherRows
 		}
+		eventCount += 1 + (depth - 1) * width  // Innermost atomic
 	}
 	return
 }
@@ -101,20 +104,16 @@ func TestDEVStone(t *testing.T) {
 	t.Run("corner-cases", func(t *testing.T) { DEVStoneCornerCasesTest(t) })
 	t.Run("models", func(t *testing.T) {
 		t.Run("LI", func(t *testing.T) {
-			t.Parallel()
 			DEVStoneModelTest(t, "LI")
 		})
 		t.Run("HI", func(t *testing.T) {
-			t.Parallel()
 			DEVStoneModelTest(t, "HI")
 		})
 		t.Run("HO", func(t *testing.T) {
-			t.Parallel()
 			DEVStoneModelTest(t, "HO")
 		})
 		t.Run("HOmod", func(t *testing.T) {
-			t.Parallel()
-			DEVStoneModelTest(t, "HOmod") // TODO something is wrong with the events
+			DEVStoneModelTest(t, "HOmod")
 		})
 	})
 }
@@ -170,38 +169,41 @@ func DEVStoneCornerCasesTest(t *testing.T) {
 }
 
 func DEVStoneModelTest(t *testing.T, topology devstone.Topology) {
-	rootName := fmt.Sprintf("test_%v", topology)
 	for depth := 1; depth < MaxDepth; depth++ {
 		initialWidth := 1
 		if topology == "HOmod" {
 			initialWidth = 2
 		}
 		for width := initialWidth; width < MaxWidth; width++ {
-			expectedAtomic, _ := ComputeExpectedComponents(topology, depth, width)
-			expectedEIC, expectedIC, expectedEOC := ComputeExpectedCouplings(topology, depth, width)
-			expectedEvents := ComputeExpectedEvents(topology, depth, width)
+			testName := fmt.Sprintf("%v_%v_%v", topology, depth, width)
+			t.Run(testName, func(t *testing.T) {
+				expectedAtomic, _ := ComputeExpectedComponents(topology, depth, width)
+				expectedEIC, expectedIC, expectedEOC := ComputeExpectedCouplings(topology, depth, width)
+				expectedEvents := ComputeExpectedEvents(topology, depth, width)
 
-			d, err := devstone.NewDEVStone(rootName, topology, depth, width, 0, 0, 0)
-			assert.Nil(t, err, "topology: %v; dimension: (%v,%v); failed to create DEVStone model", topology, depth, width)
-			model, ok := d.(modeling.Coupled)
-			assert.True(t, ok, "topology: %v; dimension: (%v,%v); failed to create DEVStone model", topology, depth, width)
-			nAtomic, nCoupled := model.CountComponents()
-			nIC, nEIC, nEOC := model.CountCouplings()
+				d, err := devstone.NewDEVStone(testName, topology, depth, width, 0, 0, 0)
+				assert.Nil(t, err, "topology: %v; dimension: (%v,%v); failed to create DEVStone model", topology, depth, width)
+				model, ok := d.(modeling.Coupled)
+				assert.True(t, ok, "topology: %v; dimension: (%v,%v); failed to create DEVStone model", topology, depth, width)
+				nAtomic, nCoupled := model.CountComponents()
+				nIC, nEIC, nEOC := model.CountCouplings()
 
-			assert.Equal(t, expectedAtomic, nAtomic, "topology: %v; dimension: (%v,%v); expected atomics: %v; observed: %v", topology, depth, width, expectedAtomic, nAtomic)
-			assert.Equal(t, depth, nCoupled, "topology: %v; dimension: (%v,%v); expected coupled: %v; observed: %v", topology, depth, width, depth, nCoupled)
-			assert.Equal(t, expectedEIC, nEIC, "topology: %v; dimension: (%v,%v); expected EIC: %v; observed: %v", topology, depth, width, expectedEIC, nEIC)
-			assert.Equal(t, expectedIC, nIC, "topology: %v; dimension: (%v,%v); expected IC: %v observed: %v", topology, depth, width, expectedIC, nIC)
-			assert.Equal(t, expectedEOC, nEOC, "topology: %v; dimension: (%v,%v); expected EOC: %v; observed: %v", topology, depth, width, expectedEOC, nEOC)
+				assert.Equal(t, expectedAtomic, nAtomic, "topology: %v; dimension: (%v,%v); expected atomics: %v; observed: %v", topology, depth, width, expectedAtomic, nAtomic)
+				assert.Equal(t, depth, nCoupled, "topology: %v; dimension: (%v,%v); expected coupled: %v; observed: %v", topology, depth, width, depth, nCoupled)
+				assert.Equal(t, expectedEIC, nEIC, "topology: %v; dimension: (%v,%v); expected EIC: %v; observed: %v", topology, depth, width, expectedEIC, nEIC)
+				assert.Equal(t, expectedIC, nIC, "topology: %v; dimension: (%v,%v); expected IC: %v observed: %v", topology, depth, width, expectedIC, nIC)
+				assert.Equal(t, expectedEOC, nEOC, "topology: %v; dimension: (%v,%v); expected EOC: %v; observed: %v", topology, depth, width, expectedEOC, nEOC)
 
-			coordinator := simulation.NewRootCoordinator(0, model)
-			coordinator.Initialize()
-			coordinator.SimInject(0, model.GetInPort("iIn"), []int{0})
-			coordinator.SimulateTime(util.INFINITY)
-			coordinator.Exit()
+				coordinator := simulation.NewRootCoordinator(0, model)
+				coordinator.Initialize()
+				coordinator.SimInject(0, model.GetInPort("iIn"), []int{0})
+				coordinator.SimulateTime(util.INFINITY)
+				coordinator.Exit()
 
-			eventCount := d.GetEventCount()
-			assert.Equal(t, expectedEvents, eventCount, "topology: %v; dimension: (%v,%v); expected events: %v; observed: %v", topology, depth, width, expectedEvents, eventCount)
+				eventCount := d.GetEventCount()
+				assert.Equal(t, expectedEvents, eventCount, "topology: %v; dimension: (%v,%v); expected events: %v; observed: %v", topology, depth, width, expectedEvents, eventCount)
+			})
+
 		}
 	}
 }
