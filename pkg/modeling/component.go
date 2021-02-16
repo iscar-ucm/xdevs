@@ -1,21 +1,41 @@
+/*
+ * Copyright (c) 2021, Román Cárdenas Rodríguez.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package modeling
 
-import "errors"
-
 type Component interface {
-	GetName() string							// returns Component's name.
-	Initialize()								// initializes the component before simulation.
-	Exit()										// performs a set of operations after simulation.
-	IsInputEmpty() bool							// returns true if none of the input Ports contains any value.
-	AddInPort(port Port)						// adds a new input Port.
-	GetInPort(portName string) (Port, error)	// returns one input Port with an specific name.
-	GetInPorts() []Port							// returns a slice with all the input Ports.
-	AddOutPort(port Port)						// adds a new output Port.
-	GetOutPort(portName string) (Port, error)	// returns one output Port with an specific name.
-	GetOutPorts() []Port						// returns a slice with all the output Ports.
-	setParent(component Component)				// sets one Component as parent of the Component.
-	GetParent() Component						// returns parent Component.
-	String() string								// returns a string representation of the Component.
+	GetName() string                 // returns Component's name.
+	Initialize()                     // initializes the component before simulation.
+	Exit()                           // performs a set of operations after simulation.
+	IsInputEmpty() bool              // returns true if none of the input Ports contains any value.
+	AddInPort(port Port)             // adds a new input Port.
+	GetInPort(portName string) Port  // returns one input Port with an specific name.
+	GetInPorts() []Port              // returns a slice with all the input Ports.
+	AddOutPort(port Port)            // adds a new output Port.
+	GetOutPort(portName string) Port // returns one output Port with an specific name.
+	GetOutPorts() []Port             // returns a slice with all the output Ports.
+	setParent(component Component)   // sets one Component as parent of the Component.
+	GetParent() Component            // returns parent Component.
+	String() string                  // returns a string representation of the Component.
 }
 
 // NewComponent returns a pointer to a structure that complies the Component interface.
@@ -26,21 +46,21 @@ func NewComponent(name string) Component {
 }
 
 type component struct {
-	name     string			// component's name.
-	parent   Component		// parent Component of the component.
-	inPorts  []Port 		// set of input ports. TODO map?
-	outPorts []Port 		// set of output ports. TODO map?
+	name     string    // component's name.
+	parent   Component // parent Component of the component.
+	inPorts  []Port    // set of input ports. TODO map?
+	outPorts []Port    // set of output ports. TODO map?
 }
 
 // getPort returns a Port from a slice of Ports if it has a given name.
 // It returns an error if no Port with the desired name is part of Ports slice.
-func (c *component) getPort(ports []Port, portName string) (Port, error) {
+func (c *component) getPort(ports []Port, portName string) Port {
 	for _, p := range ports {
 		if p.GetName() == portName {
-			return p, nil
+			return p
 		}
 	}
-	return nil, errors.New("godevs: port not found")
+	return nil
 }
 
 // GetName returns the component's name.
@@ -61,7 +81,7 @@ func (c *component) Exit() {
 // IsInputEmpty returns true if none of the input ports has messages.
 func (c *component) IsInputEmpty() bool {
 	for _, inPort := range c.inPorts {
-		if ! inPort.IsEmpty() {
+		if !inPort.IsEmpty() {
 			return false
 		}
 	}
@@ -76,7 +96,7 @@ func (c *component) AddInPort(port Port) {
 
 // GetInPort returns input Port of the component with the requested name.
 // if no input Port has the requested name, it returns a nil pointer and an error.
-func (c *component) GetInPort(portName string) (Port, error) {
+func (c *component) GetInPort(portName string) Port {
 	return c.getPort(c.inPorts, portName)
 }
 
@@ -92,8 +112,8 @@ func (c *component) AddOutPort(port Port) {
 }
 
 // GetOutPort returns output Port of the component with the requested name.
-// if no output Port has the requested name, it returns a nil pointer and an error.
-func (c *component) GetOutPort(portName string) (Port, error) {
+// if no output Port has the requested name, it returns a nil pointer.
+func (c *component) GetOutPort(portName string) Port {
 	return c.getPort(c.outPorts, portName)
 }
 

@@ -1,19 +1,41 @@
+/*
+ * Copyright (c) 2021, Román Cárdenas Rodríguez.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package modeling
 
 import "reflect"
 
 type Port interface {
-	GetName() string				// returns the name of the Port.
-	Length() int					// returns the number of elements stored in the Port.
-	IsEmpty() bool					// returns true if the Port does not contain any element.
-	Clear()							// removes all the elements stored in the Port.
-	AddValue(val interface{})		// adds a single value to the Port.
-	AddValues(val interface{})		// Add multiple values to the Port. Values must be stored in a slice.
-	GetSingleValue() interface{}	// returns a single value of the Port.
-	GetValues() interface{}			// returns a slice with all the values of the Port.
-	setParent(c Component)			// sets a given DEVS model as parent of the Port.
-	GetParent() Component			// returns the parent of the Port.
-	String() string					// returns a string representation of the Port.
+	GetName() string             // returns the name of the Port.
+	Length() int                 // returns the number of elements stored in the Port.
+	IsEmpty() bool               // returns true if the Port does not contain any element.
+	Clear()                      // removes all the elements stored in the Port.
+	AddValue(val interface{})    // adds a single value to the Port.
+	AddValues(val interface{})   // Add multiple values to the Port. Values must be stored in a slice.
+	GetSingleValue() interface{} // returns a single value of the Port.
+	GetValues() interface{}      // returns a slice with all the values of the Port.
+	setParent(c Component)       // sets a given DEVS model as parent of the Port.
+	GetParent() Component        // returns the parent of the Port.
+	String() string              // returns a string representation of the Port.
 }
 
 // NewPort returns a pointer to a structure that complies the Port interface.
@@ -32,9 +54,9 @@ func NewPort(name string, portValue interface{}) Port {
 }
 
 type port struct {
-	name   string		// Name of the port.
-	parent Component	// Parent DEVS model that contains the port.
-	values interface{}	// Values stored in the port. It is an empty interface to allow ports of different data types.
+	name   string      // Name of the port.
+	parent Component   // Parent DEVS model that contains the port.
+	values interface{} // Values stored in the port. It is an empty interface to allow ports of different data types.
 }
 
 // GetName returns the name of the port.
@@ -86,7 +108,7 @@ func (p *port) GetValues() interface{} {
 }
 
 // setParent sets c as the parent DEVS Component of the port.
-func (p *port) setParent(c Component)  {
+func (p *port) setParent(c Component) {
 	p.parent = c
 }
 

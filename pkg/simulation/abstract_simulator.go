@@ -1,20 +1,42 @@
+/*
+ * Copyright (c) 2021, Román Cárdenas Rodríguez.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package simulation
 
 import "github.com/pointlesssoft/godevs/pkg/modeling"
 
 type AbstractSimulator interface {
-	Initialize()					// performs all the required operations before starting a simulation.
-	Exit()							// performs all the required operations to exit after a simulation.
-	TA() float64					// time advance function.
-	Collect()						// collection function.
-	Transition()					// transition function.
-	Clear()							// clear function.
-	GetModel() modeling.Component	// returns the Component attached to the simulator.
-	GetTL() float64					// returns simulator's last simulation time.
-	SetTL(tl float64)				// sets simulator's last simulation time.
-	GetTN() float64					// returns simulator's next timeout.
-	SetTN(tn float64)				// sets simulator's next timeout.
-	GetClock() Clock				// returns abstract simulator's simulation Clock.
+	Initialize()                  // performs all the required operations before starting a simulation.
+	Exit()                        // performs all the required operations to exit after a simulation.
+	TA() float64                  // time advance function.
+	Collect()                     // collection function.
+	Transition()                  // transition function.
+	Clear()                       // clear function.
+	GetModel() modeling.Component // returns the Component attached to the simulator.
+	GetTL() float64               // returns simulator's last simulation time.
+	SetTL(tl float64)             // sets simulator's last simulation time.
+	GetTN() float64               // returns simulator's next timeout.
+	SetTN(tn float64)             // sets simulator's next timeout.
+	GetClock() Clock              // returns abstract simulator's simulation Clock.
 }
 
 func NewAbstractSimulator(clock Clock) AbstractSimulator {
@@ -23,9 +45,9 @@ func NewAbstractSimulator(clock Clock) AbstractSimulator {
 }
 
 type abstractSimulator struct {
-	clock Clock		// Simulation Clock.
-	tL    float64  	// Time of last event
-	tN    float64  	// Time of next event
+	clock Clock   // Simulation Clock.
+	tL    float64 // Time of last event
+	tN    float64 // Time of next event
 }
 
 // Initialize performs all the required operations before starting a simulation.
@@ -52,7 +74,6 @@ func (a *abstractSimulator) Collect() {
 func (a *abstractSimulator) Transition() {
 	panic("implement me")
 }
-
 
 // Clear performs all the required operation to clear the simulation state.
 func (a *abstractSimulator) Clear() {

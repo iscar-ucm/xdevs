@@ -20,58 +20,67 @@
  * SOFTWARE.
  */
 
-package efp
+package devstone
 
 import (
 	"github.com/pointlesssoft/godevs/pkg/modeling"
 	"github.com/pointlesssoft/godevs/pkg/util"
 )
 
-type Processor struct {
+type atomicDEVStone struct {
 	modeling.Atomic
-	iIn            modeling.Port
-	oOut           modeling.Port
-	currentJob     Job
-	processingTime float64
+	useOut                       bool
+	iIn, oOut                    modeling.Port
+	intDelay, extDelay, prepTime float64
+	eventCount                   int
 }
 
-func NewProcessor(name string, processingTime float64) *Processor {
-	p := Processor{
-		modeling.NewAtomic(name),
-		modeling.NewPort("iIn", make([]Job, 0)),
-		modeling.NewPort("oOut", make([]Job, 0)),
-		Job{},
-		processingTime,
+func newAtomicDEVStone(name string, intDelay float64, extDelay float64, prepTime float64, useOut bool) (DEVStone, error) {
+	if err := checkTiming(intDelay, extDelay, prepTime); err != nil {
+		return nil, err
 	}
-	p.AddInPort(p.iIn)
-	p.AddOutPort(p.oOut)
-	return &p
+	a := atomicDEVStone{modeling.NewAtomic(name), useOut,
+		modeling.NewPort("iIn", make([]int, 0)), modeling.NewPort("oOut", make([]int, 0)),
+		intDelay, extDelay, prepTime, 0}
+	a.AddInPort(a.iIn)
+	a.AddOutPort(a.oOut)
+	return &a, nil
 }
 
-func (p *Processor) Initialize() {
-	p.Passivate()
+func (a *atomicDEVStone) Initialize() {
+	a.Passivate()
 }
 
-func (p *Processor) Exit() {}
+func (a *atomicDEVStone) Exit() {}
 
-func (p *Processor) DeltInt() {
-	p.Passivate()
+func (a *atomicDEVStone) DeltInt() {
+	a.Passivate()
 }
 
-func (p *Processor) DeltExt(e float64) {
-	if p.GetPhase() == util.PASSIVE {
-		p.currentJob = p.iIn.GetSingleValue().(Job)
-		p.HoldIn(util.ACTIVE, p.processingTime)
-	} else {
-		p.HoldIn(util.ACTIVE, p.GetSigma()-e)
+func (a *atomicDEVStone) DeltExt(e float64) {
+	a.eventCount++
+	a.HoldIn(util.ACTIVE, a.prepTime)
+}
+
+func (a *atomicDEVStone) DeltCon(e float64) {
+	a.DeltInt()
+	a.DeltExt(0)
+}
+
+func (a *atomicDEVStone) Lambda() {
+	if a.useOut {
+		a.oOut.AddValue(0)
 	}
 }
 
-func (p *Processor) DeltCon(e float64) {
-	p.DeltInt()
-	p.DeltExt(0)
+func (a *atomicDEVStone) getInPort() modeling.Port {
+	return a.iIn
 }
 
-func (p *Processor) Lambda() {
-	p.oOut.AddValue(p.currentJob)
+func (a *atomicDEVStone) getOutPort() modeling.Port {
+	return a.oOut
+}
+
+func (a *atomicDEVStone) GetEventCount() int {
+	return a.eventCount
 }

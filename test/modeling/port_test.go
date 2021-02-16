@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2021, Román Cárdenas Rodríguez.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package modeling
 
 import (
@@ -14,8 +36,8 @@ func TestPort(t *testing.T) {
 	assert.True(t, port2.IsEmpty(), "Initially, port should be empty")
 
 	/* 2. Check that ports do not accept new values of a different type */
-	assert.Panics(t, func() {port1.AddValue("invalid")}, "port of type %T should not admit values of type ", 0, "invalid")
-	assert.Panics(t, func() {port2.AddValue(0)}, "port of type %T should not admit values of type ", "invalid", 0)
+	assert.Panics(t, func() { port1.AddValue("invalid") }, "port of type %T should not admit values of type ", 0, "invalid")
+	assert.Panics(t, func() { port2.AddValue(0) }, "port of type %T should not admit values of type ", "invalid", 0)
 
 	/* 3. Check that ports accept new values of their corresponding type */
 	port1.AddValue(1)
@@ -34,7 +56,7 @@ func TestPort(t *testing.T) {
 	/* 4. Check that the Clear function works */
 	port1.Clear()
 	assert.True(t, port1.IsEmpty(), "After clearing it, port should be empty")
-	assert.Panics(t, func() {port1.GetSingleValue()}, "As port is empty, it should panic")
+	assert.Panics(t, func() { port1.GetSingleValue() }, "As port is empty, it should panic")
 	assert.Equal(t, 0, len(port1.GetValues().([]int)), "Slice should be empty")
 	port2.Clear()
 	assert.True(t, port2.IsEmpty(), "After clearing it, port should be empty")

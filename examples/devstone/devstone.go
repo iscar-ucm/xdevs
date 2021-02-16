@@ -20,15 +20,26 @@
  * SOFTWARE.
  */
 
-package util
+package devstone
 
-import "math"
-
-var (
-	INFINITY = math.Inf(0)
+import (
+	"github.com/pointlesssoft/godevs/pkg/modeling"
 )
+
+type Topology string
 
 const (
-	PASSIVE = "passive"
-	ACTIVE  = "active"
+	LI    Topology = "LI"
+	HI             = "HI"
+	HO             = "HO"
+	HOmod          = "HOmod"
 )
+
+type DEVStone interface {
+	modeling.Component
+	GetEventCount() int
+}
+
+func NewDEVStone(name string, topology Topology, depth int, width int, intDelay float64, extDelay float64, prepTime float64) (DEVStone, error) {
+	return newCoupledDEVStone(name, topology, depth, width, intDelay, extDelay, prepTime)
+}
