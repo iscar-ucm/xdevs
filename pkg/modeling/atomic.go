@@ -25,6 +25,7 @@ package modeling
 import (
 	"fmt"
 	"github.com/pointlesssoft/godevs/pkg/util"
+	"math"
 )
 
 type Atomic interface {
@@ -36,8 +37,10 @@ type Atomic interface {
 	Lambda()                            // Output function.
 	HoldIn(phase string, sigma float64) // Sets Atomic model's phase and sigma.
 	Activate()                          // Sets Atomic model's phase to "active" and sigma to 0.
+	ActivateIn(phase string)            // Sets Atomic model's phase to and sigma to 0.
 	Passivate()                         // Sets Atomic model's phase to "passive" and sigma to Infinity.
 	PassivateIn(phase string)           // Sets Atomic model's phase and sigma to Infinity.
+	Continue(e float64)                 // Subtract e from Atomic model's phase.
 	PhaseIs(phase string) bool          // Returns true if Atomic model's phase is phase.
 	GetPhase() string                   // Returns the current phase of the model.
 	SetPhase(phase string)              // Sets Atomic model's phase.
@@ -98,12 +101,17 @@ func (a *atomic) Lambda() {
 // HoldIn Sets Atomic model's phase and sigma.
 func (a *atomic) HoldIn(phase string, sigma float64) {
 	a.phase = phase
-	a.sigma = sigma
+	a.SetSigma(sigma)
 }
 
 // Activate sets Atomic model's phase to "active" and sigma to 0.
 func (a *atomic) Activate() {
 	a.phase = util.ACTIVE
+	a.sigma = 0
+}
+
+func (a *atomic) ActivateIn(phase string) {
+	a.phase = phase
 	a.sigma = 0
 }
 
@@ -117,6 +125,10 @@ func (a *atomic) Passivate() {
 func (a *atomic) PassivateIn(phase string) {
 	a.phase = phase
 	a.sigma = util.INFINITY
+}
+
+func (a *atomic) Continue(e float64) {
+	a.SetSigma(a.sigma - e)
 }
 
 // PhaseIs returns true if Atomic model's phase is phase.
@@ -139,9 +151,9 @@ func (a *atomic) GetSigma() float64 {
 	return a.sigma
 }
 
-// SetSigma sets Atomic model's current sigma.
+// SetSigma sets Atomic model's current sigma. Invalid sigmas (i.e., sigma < 0) are set to 0.
 func (a *atomic) SetSigma(sigma float64) {
-	a.sigma = sigma
+	a.sigma = math.Max(sigma, 0)
 }
 
 // ShowState returns a string that represents Atomic model's state.
