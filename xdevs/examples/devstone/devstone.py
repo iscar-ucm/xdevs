@@ -251,9 +251,9 @@ if __name__ == '__main__':
     chain = True
     parallel = True
     if parallel:
-        coord = ParallelProcessCoordinator(root, flatten=flatten, chain=chain)
+        coord = ParallelProcessCoordinator(root)
     else:
-        coord = Coordinator(root, flatten=flatten, chain=chain)
+        coord = Coordinator(root, flatten=flatten)
     coord.initialize()
     coord.inject(root.i_in, 0)
     coord.simulate()
