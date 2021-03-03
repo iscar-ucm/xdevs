@@ -13,7 +13,7 @@ setup(name='xdevs',
               'sql = xdevs.plugins.transducers.sql_transducer:SQLTransducer',
               'elasticsearch = xdevs.plugins.transducers.elasticsearch_transducer:ElasticsearchTransducer',
           ]},
-      extra_require={
+      extras_require={
           'sql': ['sqlalchemy==1.3.22'],
           'elasticsearch': ['elasticsearch==7.10.1'],
       },
