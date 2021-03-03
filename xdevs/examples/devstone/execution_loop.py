@@ -1,7 +1,10 @@
-import csv, time, sys
-from xdevs import LI, HI, HO
-from xdevs.sim import Coordinator
+import csv
 import sys
+import time
+
+from devstone import LI, HI, HO
+from xdevs.sim import Coordinator
+
 sys.setrecursionlimit(10000)
 
 sim_max_time = 1e10
@@ -12,7 +15,8 @@ num_execs = int(sys.argv[1]) if len(sys.argv) > 1 else 10
 
 depths_widths = [(300, 10), (10, 300), (300, 300)]
 
-filename = "xdevs_devstone_%s_%dc_%di_%de_%d.csv" % ("flatten" if flatten else "noflatten", len(depths_widths), int_delay, ext_delay, int(time.time()))
+filename = "xdevs_devstone_%s_%dc_%di_%de_%d.csv" % ("flatten" if flatten else "noflatten", len(depths_widths),
+                                                     int_delay, ext_delay, int(time.time()))
 
 with open(filename, "w") as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=';')
@@ -40,9 +44,9 @@ with open(filename, "w") as csv_file:
                     runner_time = middle2 - middle
                     sim_time = end - middle2
                     total_time = end - start
-                    #print("acc: %d" % i_exec, model_time, runner_time, sim_time, total_time)
+                    # print("acc: %d" % i_exec, model_time, runner_time, sim_time, total_time)
 
-                    #row = row + (model_time/num_execs, runner_time/num_execs, sim_time/num_execs, total_time/num_execs)
+                    # row = row + (model_time/num_execs, runner_time/num_execs, sim_time/num_execs, total_time/num_execs)
                     curr_row = row + (chain_activated, model_time, runner_time, sim_time, total_time)
 
                     print(curr_row)

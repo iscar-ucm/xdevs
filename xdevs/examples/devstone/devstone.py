@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from pystone import pystones
+from xdevs.examples.devstone.pystone import pystones
 from xdevs.models import Atomic, Coupled, Port
 from xdevs.sim import Coordinator, ParallelProcessCoordinator
 from xdevs import PHASE_ACTIVE, get_logger
 from collections import defaultdict
 
-#logger = get_#logger(__name__)
-#logger.disabled = False
+# logger = get_logger(__name__)
+# logger.disabled = False
+
 
 class DelayedAtomic(Atomic):
 

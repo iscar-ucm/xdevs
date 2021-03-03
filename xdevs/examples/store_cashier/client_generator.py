@@ -21,25 +21,26 @@ class ClientGenerator(Atomic):
         self.mean = mean
         self.stddev = stddev
         self.clock = 0
+        self.state: ClientGeneratorStatus = ClientGeneratorStatus()
 
         self.output_new_client = Port(NewClient)
         self.add_out_port(self.output_new_client)
 
     def deltint(self):
         self.clock += self.sigma
-        self.phase.next_client_id += 1
-        self.phase.time_to_next = max(gauss(self.mean, self.stddev), 0)
-        logging.debug('({}) [{}]-> {}'.format(self.clock, self.name, str(self.phase)))
-        self.hold_in(self.phase, self.phase.time_to_next)
+        self.state.next_client_id += 1
+        self.state.time_to_next = max(gauss(self.mean, self.stddev), 0)
+        logging.debug('({}) [{}]-> {}'.format(self.clock, self.name, str(self.state)))
+        self.hold_in(self.phase, self.state.time_to_next)
 
     def deltext(self, e):
         pass
 
     def lambdaf(self):
-        self.output_new_client.add(NewClient(self.phase, self.clock + self.sigma))
+        self.output_new_client.add(NewClient(self.state, self.clock + self.sigma))
 
     def initialize(self):
-        self.hold_in(ClientGeneratorStatus(), 0)
+        self.activate()
 
     def exit(self):
         pass

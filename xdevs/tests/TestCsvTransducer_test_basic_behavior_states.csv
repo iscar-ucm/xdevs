@@ -1,0 +1,4 @@
+sim_time,model_name,phase,sigma,current_job
+0,processor,passive,inf,None
+1,processor,active,100,<xdevs.examples.basic.basic.Job object at 0x103a4ba00>
+101,processor,passive,inf,<xdevs.examples.basic.basic.Job object at 0x103a4ba00>
