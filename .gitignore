@@ -17,4 +17,4 @@ __pycache__
 xdevs.iml
 venv/
 .venv/
-tests/Test*.csv
+xdevs/tests/Test*.csv
