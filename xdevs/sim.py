@@ -62,7 +62,7 @@ class AbstractSimulator(ABC):
         pass
 
     @abstractmethod
-    def lambdaf(self) -> bool:
+    def lambdaf(self) -> NoReturn:
         pass
 
     @abstractmethod
@@ -120,14 +120,12 @@ class Simulator(AbstractSimulator):
         self.time_next = self.time_last + self.model.ta
         return self
 
-    def lambdaf(self) -> bool:
+    def lambdaf(self) -> NoReturn:
         if self.clock.time == self.time_next:
             self.model.lambdaf()
-            return True
-        return False
 
     def clear(self) -> NoReturn:
-        for port in itertools.chain(self.model.used_in_ports, self.model.used_in_ports):
+        for port in itertools.chain(self.model.in_ports, self.model.out_ports):
             port.clear()
 
 
@@ -250,16 +248,14 @@ class Coordinator(AbstractSimulator):
     def ta(self):
         return min((proc.time_next for proc in self.processors), default=INFINITY) - self.clock.time
 
-    def lambdaf(self) -> bool:
-        res = False
+    def lambdaf(self) -> NoReturn:
         for proc in self.processors:
-            if proc.lambdaf():
-                res = True
+            if self.clock.time == proc.time_next:
+                proc.lambdaf()
                 self.propagate_output(proc.model)
-        return res
 
-    def propagate_output(self, proc: Component):
-        for port in proc.used_out_ports:
+    def propagate_output(self, comp: Component):
+        for port in comp.used_out_ports:
             for coup in itertools.chain(self.model.ic.get(port, dict()).values(),
                                         self.model.eoc.get(port, dict()).values()):
                 coup.propagate()
@@ -280,9 +276,9 @@ class Coordinator(AbstractSimulator):
             for coup in self.model.eic.get(port, dict()).values():
                 coup.propagate()
 
-    def clear(self):
-        for item in itertools.chain(self.imminent_processors, self.model.used_in_ports, self.model.used_out_ports):
-            item.clear()
+    def clear(self) -> NoReturn:
+        for port in itertools.chain(self.processors, self.model.in_ports, self.model.out_ports):
+            port.clear()
 
     def inject(self, port: Union[str, Port[T]], values: Union[T, List[T]], e: float = 0) -> bool:
         # TODO enable any iterable as values (careful with str)
