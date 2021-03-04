@@ -17,7 +17,7 @@ class Port(Generic[T]):
     IN = "in"
     OUT = "out"
 
-    def __init__(self, p_type: Type[T], name: Optional[str] = None, serve: bool = False):
+    def __init__(self, p_type: Type[T] = None, name: Optional[str] = None, serve: bool = False):
         """
         xDEVS implementation of DEVS Port.
         :param p_type: data type of events to be sent/received via the new port instance.
@@ -25,8 +25,6 @@ class Port(Generic[T]):
         :param serve: set to True if the port is going to be accessible via RPC server. Defaults to False.
         """
         self.name: str = name if name else self.__class__.__name__
-        if p_type is None:
-            raise TypeError("Invalid p_type")
         self.p_type: Type[T] = p_type
         self.serve: bool = serve
         self.parent: Optional[Component] = None  # xDEVS Component that owns the port
@@ -42,7 +40,7 @@ class Port(Generic[T]):
         return sum(1 for _ in self.values)
 
     def __str__(self) -> str:
-        return "%s.%s(%s)" % (self.parent.name, self.name, self.p_type)
+        return "%s.%s(%s)" % (self.parent.name, self.name, self.p_type or "None")
 
     def __repr__(self) -> str:
         return str(self)
@@ -78,7 +76,7 @@ class Port(Generic[T]):
         :param val: event to be added.
         :raises TypeError: If event is not instance of port type.
         """
-        if not isinstance(val, self.p_type):
+        if self.p_type is not None and not isinstance(val, self.p_type):
             raise TypeError("Value type is %s (%s expected)" % (type(val).__name__, self.p_type.__name__))
         self._values.append(val)
 
@@ -180,7 +178,7 @@ class Coupling(Generic[T]):
             raise ValueError("Input ports whose parent is an Atomic model can not be coupled to any other port")
         if isinstance(comp_to, Atomic) and port_to.direction == Port.OUT:
             raise ValueError("Output ports whose parent is an Atomic model can not be recipient of any other port")
-        if port_to in inspect.getmro(port_from.p_type):
+        if port_from.p_type is not None and port_to in inspect.getmro(port_from.p_type):
             raise ValueError("Ports don't share the same port type")
         self.port_from: Port = port_from
         self.port_to: Port = port_to
