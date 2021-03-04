@@ -39,16 +39,15 @@ class AbstractSimulator(ABC):
                 self.event_transducers = port_transducers
 
     @property
-    def imminent_internal(self) -> bool:
-        return self.clock.time == self.time_next
-
-    @property
-    def imminent_external(self) -> bool:
-        return not self.model.in_empty()
-
-    @property
     def imminent(self) -> bool:
-        return self.imminent_internal or self.imminent_external
+        return self.clock.time == self.time_next or not self.model.in_empty()
+
+    def trigger_event_transducers(self):
+        if self.event_transducers is not None:
+            for port, transducers in self.event_transducers.items():
+                if port:  # Only for ports with messages
+                    for trans in transducers:
+                        trans.add_imminent_port(port)
 
     @abstractmethod
     def initialize(self) -> NoReturn:
@@ -63,7 +62,7 @@ class AbstractSimulator(ABC):
         pass
 
     @abstractmethod
-    def lambdaf(self) -> NoReturn:
+    def lambdaf(self) -> bool:
         pass
 
     @abstractmethod
@@ -100,13 +99,13 @@ class Simulator(AbstractSimulator):
         self.model.exit()
 
     def deltfcn(self) -> Optional[Simulator]:  # TODO
-        if self.imminent_external:
+        if not self.model.in_empty():
             e = self.clock.time - self.time_last
-            if self.imminent_internal:
+            if self.clock.time == self.time_next:
                 self.model.deltcon(e)
             else:
                 self.model.deltext(e)
-        elif self.imminent_internal:
+        elif self.clock.time == self.time_next:
             self.model.deltint()
         else:
             return
@@ -114,20 +113,18 @@ class Simulator(AbstractSimulator):
         if self.state_transducers is not None:
             for trans in self.state_transducers:
                 trans.add_imminent_model(self.model)
-                
-        if self.event_transducers is not None:
-            for port, transducers in self.event_transducers.items():
-                if port:  # Only for ports with messages
-                    for trans in transducers:
-                        trans.add_imminent_port(port)
+
+        self.trigger_event_transducers()
 
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.model.ta
         return self
 
-    def lambdaf(self) -> NoReturn:
-        if self.imminent_internal:
+    def lambdaf(self) -> bool:
+        if self.clock.time == self.time_next:
             self.model.lambdaf()
+            return True
+        return False
 
     def clear(self) -> NoReturn:
         for port in itertools.chain(self.model.used_in_ports, self.model.used_in_ports):
@@ -192,10 +189,6 @@ class Coordinator(AbstractSimulator):
     def imminent_processors(self) -> Generator[AbstractSimulator, None, None]:
         return (proc for proc in self.processors if proc.imminent)
 
-    @property
-    def imminent_internal_processors(self) -> Generator[AbstractSimulator, None, None]:
-        return (proc for proc in self.processors if proc.imminent_internal)
-
     def initialize(self):
         self._build_hierarchy()
 
@@ -257,13 +250,16 @@ class Coordinator(AbstractSimulator):
     def ta(self):
         return min((proc.time_next for proc in self.processors), default=INFINITY) - self.clock.time
 
-    def lambdaf(self) -> NoReturn:
-        for proc in self.imminent_internal_processors:
-            proc.lambdaf()
-            self.propagate_output(proc.model.used_out_ports)
+    def lambdaf(self) -> bool:
+        res = False
+        for proc in self.processors:
+            if proc.lambdaf():
+                res = True
+                self.propagate_output(proc.model)
+        return res
 
-    def propagate_output(self, ports: Generator[Port, None, None]):
-        for port in ports:
+    def propagate_output(self, proc: Component):
+        for port in proc.used_out_ports:
             for coup in itertools.chain(self.model.ic.get(port, dict()).values(),
                                         self.model.eoc.get(port, dict()).values()):
                 coup.propagate()
@@ -274,10 +270,7 @@ class Coordinator(AbstractSimulator):
         for proc in self.imminent_processors:
             proc.deltfcn()
 
-        if self.event_transducers is not None:
-            for port, transducers in self.event_transducers.items():
-                for trans in transducers:
-                    trans.add_imminent_port(port)
+        self.trigger_event_transducers()
 
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.ta()
@@ -288,14 +281,8 @@ class Coordinator(AbstractSimulator):
                 coup.propagate()
 
     def clear(self):
-        for proc in self.imminent_processors:
-            proc.clear()
-
-        for in_port in self.model.used_in_ports:
-            in_port.clear()
-
-        for out_port in self.model.used_out_ports:
-            out_port.clear()
+        for item in itertools.chain(self.imminent_processors, self.model.used_in_ports, self.model.used_out_ports):
+            item.clear()
 
     def inject(self, port: Union[str, Port[T]], values: Union[T, List[T]], e: float = 0) -> bool:
         # TODO enable any iterable as values (careful with str)
