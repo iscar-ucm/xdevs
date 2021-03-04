@@ -129,12 +129,12 @@ class Component(ABC):
         return not any(self.out_ports)
 
     @property
-    def used_in_ports(self) -> List[Port]:
-        return [port for port in self.in_ports if port]
+    def used_in_ports(self) -> Generator[Port, None, None]:
+        return (port for port in self.in_ports if port)
 
     @property
-    def used_out_ports(self) -> List[Port]:
-        return [port for port in self.out_ports if port]
+    def used_out_ports(self) -> Generator[Port, None, None]:
+        return (port for port in self.out_ports if port)
 
     def add_in_port(self, port: Port) -> NoReturn:
         """
