@@ -246,14 +246,13 @@ class HOmod(Coupled):
 if __name__ == '__main__':
     import sys
     sys.setrecursionlimit(10000)
-    root = HO("HO_root", 10, 10, 100000, 100000)
+    root = HO("HO_root", 50, 50, 0, 0)
     flatten = False
-    chain = True
-    parallel = True
+    parallel = False
     if parallel:
-        coord = ParallelProcessCoordinator(root, flatten=flatten, chain=chain)
+        coord = ParallelProcessCoordinator(root)
     else:
-        coord = Coordinator(root, flatten=flatten, chain=chain)
+        coord = Coordinator(root, flatten=flatten)
     coord.initialize()
     coord.inject(root.i_in, 0)
     coord.simulate()

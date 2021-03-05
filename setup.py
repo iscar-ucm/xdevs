@@ -16,7 +16,7 @@ setup(name='xdevs',
           'xdevs.plugins.wrappers': [
               'pypdevs = xdevs.plugins.wrappers.pypdevs:PyPDEVSWrapper'
           ]},
-      extra_require={
+      extras_require={
           'sql': ['sqlalchemy==1.3.22'],
           'elasticsearch': ['elasticsearch==7.10.1'],
       },

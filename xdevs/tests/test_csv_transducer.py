@@ -1,5 +1,4 @@
 import os
-import sys
 from unittest import TestCase
 
 from xdevs.models import Port, Coupled
@@ -177,7 +176,7 @@ class TestCsvTransducer(TestCase):
         gpt = Gpt("gpt", 3, 1000)
         csv_transducer.add_target_component(gpt)
 
-        coord = Coordinator(gpt, flatten=False, chain=False)
+        coord = Coordinator(gpt, flatten=False)
         coord.add_transducer(csv_transducer)
         coord.initialize()
         coord.simulate_time()

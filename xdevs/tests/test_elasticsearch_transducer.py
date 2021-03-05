@@ -1,4 +1,3 @@
-from math import inf
 from xdevs.transducers import Transducers
 from xdevs.examples.basic.basic import Job, Processor
 

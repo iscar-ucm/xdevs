@@ -146,7 +146,7 @@ class TestLI(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 li_root = LI("LI_root", **params)
-                coord = coord_type(li_root, flatten=False, chain=False)
+                coord = coord_type(li_root, flatten=False)
                 coord.initialize()
                 coord.inject(li_root.i_in, 0)
                 coord.simulate()
@@ -200,7 +200,7 @@ class TestHI(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 hi_root = HI("HI_root", **params)
-                coord = coord_type(hi_root, flatten=False, chain=False)
+                coord = coord_type(hi_root, flatten=False)
                 coord.initialize()
                 coord.inject(hi_root.i_in, 0)
                 coord.simulate()
@@ -254,7 +254,7 @@ class TestHO(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 ho_root = HO("HO_root", **params)
-                coord = coord_type(ho_root, flatten=False, chain=False)
+                coord = coord_type(ho_root, flatten=False)
                 coord.initialize()
                 coord.inject(ho_root.i_in, 0)
                 coord.inject(ho_root.i_in2, 0)
@@ -316,7 +316,7 @@ class TestHOmod(DevstoneUtilsTestCase):
 
             with self.subTest(**params):
                 ho_mod_root = HOmod("HOmod_root", **params)
-                coord = coord_type(ho_mod_root, flatten=False, chain=False)
+                coord = coord_type(ho_mod_root, flatten=False)
                 coord.initialize()
                 coord.inject(ho_mod_root.i_in, 0)
                 coord.inject(ho_mod_root.i_in2, 0)

@@ -14,9 +14,6 @@ T = TypeVar('T')
 
 class Port(Generic[T]):
 
-    IN = "in"
-    OUT = "out"
-
     def __init__(self, p_type: Type[T] = None, name: Optional[str] = None, serve: bool = False):
         """
         xDEVS implementation of DEVS Port.
@@ -28,16 +25,14 @@ class Port(Generic[T]):
         self.p_type: Type[T] = p_type
         self.serve: bool = serve
         self.parent: Optional[Component] = None  # xDEVS Component that owns the port
-        self.direction: Optional[str] = None     # Message flow direction of the port. It is either PORT_IN or PORT_OUT
-        self._values: Deque[T] = deque()         # Bag containing messages directly written to the port
-        self.links_to: List[Port] = list()       # Ports that receive data from the port (only used by output ports)
-        self.links_from: List[Port] = list()     # Ports that inject data to the port (only used by input ports)
+        self._values: Deque[T] = deque()         # Bag containing events directly written to the port
+        self._bag: List[Port[T]] = list()        # Bag containing coupled ports containing events
 
     def __bool__(self) -> bool:
         return not self.empty()
 
     def __len__(self) -> int:
-        return sum(1 for _ in self.values)
+        return sum((len(port) for port in self._bag), len(self._values))
 
     def __str__(self) -> str:
         return "%s.%s(%s)" % (self.parent.name, self.name, self.p_type or "None")
@@ -46,12 +41,11 @@ class Port(Generic[T]):
         return str(self)
 
     def empty(self) -> bool:
-        for _ in self.values:
-            return False
-        return True
+        return not bool(self._values or self._bag)
 
     def clear(self) -> NoReturn:
         self._values.clear()
+        self._bag.clear()
 
     @property
     def values(self) -> Generator[T, None, None]:
@@ -59,8 +53,8 @@ class Port(Generic[T]):
         for val in self._values:
             yield val
 
-        for port in self.links_from:
-            for val in port._values:
+        for port in self._bag:
+            for val in port.values:
                 yield val
 
     def get(self) -> T:
@@ -88,6 +82,14 @@ class Port(Generic[T]):
         """
         for val in vals:
             self.add(val)
+
+    def add_to_bag(self, port: Port[T]) -> NoReturn:
+        """
+        Adds a port that contains events to the message bag.
+        :param port: port to be added to the bag.
+        """
+        if port:
+            self._bag.append(port)
 
 
 class Component(ABC):
@@ -119,17 +121,19 @@ class Component(ABC):
 
     def in_empty(self) -> bool:
         """:return: True if model has not any message in all its input ports."""
-        for port in self.in_ports:
-            if port:
-                return False
-        return True
+        return not any(self.in_ports)
 
     def out_empty(self) -> bool:
         """:return: True if model has not any message in all its output ports."""
-        for port in self.out_ports:
-            if port:
-                return False
-        return True
+        return not any(self.out_ports)
+
+    @property
+    def used_in_ports(self) -> Generator[Port, None, None]:
+        return (port for port in self.in_ports if port)
+
+    @property
+    def used_out_ports(self) -> Generator[Port, None, None]:
+        return (port for port in self.out_ports if port)
 
     def add_in_port(self, port: Port) -> NoReturn:
         """
@@ -137,7 +141,6 @@ class Component(ABC):
         :param port: port to be added to the model.
         """
         port.parent = self
-        port.direction = Port.IN
         self.in_ports.append(port)
 
     def add_out_port(self, port: Port) -> NoReturn:
@@ -146,7 +149,6 @@ class Component(ABC):
         :param port: port to be added to the model.
         """
         port.parent = self
-        port.direction = Port.OUT
         self.out_ports.append(port)
 
     def get_in_port(self, name) -> Optional[Port]:
@@ -174,12 +176,13 @@ class Coupling(Generic[T]):
         # Check that couplings are valid
         comp_from: Component = port_from.parent
         comp_to: Component = port_to.parent
-        if isinstance(comp_from, Atomic) and port_from.direction == Port.IN:
+        if isinstance(comp_from, Atomic) and port_from in comp_from.in_ports:
             raise ValueError("Input ports whose parent is an Atomic model can not be coupled to any other port")
-        if isinstance(comp_to, Atomic) and port_to.direction == Port.OUT:
+        if isinstance(comp_to, Atomic) and port_to in comp_from.out_ports:
             raise ValueError("Output ports whose parent is an Atomic model can not be recipient of any other port")
         if port_from.p_type is not None and port_to in inspect.getmro(port_from.p_type):
             raise ValueError("Ports don't share the same port type")
+
         self.port_from: Port = port_from
         self.port_to: Port = port_to
         self.host = host  # TODO identify host's variable type
@@ -197,7 +200,7 @@ class Coupling(Generic[T]):
                 values = list(map(lambda x: pickle.dumps(x, protocol=0).decode(), self.port_from.values))
                 self.host.inject(self.port_to, values)
         else:
-            self.port_to.extend(self.port_from.values)
+            self.port_to.add_to_bag(self.port_from)
 
 
 class Atomic(Component, ABC):
@@ -254,7 +257,7 @@ class Atomic(Component, ABC):
         self.phase = phase
         self.sigma = sigma
 
-    def activate(self, phase=PHASE_ACTIVE) -> NoReturn:
+    def activate(self, phase: str = PHASE_ACTIVE) -> NoReturn:
         """
         Sets next timeout to 0.
         :param phase: New phase. Defaults to "PHASE_ACTIVE".
@@ -262,7 +265,7 @@ class Atomic(Component, ABC):
         self.phase = phase
         self.sigma = 0
 
-    def passivate(self, phase=PHASE_PASSIVE) -> NoReturn:
+    def passivate(self, phase: str = PHASE_PASSIVE) -> NoReturn:
         """
         Sets next timeout to 0 infinity.
         :param phase: New phase. Defaults to "PHASE_PASSIVE".
@@ -288,9 +291,9 @@ class Coupled(Component, ABC):
         self.chain: bool = False
 
         self.components: List[Component] = list()
-        self.ic: Dict[Port, List[Coupling]] = dict()
-        self.eic: Dict[Port, List[Coupling]] = dict()
-        self.eoc: Dict[Port, List[Coupling]] = dict()
+        self.ic: Dict[Port, Dict[Port, Coupling]] = dict()
+        self.eic: Dict[Port, Dict[Port, Coupling]] = dict()
+        self.eoc: Dict[Port, Dict[Port, Coupling]] = dict()
 
     def initialize(self) -> NoReturn:
         pass
@@ -306,22 +309,18 @@ class Coupled(Component, ABC):
         :param host: TODO documentation
         :raises ValueError: if coupling is not well defined.
         """
-        coupling = Coupling(p_from, p_to, host)
         if p_from.parent == self and p_to.parent in self.components:
-            Coupled._safe_coup_add(self.eic, coupling)
+            coupling_set = self.eic
         elif p_from.parent in self.components and p_to.parent == self:
-            Coupled._safe_coup_add(self.eoc, coupling)
+            coupling_set = self.eoc
         elif p_from.parent in self.components and p_to.parent in self.components:
-            Coupled._safe_coup_add(self.ic, coupling)
+            coupling_set = self.ic
         else:
             raise ValueError("Components that compose the coupling are not submodules of coupled model")
 
-    @staticmethod
-    def _safe_coup_add(dct: Dict[Port, List[Coupling]], coup: Coupling) -> NoReturn:
-        if coup.port_from not in dct:
-            dct[coup.port_from] = [coup]
-        else:
-            dct[coup.port_from].append(coup)
+        if p_from not in coupling_set:
+            coupling_set[p_from] = dict()
+        coupling_set[p_from][p_to] = Coupling(p_from, p_to, host)
 
     def remove_coupling(self, coupling: Coupling) -> NoReturn:
         """
@@ -329,24 +328,13 @@ class Coupled(Component, ABC):
         :param coupling: Couplings to be removed.
         :raises ValueError: if coupling is not found.
         """
-        for key, coups in self.eic.items():
-            for coup in coups:
-                if coupling == coup:
-                    del self.eic[key]
-                    return
-
-        for key, coups in self.eoc.items():
-            for coup in coups:
-                if coupling == coup:
-                    del self.eoc[key]
-                    return
-
-        for key, coups in self.ic.items():
-            for coup in coups:
-                if coupling == coup:
-                    del self.ic[key]
-                    return
-
+        port_from = coupling.port_from
+        port_to = coupling.port_to
+        for coupling_set in (self.eic, self.eoc, self.ic):
+            if coupling_set.get(port_from, dict()).pop(port_to, None) == coupling:
+                if not coupling_set[port_from]:
+                    coupling_set.pop(port_from)
+                return
         raise ValueError("Coupling was not found in model definition")
 
     def add_component(self, component: Component) -> NoReturn:
@@ -357,45 +345,15 @@ class Coupled(Component, ABC):
         component.parent = self
         self.components.append(component)
 
-    def chain_components(self, unroll: bool = True) -> NoReturn:
-        """
-        Chains submodules to enhance sequential execution performance.
-        """
-        self.chain = True
-        if unroll:
-            self.flatten()
-        else:
-            for comp in self.components:
-                if isinstance(comp, Coupled):
-                    comp.chain_components(unroll)
-
-        for coup_list in self.eic.values():
-            for coup in coup_list:
-                self._chain_from_coupling(coup)
-        # self.eic.clear()
-        for coup_list in self.eoc.values():
-            for coup in coup_list:
-                self._chain_from_coupling(coup)
-        # self.eoc.clear()
-        for coup_list in self.ic.values():
-            for coup in coup_list:
-                self._chain_from_coupling(coup)
-        # self.ic.clear()
-
-    @staticmethod
-    def _chain_from_coupling(coup: Coupling) -> NoReturn:
-        coup.port_from.links_to.append(coup.port_to)
-        coup.port_to.links_from.append(coup.port_from)
-
-    def flatten(self) -> Tuple[List[Component], List[Coupling]]:
+    def flatten(self) -> Tuple[List[Atomic], List[Coupling]]:
         """
         Flattens coupled model (i.e., parent coupled model inherits the connection of the model).
         :return: Components and couplings to be transferred to parent
         """
-        new_comps_up = list()  # list with children components to be inherited by parent
-        new_coups_up = list()  # list with couplings to be inherited by parent
+        new_comps_up: List[Atomic] = list()  # list with children components to be inherited by parent
+        new_coups_up: List[Coupling] = list()  # list with couplings to be inherited by parent
 
-        old_comps = list()  # list with children coupled models to be deleted
+        old_comps: List[Coupled] = list()  # list with children coupled models to be deleted
 
         for comp in self.components:
             if isinstance(comp, Coupled):  # Propagate flattening to children coupled models
@@ -404,15 +362,15 @@ class Coupled(Component, ABC):
                 for new_comp in new_comps_down:
                     self.add_component(new_comp)
                 for coup in new_coups_down:
-                    self.add_coupling(coup.port_from, coup.port_to)
+                    self.add_coupling(coup.port_from, coup.port_to, coup.host)
+            elif isinstance(comp, Atomic):
+                new_comps_up.append(comp)
 
         for comp in old_comps:
             self._remove_couplings_of_child(comp)
             self.components.remove(comp)
 
         if self.parent is not None:  # If module is not root, trigger the flatten process
-            new_comps_up.extend(self.components)
-
             left_bridge_eic = self._create_left_bridge(self.parent.eic)
             new_coups_up.extend(self._complete_left_bridge(left_bridge_eic))
 
@@ -424,11 +382,11 @@ class Coupled(Component, ABC):
             right_bridge_eoc = self._create_right_bridge(self.parent.eoc)
             new_coups_up.extend(self._complete_right_bridge(right_bridge_eoc))
 
-            new_coups_up.extend([c for cl in self.ic.values() for c in cl])
+            new_coups_up.extend([c for cl in self.ic.values() for c in cl.values()])
 
         return new_comps_up, new_coups_up
 
-    def _remove_couplings_of_child(self, child: Component) -> NoReturn:
+    def _remove_couplings_of_child(self, child: Coupled) -> NoReturn:
         for in_port in child.in_ports:
             self._remove_couplings(in_port, self.eic)
             self._remove_couplings(in_port, self.ic)
@@ -437,17 +395,13 @@ class Coupled(Component, ABC):
             self._remove_couplings(out_port, self.eoc)
 
     @staticmethod
-    def _remove_couplings(port: Port, couplings: Dict[Port, List[Coupling]]) -> NoReturn:
+    def _remove_couplings(port: Port, couplings: Dict[Port, Dict[Port, Coupling]]) -> NoReturn:
         # Remove port from couplings list
         couplings.pop(port, None)
         # For remaining ports, remove couplings which source is the port to be removed
-        to_remove = list()
-        for _, coup_list in couplings.items():
-            for coup in coup_list:
-                if coup.port_to == port:
-                    to_remove.append(coup)
-        for coup in to_remove:
-            couplings[coup.port_from].remove(coup)
+        for coups in couplings.values():
+            coups.pop(port, None)
+        return
 
     def _create_left_bridge(self, pc) -> Dict[Port, List[Port]]:
         bridge = defaultdict(list)
@@ -467,19 +421,19 @@ class Coupled(Component, ABC):
                         bridge[out_port].append(coup.port_to)
         return bridge
 
-    def _complete_left_bridge(self, bridge) -> List[Coupling]:
+    def _complete_left_bridge(self, bridge: Dict[Port, List[Port]]) -> List[Coupling]:
         couplings = list()
         for coup_list in self.eic.values():
-            for coup in coup_list:
+            for coup in coup_list.values():
                 ports = bridge[coup.port_from]
                 for port in ports:
                     couplings.append(Coupling(port, coup.port_to))
         return couplings
 
-    def _complete_right_bridge(self, bridge) -> List[Coupling]:
+    def _complete_right_bridge(self, bridge: Dict[Port, List[Port]]) -> List[Coupling]:
         couplings = list()
         for coup_list in self.eoc.values():
-            for coup in coup_list:
+            for coup in coup_list.values():
                 ports = bridge[coup.port_to]
                 for port in ports:
                     couplings.append(Coupling(coup.port_from, port))

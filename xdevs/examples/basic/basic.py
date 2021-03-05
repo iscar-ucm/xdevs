@@ -158,8 +158,8 @@ class Gpt(Coupled):
 		if obs_time < 0:
 			raise ValueError("obs_time has to be greater or equal than 0")
 
-		gen = Generator("generator", period)
-		proc = Processor("processor", 3*period)
+		gen = Generator("generator", 3*period)
+		proc = Processor("processor", period)
 		trans = Transducer("transducer", obs_time)
 
 		self.add_component(gen)
@@ -185,8 +185,8 @@ if __name__ == '__main__':
 	wrap = Wrap("gpt", 3, 1000)
 	parallel = False
 	if parallel:
-		coord = ParallelCoordinator(wrap, flatten=False, chain=False)
+		coord = ParallelCoordinator(wrap, flatten=True)
 	else:
-		coord = Coordinator(wrap, flatten=False, chain=False)
+		coord = Coordinator(wrap, flatten=True)
 	coord.initialize()
 	coord.simulate()
