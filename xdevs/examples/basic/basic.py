@@ -72,6 +72,7 @@ class Processor(Atomic):
 		if self.phase == PHASE_PASSIVE:
 			self.current_job = self.i_in.get()
 			self.hold_in(PHASE_ACTIVE, self.proc_time)
+		self.continuef(e)
 	
 	def lambdaf(self):
 		self.o_out.add(self.current_job)
@@ -139,6 +140,7 @@ class Transducer(Atomic):
 				logger.info("Job %s finished @ t = %d" % (job.name, self.clock))
 				self.total_ta += self.clock - job.time
 				self.jobs_solved.append(job)
+
 		self.continuef(e)
 	
 	def lambdaf(self):
