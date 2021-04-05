@@ -422,14 +422,12 @@ public class Coupled extends Component {
     public String getDistributedModel() {
         StringBuilder builder = new StringBuilder();
         builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
-        builder.append("<simulation>\n");
-        builder.append("\t<coordinator name=\"CoordinatorDistributed\"");
-        builder.append(" class=\"").append(CoordinatorDistributed.class.getCanonicalName()).append("\"");
+        builder.append("<coupled name=\"" + this.getName() + "\"");
+        builder.append(" class=\"").append(this.getClass().getCanonicalName()).append("\"");
         builder.append(" host=\"127.0.0.1\"");
         builder.append(" mainPort=\"5000\"");
         builder.append(" auxPort=\"6000\"");
-        builder.append("/>\n");
-        Collection<Component> components = getComponents();
+        builder.append(">\n");
         int counter = 1;
         for (Component component : components) {
             if (component instanceof Coupled) {
@@ -439,21 +437,9 @@ public class Coupled extends Component {
                 builder.append(" class=\"").append(component.getClass().getCanonicalName()).append("\"");
                 builder.append(" host=\"127.0.0.1\"");
                 builder.append(" mainPort=\"").append(5000 + counter).append("\"");
-                builder.append(" auxPort=\"").append(5000 + counter).append("\"");
+                builder.append(" auxPort=\"").append(6000 + counter).append("\"");
                 builder.append(">\n");
             }
-            Collection<Port<?>> ports = component.getInPorts();
-            ports.forEach((port) -> {
-                builder.append("\t\t<inport name=\"").append(port.getName()).append("\"");
-                builder.append(" class=\"TODO\"");
-                builder.append("/>\n");
-            });
-            ports = component.getOutPorts();
-            ports.forEach((port) -> {
-                builder.append("\t\t<outport name=\"").append(port.getName()).append("\"");
-                builder.append(" class=\"TODO\"");
-                builder.append("/>\n");
-            });
             builder.append("\t</atomic>\n");
             counter++;
         }
@@ -461,15 +447,15 @@ public class Coupled extends Component {
         LinkedList<Coupling<?>> couplings = getIC();
         couplings.forEach((coupling) -> {
             builder.append("\t<connection");
-            builder.append(" atomicFrom=\"").append(coupling.getPortFrom().getParent().getName()).append("\"");
+            builder.append(" componentFrom=\"").append(coupling.getPortFrom().getParent().getName()).append("\"");
             builder.append(" classFrom=\"").append(coupling.getPortFrom().getParent().getClass().getCanonicalName()).append("\"");
             builder.append(" portFrom=\"").append(coupling.getPortFrom().getName()).append("\"");
-            builder.append(" atomicTo=\"").append(coupling.getPortTo().getParent().getName()).append("\"");
+            builder.append(" componentTo=\"").append(coupling.getPortTo().getParent().getName()).append("\"");
             builder.append(" classTo=\"").append(coupling.getPortTo().getParent().getClass().getCanonicalName()).append("\"");
             builder.append(" portTo=\"").append(coupling.getPortTo().getName()).append("\"");
             builder.append("/>\n");
         });
-        builder.append("</simulation>\n");
+        builder.append("</coupled>\n");
         return builder.toString();
     }
 

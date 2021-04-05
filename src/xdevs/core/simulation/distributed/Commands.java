@@ -11,8 +11,7 @@ package xdevs.core.simulation.distributed;
  */
 public class Commands {
     // Commands constants
-    public static final int NONE = 0; //This does not do anything.
-    public static final int BUILD_HIERARCHY = 1; //It allows to create a instance of each model of remotely.    
+    public static final int NONE = 0; //This does not do anything.   
     public static final int INITIALIZE = 2; //It allows to initialize the simulator.
     public static final int TA = 3; //It allows find the advance time.
     public static final int LAMBDA = 4; //It allows to execute the lambda method.

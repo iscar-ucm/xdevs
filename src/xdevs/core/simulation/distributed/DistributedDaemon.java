@@ -29,7 +29,7 @@ public class DistributedDaemon implements Runnable {
     @Override
     public void run() {			
         try {
-            ServerSocket serverSocket = new ServerSocket(this.port);
+            ServerSocket serverSocket = new ServerSocket(this.port);            
             while (!sd.isGetOut()) {
                 Socket socket = serverSocket.accept();
                 ObjectInputStream in = new ObjectInputStream(socket.getInputStream());                

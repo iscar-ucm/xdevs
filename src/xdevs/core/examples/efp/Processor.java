@@ -22,7 +22,6 @@
 package xdevs.core.examples.efp;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
 
@@ -36,21 +35,20 @@ public class Processor extends Atomic {
     protected Port<Job> oOut = new Port<>("oOut");
     protected Job currentJob = null;
     protected double processingTime;
+    protected double clock; // *
 
     public Processor(String name, double processingTime) {
         super(name);
         super.addInPort(iIn);
         super.addOutPort(oOut);
         this.processingTime = processingTime;
+        this.clock = 1; // *
+
     }
 
     public Processor(Element xmlAtomic) {
-        super(xmlAtomic);
-        iIn = (Port<Job>) super.getInPort(iIn.getName());
-        oOut = (Port<Job>) super.getOutPort(oOut.getName());
-        NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
-        Element xmlParameter = (Element)xmlParameters.item(0);
-        processingTime = Double.valueOf(xmlParameter.getAttribute("value"));
+        this(xmlAtomic.getAttribute("name"), 
+             Double.parseDouble(((Element)(xmlAtomic.getElementsByTagName("constructor-arg").item(0))).getAttribute("value")));
     }
 
     @Override
@@ -72,6 +70,8 @@ public class Processor extends Atomic {
         if (super.phaseIs("passive")) {
             currentJob = iIn.getSingleValue();
             super.holdIn("active", processingTime);
+            currentJob.time = clock; // *
+            clock = clock + processingTime; // *
         }
     }
 

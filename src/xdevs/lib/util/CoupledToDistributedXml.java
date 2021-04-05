@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package xdevs.core.examples.distributed.gpt;
+package xdevs.lib.util;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,7 +19,7 @@ public class CoupledToDistributedXml {
     public static void main(String[] args) throws Exception {
         Coupled efp = new Efp("GPT", 1, 3, 100);
         Coupled newEfp = efp.flatten();
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File("tmp" + File.separator + "example.xml")))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File("tmp" + File.separator + "gpt.xml")))) {
             writer.write(newEfp.getDistributedModel());
         }
     } 

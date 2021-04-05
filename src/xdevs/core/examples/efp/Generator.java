@@ -47,13 +47,8 @@ public class Generator extends Atomic {
     }
     
     public Generator(Element xmlAtomic) {
-        super(xmlAtomic);
-        iStart = (Port<Job>) super.getInPort(iStart.getName());
-        iStop = (Port<Job>) super.getInPort(iStop.getName());
-        oOut = (Port<Job>) super.getOutPort(oOut.getName());  
-        NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
-        Element xmlParameter = (Element)xmlParameters.item(0);
-        period = Double.valueOf(xmlParameter.getAttribute("value"));
+        this(xmlAtomic.getAttribute("name"), 
+             Double.parseDouble(((Element)(xmlAtomic.getElementsByTagName("constructor-arg").item(0))).getAttribute("value")));
     }
 
     @Override

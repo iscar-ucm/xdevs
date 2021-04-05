@@ -14,13 +14,15 @@ import xdevs.core.simulation.SimulationClock;
  */
 public class DistributedTask implements Callable<String> {
     // DistributedTask attributes
-    protected Node node;
+    protected String host;
+    protected Integer port;
     protected int command;
     protected String message;
     
     // DistributedTask constructors
-    public DistributedTask(Node node, int command, String message) {
-        this.node = node;
+    public DistributedTask(String host, Integer port, int command, String message) {
+        this.host = host;
+        this.port = port;
         this.command = command;
         this.message = message;        
     }
@@ -29,7 +31,7 @@ public class DistributedTask implements Callable<String> {
     @Override
     public String call() {
         MessageDistributed md = new MessageDistributed(this.command, this.message);
-        PingMessage pm = new PingMessage(md, this.node.host, this.node.port);
+        PingMessage pm = new PingMessage(md, host, port);
         md = pm.ping();        
         return md.getMessage();
     }

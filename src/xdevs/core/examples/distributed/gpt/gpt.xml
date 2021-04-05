@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<coupled name="GPT" class="xdevs.core.examples.efp.Efp" host="127.0.0.1" mainPort="5000" auxPort="6000">
+	<atomic name="processor" class="xdevs.core.examples.efp.Processor" host="127.0.0.1" mainPort="5001" auxPort="6001">
+		<constructor-arg value="3.0"/>
+	</atomic>
+	<atomic name="generator" class="xdevs.core.examples.efp.Generator" host="127.0.0.1" mainPort="5002" auxPort="6002">
+		<constructor-arg value="1.0"/>
+	</atomic>
+	<atomic name="transducer" class="xdevs.core.examples.efp.Transducer" host="127.0.0.1" mainPort="5003" auxPort="6003">
+		<constructor-arg value="100.0"/>
+	</atomic>
+	<connection componentFrom="processor" portFrom="oOut" componentTo="transducer" portTo="iSolved"/>
+	<connection componentFrom="generator" portFrom="oOut" componentTo="processor" portTo="iIn"/>
+	<connection componentFrom="generator" portFrom="oOut" componentTo="transducer" portTo="iArrived"/>
+	<connection componentFrom="transducer" portFrom="oOut" componentTo="generator" portTo="iStop"/>
+</coupled>
+

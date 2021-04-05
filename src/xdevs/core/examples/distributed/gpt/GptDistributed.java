@@ -6,66 +6,46 @@
 package xdevs.core.examples.distributed.gpt;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import xdevs.core.examples.efp.Generator;
-import xdevs.core.examples.efp.Processor;
-import xdevs.core.examples.efp.Transducer;
-import xdevs.core.modeling.Atomic;
-import xdevs.core.modeling.Coupled;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+import xdevs.core.modeling.distributed.CoupledDistributed;
 import xdevs.core.simulation.distributed.CoordinatorDistributed;
 import xdevs.core.util.DevsLogger;
-import xdevs.core.simulation.distributed.DistributedInterface;
 
 /**
  *
  * @author Almendras
  */
-public class GptDistributed extends Coupled implements DistributedInterface{
-           
-    // Atributtes GptDistributed
-    private String simulationPlane;
-    private double period;
-    private double processingTime;
-    private double observationTime;
-            
-    // Constructors GptDistributed
-    public GptDistributed(String name, double period, double observationTime, String simulationPlane) {
-    	this(period, observationTime, simulationPlane);           
-        super.name= name;
-    }
-    public GptDistributed(double period, double observationTime, String simulationPlane) {
-    	super(GptDistributed.class.getSimpleName());        
-        this.period = period;
-        this.processingTime = period*3;
-        this.observationTime = observationTime;
-        this.simulationPlane = simulationPlane;
-    }    
-    
-    // Methods GptDistributed 
-    @Override
-    public Atomic returnModel(String ClassName) {
-        if (ClassName.compareTo("Generator") == 0) {
-            return new Generator(ClassName, this.period);
-        } else if (ClassName.compareTo("Processor") == 0) {
-            return new Processor(ClassName, this.processingTime);
-        } else {
-            return new Transducer(ClassName, this.observationTime);
-        }
+public class GptDistributed extends CoupledDistributed {
+
+    private static final Logger LOGGER = Logger.getLogger(GptDistributed.class.getName());
+
+    public GptDistributed(Element xmlCoupled) {
+        super(xmlCoupled);
     }
 
-    @Override
-    public String getSimulationPlane() {
-        return simulationPlane;
-    }
-    private static final Logger LOGGER = Logger.getLogger(GptDistributed.class.getName());
     public static void main(String[] args) {
-        if(args.length==0) {
-            args = new String[]{"5.0", "100.0", "tmp" + File.separator + "gpt.xml"};
+        if (args.length == 0) {
+            args = new String[]{"tmp" + File.separator + "gpt.xml"};
+        }
+        Element xmlCoupled;
+        try {
+            Document xmlCoupledModel = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(args[0]));
+            xmlCoupled = (Element) xmlCoupledModel.getElementsByTagName("coupled").item(0);
+            LOGGER.info(xmlCoupled.toString());
+        } catch (IOException | ParserConfigurationException | SAXException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return;
         }
         DevsLogger.setup(Level.INFO);
-        System.out.println("Run Coordinator Atomic....");
-        GptDistributed gpt = new GptDistributed(Double.valueOf(args[0]), Double.valueOf(args[1]), args[2]);
+        LOGGER.info("Run Coordinator Atomic....");
+        GptDistributed gpt = new GptDistributed(xmlCoupled);
         CoordinatorDistributed coordinator = new CoordinatorDistributed(gpt);
         long start = System.currentTimeMillis();
         coordinator.initialize();
@@ -73,6 +53,6 @@ public class GptDistributed extends Coupled implements DistributedInterface{
         coordinator.exit();
         long end = System.currentTimeMillis();
         double time = (end - start) / 1000.0;
-        LOGGER.info("TIME: " + time); 
-    }    
+        LOGGER.info("TIME: " + time);
+    }
 }
