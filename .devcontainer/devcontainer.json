@@ -1,0 +1,13 @@
+{
+    "name": "xdevs-java",
+    "dockerFile": "Dockerfile",
+    "settings": {
+    	"workbench.colorTheme": "Cobalt2",
+    	"terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "extensions": [
+        "vscjava.vscode-java-pack",
+    	"esbenp.prettier-vscode",
+    	"wesbos.theme-cobalt2"
+    ]
+}

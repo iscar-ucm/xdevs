@@ -39,6 +39,9 @@ public class NodeGenerator {
         DevsLogger.setup(Level.INFO);
         CoupledDistributed gpt = new CoupledDistributed(xmlCoupled);
         LOGGER.info("Run Generator Atomic....");
-        SimulatorDistributed node = new SimulatorDistributed(gpt, "generator");
+        // TODO: It would be nice to have one "start" method to instantiate the class and after that launch the simulation, for example:
+        // - SimulatorDistributed node = new SimulatorDistributed(gpt, "generator");
+        // node.run();
+        new SimulatorDistributed(gpt, "generator");
     }
 }

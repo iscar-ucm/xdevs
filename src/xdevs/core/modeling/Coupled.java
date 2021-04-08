@@ -23,12 +23,16 @@ package xdevs.core.modeling;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import xdevs.core.simulation.distributed.CoordinatorDistributed;
 
 /**
  *
@@ -76,8 +80,8 @@ public class Coupled extends Component {
                 case "atomic":
                     xmlChild = (Element) xmlNode;
                     try {
-                        Class atomicClass = Class.forName(xmlChild.getAttribute("class"));
-                        Constructor constructor = atomicClass.getConstructor(new Class[]{Class.forName("org.w3c.dom.Element")});
+                        Class<?> atomicClass = Class.forName(xmlChild.getAttribute("class"));
+                        Constructor<?> constructor = atomicClass.getConstructor(new Class[]{Class.forName("org.w3c.dom.Element")});
                         Object atomicObject = constructor.newInstance(new Object[]{xmlChild});
                         this.addComponent((Atomic) atomicObject);
                     } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
@@ -127,19 +131,19 @@ public class Coupled extends Component {
      */
     public void addCoupling(Component cFrom, int oPortIndex, Component cTo, int iPortIndex) {
         if (cFrom == this) { // EIC
-            Port portFrom = cFrom.inPorts.get(oPortIndex);
-            Port portTo = cTo.inPorts.get(iPortIndex);
-            Coupling coupling = new Coupling(portFrom, portTo);
+            Port<?> portFrom = cFrom.inPorts.get(oPortIndex);
+            Port<?> portTo = cTo.inPorts.get(iPortIndex);
+            Coupling<?> coupling = new Coupling(portFrom, portTo);
             eic.add(coupling);
         } else if (cTo == this) { // EOC
-            Port portFrom = cFrom.outPorts.get(oPortIndex);
-            Port portTo = cTo.outPorts.get(iPortIndex);
-            Coupling coupling = new Coupling(portFrom, portTo);
+            Port<?> portFrom = cFrom.outPorts.get(oPortIndex);
+            Port<?> portTo = cTo.outPorts.get(iPortIndex);
+            Coupling<?> coupling = new Coupling(portFrom, portTo);
             eoc.add(coupling);
         } else { // IC
-            Port portFrom = cFrom.outPorts.get(oPortIndex);
-            Port portTo = cTo.inPorts.get(iPortIndex);
-            Coupling coupling = new Coupling(portFrom, portTo);
+            Port<?> portFrom = cFrom.outPorts.get(oPortIndex);
+            Port<?> portTo = cTo.inPorts.get(iPortIndex);
+            Coupling<?> coupling = new Coupling(portFrom, portTo);
             ic.add(coupling);
         }
     }

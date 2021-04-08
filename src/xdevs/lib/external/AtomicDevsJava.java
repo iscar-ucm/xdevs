@@ -36,7 +36,7 @@ public class AtomicDevsJava extends Atomic {
         super(model.getName());
         this.model = model;
         genDevs.modeling.ports devsJavaPorts = model.mh.getInports();
-        Iterator itr = devsJavaPorts.iterator();
+        Iterator<?> itr = devsJavaPorts.iterator();
         while(itr.hasNext()) {
             genDevs.modeling.port devsJavaPort = (genDevs.modeling.port) itr.next();
             super.addInPort(new Port(devsJavaPort.getName()));

@@ -24,13 +24,15 @@ import xdevs.core.util.DevsLogger;
  */
 public class NodeProcessor {
     private static final Logger LOGGER = Logger.getLogger(NodeProcessor.class.getName());
+
     public static void main(String[] args) {
-        if(args.length==0) {
-            args = new String[]{"tmp" + File.separator + "gpt.xml"};
+        if (args.length == 0) {
+            args = new String[] { "tmp" + File.separator + "gpt.xml" };
         }
         Element xmlCoupled;
         try {
-            Document xmlCoupledModel = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(args[0]));
+            Document xmlCoupledModel = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                    .parse(new File(args[0]));
             xmlCoupled = (Element) xmlCoupledModel.getElementsByTagName("coupled").item(0);
         } catch (IOException | ParserConfigurationException | SAXException ex) {
             Logger.getLogger(CoupledDistributed.class.getName()).log(Level.SEVERE, null, ex);
@@ -39,6 +41,10 @@ public class NodeProcessor {
         DevsLogger.setup(Level.INFO);
         CoupledDistributed gpt = new CoupledDistributed(xmlCoupled);
         LOGGER.info("Run Processor Atomic....");
-        SimulatorDistributed node = new SimulatorDistributed(gpt, "processor");
+        // TODO: It would be nice to have one "start" method to instantiate the class
+        // and after that launch the simulation, for example:
+        // - SimulatorDistributed node = new SimulatorDistributed(gpt, "generator");
+        // node.run();
+        new SimulatorDistributed(gpt, "processor");
     }
 }

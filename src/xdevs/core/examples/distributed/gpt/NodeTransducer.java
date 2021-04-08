@@ -39,6 +39,6 @@ public class NodeTransducer {
         DevsLogger.setup(Level.INFO);
         CoupledDistributed gpt = new CoupledDistributed(xmlCoupled);
         LOGGER.info("Run Transducer Atomic....");
-        SimulatorDistributed node = new SimulatorDistributed(gpt, "transducer");
+        new SimulatorDistributed(gpt, "transducer");
     }
 }

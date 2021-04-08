@@ -22,14 +22,15 @@
 package xdevs.core.examples.efp;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
 
 /**
  *
  * @author José Luis Risco Martín TODO: I must also modify this class, according
- * to the source code implemented by Saurabh, a iStart input port must be added.
+ *         to the source code implemented by Saurabh, a iStart input port must
+ *         be added.
  */
 public class Generator extends Atomic {
     protected Port<Job> iStart = new Port<>("iStart");
@@ -45,10 +46,10 @@ public class Generator extends Atomic {
         super.addOutPort(oOut);
         this.period = period;
     }
-    
+
     public Generator(Element xmlAtomic) {
-        this(xmlAtomic.getAttribute("name"), 
-             Double.parseDouble(((Element)(xmlAtomic.getElementsByTagName("constructor-arg").item(0))).getAttribute("value")));
+        this(xmlAtomic.getAttribute("name"), Double.parseDouble(
+                ((Element) (xmlAtomic.getElementsByTagName("constructor-arg").item(0))).getAttribute("value")));
     }
 
     @Override

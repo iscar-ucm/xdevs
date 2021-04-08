@@ -19,16 +19,12 @@
  */
 package xdevs.lib.performance;
 
-import java.util.logging.Logger;
-
 /**
  * Coupled model to study the performance LI DEVStone models
  *
  * @author José Luis Risco Martín
  */
 public class DevStoneCoupledLI extends DevStone {
-
-    private static final Logger logger = Logger.getLogger(DevStoneCoupledLI.class.getName());
 
     public DevStoneCoupledLI(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime) {
         super(prefix + (depth - 1));

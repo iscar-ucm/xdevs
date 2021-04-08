@@ -52,7 +52,7 @@ public class Efp extends Coupled {
 
     public static void main(String args[]) {
         DevsLogger.setup(Level.FINE);
-        Efp efp = new Efp("efp", 1, 3, 100000);
+        Efp efp = new Efp("efp", 1, 3, 100);
         Coordinator coordinator = new Coordinator(efp);
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);

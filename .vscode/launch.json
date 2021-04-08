@@ -1,0 +1,133 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch GptDistributed",
+            "request": "launch",
+            "mainClass": "xdevs.core.examples.distributed.gpt.GptDistributed",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch NodeGenerator",
+            "request": "launch",
+            "mainClass": "xdevs.core.examples.distributed.gpt.NodeGenerator",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch NodeProcessor",
+            "request": "launch",
+            "mainClass": "xdevs.core.examples.distributed.gpt.NodeProcessor",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch NodeTransducer",
+            "request": "launch",
+            "mainClass": "xdevs.core.examples.distributed.gpt.NodeTransducer",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch Efp",
+            "request": "launch",
+            "mainClass": "xdevs.core.examples.efp.Efp",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch Gpt",
+            "request": "launch",
+            "mainClass": "xdevs.core.examples.efp.Gpt",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch GptXml",
+            "request": "launch",
+            "mainClass": "xdevs.core.examples.efp.GptXml",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch CoupledDistributed",
+            "request": "launch",
+            "mainClass": "xdevs.core.modeling.distributed.CoupledDistributed",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch Coordinator",
+            "request": "launch",
+            "mainClass": "xdevs.core.simulation.Coordinator",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch CoordinatorParallel",
+            "request": "launch",
+            "mainClass": "xdevs.core.simulation.parallel.CoordinatorParallel",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch CoordinatorProfile",
+            "request": "launch",
+            "mainClass": "xdevs.core.simulation.profile.CoordinatorProfile",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch RTCentralCoordinator",
+            "request": "launch",
+            "mainClass": "xdevs.core.simulation.realtime.RTCentralCoordinator",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch GptDevsJavaX",
+            "request": "launch",
+            "mainClass": "xdevs.lib.external.GptDevsJavaX",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch DevStone",
+            "request": "launch",
+            "mainClass": "xdevs.lib.performance.DevStone",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch DevStoneCoupledHO",
+            "request": "launch",
+            "mainClass": "xdevs.lib.performance.DevStoneCoupledHO",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch CoupledToDistributedXml",
+            "request": "launch",
+            "mainClass": "xdevs.lib.util.CoupledToDistributedXml",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch Dhrystone",
+            "request": "launch",
+            "mainClass": "xdevs.lib.util.Dhrystone",
+            "projectName": "xdevs"
+        }
+    ]
+}
