@@ -32,6 +32,7 @@ public class AtomicDevsJava extends Atomic {
 
     private final genDevs.modeling.atomic model;
 
+    @SuppressWarnings({"rawtypes"})
     public AtomicDevsJava(genDevs.modeling.atomic model) {
         super(model.getName());
         this.model = model;
@@ -85,6 +86,7 @@ public class AtomicDevsJava extends Atomic {
     }
 
     @Override
+    @SuppressWarnings({"rawtypes"})
     public void lambda() {
         genDevs.modeling.message msg = model.out();
         genDevs.modeling.ContentIteratorInterface itr = msg.mIterator();

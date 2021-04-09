@@ -6,7 +6,7 @@ RUN apt-get clean
 RUN apt-get update --fix-missing
 RUN apt-get update
 RUN sed -i 's:^path-exclude=/usr/share/man:#path-exclude=/usr/share/man:' /etc/dpkg/dpkg.cfg.d/excludes
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales sudo bash-completion whois time wget git maven default-jdk
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales sudo bash-completion whois time wget git default-jdk maven
 
 # LOCALE
 RUN sed -i '/es_ES.UTF-8/s/^# //g' /etc/locale.gen && locale-gen

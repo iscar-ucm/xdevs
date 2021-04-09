@@ -56,6 +56,7 @@ public class Coupled extends Component {
         this(Coupled.class.getSimpleName());
     }
 
+    @SuppressWarnings({"rawtypes"})
     public Coupled(Element xmlCoupled) {
         super(xmlCoupled.getAttribute("name"));
         // Creamos los distintos elementos
@@ -129,6 +130,7 @@ public class Coupled extends Component {
      * @param cTo Component at the end of the connection
      * @param iPortIndex Index of the destination port in cTo, starting at 0
      */
+    @SuppressWarnings({"unchecked"})
     public void addCoupling(Component cFrom, int oPortIndex, Component cTo, int iPortIndex) {
         if (cFrom == this) { // EIC
             Port<?> portFrom = cFrom.inPorts.get(oPortIndex);

@@ -103,7 +103,7 @@ public class Controller extends Thread {
      * @param values Set of values
      * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(double, mitris.sim.core.modeling.InPort, java.util.Collection) 
      */
-    public void simInject(double e, Port port, Collection<Object> values) {
+    public void simInject(double e, Port<?> port, Collection<?> values) {
         coordinator.simInject(e, port, values);
     }
 
@@ -113,7 +113,7 @@ public class Controller extends Thread {
      * @param values Set of values
      * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(mitris.sim.core.modeling.InPort, java.util.Collection) 
      */
-    public void simInject(Port port, Collection<Object> values) {
+    public void simInject(Port<?> port, Collection<?> values) {
         coordinator.simInject(port, values);
     }
 
@@ -124,7 +124,7 @@ public class Controller extends Thread {
      * @param value Set of values
      * @see xdevs.core.simulation.api.CoordinatorInterface#simInject(double, mitris.sim.core.modeling.InPort, java.lang.Object) 
      */
-    public void simInject(double e, Port port, Object value) {
+    public void simInject(double e, Port<?> port, Object value) {
         coordinator.simInject(e, port, value);
     }
 
@@ -134,7 +134,7 @@ public class Controller extends Thread {
      * @param value Set of values
      * @see xdevs.core.simulation.Coordinator#simInject(xdevs.core.modeling.Port, java.lang.Object)
      */
-    public void simInject(Port port, Object value) {
+    public void simInject(Port<?> port, Object value) {
         coordinator.simInject(port, value);
     }
 
