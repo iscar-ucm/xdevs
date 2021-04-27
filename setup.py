@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='xdevs',
       version='2.1',
@@ -6,7 +6,7 @@ setup(name='xdevs',
       url='https://github.com/dacya/xdevs',
       author='Kevin Henares, Román Cárdenas',
       author_email='khenares@ucm.es, r.cardenas@upm.es',
-      packages=['xdevs'],
+      packages=find_packages(exclude=['xdevs.tests']),
       entry_points={
           'xdevs.plugins.transducers': [
               'csv = xdevs.plugins.transducers.csv_transducer:CSVTransducer',
