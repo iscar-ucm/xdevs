@@ -1,4 +1,3 @@
-
 import logging
 from typing import NoReturn
 from xdevs.models import Atomic, Port
@@ -18,6 +17,7 @@ def update_sigma_on_state_change(delt_func):
             self.sigma = self.atomic.timeAdvance()
 
     return inner
+
 
 class PyPDEVSWrapper(Atomic):
 
@@ -70,7 +70,3 @@ class PyPDEVSWrapper(Atomic):
             in_values[self.pypdevs_in_ports[in_port.name]] = in_port_values
 
         return in_values
-
-
-
-
