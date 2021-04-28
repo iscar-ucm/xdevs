@@ -17,8 +17,11 @@ class CSVTransducer(Transducer):
         self.state_filename = os.path.join(output_dir, self.transducer_id + '_states.csv')
         self.event_filename = os.path.join(output_dir, self.transducer_id + '_events.csv')
 
-        self.state_header: List[str] = ['sim_time', 'model_name']
-        self.event_header: List[str] = ['sim_time', 'model_name', 'port_name']
+        self.state_header: List[str] = [self.sim_time_id]
+        self.event_header: List[str] = [self.sim_time_id]
+        if self.include_names:
+            self.state_header.append(self.model_name_id)
+            self.event_header.extend((self.model_name_id, self.port_name_id))
 
         self.state_csv_file = None
         self.event_csv_file = None

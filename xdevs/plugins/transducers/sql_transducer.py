@@ -44,15 +44,17 @@ try:
             if self.target_components:
                 table_name: str = self.transducer_id + '_states'
                 columns = [Column('id', self.supported_data_types[int], primary_key=True, autoincrement=True),
-                           Column('sim_time', self.supported_data_types[float], nullable=False),
-                           Column('model_name', self.supported_data_types[str], nullable=False)]
+                           Column(self.sim_time_id, self.supported_data_types[float], nullable=False)]
+                if self.include_names:
+                    columns.append(Column(self.model_name_id, self.supported_data_types[str], nullable=False))
                 self.state_table = self.create_table(table_name, columns, self.state_mapper, metadata)
             if self.target_ports:
                 table_name: str = self.transducer_id + '_events'
                 columns = [Column('id', self.supported_data_types[int], primary_key=True, autoincrement=True),
-                           Column('sim_time', self.supported_data_types[float], nullable=False),
-                           Column('model_name', self.supported_data_types[str], nullable=False),
-                           Column('port_name', self.supported_data_types[str], nullable=False)]
+                           Column(self.sim_time_id, self.supported_data_types[float], nullable=False)]
+                if self.include_names:
+                    columns.extend([Column(self.model_name_id, self.supported_data_types[str], nullable=False),
+                                    Column(self.port_name_id, self.supported_data_types[str], nullable=False)])
                 self.event_table = self.create_table(table_name, columns, self.event_mapper, metadata)
             metadata.create_all(self.engine)
 

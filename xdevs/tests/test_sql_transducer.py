@@ -5,6 +5,8 @@ from xdevs.examples.basic.basic import Job, Processor
 if __name__ == '__main__':
     sql = Transducers.create_transducer('sql',
                                         transducer_id='transducer_test',
+                                        sim_time_id='time',
+                                        include_names=True,
                                         exhaustive=True,
                                         url='mysql+pymysql://root@localhost/test')
 

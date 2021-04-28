@@ -19,6 +19,10 @@ class Transducer(ABC):
         """
         Transducer for the xDEVS M&S tool.
         :param str transducer_id: ID of the transducer.
+        :param str sim_time_id: ID of the data field containing the simulation time. By default, it is "sim_time".
+        :param bool include_names: when True, the logs include DEVS port and component names. By default, it is True.
+        :param str model_name_id: ID of the data field containing the DEVS model name. By default, it is "model_name".
+        :param str port_name_id: ID of the data field containing the DEVS port name. By default, it is "port_name".
         :param bool exhaustive: determines if the output contains the state of the target components for each iteration
         (True) or only includes the change states (False).
         """
@@ -26,6 +30,12 @@ class Transducer(ABC):
         self.transducer_id: str = kwargs.get('transducer_id', None)
         if self.transducer_id is None:
             raise AttributeError("You must specify a transducer ID.")
+
+        # TODO make all these variables as class variables instead of object variables?
+        self.sim_time_id: str = kwargs.get('sim_time_id', 'sim_time')
+        self.include_names: bool = kwargs.get('include_names', True)
+        self.model_name_id: str = kwargs.get('model_name_id', 'model_name')
+        self.port_name_id: str = kwargs.get('port_name_id', 'port_name')
 
         self.exhaustive: bool = kwargs.get('exhaustive', False)
         self.target_components: Set[Atomic] = set()
@@ -60,7 +70,7 @@ class Transducer(ABC):
     def add_target_port(self, port: Port) -> NoReturn:
         parent: Optional[Component] = port.parent
         if parent is None:
-            raise ValueError('Port {} does not have a parent component', port.name)
+            raise ValueError('Port {} does not have a parent component'.format(port.name))
         self.target_ports.add(port)
 
     def add_target_ports_by_component(self, component, component_filters=None, port_filters=None):
@@ -90,6 +100,10 @@ class Transducer(ABC):
         :param field_getter: function that takes an event as input and returns the value of the new event field.
         :raise KeyError: if field name is already in event mapper.
         """
+        if field_name == self.sim_time_id:
+            raise KeyError('Field name {} is reserved for the simulation time field'.format(field_name))
+        elif self.include_names and field_name in (self.model_name_id, self.port_name_id):
+            raise KeyError('Field name {} is reserved for DEVS element name field'.format(field_name))
         self._add_field(self.event_mapper, field_name, field_type, field_getter)
 
     def add_state_field(self, field_name: str, field_type: Type[T], field_getter: Callable[[Atomic], T]) -> NoReturn:
@@ -100,6 +114,10 @@ class Transducer(ABC):
         :param field_getter: function that takes an atomic model as input and returns the value of the new event field.
         :raise KeyError: if field name is already in state mapper.
         """
+        if field_name == self.sim_time_id:
+            raise KeyError('Field name {} is reserved for the simulation time field'.format(field_name))
+        elif self.include_names and field_name == self.model_name_id:
+            raise KeyError('Field name {} is reserved for DEVS component name field'.format(field_name))
         self._add_field(self.state_mapper, field_name, field_type, field_getter)
 
     @staticmethod
@@ -190,16 +208,22 @@ class Transducer(ABC):
 
         # TODO: filter actually changed states
         for component in components:
+            fields = {self.sim_time_id: sim_time}
+            if self.include_names:
+                fields.update({self.model_name_id: component.name})
             extra_fields = self.map_extra_fields(component, self.state_mapper)
-            yield {'sim_time': sim_time, 'model_name': component.name, **extra_fields}
+            yield {**fields, **extra_fields}
 
     def _iterate_event_inserts(self, sim_time: float):
         ports = self.target_ports if self.exhaustive else self.imminent_ports
 
         for port in ports:
             for event in port.values:
+                fields = {self.sim_time_id: sim_time}
+                if self.include_names:
+                    fields.update({self.model_name_id: port.parent.name, self.port_name_id: port.name})
                 extra_fields = self.map_extra_fields(event, self.event_mapper)
-                yield {'sim_time': sim_time, 'model_name': port.parent.name, 'port_name': port.name, **extra_fields}
+                yield {**fields, **extra_fields}
 
     def map_extra_fields(self, target: Any, field_mapper: dict) -> Dict[str, Any]:
         """
@@ -220,7 +244,7 @@ class Transducer(ABC):
         return extra_fields
 
     def _log_unknown_data(self, data_type: type, field_name: str) -> NoReturn:
-        logging.warning('Transducer {} do not support data type {} of field {}. '
+        logging.warning('Transducer {} does not support data type {} of field {}. '
                         'It will cast it to string'.format(self.transducer_id, data_type, field_name))
 
 
