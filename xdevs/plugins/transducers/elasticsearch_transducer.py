@@ -34,17 +34,14 @@ try:
 
         def initialize(self) -> NoReturn:
             if self.target_components:
-                fields = {
-                    'sim_time': {'type': 'double'},
-                    'model_name': {'type': 'text'},
-                }
+                fields = {self.sim_time_id: {'type': 'double'}}
+                if self.include_names:
+                    fields.update({self.model_name_id: {'type': 'text'}})
                 self.create_index(self.transducer_id + '_states', fields, self.state_mapper)
             if self.target_ports:
-                fields = {
-                    'sim_time': {'type': 'double'},
-                    'model_name': {'type': 'text'},
-                    'port_name': {'type': 'text'},
-                }
+                fields = {self.sim_time_id: {'type': 'double'}}
+                if self.include_names:
+                    fields.update({self.model_name_id: {'type': 'text'}, self.port_name_id: {'type': 'text'}})
                 self.create_index(self.transducer_id + '_events', fields, self.event_mapper)
             if self.target_components or self.target_ports:
                 self.es = Elasticsearch([self.url])
