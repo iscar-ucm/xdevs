@@ -2,13 +2,18 @@ from __future__ import annotations
 
 import _thread
 import itertools
+import json
 import pickle
+import socket
 
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from concurrent import futures
+from io import StringIO
 from typing import Dict, Generator, List, NoReturn, Optional, Union
 from xmlrpc.server import SimpleXMLRPCServer
+
+from lxml import etree
 
 from xdevs import INFINITY
 from xdevs.models import Atomic, Coupled, Component, Port, T
@@ -495,3 +500,221 @@ class ParallelProcessCoordinator(Coordinator):
         self.time_next = self.time_last + self.ta()
         # logger.debug({proc.model.name:proc.time_next for proc in self.processors})
         # logger.debug("Deltfcn %s: TL: %s, TN: %s" % (self.model.name, self.time_last, self.time_next))
+
+
+class DistributedSimulator(Simulator):
+    CMD_INITIALIZE = "initialize"
+    CMD_TA = "ta"
+    CMD_LAMBDA = "lambda"
+    CMD_INJECT = "inject"
+    CMD_PROPAGATE_OUT = "propagate_output"
+    CMD_DELTFCN = "deltfcn"
+    CMD_CLEAR = "clear"
+    CMD_EXIT = "exit"
+
+    ERR_INVALID_MSG = "invalid_msg"
+    ERR_INVALID_PORT = "invalid_port"
+    ERR_NO_CMD = "no_cmd"
+    ERR_BAD_CMD = "bad_cmd"
+
+    STATUS_OK = "ok"
+    STATUS_ERR = "error"
+    STATUS_EXIT = "exit"
+
+    def __init__(self, model_xml: str, model_name: str, buff_size=1024):
+        self.buff_size = buff_size
+        self.comp_sockets = {}  # Socket of the destination components (linked with self with couplings)
+        self.couplings = {}  # self_port: [(dest_comp, dest_port), ...]
+        self.host = None
+        self.port = None
+        self._parse_xml(model_xml, model_name)
+
+    def _parse_xml(self, model_xml: str, model_name: str):
+        root = etree.parse(model_xml).getroot()
+        self.host = root.attrib["host"]
+        self.port = int(root.attrib["mainPort"])
+
+        # This asumes that there is no coupled children
+        for comp in root.getchildren()[::-1]:
+            if comp.tag == "connection":
+                if comp.attrib["componentFrom"] == model_name:
+                    self.comp_sockets[comp.attrib["componentTo"]] = None
+
+                    if comp.attrib["portFrom"] not in self.couplings:
+                        self.couplings[comp.attrib["portFrom"]] = []
+
+                    self.couplings[comp.attrib["portFrom"]].append((comp.attrib["componentTo"], comp.attrib["portTo"]))
+            elif comp.tag == "atomic":
+                if comp.attrib["name"] == model_name:
+                    atomic_class = DistributedSimulator._get_external_class(comp.attrib["class"])
+                    constructor_args = [model_name]
+
+                    for arg in comp.getchildren():
+                        if arg.tag == "constructor-arg":
+                            constructor_args.append(DistributedSimulator._cast_arg(arg.attrib["value"]))
+
+                    print("Loading class %s with the following args:" % comp.attrib["class"], constructor_args)
+                    super().__init__(atomic_class(*constructor_args), SimulationClock())
+
+                elif comp.attrib["name"] in self.comp_sockets:
+                    self.comp_sockets[comp.attrib["name"]] = (comp.attrib["host"], int(comp.attrib["mainPort"]))
+
+        print(self.comp_sockets, self.couplings)
+
+    @staticmethod
+    def _get_external_class(name: str):
+        components = name.split('.')
+        mod = __import__(components[0])
+        for comp in components[1:]:
+            mod = getattr(mod, comp)
+        return mod
+
+    @staticmethod
+    def _cast_arg(val: str):
+        if val.replace('.', '', 1).isdigit():
+            val_f = float(val)
+            val_i = int(val_f)
+            return val_i if val_i == val_f else val_f
+        else:
+            return val
+
+    @staticmethod
+    def _cast_port_values(values):
+        res = []
+        for val_type, val_attribs in values:
+            val_class = DistributedSimulator._get_external_class(val_type)
+            curr = val_class(**val_attribs)
+
+            for k, v in val_attribs.items():
+                setattr(curr, k, v)
+
+            res.append(curr)
+
+        return res
+
+    @staticmethod
+    def _encode_port_values(values):
+        res = []
+        for val in values:
+            val_cl = val.__class__
+            val_type = ".".join([val_cl.__module__, val_cl.__name__])
+            val_attribs = val.__dict__
+            res.append([val_type, val_attribs])
+
+        return res
+
+
+    def _propagate_output(self):
+        for out_port in self.model.out_ports:
+            if not out_port.empty():
+                if not out_port.name in self.couplings:
+                    raise RuntimeError("Non-empty output port without couplings.")
+                dest_comps = self.couplings[out_port.name]
+                for dest_comp, dest_port in dest_comps:
+                    msg = {"cmd": "inject", "port": "i_in"}
+                    msg["values"] = DistributedSimulator._encode_port_values(out_port.values)
+
+                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                        dest_host, dest_port = self.comp_sockets[dest_comp]
+                        print("Connecting to %s:%d..." % (dest_host, dest_port))
+                        # s.connect((dest_host, dest_port))
+                        print("Sending data: ", json.dumps(msg).encode())
+                        # s.sendall(json.dumps(msg).encode())
+
+    def _interpret_msg(self, msg_str):
+        print("Interpreting...", msg_str)
+        res = {}
+
+        try:
+            msg = json.loads(msg_str)
+        except json.decoder.JSONDecodeError:
+            msg = None
+            res["error"] = DistributedSimulator.ERR_INVALID_MSG
+
+        if msg is not None:
+            if "cmd" in msg:
+                if "time" in msg:
+                    self.clock.time = msg["time"]
+
+                if msg["cmd"] == DistributedSimulator.CMD_INITIALIZE:
+                    print("Initializing")
+                    self.model.initialize()
+
+                elif msg["cmd"] == DistributedSimulator.CMD_TA:
+                    print("ta")
+                    res[DistributedSimulator.CMD_TA] = self.model.ta
+
+                elif msg["cmd"] == DistributedSimulator.CMD_LAMBDA:
+                    print("Lambda")
+                    self.model.lambdaf()
+
+                elif msg["cmd"] == DistributedSimulator.CMD_INJECT:
+                    print("Inject")
+                    if "port" in msg and "values" in msg:
+                        inject_port = msg["port"]
+                        found = False
+                        for port in itertools.chain(self.model.in_ports, self.model.out_ports):
+                            if port.name == inject_port:
+                                port.extend(DistributedSimulator._cast_port_values(msg["values"]))
+                                found = True
+                                break
+                        if not found:
+                            res["error"] = DistributedSimulator.ERR_INVALID_PORT
+                    else:
+                        res["error"] = DistributedSimulator.ERR_BAD_CMD
+
+                elif msg["cmd"] == DistributedSimulator.CMD_PROPAGATE_OUT:
+                    print("Propagate output")
+                    self._propagate_output()
+
+                elif msg["cmd"] == DistributedSimulator.CMD_DELTFCN:
+                    print("Deltfcn")
+                    self.deltfcn()
+
+                elif msg["cmd"] == DistributedSimulator.CMD_CLEAR:
+                    print("Clear")
+                    self.clear()
+
+                elif msg["cmd"] == DistributedSimulator.CMD_EXIT:
+                    print("Exit")
+                    self.exit()
+                    res["status"] = DistributedSimulator.STATUS_EXIT
+
+                else:
+                    res["error"] = DistributedSimulator.ERR_BAD_CMD
+            else:
+                res["error"] = DistributedSimulator.ERR_NO_CMD
+
+        if "status" not in res:
+            if "error" in res:
+                res["status"] = DistributedSimulator.STATUS_ERR
+            else:
+                res["status"] = DistributedSimulator.STATUS_OK
+
+        return res
+
+    def listen(self):
+        print("Listening on %s:%d..." % (self.host, self.port))
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind((self.host, self.port))
+            s.listen()
+            conn, addr = s.accept()
+            # s.setblocking(False)
+
+            with conn:
+                print('Connected by', addr)
+                data = ""
+
+                while True:
+                    buff = conn.recv(self.buff_size)
+                    buff = buff.decode("utf-8")
+                    data += buff
+
+                    lb_ind = buff.find('\n')
+                    if lb_ind != -1:
+                        res = self._interpret_msg(data[:len(data) + lb_ind + 1].strip())
+                        conn.sendall((json.dumps(res) + "\n").encode())
+                        data = data[len(data)+lb_ind+1:]
+                        print(res)
+                        if res["status"] == DistributedSimulator.STATUS_EXIT:
+                            break
