@@ -1,4 +1,4 @@
-FROM debian
+FROM debian:buster
 
 RUN apt-get clean
 RUN apt-get update --fix-missing
