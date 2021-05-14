@@ -21,8 +21,6 @@
  */
 package xdevs.lib.external;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
 

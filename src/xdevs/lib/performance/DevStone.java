@@ -53,6 +53,8 @@ public abstract class DevStone extends Coupled {
         super.addOutPort(oOut);
     }
 
+    public abstract int getNumOfAtomic(int width, int depth);
+
     public abstract int getNumDeltExts(int maxEvents, int width, int depth);
 
     public abstract int getNumDeltInts(int maxEvents, int width, int depth);

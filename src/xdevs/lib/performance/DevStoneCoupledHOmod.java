@@ -31,7 +31,8 @@ public class DevStoneCoupledHOmod extends DevStone {
 
     public Port<Integer> iInAux = new Port<>("inAux");
 
-    public DevStoneCoupledHOmod(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime) {
+    public DevStoneCoupledHOmod(String prefix, int width, int depth, double preparationTime, double intDelayTime,
+            double extDelayTime) {
         super(prefix + (depth - 1));
         super.addInPort(iInAux);
         if (depth == 1) {
@@ -40,14 +41,16 @@ public class DevStoneCoupledHOmod extends DevStone {
             super.addCoupling(iIn, atomic.iIn);
             super.addCoupling(atomic.oOut, oOut);
         } else {
-            DevStoneCoupledHOmod coupled = new DevStoneCoupledHOmod(prefix, width, depth - 1, preparationTime, intDelayTime, extDelayTime);
+            DevStoneCoupledHOmod coupled = new DevStoneCoupledHOmod(prefix, width, depth - 1, preparationTime,
+                    intDelayTime, extDelayTime);
             super.addComponent(coupled);
             super.addCoupling(iIn, coupled.iIn);
             super.addCoupling(coupled.oOut, oOut);
             // First layer of atomic models:
             ArrayList<DevStoneAtomic> prevLayer = new ArrayList<>();
             for (int i = 0; i < (width - 1); ++i) {
-                DevStoneAtomic atomic = new DevStoneAtomic("AL1_" + (i + 1) + "_" + name, preparationTime, intDelayTime, extDelayTime);
+                DevStoneAtomic atomic = new DevStoneAtomic("AL1_" + (i + 1) + "_" + name, preparationTime, intDelayTime,
+                        extDelayTime);
                 super.addComponent(atomic);
                 super.addCoupling(iInAux, atomic.iIn);
                 super.addCoupling(atomic.oOut, coupled.iInAux);
@@ -56,7 +59,8 @@ public class DevStoneCoupledHOmod extends DevStone {
             // Second layer of atomic models:
             ArrayList<DevStoneAtomic> currentLayer = new ArrayList<>();
             for (int i = 0; i < (width - 1); ++i) {
-                DevStoneAtomic atomic = new DevStoneAtomic("AL2_" + (i + 1) + "_" + name, preparationTime, intDelayTime, extDelayTime);
+                DevStoneAtomic atomic = new DevStoneAtomic("AL2_" + (i + 1) + "_" + name, preparationTime, intDelayTime,
+                        extDelayTime);
                 super.addComponent(atomic);
                 if (i == 0) {
                     super.addCoupling(iInAux, atomic.iIn);
@@ -77,7 +81,8 @@ public class DevStoneCoupledHOmod extends DevStone {
             int level = 3;
             while (prevLayer.size() > 1) {
                 for (int i = 0; i < prevLayer.size() - 1; ++i) {
-                    DevStoneAtomic atomic = new DevStoneAtomic("AL" + level + "_" + (i + 1) + "_" + name, preparationTime, intDelayTime, extDelayTime);
+                    DevStoneAtomic atomic = new DevStoneAtomic("AL" + level + "_" + (i + 1) + "_" + name,
+                            preparationTime, intDelayTime, extDelayTime);
                     super.addComponent(atomic);
                     if (i == 0) {
                         super.addCoupling(iInAux, atomic.iIn);
@@ -116,11 +121,13 @@ public class DevStoneCoupledHOmod extends DevStone {
         long numEvents = 1;
         int gamma1 = getGammaI(1, width);
         int k = 1; // k for level 1
-        long[] bag = new long[1 + 1 + depth * gamma1]; // Maximum number of propagations (asumming first index is 1, index 0 is not used)
+        long[] bag = new long[1 + 1 + depth * gamma1]; // Maximum number of propagations (asumming first index is 1,
+                                                       // index 0 is not used)
         bag[1] = 1; // bag for level 1
         for (int d = 1; d < depth; ++d) {
             // Update numEvents
-            long[] nextBag = new long[1 + 1 + depth * gamma1]; // Maximum number of propagations (asumming first index is 1, index 0 is not used)
+            long[] nextBag = new long[1 + 1 + depth * gamma1]; // Maximum number of propagations (asumming first index
+                                                               // is 1, index 0 is not used)
             for (int c = 1; c <= (k + gamma1); ++c) {
                 long popSum1 = 0;
                 long popSum2 = 0;
@@ -138,6 +145,15 @@ public class DevStoneCoupledHOmod extends DevStone {
             bag = nextBag;
         }
         return maxEvents * numEvents;
+    }
+
+    @Override
+    public int getNumOfAtomic(int width, int depth) {
+        int sum = 0;
+        for (int i = 1; i <= (width - 1); i++) {
+            sum += i;
+        }
+        return ((width - 1) + sum) * (depth - 1) + 1;
     }
 
     private int getGammaI(int i, int width) {

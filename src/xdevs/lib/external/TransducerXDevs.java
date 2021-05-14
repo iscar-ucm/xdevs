@@ -58,6 +58,7 @@ public class TransducerXDevs extends Atomic {
         this.observationTime = observationTime;
     }
 
+    @SuppressWarnings("unchecked")
     public TransducerXDevs(Element xmlAtomic) {
         super(xmlAtomic);
         iArrived = (Port<JobDevsJava>) super.getInPort(iArrived.getName());

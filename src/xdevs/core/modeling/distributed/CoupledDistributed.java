@@ -51,8 +51,8 @@ public class CoupledDistributed extends Coupled {
                 case "atomic":
                     try {
                     Element xmlChild = (Element) xmlNode;
-                    Class atomicClass = Class.forName(xmlChild.getAttribute("class"));
-                    Constructor constructor = atomicClass.getConstructor(new Class[]{Class.forName("org.w3c.dom.Element")});
+                    Class<?> atomicClass = Class.forName(xmlChild.getAttribute("class"));
+                    Constructor<?> constructor = atomicClass.getConstructor(new Class[]{Class.forName("org.w3c.dom.Element")});
                     Object atomicObject = constructor.newInstance(new Object[]{xmlChild});
                     this.addComponent((Atomic) atomicObject);
                     hosts.put(xmlChild.getAttribute("name"), xmlChild.getAttribute("host"));

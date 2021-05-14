@@ -178,7 +178,8 @@ public class Coordinator extends AbstractSimulator {
      * @param port input port to inject the set of values
      * @param values set of values to inject
      */
-    public void simInject(double e, Port port, Collection<Object> values) {
+    @SuppressWarnings({"rawtypes"})
+    public void simInject(double e, Port port, Collection values) {
         double time = clock.getTime() + e;
         if (time <= tN) {
             port.addValues(values);
@@ -195,7 +196,7 @@ public class Coordinator extends AbstractSimulator {
      * @param port input port to inject the set of values
      * @param values set of values to inject
      */
-    public void simInject(Port port, Collection<Object> values) {
+    public void simInject(Port<?> port, Collection<?> values) {
         simInject(0.0, port, values);
     }
 

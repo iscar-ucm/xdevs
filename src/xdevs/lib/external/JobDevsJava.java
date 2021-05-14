@@ -29,6 +29,7 @@ import java.io.Serializable;
  */
 public class JobDevsJava extends GenCol.entity implements Serializable {
 
+  private static final long serialVersionUID = 73236647174712004L;
   protected String id;
   protected double time;
 

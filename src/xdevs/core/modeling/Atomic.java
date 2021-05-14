@@ -52,6 +52,7 @@ public abstract class Atomic extends Component {
      * ...
      * </atomic>
      */
+    @SuppressWarnings({"rawtypes"})
     public Atomic(Element xmlAtomic) {
         this(xmlAtomic.getAttribute("name"));
         setPhase(xmlAtomic.getAttribute("phase"));

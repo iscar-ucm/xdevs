@@ -1,13 +1,16 @@
 {
-    "name": "xdevs-java",
+    "name": "xdevs-java-distributed",
     "dockerFile": "Dockerfile",
     "settings": {
     	"workbench.colorTheme": "Cobalt2",
     	"terminal.integrated.shell.linux": "/bin/bash"
     },
     "extensions": [
-        "vscjava.vscode-java-pack",
-    	"esbenp.prettier-vscode",
-    	"wesbos.theme-cobalt2"
-    ]
+		"vscjava.vscode-java-pack",
+		"redhat.vscode-xml",
+		"redhat.fabric8-analytics",
+		"esbenp.prettier-vscode",
+		"wesbos.theme-cobalt2"
+	]
 }
+
