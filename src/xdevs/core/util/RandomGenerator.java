@@ -70,7 +70,7 @@ public class RandomGenerator {
     public static void main(String[] args) {
         RandomGenerator.setSeed(1234);
         for(int i=0; i<100; i++)
-            System.out.println("RandInt[0,10)="+RandomGenerator.nextInt(0, 10));
+            System.out.println("RandInt[0,10)="+RandomGenerator.nextDouble(0, 1));
     }
 
 }
