@@ -38,24 +38,24 @@ public class DevStoneCoupledHO extends DevStone {
     public Port<Integer> iInAux = new Port<>("inAux");
     public Port<Integer> oOutAux = new Port<>("outAux");
 
-    public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime) {
+    public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime, boolean randomGenerator) {
         super(prefix + (depth - 1));
         super.addInPort(iInAux);
         super.addOutPort(oOutAux);
         if (depth == 1) {
-            DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, intDelayTime, extDelayTime);
+            DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, intDelayTime, extDelayTime, randomGenerator);
             super.addComponent(atomic);
             super.addCoupling(iIn, atomic.iIn);
             super.addCoupling(atomic.oOut, oOut);
         } else {
-            DevStoneCoupledHO coupled = new DevStoneCoupledHO(prefix, width, depth - 1, preparationTime, intDelayTime, extDelayTime);
+            DevStoneCoupledHO coupled = new DevStoneCoupledHO(prefix, width, depth - 1, preparationTime, intDelayTime, extDelayTime, randomGenerator);
             super.addComponent(coupled);
             super.addCoupling(iIn, coupled.iIn);
             super.addCoupling(iIn, coupled.iInAux);
             super.addCoupling(coupled.oOut, oOut);
             DevStoneAtomic atomicPrev = null;
             for (int i = 0; i < (width - 1); ++i) {
-                DevStoneAtomic atomic = new DevStoneAtomic("A" + (i + 1) + "_" + name, preparationTime, intDelayTime, extDelayTime);
+                DevStoneAtomic atomic = new DevStoneAtomic("A" + (i + 1) + "_" + name, preparationTime, intDelayTime, extDelayTime, randomGenerator);
                 super.addComponent(atomic);
                 super.addCoupling(iInAux, atomic.iIn);
                 super.addCoupling(atomic.oOut, oOutAux);
@@ -67,10 +67,13 @@ public class DevStoneCoupledHO extends DevStone {
         }
     }
 
+    public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime) {
+        this(prefix, width, depth, preparationTime, intDelayTime, extDelayTime, false);
+    }
+
     @Override
     public int getNumDeltExts(int maxEvents, int width, int depth) {
         return maxEvents * (((width * width - width) / 2) * (depth - 1) + 1);
-
     }
 
     @Override
@@ -128,4 +131,10 @@ public class DevStoneCoupledHO extends DevStone {
         String stats = maxEvents + ";" + width + ";" + depth + ";" + DevStoneAtomic.NUM_DELT_INTS + ";" + DevStoneAtomic.NUM_DELT_EXTS + ";" + DevStoneAtomic.NUM_OF_EVENTS + ";" + time;
         LOGGER.info(stats);        
     }
+
+    @Override
+    public int getNumOfAtomic(int width, int depth) {
+        return (width - 1) * (depth - 1) + 1;
+    }
+
 }

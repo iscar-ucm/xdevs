@@ -65,4 +65,9 @@ public class DevStoneCoupledHI extends DevStone {
     public long getNumOfEvents(int maxEvents, int width, int depth) {
         return getNumDeltExts(maxEvents, width, depth);
     }
+
+    @Override
+    public int getNumOfAtomic(int width, int depth) {
+        return (width - 1) * (depth - 1) + 1;
+    }
 }
