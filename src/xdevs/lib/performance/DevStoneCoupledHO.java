@@ -21,6 +21,9 @@ package xdevs.lib.performance;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.math3.distribution.RealDistribution;
+
 import xdevs.core.modeling.Coupled;
 import xdevs.core.modeling.Port;
 import xdevs.core.simulation.Coordinator;
@@ -38,24 +41,24 @@ public class DevStoneCoupledHO extends DevStone {
     public Port<Integer> iInAux = new Port<>("inAux");
     public Port<Integer> oOutAux = new Port<>("outAux");
 
-    public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime, boolean randomGenerator) {
+    public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime) {
         super(prefix + (depth - 1));
         super.addInPort(iInAux);
         super.addOutPort(oOutAux);
         if (depth == 1) {
-            DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, intDelayTime, extDelayTime, randomGenerator);
+            DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, intDelayTime, extDelayTime);
             super.addComponent(atomic);
             super.addCoupling(iIn, atomic.iIn);
             super.addCoupling(atomic.oOut, oOut);
         } else {
-            DevStoneCoupledHO coupled = new DevStoneCoupledHO(prefix, width, depth - 1, preparationTime, intDelayTime, extDelayTime, randomGenerator);
+            DevStoneCoupledHO coupled = new DevStoneCoupledHO(prefix, width, depth - 1, preparationTime, intDelayTime, extDelayTime);
             super.addComponent(coupled);
             super.addCoupling(iIn, coupled.iIn);
             super.addCoupling(iIn, coupled.iInAux);
             super.addCoupling(coupled.oOut, oOut);
             DevStoneAtomic atomicPrev = null;
             for (int i = 0; i < (width - 1); ++i) {
-                DevStoneAtomic atomic = new DevStoneAtomic("A" + (i + 1) + "_" + name, preparationTime, intDelayTime, extDelayTime, randomGenerator);
+                DevStoneAtomic atomic = new DevStoneAtomic("A" + (i + 1) + "_" + name, preparationTime, intDelayTime, extDelayTime);
                 super.addComponent(atomic);
                 super.addCoupling(iInAux, atomic.iIn);
                 super.addCoupling(atomic.oOut, oOutAux);
@@ -67,8 +70,33 @@ public class DevStoneCoupledHO extends DevStone {
         }
     }
 
-    public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime) {
-        this(prefix, width, depth, preparationTime, intDelayTime, extDelayTime, false);
+    public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, RealDistribution distribution) {
+        super(prefix + (depth - 1));
+        super.addInPort(iInAux);
+        super.addOutPort(oOutAux);
+        if (depth == 1) {
+            DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, distribution);
+            super.addComponent(atomic);
+            super.addCoupling(iIn, atomic.iIn);
+            super.addCoupling(atomic.oOut, oOut);
+        } else {
+            DevStoneCoupledHO coupled = new DevStoneCoupledHO(prefix, width, depth - 1, preparationTime, distribution);
+            super.addComponent(coupled);
+            super.addCoupling(iIn, coupled.iIn);
+            super.addCoupling(iIn, coupled.iInAux);
+            super.addCoupling(coupled.oOut, oOut);
+            DevStoneAtomic atomicPrev = null;
+            for (int i = 0; i < (width - 1); ++i) {
+                DevStoneAtomic atomic = new DevStoneAtomic("A" + (i + 1) + "_" + name, preparationTime, distribution);
+                super.addComponent(atomic);
+                super.addCoupling(iInAux, atomic.iIn);
+                super.addCoupling(atomic.oOut, oOutAux);
+                if (atomicPrev != null) {
+                    super.addCoupling(atomicPrev.oOut, atomic.iIn);
+                }
+                atomicPrev = atomic;
+            }
+        }
     }
 
     @Override

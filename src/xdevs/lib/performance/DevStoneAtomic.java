@@ -21,9 +21,11 @@ package xdevs.lib.performance;
 
 import java.util.Collection;
 import java.util.LinkedList;
+
+import org.apache.commons.math3.distribution.RealDistribution;
+
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
-import xdevs.core.util.RandomGenerator;
 import xdevs.lib.util.Dhrystone;
 
 /**
@@ -47,19 +49,19 @@ public class DevStoneAtomic extends Atomic {
     public static long NUM_DELT_EXTS = 0;
     public static long NUM_OF_EVENTS = 0;
     
-    public DevStoneAtomic(String name, double preparationTime, double intDelayTimeMax, double extDelayTimeMax, boolean randomGenerator) {
+    public DevStoneAtomic(String name, double preparationTime, double intDelayTime, double extDelayTime) {
         super(name);
         super.addInPort(iIn);
         super.addOutPort(oOut);
         this.preparationTime = preparationTime;
-        this.intDelayTime = (randomGenerator == true) ? RandomGenerator.nextDouble(0, intDelayTimeMax) : intDelayTimeMax;
-        this.extDelayTime = (randomGenerator == true) ? RandomGenerator.nextDouble(0, extDelayTimeMax) : extDelayTimeMax;
+        this.intDelayTime = intDelayTime;
+        this.extDelayTime = extDelayTime;
     }
     
-    public DevStoneAtomic(String name, double preparationTime, double intDelayTime, double extDelayTime) {
-        this(name, preparationTime, intDelayTime, extDelayTime, false);
+    public DevStoneAtomic(String name, double preparationTime, RealDistribution distribution) {
+        this(name, preparationTime, distribution.sample(), distribution.sample());
     }
-    
+
     @Override
     public void initialize() {
         super.passivate();

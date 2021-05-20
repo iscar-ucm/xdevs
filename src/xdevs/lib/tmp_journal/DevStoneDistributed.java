@@ -7,10 +7,14 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.math3.distribution.ChiSquaredDistribution;
+import org.apache.commons.math3.distribution.RealDistribution;
+import org.apache.commons.math3.distribution.UniformRealDistribution;
+
 import xdevs.core.modeling.Coupled;
 import xdevs.core.simulation.Coordinator;
+import xdevs.core.simulation.profile.CoordinatorProfile;
 import xdevs.core.util.DevsLogger;
-import xdevs.core.util.RandomGenerator;
 import xdevs.lib.performance.DevStone;
 import xdevs.lib.performance.DevStoneAtomic;
 import xdevs.lib.performance.DevStoneCoupledHO;
@@ -27,32 +31,33 @@ public class DevStoneDistributed {
     private static final int MAX_EVENTS = 1;
     private static final double PREPARATION_TIME = 0.0;
     private static final double PERIOD = 1;
-    private static final boolean RANDOM_GENERATOR = true;
 
-    protected Boolean run = false;
-    protected Boolean create = false;
+    protected String coordinatorAsString = null;
+    protected Boolean createXML = false;
     protected DevStone.BenchmarkType benchmarkType;
     protected int width = 0;
     protected int depth = 0;
-    protected double maxDelayTime = 0;
+    protected String delayDistribution = null;
     protected long seed = -1;
     protected String logPath = null;
 
+    protected RealDistribution distribution = null;
     protected Coupled framework = null;
     protected DevStoneGenerator generator = null;
     protected DevStone stone = null;
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            args = new String[] { "--run", "--create", "--model=HO", "--width=5", "--depth=5", "--max-delay-time=2.0",
-                    "--seed=1234", "--log-filepath=ho-logger.log" };
+            args = new String[] { "--coordinator=Coordinator", "--createXML", "--model=HO", "--width=5", "--depth=5",
+                    "--delay-distribution=ChiSquaredDistribution-1", "--seed=1234", "--log-filepath=ho-logger.log" };
         }
         DevStoneDistributed test = new DevStoneDistributed();
         for (String arg : args) {
-            if (arg.equals("--run")) {
-                test.run = true;
-            } else if (arg.equals("--create")) {
-                test.create = true;
+            if (arg.startsWith("--coordinator=")) {
+                String[] parts = arg.split("=");
+                test.coordinatorAsString = parts[1];
+            } else if (arg.equals("--createXML")) {
+                test.createXML = true;
             } else if (arg.startsWith("--model=")) {
                 String[] parts = arg.split("=");
                 test.benchmarkType = DevStone.BenchmarkType.valueOf(parts[1]);
@@ -62,9 +67,9 @@ public class DevStoneDistributed {
             } else if (arg.startsWith("--depth=")) {
                 String[] parts = arg.split("=");
                 test.depth = Integer.parseInt(parts[1]);
-            } else if (arg.startsWith("--max-delay-time=")) {
+            } else if (arg.startsWith("--delay-distribution")) {
                 String[] parts = arg.split("=");
-                test.maxDelayTime = Double.parseDouble(parts[1]);
+                test.delayDistribution = parts[1];
             } else if (arg.startsWith("--seed=")) {
                 String[] parts = arg.split("=");
                 test.seed = Long.parseLong(parts[1]);
@@ -93,10 +98,17 @@ public class DevStoneDistributed {
     }
 
     public void initialize() {
-        if (!run)
+        if (coordinatorAsString==null)
             return;
         // Suponemos que todos los argumentos son correctos, para simplificar
-        RandomGenerator.setSeed(seed);
+        String[] parts = delayDistribution.split("-");
+        if(parts[0].equals("UniformRealDistribution")) {
+            distribution = new UniformRealDistribution(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+        }
+        else if(parts[0].equals("ChiSquaredDistribution")) {
+            distribution = new ChiSquaredDistribution(Integer.parseInt(parts[1]));
+        }
+        distribution.reseedRandomGenerator(seed);
         DevStoneAtomic.NUM_DELT_INTS = 0;
         DevStoneAtomic.NUM_DELT_EXTS = 0;
         DevStoneAtomic.NUM_OF_EVENTS = 0;
@@ -104,10 +116,16 @@ public class DevStoneDistributed {
     }
 
     public void runSimulation() {
-        if (!run)
+        if (coordinatorAsString==null)
             return;
         DevsLogger.setup(logPath, Level.INFO);
-        Coordinator coordinator = new Coordinator(framework, false);
+        Coordinator coordinator = null;
+        if(coordinatorAsString.equals("Coordinator")) {
+            coordinator = new Coordinator(framework);
+        }
+        else if(coordinatorAsString.equals("CoordinatorProfile")) {
+            coordinator = new CoordinatorProfile(framework);
+        }
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
         coordinator.exit();
@@ -120,8 +138,7 @@ public class DevStoneDistributed {
         framework.addComponent(generator);
         switch (benchmarkType) {
             case HO:
-                stone = new DevStoneCoupledHO("C", width, depth, PREPARATION_TIME, maxDelayTime, maxDelayTime,
-                        RANDOM_GENERATOR);
+                stone = new DevStoneCoupledHO("C", width, depth, PREPARATION_TIME, distribution);
                 break;
             default:
                 LOGGER.severe("Right now, only HO model is supported.");
@@ -140,7 +157,7 @@ public class DevStoneDistributed {
     }
 
     public void logReport(double simTime) {
-        if (!run)
+        if (coordinatorAsString==null)
             return;
         // Theoretical values
         int numAtomics = stone.getNumOfAtomic(width, depth);
@@ -179,12 +196,12 @@ public class DevStoneDistributed {
          * 
          * Para ello hay que crear una función toXML, específica de este problema.
          */
-        if (!create)
+        if (!createXML)
             return;
         Coupled stoneFlattened = stone.flatten();
         String fileContent = stoneFlattened.getDistributedModel();
         BufferedWriter writer = new BufferedWriter(new FileWriter(
-                new File(benchmarkType + "_w-" + width + "_d-" + depth + "_t-" + maxDelayTime + ".xml")));
+                new File(benchmarkType + "_w-" + width + "_d-" + depth + "_t-" + delayDistribution + ".xml")));
         writer.write(fileContent);
         writer.flush();
         writer.close();
