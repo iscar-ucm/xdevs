@@ -46,10 +46,12 @@ public class DevStoneDistributed {
     protected DevStoneGenerator generator = null;
     protected DevStone stone = null;
 
+    protected Coordinator coordinator = null;
+
     public static void main(String[] args) {
         if (args.length == 0) {
-            args = new String[] { "--coordinator=Coordinator", "--createXML", "--model=HO", "--width=5", "--depth=5",
-                    "--delay-distribution=ChiSquaredDistribution-1", "--seed=1234", "--log-filepath=ho-logger.log" };
+            args = new String[] { "--coordinator=CoordinatorProfile", "--createXML", "--model=HO", "--width=5", "--depth=5",
+                    "--delay-distribution=UniformRealDistribution-0-1", "--seed=1234", "--log-filepath=ho-logger.log" };
         }
         DevStoneDistributed test = new DevStoneDistributed();
         for (String arg : args) {
@@ -119,7 +121,6 @@ public class DevStoneDistributed {
         if (coordinatorAsString==null)
             return;
         DevsLogger.setup(logPath, Level.INFO);
-        Coordinator coordinator = null;
         if(coordinatorAsString.equals("Coordinator")) {
             coordinator = new Coordinator(framework);
         }
@@ -129,7 +130,6 @@ public class DevStoneDistributed {
         coordinator.initialize();
         coordinator.simulate(Long.MAX_VALUE);
         coordinator.exit();
-
     }
 
     public void buildFramework() {
@@ -184,6 +184,17 @@ public class DevStoneDistributed {
         stats.append("-------------------------------------------------------------\n");
 
         LOGGER.info(stats.toString());
+
+        if(coordinatorAsString.equals("CoordinatorProfile")) {
+            try {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(new File(logPath + ".csv")));
+                writer.write(coordinator.toString());
+                writer.flush();
+                writer.close();
+                } catch (IOException ee) {
+                LOGGER.severe(ee.getLocalizedMessage());
+            }
+        }
     }
 
     public void toXML() throws IOException {
