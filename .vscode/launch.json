@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Pruebas",
+            "request": "launch",
+            "mainClass": "xdevs.lib.tmp_journal.Pruebas",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
             "name": "Launch DevStoneDistributed",
             "request": "launch",
             "mainClass": "xdevs.lib.tmp_journal.DevStoneDistributed",
