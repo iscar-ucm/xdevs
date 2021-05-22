@@ -50,8 +50,8 @@ public class DevStoneDistributed {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            args = new String[] { "--coordinator=CoordinatorProfile", "--createXML", "--model=HO", "--width=5", "--depth=5",
-                    "--delay-distribution=UniformRealDistribution-0-1", "--seed=1234", "--log-filepath=ho-logger.log" };
+            args = new String[] { "--coordinator=CoordinatorProfile", "--createXML", "--model=HO", "--width=5",
+                    "--depth=5", "--delay-distribution=Constant-1", "--seed=1234", "--log-filepath=ho-logger.log" };
         }
         DevStoneDistributed test = new DevStoneDistributed();
         for (String arg : args) {
@@ -100,36 +100,24 @@ public class DevStoneDistributed {
     }
 
     public void initialize() {
-        if (coordinatorAsString==null)
+        if (coordinatorAsString == null)
             return;
         // Suponemos que todos los argumentos son correctos, para simplificar
         String[] parts = delayDistribution.split("-");
-        if(parts[0].equals("UniformRealDistribution")) {
+        if (parts[0].equals("UniformRealDistribution")) {
             distribution = new UniformRealDistribution(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-        }
-        else if(parts[0].equals("ChiSquaredDistribution")) {
+        } else if (parts[0].equals("ChiSquaredDistribution")) {
             distribution = new ChiSquaredDistribution(Integer.parseInt(parts[1]));
+        } else if (parts[0].equals("Constant")) {
+            distribution = null;
+            delayDistribution = parts[1];
         }
-        distribution.reseedRandomGenerator(seed);
+        if (distribution != null)
+            distribution.reseedRandomGenerator(seed);
         DevStoneAtomic.NUM_DELT_INTS = 0;
         DevStoneAtomic.NUM_DELT_EXTS = 0;
         DevStoneAtomic.NUM_OF_EVENTS = 0;
 
-    }
-
-    public void runSimulation() {
-        if (coordinatorAsString==null)
-            return;
-        DevsLogger.setup(logPath, Level.INFO);
-        if(coordinatorAsString.equals("Coordinator")) {
-            coordinator = new Coordinator(framework);
-        }
-        else if(coordinatorAsString.equals("CoordinatorProfile")) {
-            coordinator = new CoordinatorProfile(framework);
-        }
-        coordinator.initialize();
-        coordinator.simulate(Long.MAX_VALUE);
-        coordinator.exit();
     }
 
     public void buildFramework() {
@@ -138,7 +126,10 @@ public class DevStoneDistributed {
         framework.addComponent(generator);
         switch (benchmarkType) {
             case HO:
-                stone = new DevStoneCoupledHO("C", width, depth, PREPARATION_TIME, distribution);
+                stone = (distribution != null)
+                        ? new DevStoneCoupledHO("C", width, depth, PREPARATION_TIME, distribution)
+                        : new DevStoneCoupledHO("C", width, depth, PREPARATION_TIME,
+                                Double.parseDouble(delayDistribution), Double.parseDouble(delayDistribution));
                 break;
             default:
                 LOGGER.severe("Right now, only HO model is supported.");
@@ -156,8 +147,22 @@ public class DevStoneDistributed {
         }
     }
 
+    public void runSimulation() {
+        if (coordinatorAsString == null)
+            return;
+        DevsLogger.setup(logPath, Level.INFO);
+        if (coordinatorAsString.equals("Coordinator")) {
+            coordinator = new Coordinator(framework);
+        } else if (coordinatorAsString.equals("CoordinatorProfile")) {
+            coordinator = new CoordinatorProfile(framework);
+        }
+        coordinator.initialize();
+        coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
+    }
+
     public void logReport(double simTime) {
-        if (coordinatorAsString==null)
+        if (coordinatorAsString == null)
             return;
         // Theoretical values
         int numAtomics = stone.getNumOfAtomic(width, depth);
@@ -185,13 +190,13 @@ public class DevStoneDistributed {
 
         LOGGER.info(stats.toString());
 
-        if(coordinatorAsString.equals("CoordinatorProfile")) {
+        if (coordinatorAsString.equals("CoordinatorProfile")) {
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(new File(logPath + ".csv")));
                 writer.write(coordinator.toString());
                 writer.flush();
                 writer.close();
-                } catch (IOException ee) {
+            } catch (IOException ee) {
                 LOGGER.severe(ee.getLocalizedMessage());
             }
         }
