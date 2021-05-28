@@ -109,7 +109,7 @@ public class XmlStoneGenerator {
 
   public void toXML() throws IOException {
     Coupled frameworkFlattened = framework.flatten();
-    String fileContent = getXmlModel(frameworkFlattened, false);
+    String fileContent = getXmlModel(frameworkFlattened, true);
     BufferedWriter writer = new BufferedWriter(
         new FileWriter(new File(model + "_s-" + size + "_t-" + delayDistribution + ".xml")));
     writer.write(fileContent);
