@@ -50,7 +50,9 @@ public class DevStoneDistributed {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            args = new String[] { "--coordinator=CoordinatorProfile", "--createXML", "--model=HO", "--width=5",
+            //args = new String[] { "--coordinator=CoordinatorProfile", "--createXML", "--model=HO", "--width=5",
+                    //"--depth=5", "--delay-distribution=Constant-1", "--seed=1234", "--log-filepath=ho-logger.log" };
+                    args = new String[] { "--coordinator=Coordinator", "--model=HO", "--width=5",
                     "--depth=5", "--delay-distribution=Constant-1", "--seed=1234", "--log-filepath=ho-logger.log" };
         }
         DevStoneDistributed test = new DevStoneDistributed();

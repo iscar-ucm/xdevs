@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch DevStoneXml",
+            "request": "launch",
+            "mainClass": "xdevs.lib.tmp_journal.DevStoneXml",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch XmlStoneGenerator",
+            "request": "launch",
+            "mainClass": "xdevs.lib.tmp_journal.XmlStoneGenerator",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
             "name": "Launch Pruebas",
             "request": "launch",
             "mainClass": "xdevs.lib.tmp_journal.Pruebas",

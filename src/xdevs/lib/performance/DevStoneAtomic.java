@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.apache.commons.math3.distribution.RealDistribution;
+import org.w3c.dom.Element;
 
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
@@ -62,6 +63,13 @@ public class DevStoneAtomic extends Atomic {
         this(name, preparationTime, distribution.sample(), distribution.sample());
     }
 
+    public DevStoneAtomic(Element xmlAtomic) {
+        this(xmlAtomic.getAttribute("name"), 
+            Double.parseDouble(((Element) (xmlAtomic.getElementsByTagName("constructor-arg").item(0))).getAttribute("value")),
+            Double.parseDouble(((Element) (xmlAtomic.getElementsByTagName("constructor-arg").item(1))).getAttribute("value")),
+            Double.parseDouble(((Element) (xmlAtomic.getElementsByTagName("constructor-arg").item(2))).getAttribute("value")));
+    }
+
     @Override
     public void initialize() {
         super.passivate();
@@ -97,4 +105,16 @@ public class DevStoneAtomic extends Atomic {
     public void lambda() {
         oOut.addValues(outValues);
     }
+
+    public double getPreparationTime() {
+        return preparationTime;
+    }
+
+    public double getIntDelayTime() {
+        return intDelayTime;
+    }
+
+    public double getExtDelayTime() {
+        return extDelayTime;
+    }    
 }

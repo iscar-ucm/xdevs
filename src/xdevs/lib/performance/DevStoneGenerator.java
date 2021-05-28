@@ -19,6 +19,8 @@
  */
 package xdevs.lib.performance;
 
+import org.w3c.dom.Element;
+
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
 
@@ -41,6 +43,16 @@ public class DevStoneGenerator extends Atomic {
         this.preparationTime = preparationTime;
         this.period = period;
         this.maxEvents = maxEvents;
+    }
+
+    public DevStoneGenerator(Element xmlAtomic) {
+        this(xmlAtomic.getAttribute("name"),
+                Double.parseDouble(
+                        ((Element) (xmlAtomic.getElementsByTagName("constructor-arg").item(0))).getAttribute("value")),
+                Double.parseDouble(
+                        ((Element) (xmlAtomic.getElementsByTagName("constructor-arg").item(1))).getAttribute("value")),
+                Integer.parseInt(
+                        ((Element) (xmlAtomic.getElementsByTagName("constructor-arg").item(2))).getAttribute("value")));
     }
 
     @Override
@@ -72,4 +84,17 @@ public class DevStoneGenerator extends Atomic {
     public void lambda() {
         oOut.addValue(counter);
     }
+
+    public double getPeriod() {
+        return period;
+    }
+
+    public int getMaxEvents() {
+        return maxEvents;
+    }
+
+    public double getPreparationTime() {
+        return preparationTime;
+    }
+
 }
