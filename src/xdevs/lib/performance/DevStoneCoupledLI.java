@@ -19,6 +19,8 @@
  */
 package xdevs.lib.performance;
 
+import org.apache.commons.math3.distribution.RealDistribution;
+
 /**
  * Coupled model to study the performance LI DEVStone models
  *
@@ -27,8 +29,8 @@ package xdevs.lib.performance;
 public class DevStoneCoupledLI extends DevStone {
 
     public DevStoneCoupledLI(String prefix, int width, int depth, double preparationTime, double intDelayTime,
-            double extDelayTime) {
-        super(prefix + (depth - 1));
+                             double extDelayTime) {
+        super(prefix + (depth - 1), width, depth);
         if (depth == 1) {
             DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, intDelayTime, extDelayTime);
             super.addComponent(atomic);
@@ -43,6 +45,26 @@ public class DevStoneCoupledLI extends DevStone {
             for (int i = 0; i < (width - 1); ++i) {
                 DevStoneAtomic atomic = new DevStoneAtomic("A" + (i + 1) + "_" + name, preparationTime, intDelayTime,
                         extDelayTime);
+                super.addComponent(atomic);
+                super.addCoupling(iIn, atomic.iIn);
+            }
+        }
+    }
+
+    public DevStoneCoupledLI(String prefix, int width, int depth, double preparationTime, RealDistribution distribution) {
+        super(prefix + (depth - 1), width, depth);
+        if (depth == 1) {
+            DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, distribution);
+            super.addComponent(atomic);
+            super.addCoupling(iIn, atomic.iIn);
+            super.addCoupling(atomic.oOut, oOut);
+        } else {
+            DevStoneCoupledLI coupled = new DevStoneCoupledLI(prefix, width, depth - 1, preparationTime, distribution);
+            super.addComponent(coupled);
+            super.addCoupling(iIn, coupled.iIn);
+            super.addCoupling(coupled.oOut, oOut);
+            for (int i = 0; i < (width - 1); ++i) {
+                DevStoneAtomic atomic = new DevStoneAtomic("A" + (i + 1) + "_" + name, preparationTime, distribution);
                 super.addComponent(atomic);
                 super.addCoupling(iIn, atomic.iIn);
             }

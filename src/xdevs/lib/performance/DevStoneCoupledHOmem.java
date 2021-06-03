@@ -20,6 +20,8 @@
 package xdevs.lib.performance;
 
 import java.util.ArrayList;
+
+import org.apache.commons.math3.distribution.RealDistribution;
 import xdevs.core.modeling.Port;
 
 /**
@@ -33,7 +35,7 @@ public class DevStoneCoupledHOmem extends DevStone {
 
     public DevStoneCoupledHOmem(String prefix, int width, int depth, double preparationTime, double intDelayTime,
             double extDelayTime) {
-        super(prefix + (depth - 1));
+        super(prefix + (depth - 1), width, depth);
         super.addInPort(iInAux);
         if (depth == 1) {
             DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, intDelayTime, extDelayTime);
@@ -60,6 +62,46 @@ public class DevStoneCoupledHOmem extends DevStone {
             for (int i = 0; i < (width - 1); ++i) {
                 DevStoneAtomic atomic = new DevStoneAtomic("AL2_" + (i + 1) + "_" + name, preparationTime, intDelayTime,
                         extDelayTime);
+                super.addComponent(atomic);
+                super.addCoupling(iInAux, atomic.iIn);
+                currentLayer.add(atomic);
+            }
+            for (int i = 0; i < currentLayer.size(); ++i) {
+                DevStoneAtomic fromAtomic = currentLayer.get(i);
+                for (int j = 0; j < prevLayer.size(); ++j) {
+                    DevStoneAtomic toAtomic = prevLayer.get(j);
+                    super.addCoupling(fromAtomic.oOut, toAtomic.iIn);
+                }
+            }
+        }
+    }
+
+    public DevStoneCoupledHOmem(String prefix, int width, int depth, double preparationTime, RealDistribution distribution) {
+        super(prefix + (depth - 1), width, depth);
+        super.addInPort(iInAux);
+        if (depth == 1) {
+            DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, distribution);
+            super.addComponent(atomic);
+            super.addCoupling(iIn, atomic.iIn);
+            super.addCoupling(atomic.oOut, oOut);
+        } else {
+            DevStoneCoupledHOmem coupled = new DevStoneCoupledHOmem(prefix, width, depth - 1, preparationTime,
+                    distribution);
+            super.addComponent(coupled);
+            super.addCoupling(iIn, coupled.iIn);
+            super.addCoupling(coupled.oOut, oOut);
+            // First layer of atomic models:
+            ArrayList<DevStoneAtomic> prevLayer = new ArrayList<>();
+            for (int i = 0; i < (width - 1); ++i) {
+                DevStoneAtomic atomic = new DevStoneAtomic("AL1_" + (i + 1) + "_" + name, preparationTime, distribution);
+                super.addComponent(atomic);
+                super.addCoupling(atomic.oOut, coupled.iInAux);
+                prevLayer.add(atomic);
+            }
+            // Second layer of atomic models:
+            ArrayList<DevStoneAtomic> currentLayer = new ArrayList<>();
+            for (int i = 0; i < (width - 1); ++i) {
+                DevStoneAtomic atomic = new DevStoneAtomic("AL2_" + (i + 1) + "_" + name, preparationTime, distribution);
                 super.addComponent(atomic);
                 super.addCoupling(iInAux, atomic.iIn);
                 currentLayer.add(atomic);

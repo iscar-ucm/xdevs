@@ -42,7 +42,7 @@ public class DevStoneCoupledHO extends DevStone {
     public Port<Integer> oOutAux = new Port<>("outAux");
 
     public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime) {
-        super(prefix + (depth - 1));
+        super(prefix + (depth - 1), width, depth);
         super.addInPort(iInAux);
         super.addOutPort(oOutAux);
         if (depth == 1) {
@@ -71,7 +71,7 @@ public class DevStoneCoupledHO extends DevStone {
     }
 
     public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, RealDistribution distribution) {
-        super(prefix + (depth - 1));
+        super(prefix + (depth - 1), width, depth);
         super.addInPort(iInAux);
         super.addOutPort(oOutAux);
         if (depth == 1) {
