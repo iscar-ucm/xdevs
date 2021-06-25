@@ -23,7 +23,6 @@
 package xdevs.core.simulation;
 
 import java.util.Collection;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import xdevs.core.modeling.Port;
 import xdevs.core.util.Constants;
@@ -33,6 +32,8 @@ import xdevs.core.util.Constants;
  * @author José Luis Risco Martín
  */
 public class Controller extends Thread {
+
+    private static final Logger LOGGER = Logger.getLogger(Controller.class.getName());
 
     protected Coordinator coordinator;
     private boolean suspended = false;
@@ -161,8 +162,7 @@ public class Controller extends Thread {
                 coordinator.getClock().setTime(coordinator.getTN());
             }
         } catch (InterruptedException ex) {
-            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.severe(ex.getLocalizedMessage());
         }
     }
-
 }

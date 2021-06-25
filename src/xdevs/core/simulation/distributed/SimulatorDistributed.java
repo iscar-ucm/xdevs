@@ -116,7 +116,7 @@ public class SimulatorDistributed extends Simulator {
             }
 
         } catch (NumberFormatException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.severe(ex.getLocalizedMessage());
         }
         return response;
     }
