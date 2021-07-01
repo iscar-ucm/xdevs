@@ -56,7 +56,6 @@ public class Coordinator extends AbstractSimulator {
         } else {
             this.model = model;
         }
-        LOGGER.fine(model.getName() + "'s hierarchical...\n" + Util.printCouplings(model));
     }
     
     public Coordinator(SimulationClock clock, Coupled model) {
