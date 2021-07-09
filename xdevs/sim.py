@@ -242,8 +242,9 @@ class Coordinator(AbstractSimulator):
         for processor in self.processors:
             processor.exit()
 
-        for transducer in self._transducers:
-            transducer.exit()
+        if self.root_coordinator:
+            for transducer in self._transducers:
+                transducer.exit()
 
     def ta(self):
         return min((proc.time_next for proc in self.processors), default=INFINITY) - self.clock.time

@@ -382,7 +382,7 @@ class Coupled(Component, ABC):
             right_bridge_eoc = self._create_right_bridge(self.parent.eoc)
             new_coups_up.extend(self._complete_right_bridge(right_bridge_eoc))
 
-            new_coups_up.extend([c for cl in self.ic.values() for c in cl.values()])
+            new_coups_up.extend((c for cl in self.ic.values() for c in cl.values()))
 
         return new_comps_up, new_coups_up
 
@@ -406,19 +406,19 @@ class Coupled(Component, ABC):
     def _create_left_bridge(self, pc) -> Dict[Port, List[Port]]:
         bridge = defaultdict(list)
         for in_port in self.in_ports:
-            for coup_list in pc.values():
-                for coup in coup_list:
-                    if coup.port_to == in_port:
-                        bridge[in_port].append(coup.port_from)
+            for port_from in pc:
+                if in_port in pc[port_from]:
+                    bridge[in_port].append(port_from)
+
         return bridge
 
     def _create_right_bridge(self, pc) -> Dict[Port, List[Port]]:
         bridge = defaultdict(list)
         for out_port in self.out_ports:
-            for coup_list in pc.values():
-                for coup in coup_list:
-                    if coup.port_from == out_port:
-                        bridge[out_port].append(coup.port_to)
+            for port_from in pc:
+                if port_from == out_port:
+                    for port_to in pc[port_from]:
+                        bridge[out_port].append(port_to)
         return bridge
 
     def _complete_left_bridge(self, bridge: Dict[Port, List[Port]]) -> List[Coupling]:
