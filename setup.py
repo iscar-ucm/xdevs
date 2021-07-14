@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='xdevs',
-      version='2.1.4',
+      version='2.2.0',
       description='xDEVS M&S framework',
       url='https://github.com/dacya/xdevs',
       author='Kevin Henares, Román Cárdenas',
@@ -14,8 +14,15 @@ setup(name='xdevs',
               'elasticsearch = xdevs.plugins.transducers.elasticsearch_transducer:ElasticsearchTransducer',
           ],
           'xdevs.plugins.wrappers': [
-              'pypdevs = xdevs.plugins.wrappers.pypdevs:PyPDEVSWrapper'
-          ]},
+              'pypdevs = xdevs.plugins.wrappers.pypdevs:PyPDEVSWrapper',
+          ],
+          'xdevs.plugins.celldevs_delays': [
+              'inertial = xdevs.plugins.celldevs_delays.inertial:InertialCellDEVSDelay',
+              'transport = xdevs.plugins.celldevs_delays.transport:TransportCellDEVSDelay',
+              'hybrid = xdevs.plugins.celldevs_delays.hybrid:HybridCellDEVSDelay',
+          ]
+      },
+
       extras_require={
           'sql': ['sqlalchemy==1.3.22'],
           'elasticsearch': ['elasticsearch==7.10.1'],
