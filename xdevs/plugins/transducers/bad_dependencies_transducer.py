@@ -1,8 +1,7 @@
-from abc import ABC
 from xdevs.transducers import Transducer
 
 
-class BadDependenciesTransducer(Transducer, ABC):
+class BadDependenciesTransducer(Transducer):
     def __init__(self, **kwargs):
         """
         Template transducer for using when dependencies are not imported.
