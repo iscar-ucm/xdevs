@@ -42,7 +42,8 @@ public class XmlStoneGenerator {
   public static void main(String[] args) {
     if (args.length == 0) {
       //args = new String[] { "--model=HO", "--size=15", "--delay-distribution=Constant-2", "--seed=1234" };
-      args = new String[] { "--model=HOmod", "--size=4", "--delay-distribution=UniformRealDistribution-0-3", "--seed=1234", "--pods=4-1"};
+      args = new String[] { "--model=HO", "--size=4", "--delay-distribution=UniformRealDistribution-0-1", "--seed=1234", "--pods=2-2"};
+      //args = new String[] { "--model=HO", "--size=15", "--delay-distribution=ChiSquaredDistribution-2", "--seed=1234", "--pods=3-1"}; //
     }
     XmlStoneGenerator test = new XmlStoneGenerator();
     for (String arg : args) {
@@ -98,8 +99,8 @@ public class XmlStoneGenerator {
   }
 
   public void buildFramework() {
-    framework = new Coupled("DevStone" + model.toString());
-    generator = new DevStoneGenerator("Generator", PREPARATION_TIME, PERIOD, MAX_EVENTS);
+    framework = new Coupled("devstone-" + model.toString().toLowerCase());
+    generator = new DevStoneGenerator("generator", PREPARATION_TIME, PERIOD, MAX_EVENTS);
     framework.addComponent(generator);
     switch (model) {
       case LI:
@@ -143,6 +144,7 @@ public class XmlStoneGenerator {
       fn += "_p" + numFastPods + "-" + numSlowPods;
     }
     fn += ".xml";
+    // System.out.println(fn);
     BufferedWriter writer = new BufferedWriter(new FileWriter(new File(fn)));
     writer.write(fileContent);
     writer.flush();
@@ -150,15 +152,25 @@ public class XmlStoneGenerator {
   }
 
   public String getXmlModel(Coupled coupled, boolean homogeneous) {
-    Map<String, String> atomicToPod = classifyAtomics(coupled);
+    Map<String, String> atomicToPod = null;
     StringBuilder builder = new StringBuilder();
+    String firstPod = "";
+    boolean usingPods = numFastPods != null && numSlowPods != null;
+
+    if (usingPods) {
+      atomicToPod = classifyAtomics(coupled);
+      firstPod = (numFastPods > 0)?"fast0":"slow0";
+    }
+
     builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
     builder.append("<coupled name=\"").append(coupled.getName()).append("\"");
     builder.append(" class=\"").append(this.getClass().getCanonicalName()).append("\"");
     if (homogeneous) {
       builder.append(" host=\"host-service\"");
+    } else if (usingPods) {
+      builder.append(" host=\"").append(firstPod).append("\"");
     } else {
-      builder.append(" host=\"").append(coupled.getName()).append("-service\"");
+      builder.append(" host=\"").append(coupled.getName().replace("_", "-").toLowerCase()).append("\"");
     }
     builder.append(" mainPort=\"5000\"");
     builder.append(" auxPort=\"6000\"");
@@ -176,8 +188,10 @@ public class XmlStoneGenerator {
           builder.append(" host=\"host-service\"");
         } else if (atomicToPod != null && atomicToPod.containsKey(component.getName())) {
           builder.append(" host=\"").append(atomicToPod.get(component.getName())).append("\"");
+        } else if (usingPods) {
+          builder.append(" host=\"").append(firstPod).append("\"");
         } else {
-          builder.append(" host=\"").append(component.getName()).append("-service\"");
+          builder.append(" host=\"").append(component.getName().replace("_", "-").toLowerCase()).append("\"");
         }
         builder.append(" mainPort=\"").append(5000 + counter).append("\"");
         builder.append(" auxPort=\"").append(6000 + counter).append("\"");
@@ -264,13 +278,13 @@ public class XmlStoneGenerator {
       Pair<Double, String> pair = delays.get(i);
 
       if(i < numFastAtomics) {  // Fast pod
-        atomicToPod.put(pair.getSecond(), "Fast" + fastPodIdx + "-service");
+        atomicToPod.put(pair.getSecond(), "fast" + fastPodIdx);
 //        System.out.println(pair.getSecond() + " -> Fast" + fastPodIdx + "-service");
         fastPodIdx += 1;
         if(fastPodIdx >= numFastPods)
           fastPodIdx = 0;
       } else {  // Slow pod
-        atomicToPod.put(pair.getSecond(), "Slow" + slowPodIdx + "-service");
+        atomicToPod.put(pair.getSecond(), "slow" + slowPodIdx);
 //        System.out.println(pair.getSecond() + " -> Slow" + slowPodIdx + "-service");
         slowPodIdx += 1;
         if(slowPodIdx >= numSlowPods)
