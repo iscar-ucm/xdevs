@@ -48,6 +48,7 @@ public class PingMessage {
             out.close();
             sc.close();
         } catch (Exception e) {
+            System.out.println("Error connecting to " + this.destinationHost + ":" + this.destinationPort + "... (command: " + message.getCommand() + "-" + message.getMessage() +  ")");
             e.printStackTrace();
         } 
         return response;
