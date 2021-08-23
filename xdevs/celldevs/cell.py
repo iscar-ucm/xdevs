@@ -14,6 +14,22 @@ V = TypeVar('V')  # Variable type used for cell vicinities
 
 class CellConfig(Generic[C, S, V]):
     def __init__(self, config_id: str, c_type: Type[C], s_type: Type[S], v_type: Type[V], **kwargs):
+        """
+        Cell-DEVS configuration structure.
+        :param config_id: identifier of the configuration.
+        :param c_type: type used to identify cells.
+        :param s_type: type used to represent cell states.
+        :param v_type: type used to represent vicinity between cells.
+        :param cell_type: identifier of the cell type.
+        :param delay: identifier of the delay buffer implemented by the cell. By default, it is set to inertial.
+        :param config: any additional configuration parameters.
+        :param state: parameters required to create the initial state of the cell.
+        :param neighborhood: representation of the cell neighborhood. By default, it is empty.
+        :param cell_map: list of cells that implement this configuration. By default, it is empty.
+        :param eic: list of external input couplings. By default, it is empty.
+        :param ic: list of internal couplings. By default, it is empty.  # TODO remove this?
+        :param eoc: list of external output couplings. By default, it is empty.
+        """
         self.config_id: str = config_id
         self.c_type: Type[C] = c_type
         self.s_type: Type[S] = s_type
@@ -31,9 +47,23 @@ class CellConfig(Generic[C, S, V]):
 
     @property
     def default(self) -> bool:
+        """:return: true if this configuration profile is the default one."""
         return self.config_id == 'default'
 
     def apply_patch(self, config_id: str, **kwargs):
+        """
+        Applies a configuration patch. This method is used for non-default configurations.
+        :param config_id: configuration ID.
+        :param cell_type: identifier of the cell type.
+        :param delay: identifier of the delay buffer implemented by the cell. By default, it is set to inertial.
+        :param config: any additional configuration parameters.
+        :param state: parameters required to create the initial state of the cell.
+        :param neighborhood: representation of the cell neighborhood. By default, it is empty.
+        :param cell_map: list of cells that implement this configuration. By default, it is empty.
+        :param eic: list of external input couplings. By default, it is empty.
+        :param ic: list of internal couplings. By default, it is empty.  # TODO remove this?
+        :param eoc: list of external output couplings. By default, it is empty.
+        """
         self.config_id = config_id
         self.cell_type = kwargs.get('cell_type', self.cell_type)
         self.delay_type = kwargs.get('delay', self.delay_type)
@@ -54,9 +84,11 @@ class CellConfig(Generic[C, S, V]):
             self.eoc = self._parse_couplings(kwargs['eoc'])
 
     def load_state(self) -> S:
+        """:return: a new initial state structure."""
         return self._load_value(self.s_type, self.state)
 
     def load_neighborhood(self) -> Dict[C, V]:
+        """:return: a new neighborhood."""
         neighbors: Dict[C, V] = dict()
         for neighborhood in self.raw_neighborhood:
             for neighbor, vicinity in neighborhood.items():
@@ -93,29 +125,51 @@ class CellConfig(Generic[C, S, V]):
 
 class Cell(Atomic, ABC, Generic[C, S, V]):
     def __init__(self, cell_id: C, config: CellConfig[C, S, V]):
+        """
+        Abstract Base Class for a Cell-DEVS cell.
+        :param cell_id: cell identifier.
+        :param config: cell configuration structure.
+        """
         super().__init__(str(cell_id))
         self._clock: float = 0
         self.cell_id: C = cell_id
         self.cell_state: S = config.load_state()
         self.neighborhood: Dict[C, V] = config.load_neighborhood()
-
         self.input_ports: List[InPort] = list()
         self.delayed_output_ports: DelayedOutput[S] = DelayedOutputs.create_celldevs_delay(config.delay_type)
 
     def add_in_port(self, in_port: InPort) -> NoReturn:
+        """
+        Adds a new input port to the cell.
+        :param in_port: input port to be added.
+        """
         self.input_ports.append(in_port)
         super().add_in_port(in_port.port)
 
     def add_out_port(self, out_port: OutPort) -> NoReturn:
+        """
+        Adds a new output port to the cell.
+        :param out_port: output port to be added.
+        """
         self.delayed_output_ports.add_out_port(out_port)
         super().add_out_port(out_port.port)
 
     @abstractmethod
     def local_computation(self, cell_state: S) -> S:
+        """
+        Computes new cell state depending on its previous state.
+        :param cell_state: current cell state.
+        :return: new cell state.
+        """
         pass
 
     @abstractmethod
     def output_delay(self, cell_state: S) -> float:
+        """
+        Returns delay to be applied to output messages related to new cell state.
+        :param cell_state: new cell state.
+        :return: delay to be applied.
+        """
         pass
 
     def deltint(self) -> NoReturn:
@@ -138,9 +192,3 @@ class Cell(Atomic, ABC, Generic[C, S, V]):
 
     def lambdaf(self) -> NoReturn:
         self.delayed_output_ports.send_events(self._clock + self.sigma)
-
-    def initialize(self) -> NoReturn:
-        pass
-
-    def exit(self) -> NoReturn:
-        pass
