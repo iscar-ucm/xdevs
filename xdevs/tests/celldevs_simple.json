@@ -1,0 +1,41 @@
+{
+  "cells": {
+    "default": {
+      "cell_type": "simple",
+      "state": {
+        "start": 1,
+        "end": 2
+      },
+      "config": [1, 2, 3],
+      "ic": [
+        ["out", "in"]
+      ]
+    },
+    "simple": {
+      "neighborhood": [
+        {"simple": 1},
+        {"complex":  0}
+      ]
+    },
+    "complex": {
+      "cell_type": "complex",
+      "delay": "transport",
+      "state": {
+        "end": 5,
+        "log": true
+      },
+      "config": [4, 5, 6],
+      "neighborhood": [
+        {"simple": 0},
+        {"complex":  1}
+      ],
+      "eic": [
+        ["in_start", "in_start"]
+      ],
+      "eoc": [
+        ["out_stats", "out_stats"],
+        ["out_done", "out_done"]
+      ]
+    }
+  }
+}

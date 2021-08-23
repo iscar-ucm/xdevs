@@ -36,6 +36,11 @@ class InPort(Generic[C, E]):
                     self.history[self.classifier(msg)] = msg
 
     def get(self, key: Optional[C] = None) -> Optional[S]:
+        """
+        Returns latest received event. If port implements a classifier, it returns latest message classified as key.
+        :param key: message key (only used if port implements a classifier).
+        :return: latest received event. If no event has been received, it returns None.
+        """
         return self.history.get(key) if self.classifier is not None else self.history
 
 
