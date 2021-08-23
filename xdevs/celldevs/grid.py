@@ -11,6 +11,12 @@ V = TypeVar('V')     # Variable type used for cell vicinities
 
 class GridScenario:
     def __init__(self, shape: C, origin: Optional[C] = None, wrapped: bool = False):
+        """
+        Grid scenario configuration.
+        :param shape: tuple describing the dimension of the scenario.
+        :param origin: tuple describing the origin of the scenario. By default, it is set to (0, 0, ...).
+        :param wrapped: if true, the scenario wraps the edges. It defaults to False.
+        """
         for dim in shape:
             if dim <= 0:
                 raise ValueError('scenario shape is invalid')
@@ -24,15 +30,33 @@ class GridScenario:
 
     @property
     def dimension(self) -> int:
+        """:return: number of dimensions of the scenario."""
         return len(self.shape)
 
     def cell_in_scenario(self, cell: C) -> bool:
+        """
+        Checks if a cell is inside the scenario.
+        :param cell: coordinates of the cell under study.
+        :return: True if the coordinates of the cell are inside the scenario.
+        """
         return self._cell_in_scenario(cell, self.shape, self.origin)
 
     def distance_vector(self, cell_from: C, cell_to: C) -> C:
+        """
+        Computes the distance vector between two cells.
+        :param cell_from: origin cell.
+        :param cell_to: destination cell.
+        :return: relative distance vector.
+        """
         return self._distance_vector(cell_from, cell_to, self.shape, self.origin, self.wrapped)
 
     def cell_to(self, cell_from: C, distance_vector: C):
+        """
+        Deduces destination cell according to an origin cell and a distance vector.
+        :param cell_from: origin cell.
+        :param distance_vector: distance vector.
+        :return: destination cell.
+        """
         if not self.cell_in_scenario(cell_from):
             raise ValueError('cell_from is not part of the scenario')
         elif len(distance_vector) != self.dimension:
@@ -45,18 +69,33 @@ class GridScenario:
         return cell_to
 
     def minkowski_distance(self, p: int, cell_from: C, cell_to: C) -> Union[int, float]:
+        """
+        Computes Minkowski distance between two cells.
+        :param p: Minkowski distance order.
+        :param cell_from: origin cell.
+        :param cell_to: destination cell.
+        :return: Minkowski distance between cells.
+        """
         return self._minkowski_distance(p, cell_from, cell_to, self.shape, self.origin, self.wrapped)
 
     def moore_neighborhood(self, r: int) -> List[C]:
+        """
+        Creates a Moore neighborhood of the desired range.
+        :param r: neighborhood range.
+        :return: List with relative distance vectors of neighbors.
+        """
         return self._moore_neighborhood(self.dimension, r)
 
     def von_neumann_neighborhood(self, r: int) -> List[C]:
+        """
+        Creates a von Neumann neighborhood of the desired range.
+        :param r: neighborhood range.
+        :return: List with relative distance vectors of neighbors.
+        """
         return self._von_neumann_neighborhood(self.dimension, r)
 
-    def next_cell(self, prev_cell: C) -> Optional[C]:
-        return self._next_cell(prev_cell, self.shape, self.origin, 0)
-
     def iter_cells(self) -> Iterator[C]:
+        """:return: iterator that goes through all the cells in the scenario."""
         return self._iter_cells(self.shape, self.origin)
 
     @staticmethod
@@ -135,6 +174,14 @@ class GridScenario:
 
 class GridCellConfig(CellConfig[C, S, V], Generic[S, V]):
     def __init__(self, scenario: GridScenario, config_id: str, s_type: Type[S], v_type: Type[V], **kwargs):
+        """
+        Grid cell configuration structure.
+        :param scenario: grid scenario structure.
+        :param config_id: identifier of the configuration.
+        :param s_type: type used to represent cell states.
+        :param v_type: type used to represent vicinity between cells.
+        :param kwargs: any additional configuration parameters required for creating a cell configuration structure.
+        """
         self.scenario: GridScenario = scenario
         super().__init__(config_id, tuple, s_type, v_type, **kwargs)
 
@@ -142,6 +189,11 @@ class GridCellConfig(CellConfig[C, S, V], Generic[S, V]):
         return [tuple(cell_id) for cell_id in args]
 
     def load_cell_neighborhood(self, cell: C) -> Dict[C, V]:
+        """
+        Creates the neighborhood corresponding to a given cell.
+        :param cell: target cell tu create the neighborhood.
+        :return: dictionary {neighbor cell: vicinity}
+        """
         neighbors: Dict[C, V] = dict()
         for neighborhood in self.raw_neighborhood:
             vicinity = neighborhood.get('vicinity')
@@ -171,27 +223,63 @@ class GridCellConfig(CellConfig[C, S, V], Generic[S, V]):
 
 class GridCell(Cell[C, S, V], ABC, Generic[S, V]):
     def __init__(self, config: GridCellConfig):
+        """
+        Grid Cell class for Cell-DEVS scenarios.
+        :param config: configuration structure for grid cells.
+        """
         super().__init__(config)
         self.scenario = config.scenario
 
     @property
     def location(self) -> C:
+        """:return: location of the cell."""
         return self.cell_id
 
     def minkowski_distance(self, p: int, other: C) -> float:
+        """
+        Computes Minkowski distance from cell to another cell.
+        :param p: Minkowski distance order.
+        :param other: destination cell.
+        :return: Minkowski distance.
+        """
         return self.scenario.minkowski_distance(p, self.location, other)
 
     def manhattan_distance(self, other: C) -> int:
+        """
+        Computes Manhattan distance from cell to another cell
+        :param other: destination cell.
+        :return: Manhattan distance.
+        """
         return self.scenario.minkowski_distance(1, self.location, other)
 
     def euclidean_distance(self, other: C) -> float:
+        """
+        Computes Euclidean distance from cell to another cell.
+        :param other: destination cell.
+        :return: Euclidean distance.
+        """
         return self.scenario.minkowski_distance(2, self.location, other)
 
     def chebyshev_distance(self, other: C) -> int:
+        """
+        Computes Chebyshev distance from cell to another cell.
+        :param other: destination cell.
+        :return: Chebyshev distance.
+        """
         return self.scenario.minkowski_distance(math.inf, self.location, other)
 
     def neighbor(self, relative: C) -> C:
+        """
+        Computes the coordinates of a neighboring cell from a relative distance vector.
+        :param relative: relative distance vector.
+        :return: coordinates of neighboring cell.
+        """
         return self.scenario.cell_to(self.location, relative)
 
     def relative(self, neighbor: C) -> C:
+        """
+        Computes the relative distance vector from the coordinates of a neighboring cell.
+        :param neighbor: coordinates of a neighboring cell.
+        :return: relative distance vector.
+        """
         return self.scenario.distance_vector(self.location, neighbor)
