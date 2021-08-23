@@ -17,15 +17,17 @@ class GridScenario:
         :param origin: tuple describing the origin of the scenario. By default, it is set to (0, 0, ...).
         :param wrapped: if true, the scenario wraps the edges. It defaults to False.
         """
+        if len(shape) < 1:
+            raise ValueError('scenario dimension is invalid')
         for dim in shape:
             if dim <= 0:
                 raise ValueError('scenario shape is invalid')
-        self.shape = shape
+        self.shape = tuple(shape)
         if origin is None:
             origin = tuple(0 for _ in range(self.dimension))
         if len(origin) != len(shape):
             raise ValueError('scenario shape and origin must have the same dimension')
-        self.origin = origin
+        self.origin = tuple(origin)
         self.wrapped = wrapped
 
     @property
@@ -78,7 +80,7 @@ class GridScenario:
         """
         return self._minkowski_distance(p, cell_from, cell_to, self.shape, self.origin, self.wrapped)
 
-    def moore_neighborhood(self, r: int) -> List[C]:
+    def moore_neighborhood(self, r: int = 1) -> List[C]:
         """
         Creates a Moore neighborhood of the desired range.
         :param r: neighborhood range.
@@ -86,7 +88,7 @@ class GridScenario:
         """
         return self._moore_neighborhood(self.dimension, r)
 
-    def von_neumann_neighborhood(self, r: int) -> List[C]:
+    def von_neumann_neighborhood(self, r: int = 1) -> List[C]:
         """
         Creates a von Neumann neighborhood of the desired range.
         :param r: neighborhood range.
@@ -136,12 +138,7 @@ class GridScenario:
             raise ValueError('neighborhood range must be greater than or equal to 0')
         n_shape: C = tuple(2 * r + 1 for _ in range(dim))
         n_origin: C = tuple(-r for _ in range(dim))
-        neighborhood: List[C] = list()
-        cell: Optional[C] = n_origin
-        while cell is not None:
-            neighborhood.append(cell)
-            cell = cls._next_cell(cell, n_shape, n_origin, 0)
-        return neighborhood
+        return list(cls._iter_cells(n_shape, n_origin))
 
     @classmethod
     def _von_neumann_neighborhood(cls, dim: int, r: int) -> List[C]:
@@ -158,10 +155,10 @@ class GridScenario:
     @classmethod
     def _next_cell(cls, prev_cell: C, shape: C, origin: C, d: int) -> Optional[C]:
         if cls._cell_in_scenario(prev_cell, shape, origin):
-            if prev_cell[d] - origin[d] < shape[d]:
+            if prev_cell[d] - origin[d] < shape[d] - 1:
                 return tuple(prev_cell[i] if i != d else prev_cell[i] + 1 for i in range(len(shape)))
             elif d < len(shape) - 1:
-                prev_cell = tuple(prev_cell[i] if i != d else 0 for i in range(len(shape)))
+                prev_cell = tuple(prev_cell[i] if i != d else origin[i] for i in range(len(shape)))
                 return cls._next_cell(prev_cell, shape, origin, d + 1)
 
     @classmethod

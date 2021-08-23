@@ -1,0 +1,48 @@
+{
+  "scenario": {
+    "shape":[25, 25],
+    "origin": [-12, -12],
+    "wrapped": false
+  },
+  "cells": {
+    "default": {
+      "cell_type": "simple",
+      "state": {
+        "start": 1,
+        "end": 2
+      },
+      "config": [1, 2, 3],
+      "neighborhood": [
+        {
+          "type": "von_neumann",
+          "range": 2,
+          "vicinity": 0.5
+        },
+        {
+          "type": "relative",
+          "neighbors": [[0, 0]],
+          "vicinity": 1
+        }
+      ],
+      "ic": [
+        ["out", "in"]
+      ]
+    },
+    "complex": {
+      "cell_type": "complex",
+      "delay": "transport",
+      "state": {
+        "end": 5,
+        "log": true
+      },
+      "config": [4, 5, 6],
+      "eic": [
+        ["in_start", "in_start"]
+      ],
+      "eoc": [
+        ["out_stats", "out_stats"],
+        ["out_done", "out_done"]
+      ]
+    }
+  }
+}

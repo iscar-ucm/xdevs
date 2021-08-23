@@ -2,7 +2,7 @@ import unittest
 from xdevs.celldevs.inout import InPort
 
 
-class MyTestCase(unittest.TestCase):
+class CellDEVSInputTest(unittest.TestCase):
     def test_basic_input(self):
         in_port: InPort[None, int] = InPort(int, 'port')
         self.assertIsNone(in_port.get())
