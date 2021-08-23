@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='xdevs',
-      version='2.2.0',
+      version='2.3.0',
       description='xDEVS M&S framework',
       url='https://github.com/dacya/xdevs',
       author='Kevin Henares, Román Cárdenas',
@@ -16,10 +16,10 @@ setup(name='xdevs',
           'xdevs.plugins.wrappers': [
               'pypdevs = xdevs.plugins.wrappers.pypdevs:PyPDEVSWrapper',
           ],
-          'xdevs.plugins.celldevs_delays': [
-              'inertial = xdevs.plugins.celldevs_delays.inertial:InertialCellDEVSDelay',
-              'transport = xdevs.plugins.celldevs_delays.transport:TransportCellDEVSDelay',
-              'hybrid = xdevs.plugins.celldevs_delays.hybrid:HybridCellDEVSDelay',
+          'xdevs.plugins.celldevs.delayed_outputs': [
+              'inertial = xdevs.plugins.celldevs.delayed_outputs.inertial:InertialDelayedOutput',
+              'transport = xdevs.plugins.celldevs.delayed_outputs.transport:TransportDelayedOutput',
+              'hybrid = xdevs.plugins.celldevs.delayed_outputs.hybrid:HybridDelayedOutput',
           ]
       },
 
