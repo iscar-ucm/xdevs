@@ -1,6 +1,6 @@
 from __future__ import annotations
 import unittest
-from typing import Dict, Tuple, Type, Callable, Any
+from typing import Dict, Tuple, Type, Callable
 from xdevs.transducers import Transducer, Transducers, Transducible, T
 
 
