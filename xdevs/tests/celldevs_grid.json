@@ -23,9 +23,6 @@
           "neighbors": [[0, 0]],
           "vicinity": 1
         }
-      ],
-      "ic": [
-        ["out", "in"]
       ]
     },
     "complex": {

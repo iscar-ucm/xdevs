@@ -1,12 +1,12 @@
 from collections import deque
 from math import inf
 from typing import Deque, Generic, Optional, Tuple
-from xdevs.celldevs.inout import DelayedOutput, S
+from xdevs.celldevs.inout import C, DelayedOutput, S
 
 
-class HybridDelayedOutput(Generic[S], DelayedOutput[S]):
-    def __init__(self):
-        super().__init__()
+class HybridDelayedOutput(DelayedOutput[C, S], Generic[C, S]):
+    def __init__(self, cell_id: C, serve: bool = False):
+        super().__init__(cell_id, serve)
         self.last_state: Optional[S] = None
         self.next_states: Deque[Tuple[float, S]] = deque()
 

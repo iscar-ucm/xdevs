@@ -43,7 +43,7 @@ class TestCellDEVSSimple(unittest.TestCase):
         self.assertFalse(neighborhood)
         self.assertFalse(config.eic)
         self.assertEqual(len(config.ic), 1)
-        self.assertTrue(('out', 'in') in config.ic)
+        self.assertTrue(('out_celldevs', 'in_celldevs') in config.ic)
         self.assertFalse(config.eoc)
 
         # Second, we test the simple configuration
@@ -67,7 +67,7 @@ class TestCellDEVSSimple(unittest.TestCase):
         self.assertEqual(neighborhood['complex'], 0.0)
         self.assertFalse(config.eic)
         self.assertEqual(len(config.ic), 1)
-        self.assertTrue(('out', 'in') in config.ic)
+        self.assertTrue(('out_celldevs', 'in_celldevs') in config.ic)
         self.assertFalse(config.eoc)
 
         # Third, we test the complex configuration
@@ -92,7 +92,7 @@ class TestCellDEVSSimple(unittest.TestCase):
         self.assertEqual(len(config.eic), 1)
         self.assertTrue(('in_start', 'in_start') in config.eic)
         self.assertEqual(len(config.ic), 1)
-        self.assertTrue(('out', 'in') in config.ic)
+        self.assertTrue(('out_celldevs', 'in_celldevs') in config.ic)
         self.assertEqual(len(config.eoc), 2)
         self.assertTrue(('out_stats', 'out_stats') in config.eoc)
         self.assertTrue(('out_done', 'out_done') in config.eoc)

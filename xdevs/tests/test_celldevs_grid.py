@@ -142,7 +142,7 @@ class MyTestCase(unittest.TestCase):
                 self.assertEqual(vicinity, 0.5)
         self.assertFalse(config.eic)
         self.assertEqual(len(config.ic), 1)
-        self.assertTrue(('out', 'in') in config.ic)
+        self.assertTrue(('out_celldevs', 'in_celldevs') in config.ic)
         self.assertFalse(config.eoc)
 
         # Then, we test the complex configuration
@@ -170,7 +170,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(len(config.eic), 1)
         self.assertTrue(('in_start', 'in_start') in config.eic)
         self.assertEqual(len(config.ic), 1)
-        self.assertTrue(('out', 'in') in config.ic)
+        self.assertTrue(('out_celldevs', 'in_celldevs') in config.ic)
         self.assertEqual(len(config.eoc), 2)
         self.assertTrue(('out_stats', 'out_stats') in config.eoc)
         self.assertTrue(('out_done', 'out_done') in config.eoc)

@@ -1,74 +1,46 @@
 from abc import ABC, abstractmethod
 import pkg_resources
-from typing import Callable, Dict, Generic, List, NoReturn, Optional, Type, TypeVar, Union
+from typing import Dict, Generic, NoReturn, Optional, Tuple, Type, TypeVar
 from xdevs.models import Port
+
 
 C = TypeVar('C')  # Variable type used for cell IDs
 S = TypeVar('S')  # Variable type used for cell states
-E = TypeVar('E')  # Variable type used for port events
 
 
-class InPort(Generic[C, E]):
-    def __init__(self, p_type: Type[E], port_name: Optional[str] = None,
-                 serve: bool = False, classifier: Optional[Callable[[E], C]] = None):
+class InPort(Generic[C, S]):
+    def __init__(self, cell_id: C, serve: bool = False):
         """
         Cell-DEVS in port.
-        :param p_type: data type of events received by port.
-        :param port_name: name of the port. By default, it is set to "InPort".
+        :param cell_id: ID of the cell that owns the port.
         :param serve: set to True if the port is going to be accessible via RPC server. Defaults to False.
-        :param classifier: function to classify incoming events into different groups.
-                           By default, it is set to None (i.e., messages are not classified).
         """
-        self.port: Port[E] = Port(p_type, port_name, serve)
-        self.classifier: Optional[Callable[[E], C]] = classifier
-        self.history: Union[Optional[E], Dict[C, E]] = None if self.classifier is None else dict()
+        self.port: Port[Tuple[C, S]] = Port(tuple, 'in_celldevs', serve)
+        self.history: Dict[C, S] = dict()
 
-    def read_new_events(self) -> NoReturn:
-        """
-        It stores the latest incoming event into self.history[group], where group = self.classifier(event).
-        If self.history is None, the latest event is stored into self.history (with no group classification).
-        """
-        if self.port:
-            if self.classifier is None:
-                self.history = self.port.get()
-            else:
-                for msg in self.port.values:
-                    self.history[self.classifier(msg)] = msg
+    def read_new_events(self):
+        """It stores the latest incoming events into self.history"""
+        for cell_id, cell_state in self.port.values:
+            self.history[cell_id] = cell_state
 
-    def get(self, key: Optional[C] = None) -> Optional[S]:
+    def get(self, cell_id: C) -> Optional[S]:
         """
-        Returns latest received event. If port implements a classifier, it returns latest message classified as key.
-        :param key: message key (only used if port implements a classifier).
+        Returns latest received event.
+        :param cell_id: ID of the cell that sent the event.
         :return: latest received event. If no event has been received, it returns None.
         """
-        return self.history.get(key) if self.classifier is not None else self.history
+        return self.history.get(cell_id)
 
 
-class OutPort(Generic[S, E]):
-    def __init__(self, port_type: Type[E], port_name: Optional[str] = None,
-                 serve: bool = False, mapper: Optional[Callable[[S], E]] = None):
+class DelayedOutput(Generic[C, S], ABC):
+    def __init__(self, cell_id: C, serve: bool = False):
         """
-        Cell-DEVS out port.
-        :param port_type: data type of events sent by port.
-        :param port_name: name of the port. By default, it is set to "OutPort".
+        Cell-DEVS delayed output port. This is an abstract base class.
+        :param cell_id: ID of the cell that owns this delayed output.
         :param serve: set to True if the port is going to be accessible via RPC server. Defaults to False.
-        :param mapper: function to map a cell state S to a port event V. By default, mapper(S) = S.
         """
-        self.port: Port[E] = Port(port_type, port_name, serve)
-        self.mapper = lambda x: x if mapper is None else mapper
-
-    def add(self, cell_state: S) -> NoReturn:
-        """
-        Maps a cell state to an event and sends it through the port.
-        :param cell_state: cell state.
-        """
-        self.port.add(self.mapper(cell_state))
-
-
-class DelayedOutput(Generic[S], ABC):
-    def __init__(self):
-        """Cell-DEVS delayed output ports. This is an abstract base class."""
-        self.out_ports: List[OutPort[S, E]] = list()
+        self.cell_id = cell_id
+        self.port: Port[Tuple[C, S]] = Port(tuple, 'out_celldevs', serve)
 
     @abstractmethod
     def add_to_buffer(self, when: float, state: S) -> NoReturn:
@@ -94,19 +66,13 @@ class DelayedOutput(Generic[S], ABC):
         """removes schedule state from the delayed output."""
         pass
 
-    def add_out_port(self, out_port: OutPort[S, E]) -> NoReturn:
-        """Adds a Cell-DEVS output port to the delayed output."""
-        self.out_ports.append(out_port)
-
     def send_events(self, time: float) -> NoReturn:
         """
         If there is an scheduled state, it sends a new event via every Cell-DEVS output port.
         :param time: current simulation time.
         """
         if self.next_time() <= time:
-            next_state = self.next_state()
-            for out_port in self.out_ports:
-                out_port.add(next_state)
+            self.port.add((self.cell_id, self.next_state()))
 
     def clean(self, time: float) -> NoReturn:
         """
@@ -119,17 +85,18 @@ class DelayedOutput(Generic[S], ABC):
 
 class DelayedOutputs:
 
-    _plugins: Dict[str, Type[DelayedOutput]] = {ep.name: ep.load()
-                                                for ep in pkg_resources.iter_entry_points('xdevs.plugins.celldevs.delayed_outputs')}
+    _plugins: Dict[str, Type[DelayedOutput]] = {
+        ep.name: ep.load() for ep in pkg_resources.iter_entry_points('xdevs.plugins.celldevs.delayed_outputs')
+    }
 
     @staticmethod
-    def add_plugin(name: str, plugin: Type[DelayedOutput]) -> NoReturn:
-        if name in DelayedOutputs._plugins:
-            raise ValueError('xDEVS Cell-DEVS delayed output plugin with name "{}" already exists'.format(name))
-        DelayedOutputs._plugins[name] = plugin
+    def add_plugin(delay_id: str, plugin: Type[DelayedOutput]) -> NoReturn:
+        if delay_id in DelayedOutputs._plugins:
+            raise ValueError('xDEVS Cell-DEVS delayed output plugin with name "{}" already exists'.format(delay_id))
+        DelayedOutputs._plugins[delay_id] = plugin
 
     @staticmethod
-    def create_celldevs_delay(name: str) -> DelayedOutput:
-        if name not in DelayedOutputs._plugins:
-            raise ValueError('xDEVS Cell-DEVS delayed output plugin with name "{}" not found'.format(name))
-        return DelayedOutputs._plugins[name]()
+    def create_delayed_output(delay_id: str, cell_id: C, serve: bool = False) -> DelayedOutput:
+        if delay_id not in DelayedOutputs._plugins:
+            raise ValueError('xDEVS Cell-DEVS delayed output plugin with name "{}" not found'.format(delay_id))
+        return DelayedOutputs._plugins[delay_id](cell_id, serve)

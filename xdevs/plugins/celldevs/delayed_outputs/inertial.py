@@ -1,11 +1,11 @@
 from math import inf
 from typing import Generic, Optional
-from xdevs.celldevs.inout import DelayedOutput, S
+from xdevs.celldevs.inout import C, DelayedOutput, S
 
 
-class InertialDelayedOutput(Generic[S], DelayedOutput[S]):
-    def __init__(self):
-        super().__init__()
+class InertialDelayedOutput(DelayedOutput[C, S], Generic[C, S]):
+    def __init__(self, cell_id: C, serve: bool = False):
+        super().__init__(cell_id, serve)
         self.last_state: Optional[S] = None
         self.next_t: float = inf
 

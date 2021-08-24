@@ -1,11 +1,9 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Any, Dict, Generic, List, NoReturn, Optional, Tuple, Type, TypeVar
-from xdevs.celldevs.inout import InPort, OutPort, DelayedOutput, DelayedOutputs
+from xdevs.celldevs.inout import InPort, DelayedOutput, DelayedOutputs
 from xdevs.models import Atomic
 
-
-T = TypeVar('T')  # Variable type used for generic types
 
 C = TypeVar('C')  # Variable type used for cell IDs
 S = TypeVar('S')  # Variable type used for cell states
@@ -27,7 +25,6 @@ class CellConfig(Generic[C, S, V]):
         :param neighborhood: representation of the cell neighborhood. By default, it is empty.
         :param cell_map: list of cells that implement this configuration. By default, it is empty.
         :param eic: list of external input couplings. By default, it is empty.
-        :param ic: list of internal couplings. By default, it is empty.  # TODO remove this?
         :param eoc: list of external output couplings. By default, it is empty.
         """
         self.config_id: str = config_id
@@ -42,7 +39,7 @@ class CellConfig(Generic[C, S, V]):
         self.raw_neighborhood: List[Dict] = kwargs.get('neighborhood', list())
         self.cell_map: Optional[List[C]] = None if self.default else self._load_map(*kwargs.get('cell_map', list()))
         self.eic: List[Tuple[str, str]] = self._parse_couplings(kwargs.get('eic', list()))
-        self.ic: List[Tuple[str, str]] = self._parse_couplings(kwargs.get('ic', list()))  # TODO remove this?
+        self.ic: List[Tuple[str, str]] = [('out_celldevs', 'in_celldevs')]
         self.eoc: List[Tuple[str, str]] = self._parse_couplings(kwargs.get('eoc', list()))
 
     @property
@@ -112,7 +109,7 @@ class CellConfig(Generic[C, S, V]):
         return [(coupling[0], coupling[1]) for coupling in couplings]
 
     @staticmethod
-    def _load_value(t_type: Type[T], params: Any) -> T:
+    def _load_value(t_type, params: Any):
         params = deepcopy(params)
         if isinstance(params, Dict):
             return t_type(**params)
@@ -132,27 +129,19 @@ class Cell(Atomic, ABC, Generic[C, S, V]):
         """
         super().__init__(str(cell_id))
         self._clock: float = 0
+        self.ics = config.eic
         self.cell_id: C = cell_id
         self.cell_state: S = config.load_state()
         self.neighborhood: Dict[C, V] = config.load_neighborhood()
-        self.input_ports: List[InPort] = list()
-        self.delayed_output_ports: DelayedOutput[S] = DelayedOutputs.create_celldevs_delay(config.delay_type)
 
-    def add_in_port(self, in_port: InPort) -> NoReturn:
-        """
-        Adds a new input port to the cell.
-        :param in_port: input port to be added.
-        """
-        self.input_ports.append(in_port)
-        super().add_in_port(in_port.port)
+        self.in_celldevs: InPort[C, S] = InPort(self.cell_id)
+        self.out_celldevs: DelayedOutput[C, S] = DelayedOutputs.create_delayed_output(config.delay_type, self.cell_id)
+        self.add_in_port(self.in_celldevs.port)
+        self.add_out_port(self.out_celldevs.port)
 
-    def add_out_port(self, out_port: OutPort) -> NoReturn:
-        """
-        Adds a new output port to the cell.
-        :param out_port: output port to be added.
-        """
-        self.delayed_output_ports.add_out_port(out_port)
-        super().add_out_port(out_port.port)
+    @property
+    def neighbors_state(self) -> Dict[C, S]:
+        return self.in_celldevs.history
 
     @abstractmethod
     def local_computation(self, cell_state: S) -> S:
@@ -174,21 +163,27 @@ class Cell(Atomic, ABC, Generic[C, S, V]):
 
     def deltint(self) -> NoReturn:
         self._clock += self.sigma
-        self.delayed_output_ports.clean(self._clock)
-        self.sigma = self.delayed_output_ports.next_state() - self._clock
+        self.out_celldevs.clean(self._clock)
+        self.sigma = self.out_celldevs.next_state() - self._clock
 
     def deltext(self, e: float) -> NoReturn:
         self._clock += e
         self.sigma -= e
-        for in_port in self.input_ports:
-            in_port.read_new_events()
+        self.in_celldevs.read_new_events()
 
         new_state = self.local_computation(deepcopy(self.cell_state))
         if new_state != self.cell_state:
             state = deepcopy(new_state)
-            self.delayed_output_ports.add_to_buffer(self._clock + self.output_delay(state), state)
-            self.sigma = self.delayed_output_ports.next_time() - self._clock
+            self.out_celldevs.add_to_buffer(self._clock + self.output_delay(state), state)
+            self.sigma = self.out_celldevs.next_time() - self._clock
         self.cell_state = new_state
 
     def lambdaf(self) -> NoReturn:
-        self.delayed_output_ports.send_events(self._clock + self.sigma)
+        self.out_celldevs.send_events(self._clock + self.sigma)
+
+    def initialize(self) -> NoReturn:
+        self.out_celldevs.add_to_buffer(0, self.cell_state)
+        self.activate()
+
+    def exit(self) -> NoReturn:
+        pass

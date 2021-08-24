@@ -3,9 +3,12 @@ from unittest import TestCase
 from xdevs.celldevs.inout import DelayedOutput, DelayedOutputs
 
 
+CELL_ID: str = 'CELL_ID'
+
+
 class TestCellDEVSDelays(TestCase):
     def test_inertial_delay(self):
-        delay: DelayedOutput[int] = DelayedOutputs.create_celldevs_delay('inertial')
+        delay: DelayedOutput[int] = DelayedOutputs.create_delayed_output('inertial', CELL_ID)
         self.assertIsNone(delay.next_state())
         self.assertEqual(inf, delay.next_time())
 
@@ -23,7 +26,7 @@ class TestCellDEVSDelays(TestCase):
         self.assertEqual(inf, delay.next_time())
 
     def test_transport_delay(self):
-        delay = DelayedOutputs.create_celldevs_delay('transport')
+        delay = DelayedOutputs.create_delayed_output('transport', CELL_ID)
         self.assertIsNone(delay.next_state())
         self.assertEqual(inf, delay.next_time())
 
@@ -57,7 +60,7 @@ class TestCellDEVSDelays(TestCase):
         self.assertEqual(inf, delay.next_time())
 
     def test_hybrid_delay(self):
-        delay = DelayedOutputs.create_celldevs_delay('hybrid')
+        delay = DelayedOutputs.create_delayed_output('hybrid', CELL_ID)
         self.assertIsNone(delay.next_state())
         self.assertEqual(inf, delay.next_time())
 

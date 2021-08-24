@@ -6,10 +6,7 @@
         "start": 1,
         "end": 2
       },
-      "config": [1, 2, 3],
-      "ic": [
-        ["out", "in"]
-      ]
+      "config": [1, 2, 3]
     },
     "simple": {
       "neighborhood": [
