@@ -14,9 +14,9 @@ T = TypeVar('T')
 
 
 class Transducible(ABC):
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def transducer_map() -> Dict[str, Tuple[Type[T], Callable[[Any], T]]]:
+    def transducer_map(cls) -> Dict[str, Tuple[Type[T], Callable[[Any], T]]]:
         pass
 
 

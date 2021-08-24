@@ -12,8 +12,8 @@ class NonTransducibleClass:
 
 
 class TransducibleClass(NonTransducibleClass, Transducible):
-    @staticmethod
-    def transducer_map() -> Dict[str, Tuple[Type[T], Callable[[TransducibleClass], T]]]:
+    @classmethod
+    def transducer_map(cls) -> Dict[str, Tuple[Type[T], Callable[[TransducibleClass], T]]]:
         return {
             'start': (int, lambda x: x.start),
             'stop': (float, lambda x: x.stop),
