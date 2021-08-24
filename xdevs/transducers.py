@@ -1,3 +1,4 @@
+from __future__ import annotations
 import inspect
 import itertools
 import logging
@@ -9,9 +10,18 @@ from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Ty
 from xdevs.models import Atomic, Component, Coupled, Port
 
 
+T = TypeVar('T')
+
+
+class Transducible(ABC):
+    @staticmethod
+    @abstractmethod
+    def transducer_map() -> Dict[str, Tuple[Type[T], Callable[[Any], T]]]:
+        pass
+
+
 class Transducer(ABC):
 
-    T = TypeVar('T')
     state_mapper: Dict[str, Tuple[Type[T], Callable[[Atomic], T]]]
     event_mapper: Dict[str, Tuple[Type[T], Callable[[Any], T]]]
 
@@ -31,7 +41,6 @@ class Transducer(ABC):
         if self.transducer_id is None:
             raise AttributeError("You must specify a transducer ID.")
 
-        # TODO make all these variables as class variables instead of object variables?
         self.sim_time_id: str = kwargs.get('sim_time_id', 'sim_time')
         self.include_names: bool = kwargs.get('include_names', True)
         self.model_name_id: str = kwargs.get('model_name_id', 'model_name')
@@ -44,7 +53,11 @@ class Transducer(ABC):
         self.imminent_ports: Optional[List[Port]] = None if self.exhaustive else []
 
         self.state_mapper = {'phase': (str, lambda x: x.phase), 'sigma': (float, lambda x: x.sigma)}
-        self.event_mapper = {'value': (str, lambda x: str(x))}
+        event_type: Optional[Type[T]] = kwargs.get('event_type')
+        if event_type is not None and issubclass(event_type, Transducible):
+            self.event_mapper = event_type.transducer_map()
+        else:
+            self.event_mapper = {'value': (str, lambda x: str(x))}
 
         self.supported_data_types: Iterable[type] = self.create_known_data_types_map()
         self._remove_special_numbers: bool = False
@@ -250,8 +263,9 @@ class Transducer(ABC):
 
 class Transducers:
 
-    _plugins: Dict[str, Type[Transducer]] = {ep.name: ep.load()
-                                             for ep in pkg_resources.iter_entry_points('xdevs.plugins.transducers')}
+    _plugins: Dict[str, Type[Transducer]] = {
+        ep.name: ep.load() for ep in pkg_resources.iter_entry_points('xdevs.plugins.transducers')
+    }
 
     @staticmethod
     def add_plugin(name: str, plugin: Type[Transducer]) -> NoReturn:
