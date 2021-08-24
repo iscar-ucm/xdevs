@@ -299,7 +299,6 @@ class Coordinator(AbstractSimulator):
         if time <= self.time_next or time != time:
             port.extend(values)
             self.clock.time = time
-            self.lambdaf()
             self.deltfcn()
             self.clear()
             self.clock.time = self.time_next
