@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='xdevs',
-      version='2.2.1',
+      version='2.2.2',
       description='xDEVS M&S framework',
       url='https://github.com/dacya/xdevs',
       author='Kevin Henares, Román Cárdenas',
