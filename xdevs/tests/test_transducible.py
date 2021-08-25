@@ -1,6 +1,6 @@
 from __future__ import annotations
 import unittest
-from typing import Dict, Tuple, Type, Callable
+from typing import Dict, Type
 from xdevs.transducers import Transducer, Transducers, Transducible, T
 
 
@@ -13,12 +13,11 @@ class NonTransducibleClass:
 
 class TransducibleClass(NonTransducibleClass, Transducible):
     @classmethod
-    def transducer_map(cls) -> Dict[str, Tuple[Type[T], Callable[[TransducibleClass], T]]]:
-        return {
-            'start': (int, lambda x: x.start),
-            'stop': (float, lambda x: x.stop),
-            'log': (bool, lambda x: x.log),
-        }
+    def transducible_fields(cls) -> Dict[str, Type[T]]:
+        return {'start': int, 'stop': float, 'log': bool}
+
+    def transduce(self) -> Dict[str, T]:
+        return {'start': self.start, 'stop': self.stop, 'log': self.log}
 
 
 class MyTestCase(unittest.TestCase):

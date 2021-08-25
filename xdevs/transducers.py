@@ -16,7 +16,11 @@ T = TypeVar('T')
 class Transducible(ABC):
     @classmethod
     @abstractmethod
-    def transducer_map(cls) -> Dict[str, Tuple[Type[T], Callable[[Any], T]]]:
+    def transducible_fields(cls) -> Dict[str, Type[T]]:
+        pass
+
+    @abstractmethod
+    def transduce(self) -> Dict[str, T]:
         pass
 
 
@@ -53,14 +57,20 @@ class Transducer(ABC):
         self.imminent_ports: Optional[List[Port]] = None if self.exhaustive else []
 
         self.state_mapper = {'phase': (str, lambda x: x.phase), 'sigma': (float, lambda x: x.sigma)}
-        event_type: Optional[Type[T]] = kwargs.get('event_type')
-        if event_type is not None and issubclass(event_type, Transducible):
-            self.event_mapper = event_type.transducer_map()
+
+        self.event_type: Optional[Type[T]] = kwargs.get('event_type')
+        if self.transducible:
+            self.event_mapper = {field_name: (field_type, None)
+                                 for field_name, field_type in self.event_type.transducible_fields().items()}
         else:
             self.event_mapper = {'value': (str, lambda x: str(x))}
 
         self.supported_data_types: Iterable[type] = self.create_known_data_types_map()
         self._remove_special_numbers: bool = False
+
+    @property
+    def transducible(self):
+        return self.event_type is not None and issubclass(self.event_type, Transducible)
 
     def activate_remove_special_numbers(self):
         logging.warning('Transducer {} does not support special number values (e.g., infinity). '
@@ -238,15 +248,18 @@ class Transducer(ABC):
                 extra_fields = self.map_extra_fields(event, self.event_mapper)
                 yield {**fields, **extra_fields}
 
-    def map_extra_fields(self, target: Any, field_mapper: dict) -> Dict[str, Any]:
+    def map_extra_fields(self, target: Any, fields_mapper: dict) -> Dict[str, Any]:
         """
         Maps fields from target object according to a field mapper.
         :param target: target object that contains the additional data.
-        :param field_mapper: field mapper. It has the following structure: {'field_id': (data_type, getter_function)}.
+        :param fields_mapper: field mapper. It has the following structure: {'field_id': (data_type, getter_function)}.
         :return: dictionary with the values to be bulked to the destination.
         """
+        if self.transducible:
+            return target.transduce()
+
         extra_fields: Dict[str, Any] = dict()
-        for field_id, (field_type, field_mapper) in field_mapper.items():
+        for field_id, (field_type, field_mapper) in fields_mapper.items():
             field_value = field_mapper(target)  # subtract extra field from target
             if field_type not in self.supported_data_types:
                 field_value = str(field_value)  # unknown data types are automatically converted to string
