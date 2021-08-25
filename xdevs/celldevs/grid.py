@@ -219,12 +219,15 @@ class GridCellConfig(CellConfig[C, S, V], Generic[S, V]):
 
 
 class GridCell(Cell[C, S, V], ABC, Generic[S, V]):
-    def __init__(self, config: GridCellConfig):
+
+    _config: GridCellConfig[S, V]
+
+    def __init__(self, cell_id: C, config: GridCellConfig):
         """
         Grid Cell class for Cell-DEVS scenarios.
         :param config: configuration structure for grid cells.
         """
-        super().__init__(config)
+        super().__init__(cell_id, config)
         self.scenario = config.scenario
 
     @property
@@ -280,3 +283,6 @@ class GridCell(Cell[C, S, V], ABC, Generic[S, V]):
         :return: relative distance vector.
         """
         return self.scenario.distance_vector(self.location, neighbor)
+
+    def _load_neighborhood(self) -> Dict[C, V]:
+        return self._config.load_cell_neighborhood(self.cell_id)

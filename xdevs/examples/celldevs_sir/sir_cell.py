@@ -1,13 +1,28 @@
+from __future__ import annotations
+from typing import Dict, Type
 from xdevs.celldevs.cell import S
-from xdevs.celldevs.grid import GridCell, GridCellConfig
+from xdevs.celldevs.grid import C, GridCell, GridCellConfig
+from xdevs.transducers import Transducible, T
 
 
-class State:
+class State(Transducible):
     def __init__(self, population: int, susceptible: float, infected: float, recovered: float):
         self.population: int = population
         self.susceptible: float = susceptible
         self.infected: float = infected
         self.recovered: float = recovered
+
+    def __eq__(self, other: State):
+        return self.population == other.population and self.susceptible == other.susceptible \
+            and self.infected == other.infected and self.recovered == other.recovered
+
+    @classmethod
+    def transducible_fields(cls) -> Dict[str, Type[T]]:
+        return {'population': int, 'susceptible': float, 'infected': float, 'recovered': float}
+
+    def transduce(self) -> Dict[str, T]:
+        return {'population': self.population, 'susceptible': self.susceptible,
+                'infected': self.infected, 'recovered': self.recovered}
 
 
 class Vicinity:
@@ -27,8 +42,8 @@ class Config:
 
 
 class SIRGridCell(GridCell[State, Vicinity]):
-    def __init__(self, config: GridCellConfig):
-        super().__init__(config)
+    def __init__(self, cell_id: C, config: GridCellConfig):
+        super().__init__(cell_id, config)
         self.config: Config = Config(**config.cell_config)
 
     def local_computation(self, cell_state: S) -> S:

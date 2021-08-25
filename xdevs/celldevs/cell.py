@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Any, Dict, Generic, List, NoReturn, Optional, Tuple, Type, TypeVar
-from xdevs.celldevs.inout import InPort, DelayedOutput, DelayedOutputs
+from xdevs.celldevs.inout import CellMessage, InPort, DelayedOutput, DelayedOutputs
 from xdevs.models import Atomic
 
 
@@ -31,6 +31,7 @@ class CellConfig(Generic[C, S, V]):
         self.c_type: Type[C] = c_type
         self.s_type: Type[S] = s_type
         self.v_type: Type[V] = v_type
+        CellMessage.state_t = s_type
 
         self.cell_type: str = kwargs['cell_type']
         self.delay_type: str = kwargs.get('delay', 'inertial')
@@ -72,7 +73,7 @@ class CellConfig(Generic[C, S, V]):
                 if isinstance(self.state, Dict) else kwargs['state']
         self.raw_neighborhood = kwargs.get('neighborhood', self.raw_neighborhood)
         if 'cell_map' in kwargs:
-            self.cell_map = self._load_map(kwargs['cell_map'])
+            self.cell_map = self._load_map(*kwargs['cell_map'])
         if 'eic' in kwargs:
             self.eic = self._parse_couplings(kwargs['eic'])
         if 'ic' in kwargs:
@@ -129,10 +130,11 @@ class Cell(Atomic, ABC, Generic[C, S, V]):
         """
         super().__init__(str(cell_id))
         self._clock: float = 0
+        self._config: CellConfig = config
         self.ics = config.eic
         self.cell_id: C = cell_id
         self.cell_state: S = config.load_state()
-        self.neighborhood: Dict[C, V] = config.load_neighborhood()
+        self.neighborhood: Dict[C, V] = self._load_neighborhood()
 
         self.in_celldevs: InPort[C, S] = InPort(self.cell_id)
         self.out_celldevs: DelayedOutput[C, S] = DelayedOutputs.create_delayed_output(config.delay_type, self.cell_id)
@@ -164,7 +166,7 @@ class Cell(Atomic, ABC, Generic[C, S, V]):
     def deltint(self) -> NoReturn:
         self._clock += self.sigma
         self.out_celldevs.clean(self._clock)
-        self.sigma = self.out_celldevs.next_state() - self._clock
+        self.sigma = self.out_celldevs.next_time() - self._clock
 
     def deltext(self, e: float) -> NoReturn:
         self._clock += e
@@ -187,3 +189,6 @@ class Cell(Atomic, ABC, Generic[C, S, V]):
 
     def exit(self) -> NoReturn:
         pass
+
+    def _load_neighborhood(self) -> Dict[C, V]:
+        return self._config.load_neighborhood()

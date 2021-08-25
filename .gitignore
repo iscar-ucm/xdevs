@@ -1,3 +1,4 @@
+.DS_Store
 .settings
 bin
 build
@@ -18,3 +19,4 @@ xdevs.iml
 venv/
 .venv/
 xdevs/tests/Test*.csv
+xdevs/examples/*/*.csv

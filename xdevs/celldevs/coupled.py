@@ -1,11 +1,10 @@
 import json
 from abc import abstractmethod, ABC
 from copy import deepcopy
-from typing import Generic, List, Optional, Tuple, Type, TypeVar
+from typing import Dict, Generic, Optional, Tuple, Type, TypeVar
 from xdevs.celldevs.cell import Cell, CellConfig
 from xdevs.celldevs.grid import GridCell, GridCellConfig, GridScenario
-from xdevs.models import Coupled, Dict, Port
-from xdevs.transducers import Transducer, Transducers
+from xdevs.models import Coupled
 
 
 C = TypeVar('C')  # Variable type used for cell IDs
@@ -23,7 +22,6 @@ class CoupledCellDEVS(Coupled, ABC, Generic[C, S, V]):
             self.raw_config = json.load(file)
         self._configs: Dict[str, CellConfig[C, S, V]] = dict()
         self._cells: Dict[C, Tuple[Cell[C, S, V], CellConfig]] = dict()
-        self._transducers: List[Transducer] = list()
 
     def load_config(self):
         raw_configs = self.raw_config['cells']
@@ -41,7 +39,7 @@ class CoupledCellDEVS(Coupled, ABC, Generic[C, S, V]):
                 for cell_id in cell_config.cell_map:
                     if cell_id in self._cells:
                         raise ValueError('cell with the same ID already exists')
-                    cell: Cell[C, S, V] = self.create_cell(cell_config.cell_type, cell_config)
+                    cell: Cell[C, S, V] = self.create_cell(cell_config.cell_type, cell_id, cell_config)
                     self._cells[cell_id] = (cell, cell_config)
                     self.add_component(cell)
 
@@ -56,26 +54,11 @@ class CoupledCellDEVS(Coupled, ABC, Generic[C, S, V]):
             for port_from, port_to in cell_config.eoc:
                 self.add_coupling(cell_to.get_out_port(port_from), self.get_out_port(port_to))
 
-    def load_transducers(self):
-        if self.raw_config["transducers"]:
-            sink: Port[Tuple[C, S]] = Port(tuple, 'sink')
-            self.add_out_port(sink)
-            for cell in self.components:
-                assert isinstance(cell, Cell)
-                self.add_coupling(cell.out_celldevs.port, sink)
-            for trans_id, trans_config in self.raw_config["transducers"].items():
-                transducer: Transducer = Transducers.create_transducer(trans_id, **trans_config)
-                transducer.add_target_port(sink)
-
-                transducer.add_event_field("cell_id", self.c_type, lambda x: x[0])
-                transducer.add_event_field("cell_state", self.s_type, lambda x: x[0])
-                self._transducers.append(transducer)
-
     def _load_default_config(self, raw_config: Dict) -> CellConfig[C, S, V]:
         return CellConfig('default', self.c_type, self.s_type, self.v_type, **raw_config)
 
     @abstractmethod
-    def create_cell(self, cell_type: str, cell_config: CellConfig[C, S, V]) -> Cell[C, S, V]:
+    def create_cell(self, cell_type: str, cell_id: C, cell_config: CellConfig[C, S, V]) -> Cell[C, S, V]:
         pass
 
 
@@ -85,14 +68,19 @@ class CoupledGridCellDEVS(CoupledCellDEVS[Tuple[int, ...], S, V], ABC, Generic[S
 
     def __init__(self, s_type: Type[S], v_type: Type[V], config_file: str):
         super().__init__(tuple, s_type, v_type, config_file)
-        self.scenario: GridScenario = GridScenario(**self.raw_config['scenario'])
+
+        scenario_config = self.raw_config['scenario']
+        shape = tuple(scenario_config['shape'])
+        origin = tuple(scenario_config['origin']) if 'origin' in scenario_config else None
+        wrapped = scenario_config.get('wrapped', False)
+        self.scenario: GridScenario = GridScenario(shape, origin, wrapped)
 
     def load_cells(self):
         super().load_cells()
         default_config = self._configs['default']
         for cell_id in self.scenario.iter_cells():
             if cell_id not in self._cells:
-                cell: GridCell[S, V] = self.create_cell(default_config.cell_type, default_config)
+                cell: GridCell[S, V] = self.create_cell(default_config.cell_type, cell_id, default_config)
                 self._cells[cell_id] = (cell, default_config)
                 self.add_component(cell)
 
@@ -100,5 +88,6 @@ class CoupledGridCellDEVS(CoupledCellDEVS[Tuple[int, ...], S, V], ABC, Generic[S
         return GridCellConfig(self.scenario, 'default', self.s_type, self.v_type, **raw_config)
 
     @abstractmethod
-    def create_cell(self, cell_type: str, cell_config: GridCellConfig[S, V]) -> GridCell[S, V]:
+    def create_cell(self, cell_type: str, cell_id: Tuple[int, ...],
+                    cell_config: GridCellConfig[S, V]) -> GridCell[S, V]:
         pass

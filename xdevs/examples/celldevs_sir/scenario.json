@@ -1,8 +1,8 @@
 {
   "scenario":{
-    "shape": [50, 50],
+    "shape": [25, 25],
     "origin": [-12, -12],
-    "wrapped": true
+    "wrapped": false
   },
   "cells": {
     "default": {
@@ -13,16 +13,16 @@
           "type": "von_neumann",
           "range": 1,
           "vicinity": {
-            "connection": 1,
-            "movement": 0.5
+            "connectivity": 1,
+            "mobility": 0.5
           }
         },
         {
           "type": "relative",
           "neighbors": [[0, 0]],
           "vicinity": {
-            "connection": 1,
-            "movement": 1
+            "connectivity": 1,
+            "mobility": 1
           }
         }
       ],
@@ -35,7 +35,8 @@
       "config": {
         "virulence": 0.6,
         "recovery": 0.4
-      }
+      },
+      "eoc": [["out_celldevs", "out_sink"]]
     },
     "epicenter": {
       "state": {
@@ -43,11 +44,6 @@
         "infected": 0.3
       },
       "cell_map": [[0, 0]]
-    }
-  },
-  "transducers": {
-    "csv": {
-
     }
   }
 }
