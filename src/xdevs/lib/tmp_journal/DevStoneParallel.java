@@ -39,13 +39,13 @@ public class DevStoneParallel extends Coordinator {
         super.buildHierarchy();
         simulators.forEach(simulator -> {
             Component component = simulator.getModel();
-            if (component.getClass().getSimpleName().equals(StaticSensorPayload.class.getSimpleName())) {
-                lambdaTasksSensorModel.add(new TaskLambda(simulator));
-                deltfcnTasksSensorModel.add(new TaskDeltFcn(simulator));                
+            if (component.getName().startsWith("Slow")) {
+                lambdaSlowTasks.add(new TaskLambda(simulator));
+                deltfcnSlowTasks.add(new TaskDeltFcn(simulator));                
             }
             else {
-                lambdaTasksRest.add(new TaskLambda(simulator));
-                deltfcnTasksRest.add(new TaskDeltFcn(simulator));
+                lambdaFastTasks.add(new TaskLambda(simulator));
+                deltfcnFastTasks.add(new TaskDeltFcn(simulator));
             }
         });
     }
