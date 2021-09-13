@@ -62,6 +62,9 @@ public class Dhrystone {
     }
 
     public void run(double seconds) {
+        ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+        long begin_time = threadBean.getCurrentThreadCpuTime();
+
         int Int_Loc_1, Int_Loc_2, Int_Loc_3;
         int[] Int_Loc_3_Ref = new int[1];
         int[] Int_Loc_1_Ref = new int[1];
@@ -70,7 +73,6 @@ public class Dhrystone {
         String String_Loc_1, String_Loc_2;
 
         long nanoSeconds = Math.round(1e9 * seconds);
-        ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
 
         Next_Record_Glob = Second_Record;
         Record_Glob = First_Record;
@@ -83,7 +85,8 @@ public class Dhrystone {
 
         String_Loc_1 = "DHRYSTONE PROGRAM, 1'ST STRING";
 
-        long total_time = threadBean.getCurrentThreadCpuTime();
+        long end_time = threadBean.getCurrentThreadCpuTime();
+        long total_time = end_time - begin_time;
 
         for (long Run_Index = 1; Run_Index <= Number_Of_Runs && total_time < nanoSeconds; ++Run_Index) {
 
@@ -122,8 +125,8 @@ public class Dhrystone {
             Proc_2(Int_Loc_1_Ref);
             Int_Loc_1 = Int_Loc_1_Ref[0];
 
-            total_time = threadBean.getCurrentThreadCpuTime();
-
+            end_time = threadBean.getCurrentThreadCpuTime();
+            total_time = end_time - begin_time;
         }
     }
 
@@ -336,6 +339,7 @@ public class Dhrystone {
 
     public static void main(String[] args) {
         Dhrystone.execute(5);
+        Dhrystone.execute(4);
     }
 
 }
