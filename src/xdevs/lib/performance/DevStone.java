@@ -60,7 +60,7 @@ public abstract class DevStone extends Coupled {
     public abstract long getNumOfEvents(int maxEvents, int width, int depth);
 
     public static void printUsage() {
-        System.err.println("Usage: java DEVStone.java <MODEL> <WIDTH> <DEPTH> <INTERNAL DELAY> <EXTERNAL DELAY> <COORDINATOR> <FLATTEN>");
+        System.err.println("Usage: java DEVStone.java <MODEL> <WIDTH> <DEPTH> <INTERNAL DELAY> <EXTERNAL DELAY> <COORDINATOR> <FLATTEN> <LOGGER_PATH>");
         System.err.println("    - <MODEL>: DEVStone model (LI, HI, HO, or HOmod)");
         System.err.println("    - <WIDTH>: DEVStone model's width (it must be an integer)");
         System.err.println("    - <DEPTH>: DEVStone model's depth (it must be an integer)");
@@ -71,13 +71,13 @@ public abstract class DevStone extends Coupled {
     }
 
     public static void main(String[] args) {
-        DevsLogger.setup(Level.INFO);
-        if (args.length != 7) {
+        if (args.length != 8) {
             System.err.println("Invalid number of arguments.");
             printUsage();
-            System.err.println("Using defaults: HO 300 300 0 0 Coordinator false");
-            args = new String[]{"HO","300","300","0","0","Coordinator", "false"};
+            System.err.println("Using defaults: HO 300 300 0 0 Coordinator false logger.log");
+            args = new String[]{"HO","300","300","0","0","Coordinator", "false", "logger.log"};
         }
+        DevsLogger.setup(args[7], Level.INFO);
         BenchmarkType benchmarkType;
         int width;
         int depth;
@@ -90,7 +90,7 @@ public abstract class DevStone extends Coupled {
             intDelayTime = Double.parseDouble(args[3]);
             extDelayTime = Double.parseDouble(args[4]);
         } catch (NumberFormatException e) {
-            LOGGER.severe("Some parameters format are incorrect");
+            System.err.println("Some parameters format are incorrect");
             printUsage();
             throw new RuntimeException();
         }
@@ -149,7 +149,7 @@ public abstract class DevStone extends Coupled {
         }
 
         long modelStop = System.currentTimeMillis();
-        LOGGER.info("Model creation time: " + ((modelStop - modelStart) / 1e3));
+        double modelCreationTime = ((modelStop - modelStart) / 1e3);
 
         long coordStart = System.currentTimeMillis();
         Coordinator coordinator;
@@ -161,13 +161,13 @@ public abstract class DevStone extends Coupled {
                 coordinator = new CoordinatorParallel(framework);
                 break;
             default:
-                LOGGER.info("xDEVS coordinator type not found");
+                System.err.println("xDEVS coordinator type not found");
                 printUsage();
                 throw new RuntimeException();
         }
         coordinator.initialize();
         long coordStop = System.currentTimeMillis();
-        LOGGER.info("Engine setup time: " + ((coordStop - coordStart) / 1e3));       
+        double engineSetupTime = ((coordStop - coordStart) / 1e3);
         
         // Theoretical values
         int numDeltInts = stoneCoupled.getNumDeltInts(maxEvents, width, depth);
@@ -179,15 +179,16 @@ public abstract class DevStone extends Coupled {
         coordinator.exit();
         long simulationStop = System.currentTimeMillis();
         double simulationTime = (simulationStop - simulationStart) / 1e3;
-        LOGGER.info("Simulation time: " + simulationTime);
 
-        LOGGER.info("MAXEVENTS;WIDTH;DEPTH;NUM_DELT_INTS;NUM_DELT_EXTS;NUM_OF_EVENTS;TIME");
+        LOGGER.info("MODEL,MAXEVENTS,WIDTH,DEPTH,NUM_DELT_INTS,NUM_DELT_EXTS,NUM_OF_EVENTS,SIMULATION_TIME,MODEL_CREATION_TIME,ENGINE_SETUP_TIME");
         String stats;
-        if (DevStoneAtomic.NUM_DELT_INTS == numDeltInts && DevStoneAtomic.NUM_DELT_EXTS == numDeltExts && DevStoneAtomic.NUM_OF_EVENTS == numOfEvents) {
-            stats = maxEvents + ";" + width + ";" + depth + ";" + DevStoneAtomic.NUM_DELT_INTS + ";" + DevStoneAtomic.NUM_DELT_EXTS + ";" + DevStoneAtomic.NUM_OF_EVENTS + ";" + simulationTime;
-        } else {
-            stats = "ERROR: NumDeltInts or NumDeltExts or NumOfEvents do not match the theoretical values (between brackets): " + DevStoneAtomic.NUM_DELT_INTS + ";[" + numDeltInts + "];" + DevStoneAtomic.NUM_DELT_EXTS + ";[" + numDeltExts + "];" + DevStoneAtomic.NUM_OF_EVENTS + ";[" + numOfEvents + "];" + simulationTime;
+        if (DevStoneAtomic.NUM_DELT_INTS != numDeltInts || DevStoneAtomic.NUM_DELT_EXTS != numDeltExts || DevStoneAtomic.NUM_OF_EVENTS != numOfEvents) {
+            DevStoneAtomic.NUM_DELT_INTS = -DevStoneAtomic.NUM_DELT_INTS;
+            DevStoneAtomic.NUM_DELT_EXTS = -DevStoneAtomic.NUM_DELT_EXTS;
+            DevStoneAtomic.NUM_OF_EVENTS = -DevStoneAtomic.NUM_OF_EVENTS;
         }
+        stats = args[0] + "," + maxEvents + "," + width + "," + depth + "," + DevStoneAtomic.NUM_DELT_INTS + "," + DevStoneAtomic.NUM_DELT_EXTS + "," + 
+                DevStoneAtomic.NUM_OF_EVENTS + "," + simulationTime + "," + modelCreationTime + "," + engineSetupTime;
         LOGGER.info(stats);
     }
 
