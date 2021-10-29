@@ -44,46 +44,6 @@ public abstract class Atomic extends Component {
         this(Atomic.class.getSimpleName());
     }
 
-    /**
-     * Constructor.
-     *
-     * @param xmlAtomic in the form:
-     * <atomic name="name" phase="passive" sigma="INFINITY" class="lib.atomic...">
-     * ...
-     * </atomic>
-     */
-    @SuppressWarnings({"rawtypes"})
-    public Atomic(Element xmlAtomic) {
-        this(xmlAtomic.getAttribute("name"));
-        setPhase(xmlAtomic.getAttribute("phase"));
-        String sigmaAsString = xmlAtomic.getAttribute("sigma");
-        if (sigmaAsString.equals("INFINITY")) {
-            setSigma(Constants.INFINITY);
-        } else {
-            setSigma(Double.parseDouble(sigmaAsString));
-        }
-        
-        NodeList xmlChildList = xmlAtomic.getChildNodes();
-        for (int i = 0; i < xmlChildList.getLength(); ++i) {
-            Node xmlNode = xmlChildList.item(i);
-            Element xmlElement;
-            String nodeName = xmlNode.getNodeName();
-            switch (nodeName) {
-                case "inport":
-                    xmlElement = (Element)xmlNode;
-                    super.addInPort(new Port(xmlElement.getAttribute("name")));
-                    break;
-                case "outport":
-                    xmlElement = (Element)xmlNode;
-                    super.addOutPort(new Port(xmlElement.getAttribute("name")));
-                    break;
-                default:
-                    break;
-            }
-        }
-        
-    }
-
     // DevsAtomic methods
     public double ta() {
         return sigma;
@@ -146,5 +106,25 @@ public abstract class Atomic extends Component {
         sb.append("\t, sigma: ").append(sigma);
         sb.append("]");
         return sb.toString();
+    }
+
+    public String toXml() {
+        StringBuilder builder = new StringBuilder();
+        StringBuilder tabs = new StringBuilder();
+        Component parent = this.parent;
+        int level = 0;
+        while (parent!=null) {
+            tabs.append("\t");
+            parent = parent.parent;
+            level++;
+        }
+        builder.append(tabs).append("<atomic name=\"").append(this.getName()).append("\"");
+        builder.append(" class=\"").append(this.getClass().getCanonicalName()).append("\"");
+        builder.append(" host=\"127.0.0.1\"");
+        builder.append(" port=\"").append(5000 + level).append("\"");
+        builder.append(">\n");
+        builder.append(tabs).append("</atomic>\n");
+
+        return builder.toString();
     }
 }

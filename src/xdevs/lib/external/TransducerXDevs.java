@@ -23,16 +23,13 @@ package xdevs.lib.external;
 
 import java.util.LinkedList;
 import java.util.logging.Logger;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Port;
 
 /**
  *
- * @author José Luis Risco Martín TODO: I keep the Transducer atomic model for
- * the end ...
+ * @author José Luis Risco Martín 
  */
 public class TransducerXDevs extends Atomic {
 
@@ -56,19 +53,6 @@ public class TransducerXDevs extends Atomic {
         totalTa = 0;
         clock = 0;
         this.observationTime = observationTime;
-    }
-
-    @SuppressWarnings("unchecked")
-    public TransducerXDevs(Element xmlAtomic) {
-        super(xmlAtomic);
-        iArrived = (Port<JobDevsJava>) super.getInPort(iArrived.getName());
-        iSolved = (Port<JobDevsJava>) super.getInPort(iSolved.getName());
-        oOut = (Port<JobDevsJava>) super.getOutPort(oOut.getName());  
-        NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
-        Element xmlParameter = (Element)xmlParameters.item(0);
-        totalTa = 0;
-        clock = 0;
-        observationTime = Double.valueOf(xmlParameter.getAttribute("value"));
     }
 
     @Override

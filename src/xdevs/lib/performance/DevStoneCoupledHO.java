@@ -137,11 +137,11 @@ public class DevStoneCoupledHO extends DevStone {
         framework.addComponent(generator);
         // HO model
         DevStoneCoupledHO stoneCoupled = new DevStoneCoupledHO("C", width, depth, preparationTime, intDelayTime, extDelayTime);        
-        LOGGER.info(stoneCoupled.toXML(0));
+        LOGGER.info(stoneCoupled.toXml());
         // In the following, stoneCoupled is flattened. The idea is to have a fair comparison between sequential, parallel and distributed models.
         // Since parallel and distributed models are always flattened, we flatten also sequential executions
         stoneCoupled = (DevStoneCoupledHO)stoneCoupled.flatten();
-        LOGGER.info(stoneCoupled.toXML(0));
+        LOGGER.info(stoneCoupled.toXml());
         framework.addComponent(stoneCoupled);
         // Couplings
         framework.addCoupling(generator.oOut, stoneCoupled.iIn);

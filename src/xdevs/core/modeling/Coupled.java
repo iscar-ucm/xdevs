@@ -66,42 +66,42 @@ public class Coupled extends Component {
             Element xmlChild;
             String nodeName = xmlNode.getNodeName();
             switch (nodeName) {
-                case "inport":
-                    xmlChild = (Element) xmlNode;
-                    super.addInPort(new Port(xmlChild.getAttribute("name")));
-                    break;
-                case "outport":
-                    xmlChild = (Element) xmlNode;
-                    super.addOutPort(new Port(xmlChild.getAttribute("name")));
-                    break;
-                case "coupled":
-                    xmlChild = (Element) xmlNode;
-                    this.addComponent(new Coupled(xmlChild));
-                    break;
-                case "atomic":
-                    xmlChild = (Element) xmlNode;
-                    try {
-                        Class<?> atomicClass = Class.forName(xmlChild.getAttribute("class"));
-                        Constructor<?> constructor = atomicClass
-                                .getConstructor(new Class[] { Class.forName("org.w3c.dom.Element") });
-                        Object atomicObject = constructor.newInstance(new Object[] { xmlChild });
-                        this.addComponent((Atomic) atomicObject);
-                    } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException
-                            | InstantiationException | NoSuchMethodException | SecurityException
-                            | InvocationTargetException ex) {
-                        LOGGER.severe(ex.getLocalizedMessage());
-                    }
-                    break;
-                case "connection":
-                    xmlChild = (Element) xmlNode;
-                    String componentFrom = xmlChild.getAttribute("componentFrom");
-                    String portFrom = xmlChild.getAttribute("portFrom");
-                    String componentTo = xmlChild.getAttribute("componentTo");
-                    String portTo = xmlChild.getAttribute("portTo");
-                    this.addCoupling(componentFrom, portFrom, componentTo, portTo);
-                    break;
-                default:
-                    break;
+            case "inport":
+                xmlChild = (Element) xmlNode;
+                super.addInPort(new Port(xmlChild.getAttribute("name")));
+                break;
+            case "outport":
+                xmlChild = (Element) xmlNode;
+                super.addOutPort(new Port(xmlChild.getAttribute("name")));
+                break;
+            case "coupled":
+                xmlChild = (Element) xmlNode;
+                this.addComponent(new Coupled(xmlChild));
+                break;
+            case "atomic":
+                xmlChild = (Element) xmlNode;
+                try {
+                    Class<?> atomicClass = Class.forName(xmlChild.getAttribute("class"));
+                    Constructor<?> constructor = atomicClass
+                            .getConstructor(new Class[] { Class.forName("org.w3c.dom.Element") });
+                    Object atomicObject = constructor.newInstance(new Object[] { xmlChild });
+                    this.addComponent((Atomic) atomicObject);
+                } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException
+                        | InstantiationException | NoSuchMethodException | SecurityException
+                        | InvocationTargetException ex) {
+                    LOGGER.severe(ex.getLocalizedMessage());
+                }
+                break;
+            case "connection":
+                xmlChild = (Element) xmlNode;
+                String componentFrom = xmlChild.getAttribute("componentFrom");
+                String portFrom = xmlChild.getAttribute("portFrom");
+                String componentTo = xmlChild.getAttribute("componentTo");
+                String portTo = xmlChild.getAttribute("portTo");
+                this.addCoupling(componentFrom, portFrom, componentTo, portTo);
+                break;
+            default:
+                break;
             }
         }
 
@@ -431,35 +431,34 @@ public class Coupled extends Component {
         }
     }
 
-    public String getDistributedModel() {
+    public String toXml() {
         StringBuilder builder = new StringBuilder();
-        builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
-        builder.append("<coupled name=\"" + this.getName() + "\"");
+        StringBuilder tabs = new StringBuilder();
+        Component parent = this.getParent();
+        int level = 0;
+        while (parent!=null) {
+            tabs.append("\t");
+            parent = parent.parent;
+            level++;
+        }
+
+        if (level == 0) {
+            builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
+        }
+        builder.append(tabs).append("<coupled name=\"" + this.getName() + "\"");
         builder.append(" class=\"").append(this.getClass().getCanonicalName()).append("\"");
         builder.append(" host=\"127.0.0.1\"");
-        builder.append(" mainPort=\"5000\"");
-        builder.append(" auxPort=\"6000\"");
+        builder.append(" port=\"").append(5000 + level).append("\"");
         builder.append(">\n");
-        int counter = 1;
         for (Component component : components) {
-            if (component instanceof Coupled) {
-                LOGGER.severe("ERROR: This models should not have coupled models (" + component.getName()
-                        + " is a Coupled model).");
-            } else {
-                builder.append("\t<atomic name=\"").append(component.getName()).append("\"");
-                builder.append(" class=\"").append(component.getClass().getCanonicalName()).append("\"");
-                builder.append(" host=\"127.0.0.1\"");
-                builder.append(" mainPort=\"").append(5000 + counter).append("\"");
-                builder.append(" auxPort=\"").append(6000 + counter).append("\"");
-                builder.append(">\n");
-            }
-            builder.append("\t</atomic>\n");
-            counter++;
+            builder.append(component.toXml());
         }
         // Couplings
-        LinkedList<Coupling<?>> couplings = getIC();
-        couplings.forEach((coupling) -> {
-            builder.append("\t<connection");
+        LinkedList<Coupling<?>> allCouplings = getEIC();
+        allCouplings.addAll(getIC());
+        allCouplings.addAll(getEOC());
+        allCouplings.forEach((coupling) -> {
+            builder.append(tabs).append("\t<connection");
             builder.append(" componentFrom=\"").append(coupling.getPortFrom().getParent().getName()).append("\"");
             builder.append(" classFrom=\"").append(coupling.getPortFrom().getParent().getClass().getCanonicalName())
                     .append("\"");
@@ -470,7 +469,7 @@ public class Coupled extends Component {
             builder.append(" portTo=\"").append(coupling.getPortTo().getName()).append("\"");
             builder.append("/>\n");
         });
-        builder.append("</coupled>\n");
+        builder.append(tabs).append("</coupled>\n");
         return builder.toString();
     }
 

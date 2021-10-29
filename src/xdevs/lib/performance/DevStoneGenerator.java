@@ -22,6 +22,7 @@ package xdevs.lib.performance;
 import org.w3c.dom.Element;
 
 import xdevs.core.modeling.Atomic;
+import xdevs.core.modeling.Component;
 import xdevs.core.modeling.Port;
 
 /**
@@ -97,4 +98,27 @@ public class DevStoneGenerator extends Atomic {
         return preparationTime;
     }
 
+    public String toXml() {
+        StringBuilder builder = new StringBuilder();
+        StringBuilder tabs = new StringBuilder();
+        Component parent = this.getParent();
+        int level = 0;
+        while (parent!=null) {
+            tabs.append("\t");
+            level++;
+            parent = parent.getParent();
+        }
+
+        builder.append(tabs).append("<atomic name=\"").append(this.getName()).append("\"");
+        builder.append(" class=\"").append(this.getClass().getCanonicalName()).append("\"");
+        builder.append(" host=\"127.0.0.1\"");
+        builder.append(" port=\"").append(5000 + level).append("\"");
+        builder.append(">\n");
+        builder.append(tabs).append("\t<constructor-arg value=\"").append(this.getPreparationTime()).append("\"/>\n");
+        builder.append(tabs).append("\t<constructor-arg value=\"").append(this.getPeriod()).append("\"/>\n");
+        builder.append(tabs).append("\t<constructor-arg value=\"").append(this.getMaxEvents()).append("\"/>\n");
+        builder.append(tabs).append("</atomic>\n");
+        
+        return builder.toString();
+    }
 }

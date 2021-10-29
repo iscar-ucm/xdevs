@@ -49,6 +49,7 @@ public abstract class Component {
     
     public abstract void initialize();
     public abstract void exit();
+    public abstract String toXml();
 
     public boolean isInputEmpty() {
         return inPorts.stream().noneMatch((port) -> (!port.isEmpty()));

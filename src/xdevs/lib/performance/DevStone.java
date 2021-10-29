@@ -19,17 +19,18 @@
  */
 package xdevs.lib.performance;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import xdevs.core.modeling.Coupled;
 import xdevs.core.modeling.Port;
 import xdevs.core.simulation.Coordinator;
-import xdevs.core.util.DevsLogger;
-import java.util.logging.Logger;
-import xdevs.core.modeling.Component;
-import xdevs.core.modeling.Coupling;
 import xdevs.core.simulation.parallel.CoordinatorParallel;
+import xdevs.core.util.DevsLogger;
 
 /**
  * Coupled model to study the performance using DEVStone
@@ -66,44 +67,44 @@ public abstract class DevStone extends Coupled {
     public abstract long getNumOfEvents(int maxEvents, int width, int depth);
 
     public static void printUsage() {
-        System.err.println("Usage: java DEVStone.java <MODEL> <WIDTH> <DEPTH> <INTERNAL DELAY> <EXTERNAL DELAY> <COORDINATOR> <FLATTEN> <LOGGER_PATH>");
+        System.err.println(
+                "Usage: java DEVStone.java <MODEL> <WIDTH> <DEPTH> <DELAY> <COORDINATOR> <FLATTEN> <LOGGER_PATH>");
         System.err.println("    - <MODEL>: DEVStone model (LI, HI, HO, or HOmod)");
         System.err.println("    - <WIDTH>: DEVStone model's width (it must be an integer)");
         System.err.println("    - <DEPTH>: DEVStone model's depth (it must be an integer)");
-        System.err.println("    - <INTERNAL_DELAY>: DEVStone model's internal transition delay in seconds");
-        System.err.println("    - <EXTERNAL_DELAY>: DEVStone model's external transition delay in seconds");
-        System.err.println("    - <COORDINATOR>: Desired xDEVS coordinator type for simulating the model (Coordinator, CoordinatorParallel)");
+        System.err.println("    - <DELAY>: DEVStone model's internal and external transition delay in seconds");
+        System.err.println(
+                "    - <COORDINATOR>: Desired xDEVS coordinator type for simulating the model (Null -just saves the XML model-, Coordinator, CoordinatorParallel)");
         System.err.println("    - <FLATTEN>: Flag for flattening the model before simulation (true or false)");
     }
 
     public static void main(String[] args) {
-        if (args.length != 8) {
+        if (args.length != 7) {
             System.err.println("Invalid number of arguments.");
             printUsage();
-            System.err.println("Using defaults: HO 300 300 0 0 Coordinator false logger.log");
-            args = new String[]{"HO","300","300","0","0","Coordinator", "false", "logger.log"};
+            System.err.println("Using defaults: HO 300 300 0 Coordinator false logger.log");
+            args = new String[] { "HO", "300", "300", "0", "Coordinator", "false", "logger.log" };
         }
-        DevsLogger.setup(args[7], Level.INFO);
+        DevsLogger.setup(args[6], Level.INFO);
         BenchmarkType benchmarkType;
         int width;
         int depth;
-        double intDelayTime;
-        double extDelayTime;
+        double delayTime;
         try {
             benchmarkType = BenchmarkType.valueOf(args[0]);
             depth = Integer.parseInt(args[1]);
             width = Integer.parseInt(args[2]);
-            intDelayTime = Double.parseDouble(args[3]);
-            extDelayTime = Double.parseDouble(args[4]);
+            delayTime = Double.parseDouble(args[3]);
         } catch (NumberFormatException e) {
             System.err.println("Some parameters format are incorrect");
             printUsage();
             throw new RuntimeException();
         }
-        String coordinatorType = args[5];
-        boolean flatten = Boolean.parseBoolean(args[6]);
+        String coordinatorType = args[4];
+        boolean flatten = Boolean.parseBoolean(args[5]);
 
-        // Atomic number of internal and external transitions, as well as number of events
+        // Atomic number of internal and external transitions, as well as number of
+        // events
         DevStoneAtomic.NUM_DELT_INTS = 0;
         DevStoneAtomic.NUM_DELT_EXTS = 0;
         DevStoneAtomic.NUM_OF_EVENTS = 0;
@@ -119,39 +120,39 @@ public abstract class DevStone extends Coupled {
         framework.addComponent(generator);
         DevStone stoneCoupled;
         switch (benchmarkType) {
-            case LI:
-                stoneCoupled = new DevStoneCoupledLI("C", width, depth, preparationTime, intDelayTime, extDelayTime);
-                break;
-            case HI:
-                stoneCoupled = new DevStoneCoupledHI("C", width, depth, preparationTime, intDelayTime, extDelayTime);
-                break;
-            case HO:
-                stoneCoupled = new DevStoneCoupledHO("C", width, depth, preparationTime, intDelayTime, extDelayTime);
-                break;
-            case HOmem:
-                stoneCoupled = new DevStoneCoupledHOmem("C", width, depth, preparationTime, intDelayTime, extDelayTime);
-                break;
-            case HOmod:
-                stoneCoupled = new DevStoneCoupledHOmod("C", width, depth, preparationTime, intDelayTime, extDelayTime);
-                break;
-            default:
-                stoneCoupled = new DevStoneCoupledLI("C", width, depth, preparationTime, intDelayTime, extDelayTime);
-                break;
+        case LI:
+            stoneCoupled = new DevStoneCoupledLI("C", width, depth, preparationTime, delayTime, delayTime);
+            break;
+        case HI:
+            stoneCoupled = new DevStoneCoupledHI("C", width, depth, preparationTime, delayTime, delayTime);
+            break;
+        case HO:
+            stoneCoupled = new DevStoneCoupledHO("C", width, depth, preparationTime, delayTime, delayTime);
+            break;
+        case HOmem:
+            stoneCoupled = new DevStoneCoupledHOmem("C", width, depth, preparationTime, delayTime, delayTime);
+            break;
+        case HOmod:
+            stoneCoupled = new DevStoneCoupledHOmod("C", width, depth, preparationTime, delayTime, delayTime);
+            break;
+        default:
+            stoneCoupled = new DevStoneCoupledLI("C", width, depth, preparationTime, delayTime, delayTime);
+            break;
         }
         framework.addComponent(stoneCoupled);
         framework.addCoupling(generator.oOut, stoneCoupled.iIn);
         switch (benchmarkType) {
-            case HO:
-                framework.addCoupling(generator.oOut, ((DevStoneCoupledHO) stoneCoupled).iInAux);
-                break;
-            case HOmem:
-                framework.addCoupling(generator.oOut, ((DevStoneCoupledHOmem) stoneCoupled).iInAux);
-                break;
-            case HOmod:
-                framework.addCoupling(generator.oOut, ((DevStoneCoupledHOmod) stoneCoupled).iInAux);
-                break;
-            default:
-                break;
+        case HO:
+            framework.addCoupling(generator.oOut, ((DevStoneCoupledHO) stoneCoupled).iInAux);
+            break;
+        case HOmem:
+            framework.addCoupling(generator.oOut, ((DevStoneCoupledHOmem) stoneCoupled).iInAux);
+            break;
+        case HOmod:
+            framework.addCoupling(generator.oOut, ((DevStoneCoupledHOmod) stoneCoupled).iInAux);
+            break;
+        default:
+            break;
         }
 
         long modelStop = System.currentTimeMillis();
@@ -160,21 +161,33 @@ public abstract class DevStone extends Coupled {
         long coordStart = System.currentTimeMillis();
         Coordinator coordinator;
         switch (coordinatorType) {
-            case "Coordinator":
-                coordinator = new Coordinator(framework, flatten);
-                break;
-            case "CoordinatorParallel":
-                coordinator = new CoordinatorParallel(framework);
-                break;
-            default:
-                System.err.println("xDEVS coordinator type not found");
-                printUsage();
-                throw new RuntimeException();
+        case "Null":
+            try {
+                if (flatten) {
+                    framework.flatten();
+                }
+                var writer = new BufferedWriter(new FileWriter(new File(benchmarkType.toString() + "_W-" + width + "_D-" + depth + "_T-" + delayTime + ".xml")));
+                writer.write(framework.toXml());
+                writer.close();
+            } catch (IOException e) {
+                System.err.println(e.getLocalizedMessage());
+            }
+            return;
+        case "Coordinator":
+            coordinator = new Coordinator(framework, flatten);
+            break;
+        case "CoordinatorParallel":
+            coordinator = new CoordinatorParallel(framework);
+            break;
+        default:
+            System.err.println("xDEVS coordinator type not found");
+            printUsage();
+            throw new RuntimeException();
         }
         coordinator.initialize();
         long coordStop = System.currentTimeMillis();
         double engineSetupTime = ((coordStop - coordStart) / 1e3);
-        
+
         // Theoretical values
         int numDeltInts = stoneCoupled.getNumDeltInts(maxEvents, width, depth);
         int numDeltExts = stoneCoupled.getNumDeltExts(maxEvents, width, depth);
@@ -186,59 +199,19 @@ public abstract class DevStone extends Coupled {
         long simulationStop = System.currentTimeMillis();
         double simulationTime = (simulationStop - simulationStart) / 1e3;
 
-        LOGGER.info("MODEL,MAXEVENTS,WIDTH,DEPTH,NUM_DELT_INTS,NUM_DELT_EXTS,NUM_OF_EVENTS,SIMULATION_TIME,MODEL_CREATION_TIME,ENGINE_SETUP_TIME");
+        LOGGER.info(
+                "MODEL,MAXEVENTS,WIDTH,DEPTH,NUM_DELT_INTS,NUM_DELT_EXTS,NUM_OF_EVENTS,SIMULATION_TIME,MODEL_CREATION_TIME,ENGINE_SETUP_TIME");
         String stats;
-        if (DevStoneAtomic.NUM_DELT_INTS != numDeltInts || DevStoneAtomic.NUM_DELT_EXTS != numDeltExts || DevStoneAtomic.NUM_OF_EVENTS != numOfEvents) {
+        if (DevStoneAtomic.NUM_DELT_INTS != numDeltInts || DevStoneAtomic.NUM_DELT_EXTS != numDeltExts
+                || DevStoneAtomic.NUM_OF_EVENTS != numOfEvents) {
             DevStoneAtomic.NUM_DELT_INTS = -DevStoneAtomic.NUM_DELT_INTS;
             DevStoneAtomic.NUM_DELT_EXTS = -DevStoneAtomic.NUM_DELT_EXTS;
             DevStoneAtomic.NUM_OF_EVENTS = -DevStoneAtomic.NUM_OF_EVENTS;
         }
-        stats = args[0] + "," + maxEvents + "," + width + "," + depth + "," + DevStoneAtomic.NUM_DELT_INTS + "," + DevStoneAtomic.NUM_DELT_EXTS + "," + 
-                DevStoneAtomic.NUM_OF_EVENTS + "," + simulationTime + "," + modelCreationTime + "," + engineSetupTime;
+        stats = args[0] + "," + maxEvents + "," + width + "," + depth + "," + DevStoneAtomic.NUM_DELT_INTS + ","
+                + DevStoneAtomic.NUM_DELT_EXTS + "," + DevStoneAtomic.NUM_OF_EVENTS + "," + simulationTime + ","
+                + modelCreationTime + "," + engineSetupTime;
         LOGGER.info(stats);
-    }
-
-    public String toXML(int level) {
-        StringBuilder tabs = new StringBuilder();
-        for (int i = 0; i < level; ++i) {
-            tabs.append("\t");
-        }
-        StringBuilder builder = new StringBuilder();
-        if (level == 0) {
-            builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
-        }
-        builder.append(tabs).append("<coupled name=\"").append(super.getName()).append("\">\n");
-        // Components
-        Collection<Component> components = super.getComponents();
-        components.forEach((component) -> {
-            if (component instanceof Coupled) {
-                int levelAux = level + 1;
-                builder.append(((DevStone) component).toXML(levelAux));
-            } else {
-                builder.append(tabs).append("\t<atomic name=\"").append(component.getName()).append("\"/>\n");
-            }
-        });
-        // Couplings
-        LinkedList<Coupling<?>> couplings = super.getEIC();
-        couplings.forEach((coupling) -> {
-            builder.append(tabs).append("\t<connection ");
-            builder.append("componentFrom=\"").append(coupling.getPortFrom().getParent().getName()).append("\" portFrom=\"").append(coupling.getPortFrom().getName());
-            builder.append("\" componentTo=\"").append(coupling.getPortTo().getParent().getName()).append("\" portTo=\"").append(coupling.getPortTo().getName()).append("\"/>\n");
-        });
-        couplings = super.getIC();
-        couplings.forEach((coupling) -> {
-            builder.append(tabs).append("\t<connection ");
-            builder.append("componentFrom=\"").append(coupling.getPortFrom().getParent().getName()).append("\" portFrom=\"").append(coupling.getPortFrom().getName());
-            builder.append("\" componentTo=\"").append(coupling.getPortTo().getParent().getName()).append("\" portTo=\"").append(coupling.getPortTo().getName()).append("\"/>\n");
-        });
-        couplings = super.getEOC();
-        couplings.forEach((coupling) -> {
-            builder.append(tabs).append("\t<connection ");
-            builder.append("componentFrom=\"").append(coupling.getPortFrom().getParent().getName()).append("\" portFrom=\"").append(coupling.getPortFrom().getName());
-            builder.append("\" componentTo=\"").append(coupling.getPortTo().getParent().getName()).append("\" portTo=\"").append(coupling.getPortTo().getName()).append("\"/>\n");
-        });
-        builder.append(tabs).append("</coupled>\n");
-        return builder.toString();
     }
 
     public int getWidth() {
