@@ -44,6 +44,7 @@ public class CoordinatorDistributed extends Coordinator {
 
     public LinkedList<DistributedTask> executeTasksList(int command) {
         LinkedList<DistributedTask> distributedTasks = new LinkedList<>();
+        //System.out.println(System.currentTimeMillis() + ": Sending task " + command + "[c:" + String.valueOf(clock.getTime()) + "]");
         model.getComponents().forEach(component -> {
             String host = ((CoupledDistributed) model).getHost(component.getName());
             Integer port = ((CoupledDistributed) model).getMainPort(component.getName());
@@ -75,9 +76,9 @@ public class CoordinatorDistributed extends Coordinator {
             md = new MessageDistributed(Commands.EXIT, String.valueOf(clock.getTime()));
             pm = new PingMessage(md, host, mainPort);
             pm.ping();
-            md = new MessageDistributed(Commands.EXIT_AUX, String.valueOf(clock.getTime()));
-            pm = new PingMessage(md, host, auxPort);
-            pm.ping();
+//            md = new MessageDistributed(Commands.EXIT_AUX, String.valueOf(clock.getTime()));
+//            pm = new PingMessage(md, host, auxPort);
+//            pm.ping();
         }
         executor.shutdown();
     }

@@ -25,10 +25,11 @@ import java.io.Serializable;
 
 /**
  *
- * @author jlrisco
+ * @author José L. Risco Martín
  */
 public class Job implements Serializable {
 
+  private static final long serialVersionUID = 6442709491519565544L;
   protected String id;
   protected double time;
 

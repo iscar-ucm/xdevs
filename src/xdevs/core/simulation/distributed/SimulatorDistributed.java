@@ -45,9 +45,11 @@ public class SimulatorDistributed extends Simulator {
         MessageDistributed md;
         String nameModel = this.model.getName();
         for (Coupling c : parent.getIC()) {
-
-            if (c.getPortFrom().getParent().getName().equals(nameModel)) {
+            if (c.getPortFrom().getParent().getName().equals(nameModel) && c.getPortFrom().getValues().size() > 0) {
                 md = new MessageDistributed(Commands.PROPAGATE_OUTPUT_N2N, c.getPortTo().getName(), c.getPortFrom().getValues());
+//                System.out.println(System.currentTimeMillis() + ", " + nameModel +  ": Trying to connect to " + c.getPortTo().getParent().getName() + " (propagation: " + nameModel + "." + c.getPortFrom().getName() + " -> " + c.getPortTo().getParent().getName() + "." + c.getPortTo().getName() + ")" + "[c:" + String.valueOf(clock.getTime()) + "]");
+//                System.out.println("Ping destination: " + parent.getHost(c.getPortTo().getParent().getName()) + ":" + parent.getAuxPort(c.getPortTo().getParent().getName()));
+//                System.out.println("Len: " + c.getPortFrom().getValues().size());
                 PingMessage pm = new PingMessage(md, parent.getHost(c.getPortTo().getParent().getName()), parent.getAuxPort(c.getPortTo().getParent().getName()));
                 pm.ping();
             }
@@ -106,10 +108,10 @@ public class SimulatorDistributed extends Simulator {
                     response = new MessageDistributed("EXIT: OK At " + now.format(date));
                     this.getOut = true;
                     break;
-                case Commands.EXIT_AUX:
-                    clock.setTime(Double.parseDouble(md.getMessage()));
-                    response = new MessageDistributed("EXIT_AUX: OK At " + now.format(date));
-                    break;
+//                case Commands.EXIT_AUX:
+//                    clock.setTime(Double.parseDouble(md.getMessage()));
+//                    response = new MessageDistributed("EXIT_AUX: OK At " + now.format(date));
+//                    break;
                 default:
                     response = new MessageDistributed("BAD_COMMAND");
                     break;
@@ -123,10 +125,10 @@ public class SimulatorDistributed extends Simulator {
 
     public void run() {
         // For to attend the communication with the coordinator
-        Thread mainDaemon = new Thread(new DistributedDaemon(parent.getMainPort(model.getName()), this));
+        DistributedDaemon mainDaemon = new DistributedDaemon(parent.getMainPort(model.getName()), this);
         mainDaemon.start();
         // For to attend the communication with the workers (At this case to propagate)
-        Thread auxDaemon = new Thread(new DistributedDaemon(parent.getAuxPort(model.getName()), this));
+        DistributedDaemon auxDaemon = new DistributedDaemon(parent.getAuxPort(model.getName()), this);
         auxDaemon.start();
     }
 

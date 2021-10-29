@@ -56,6 +56,7 @@ public class Coupled extends Component {
         this(Coupled.class.getSimpleName());
     }
 
+    @SuppressWarnings({ "rawtypes" })
     public Coupled(Element xmlCoupled) {
         super(xmlCoupled.getAttribute("name"));
         // Creamos los distintos elementos
@@ -81,10 +82,13 @@ public class Coupled extends Component {
                     xmlChild = (Element) xmlNode;
                     try {
                         Class<?> atomicClass = Class.forName(xmlChild.getAttribute("class"));
-                        Constructor<?> constructor = atomicClass.getConstructor(new Class[]{Class.forName("org.w3c.dom.Element")});
-                        Object atomicObject = constructor.newInstance(new Object[]{xmlChild});
+                        Constructor<?> constructor = atomicClass
+                                .getConstructor(new Class[] { Class.forName("org.w3c.dom.Element") });
+                        Object atomicObject = constructor.newInstance(new Object[] { xmlChild });
                         this.addComponent((Atomic) atomicObject);
-                    } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
+                    } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException
+                            | InstantiationException | NoSuchMethodException | SecurityException
+                            | InvocationTargetException ex) {
                         LOGGER.severe(ex.getLocalizedMessage());
                     }
                     break;
@@ -124,11 +128,12 @@ public class Coupled extends Component {
     /**
      * This method add a connection to the DEVS component.
      *
-     * @param cFrom Component at the beginning of the connection
+     * @param cFrom      Component at the beginning of the connection
      * @param oPortIndex Index of the source port in cFrom, starting at 0
-     * @param cTo Component at the end of the connection
+     * @param cTo        Component at the end of the connection
      * @param iPortIndex Index of the destination port in cTo, starting at 0
      */
+    @SuppressWarnings({ "unchecked" })
     public void addCoupling(Component cFrom, int oPortIndex, Component cTo, int iPortIndex) {
         if (cFrom == this) { // EIC
             Port<?> portFrom = cFrom.inPorts.get(oPortIndex);
@@ -159,17 +164,18 @@ public class Coupled extends Component {
     }
 
     /**
-     * @deprecated This method add a connection to the DEVS component. This
-     * method is deprecated because since the addition of the
-     * <code>parent</code> attribute, both components <code>cFrom</code> and
-     * <code>cTo</code> are no longer needed inside the Coupling class.
+     * @deprecated This method add a connection to the DEVS component. This method
+     *             is deprecated because since the addition of the
+     *             <code>parent</code> attribute, both components <code>cFrom</code>
+     *             and <code>cTo</code> are no longer needed inside the Coupling
+     *             class.
      * @param cFrom Component at the beginning of the connection
      * @param pFrom Port at the beginning of the connection
-     * @param cTo Component at the end of the connection
-     * @param pTo Port at the end of the connection
+     * @param cTo   Component at the end of the connection
+     * @param pTo   Port at the end of the connection
      */
     public void addCoupling(Component cFrom, Port<?> pFrom, Component cTo, Port<?> pTo) {
-        @SuppressWarnings({"rawtypes", "unchecked"})
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         Coupling coupling = new Coupling(pFrom, pTo);
         // Add to connections
         if (cFrom == this) {
@@ -205,11 +211,13 @@ public class Coupled extends Component {
             pTo = cTo.getInPort(pToName);
         }
         if (pFrom == null) {
-            LOGGER.severe(cFrom.getName() + "::" + pFromName + "->" + cTo.getName() + "::" + pToName + " --> port " + pFromName + " at component " + cFrom.getName() + " does not exist");
+            LOGGER.severe(cFrom.getName() + "::" + pFromName + "->" + cTo.getName() + "::" + pToName + " --> port "
+                    + pFromName + " at component " + cFrom.getName() + " does not exist");
             return;
         }
         if (pTo == null) {
-            LOGGER.severe(cFrom.getName() + "::" + pFromName + "->" + cTo.getName() + "::" + pToName + " --> port " + pToName + " at component " + cTo.getName() + " does not exist");
+            LOGGER.severe(cFrom.getName() + "::" + pFromName + "->" + cTo.getName() + "::" + pToName + " --> port "
+                    + pToName + " at component " + cTo.getName() + " does not exist");
             return;
         }
         this.addCoupling(pFrom, pTo);
@@ -219,15 +227,17 @@ public class Coupled extends Component {
      * This member adds a connection between ports pFrom and pTo
      *
      * @param pFrom Port at the beginning of the connection
-     * @param pTo Port at the end of the connection
+     * @param pTo   Port at the end of the connection
      */
     public void addCoupling(Port<?> pFrom, Port<?> pTo) {
         if (pFrom.getParent() == null) {
-            LOGGER.severe("Port " + pFrom.getName() + " does not have a parent component. Maybe the port was not added to the component?");
+            LOGGER.severe("Port " + pFrom.getName()
+                    + " does not have a parent component. Maybe the port was not added to the component?");
             return;
         }
         if (pTo.getParent() == null) {
-            LOGGER.severe("Port " + pTo.getName() + " does not have a parent component. Maybe the port was not added to the component?");
+            LOGGER.severe("Port " + pTo.getName()
+                    + " does not have a parent component. Maybe the port was not added to the component?");
             return;
         }
         Coupling coupling = new Coupling(pFrom, pTo);
@@ -246,12 +256,12 @@ public class Coupled extends Component {
     }
 
     /**
-     * Get the first component (including this coupled model) whose name match
-     * with name argument.
+     * Get the first component (including this coupled model) whose name match with
+     * name argument.
      *
      * @param name The name of the component to find
-     * @return The component, which name is equal to the argument. If no
-     * component is found, null is returned.
+     * @return The component, which name is equal to the argument. If no component
+     *         is found, null is returned.
      */
     public Component getComponentByName(String name) {
         if (this.name.equals(name)) {
@@ -328,9 +338,8 @@ public class Coupled extends Component {
         return this;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private void completeLeftBridge(LinkedList<Coupling<?>> couplings,
-            HashMap<Port<?>, LinkedList<Port<?>>> leftBridge,
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void completeLeftBridge(LinkedList<Coupling<?>> couplings, HashMap<Port<?>, LinkedList<Port<?>>> leftBridge,
             LinkedList<Coupling<?>> pCouplings) {
         for (Coupling<?> c : couplings) {
             LinkedList<Port<?>> list = leftBridge.get(c.portFrom);
@@ -342,10 +351,9 @@ public class Coupled extends Component {
         }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void completeRightBridge(LinkedList<Coupling<?>> couplings,
-            HashMap<Port<?>, LinkedList<Port<?>>> rightBridge,
-            LinkedList<Coupling<?>> pCouplings) {
+            HashMap<Port<?>, LinkedList<Port<?>>> rightBridge, LinkedList<Coupling<?>> pCouplings) {
         for (Coupling<?> c : couplings) {
             LinkedList<Port<?>> list = rightBridge.get(c.portTo);
             if (list != null) {
@@ -435,7 +443,8 @@ public class Coupled extends Component {
         int counter = 1;
         for (Component component : components) {
             if (component instanceof Coupled) {
-                LOGGER.severe("ERROR: This models should not have coupled models (" + component.getName() + " is a Coupled model).");
+                LOGGER.severe("ERROR: This models should not have coupled models (" + component.getName()
+                        + " is a Coupled model).");
             } else {
                 builder.append("\t<atomic name=\"").append(component.getName()).append("\"");
                 builder.append(" class=\"").append(component.getClass().getCanonicalName()).append("\"");
@@ -452,15 +461,29 @@ public class Coupled extends Component {
         couplings.forEach((coupling) -> {
             builder.append("\t<connection");
             builder.append(" componentFrom=\"").append(coupling.getPortFrom().getParent().getName()).append("\"");
-            builder.append(" classFrom=\"").append(coupling.getPortFrom().getParent().getClass().getCanonicalName()).append("\"");
+            builder.append(" classFrom=\"").append(coupling.getPortFrom().getParent().getClass().getCanonicalName())
+                    .append("\"");
             builder.append(" portFrom=\"").append(coupling.getPortFrom().getName()).append("\"");
             builder.append(" componentTo=\"").append(coupling.getPortTo().getParent().getName()).append("\"");
-            builder.append(" classTo=\"").append(coupling.getPortTo().getParent().getClass().getCanonicalName()).append("\"");
+            builder.append(" classTo=\"").append(coupling.getPortTo().getParent().getClass().getCanonicalName())
+                    .append("\"");
             builder.append(" portTo=\"").append(coupling.getPortTo().getName()).append("\"");
             builder.append("/>\n");
         });
         builder.append("</coupled>\n");
         return builder.toString();
+    }
+
+    public int countAtomicComponents() {
+        int res = 0;
+        for (Component component : components) {
+            if (component instanceof Atomic) {
+                res++;
+            } else {
+                res += ((Coupled) component).countAtomicComponents();
+            }
+        }
+        return res;
     }
 
 }

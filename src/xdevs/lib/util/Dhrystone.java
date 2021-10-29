@@ -19,6 +19,9 @@
  */
 package xdevs.lib.util;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
+
 /**
  * Class to run the Dhrystone benchmark 2.1 for a given amount of time.
  * Downloaded from: http://www.okayan.jp/DhrystoneApplet/
@@ -54,16 +57,13 @@ public class Dhrystone {
     protected Record_Type First_Record = new Record_Type();
     protected Record_Type Second_Record = new Record_Type();
     protected long Number_Of_Runs = Long.MAX_VALUE;
-    // END - BENCHMARK VARIABLES -
-    protected long total_time;
-    protected double dhrystonesPerSec;
-    protected long Run_Index;
 
     public Dhrystone() {
     }
 
     public void run(double seconds) {
-        long begin_time = System.currentTimeMillis();
+        ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+        long begin_time = threadBean.getCurrentThreadCpuTime();
 
         int Int_Loc_1, Int_Loc_2, Int_Loc_3;
         int[] Int_Loc_3_Ref = new int[1];
@@ -72,9 +72,8 @@ public class Dhrystone {
         int[] Enum_Loc = new int[1];
         String String_Loc_1, String_Loc_2;
 
-        long milliSeconds = Math.round(1000 * seconds);
+        long nanoSeconds = Math.round(1e9 * seconds);
 
-        // int Run_Index; // , Meas_Index; <-- Variable not used (???)
         Next_Record_Glob = Second_Record;
         Record_Glob = First_Record;
 
@@ -86,10 +85,10 @@ public class Dhrystone {
 
         String_Loc_1 = "DHRYSTONE PROGRAM, 1'ST STRING";
 
-        long end_time = (milliSeconds<=0) ? Long.MAX_VALUE : System.currentTimeMillis();
-        total_time = end_time - begin_time;
+        long end_time = threadBean.getCurrentThreadCpuTime();
+        long total_time = end_time - begin_time;
 
-        for (Run_Index = 1; Run_Index <= Number_Of_Runs && total_time < milliSeconds; ++Run_Index) {
+        for (long Run_Index = 1; Run_Index <= Number_Of_Runs && total_time < nanoSeconds; ++Run_Index) {
 
             Proc_5();
             Proc_4();
@@ -126,29 +125,17 @@ public class Dhrystone {
             Proc_2(Int_Loc_1_Ref);
             Int_Loc_1 = Int_Loc_1_Ref[0];
 
-            end_time = System.currentTimeMillis();
+            end_time = threadBean.getCurrentThreadCpuTime();
             total_time = end_time - begin_time;
-
         }
-
-        end_time = System.currentTimeMillis();
-        total_time = end_time - begin_time;
-        dhrystonesPerSec = (Run_Index - 1) * 1000.0 / total_time;
     }
 
-    public static void execute(double seconds, boolean printResults) {
+    public static void execute(double seconds) {
         if (seconds <= 0) {
             return;
         }
         Dhrystone dhrystone = new Dhrystone();
         dhrystone.run(seconds);
-        if (printResults) {
-            dhrystone.printResults();
-        }
-    }
-
-    public static void execute(double seconds) {
-        execute(seconds, false);
     }
 
     private void Proc_1(Record_Type Pointer_Par_Val) {
@@ -350,16 +337,9 @@ public class Dhrystone {
 
     }
 
-    private void printResults() {
-        System.out.println("Total time: " + total_time + "ms");
-        System.out.println("Iterations: " + (Run_Index - 1) + " of " + Number_Of_Runs + ".");
-        System.out.println("Result: " + dhrystonesPerSec + " dhrystone/sec.");
-
-    }
-
     public static void main(String[] args) {
-        Dhrystone.execute(5, true);
-        Dhrystone.execute(4, true);
+        Dhrystone.execute(5);
+        Dhrystone.execute(4);
     }
 
 }

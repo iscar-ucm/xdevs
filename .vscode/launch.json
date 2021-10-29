@@ -6,9 +6,59 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch DevStoneXml",
+            "request": "launch",
+            "mainClass": "xdevs.lib.tmp_journal.DevStoneXml",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch XmlStoneGenerator",
+            "request": "launch",
+            "mainClass": "xdevs.lib.tmp_journal.XmlStoneGenerator",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch Pruebas",
+            "request": "launch",
+            "mainClass": "xdevs.lib.tmp_journal.Pruebas",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch DevStoneDistributed",
+            "request": "launch",
+            "mainClass": "xdevs.lib.tmp_journal.DevStoneDistributed",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch DevStoneDistributed",
+            "request": "launch",
+            "mainClass": "DevStoneDistributed",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "${file}",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch RandomGenerator",
+            "request": "launch",
+            "mainClass": "xdevs.core.util.RandomGenerator",
+            "projectName": "xdevs"
+        },
+        {
+            "type": "java",
+            "name": "Launch XDevsJournal",
+            "request": "launch",
+            "mainClass": "xdevs.core.examples.efp.XDevsJournal",
+            "projectName": "xdevs"
         },
         {
             "type": "java",

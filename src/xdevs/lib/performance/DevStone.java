@@ -46,12 +46,18 @@ public abstract class DevStone extends Coupled {
 
     public Port<Integer> iIn = new Port<>("in");
     public Port<Integer> oOut = new Port<>("out");
+    private int width;
+    private int depth;
 
-    public DevStone(String name) {
+    public DevStone(String name, int width, int depth) {
         super(name);
         super.addInPort(iIn);
         super.addOutPort(oOut);
+        this.width = width;
+        this.depth = depth;
     }
+
+    public abstract int getNumOfAtomic(int width, int depth);
 
     public abstract int getNumDeltExts(int maxEvents, int width, int depth);
 
@@ -233,5 +239,21 @@ public abstract class DevStone extends Coupled {
         });
         builder.append(tabs).append("</coupled>\n");
         return builder.toString();
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
     }
 }
