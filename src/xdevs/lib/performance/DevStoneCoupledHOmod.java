@@ -35,7 +35,7 @@ public class DevStoneCoupledHOmod extends DevStone {
 
     public DevStoneCoupledHOmod(String prefix, int width, int depth, double preparationTime, double intDelayTime,
                                 double extDelayTime) {
-        super(prefix + (depth - 1), width, depth);
+        super(prefix + (depth - 1));
         super.addInPort(iInAux);
         if (depth == 1) {
             DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, intDelayTime, extDelayTime);
@@ -104,7 +104,7 @@ public class DevStoneCoupledHOmod extends DevStone {
     }
 
     public DevStoneCoupledHOmod(String prefix, int width, int depth, double preparationTime, RealDistribution distribution) {
-        super(prefix + (depth - 1), width, depth);
+        super(prefix + (depth - 1));
         super.addInPort(iInAux);
         if (depth == 1) {
             DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, distribution);

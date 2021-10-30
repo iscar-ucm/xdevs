@@ -6,11 +6,11 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Debug DevStone",
+            "name": "Debug DevStoneSimulation",
             "request": "launch",
-            "mainClass": "xdevs.lib.performance.DevStone",
+            "mainClass": "xdevs.lib.performance.DevStoneSimulation",
             "projectName": "xdevs",
-            "args": "--model=HO --width=10 --depth=10 --coordinator=Coordinator --save-xml=HO_W10_D10_C0.xml"
+            "args": "--model=HO --width=10 --depth=10 --coordinator=Coordinator --flattened --save-xml=HO_W10_D10_C0.xml"
 
         },
         {

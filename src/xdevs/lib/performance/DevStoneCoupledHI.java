@@ -29,7 +29,7 @@ import org.apache.commons.math3.distribution.RealDistribution;
 public class DevStoneCoupledHI extends DevStone {
 
     public DevStoneCoupledHI(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime) {
-        super(prefix + (depth - 1), width, depth);
+        super(prefix + (depth - 1));
         if (depth == 1) {
             DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, intDelayTime, extDelayTime);
             super.addComponent(atomic);
@@ -54,7 +54,7 @@ public class DevStoneCoupledHI extends DevStone {
     }
 
     public DevStoneCoupledHI(String prefix, int width, int depth, double preparationTime, RealDistribution distribution) {
-        super(prefix + (depth - 1), width, depth);
+        super(prefix + (depth - 1));
         if (depth == 1) {
             DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, distribution);
             super.addComponent(atomic);
