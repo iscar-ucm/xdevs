@@ -66,26 +66,16 @@ public abstract class DevStone extends Coupled {
 
     public abstract long getNumOfEvents(int maxEvents, int width, int depth);
 
-    public static void printUsage() {
-        System.err.println(
-                "Usage: java DEVStone.java <MODEL> <WIDTH> <DEPTH> <DELAY> <COORDINATOR> <FLATTEN> <LOGGER_PATH>");
-        System.err.println("    - <MODEL>: DEVStone model (LI, HI, HO, or HOmod)");
-        System.err.println("    - <WIDTH>: DEVStone model's width (it must be an integer)");
-        System.err.println("    - <DEPTH>: DEVStone model's depth (it must be an integer)");
-        System.err.println("    - <DELAY>: DEVStone model's internal and external transition delay in seconds");
-        System.err.println(
-                "    - <COORDINATOR>: Desired xDEVS coordinator type for simulating the model (Null -just saves the XML model-, Coordinator, CoordinatorParallel)");
-        System.err.println("    - <FLATTEN>: Flag for flattening the model before simulation (true or false)");
-    }
-
     public static void main(String[] args) {
-        if (args.length != 7) {
-            System.err.println("Invalid number of arguments.");
-            printUsage();
-            System.err.println("Using defaults: HO 300 300 0 Coordinator false logger.log");
-            args = new String[] { "HO", "300", "300", "0", "Coordinator", "false", "logger.log" };
-        }
-        DevsLogger.setup(args[6], Level.INFO);
+        DevStone.BenchmarkType model;
+        Integer width, depth;
+        String delayDistribution, coordinatorAsString, createXml, logPath;
+        Long seed;
+        Boolean flattened;
+        Boolean passed = parseArguments(args, model, width, depth, delayDistribution, seed, coordinatorAsString,
+                flattened, createXml, logPath);
+        if (passed.equals(Boolean.FALSE))
+            return;
         BenchmarkType benchmarkType;
         int width;
         int depth;
@@ -166,7 +156,8 @@ public abstract class DevStone extends Coupled {
                 if (flatten) {
                     framework.flatten();
                 }
-                var writer = new BufferedWriter(new FileWriter(new File(benchmarkType.toString() + "_W-" + width + "_D-" + depth + "_T-" + delayTime + ".xml")));
+                var writer = new BufferedWriter(new FileWriter(new File(
+                        benchmarkType.toString() + "_W-" + width + "_D-" + depth + "_T-" + delayTime + ".xml")));
                 writer.write(framework.toXml());
                 writer.close();
             } catch (IOException e) {
@@ -229,4 +220,72 @@ public abstract class DevStone extends Coupled {
     public void setDepth(int depth) {
         this.depth = depth;
     }
+
+    public static Boolean parseArguments(String[] args, DevStone.BenchmarkType model, Integer width, Integer depth,
+            String delayDistribution, Long seed, String coordinatorAsString, Boolean flattened, String createXml,
+            String logPath) {
+        if (args.length == 0) {
+            System.err.println("Invalid number of arguments.");
+            printUsage();
+            return Boolean.FALSE;
+        }
+        model = null;
+        width = null;
+        depth = null;
+        delayDistribution = "Constant-0";
+        seed = 1234L;
+        coordinatorAsString = null;
+        flattened = Boolean.FALSE;
+        createXml = null;
+        logPath = null;
+        for (String arg : args) {
+            if (arg.startsWith("--model=")) {
+                String[] parts = arg.split("=");
+                model = DevStone.BenchmarkType.valueOf(parts[1]);
+            } else if (arg.startsWith("--width=")) {
+                String[] parts = arg.split("=");
+                width = Integer.parseInt(parts[1]);
+            } else if (arg.startsWith("--depth=")) {
+                String[] parts = arg.split("=");
+                depth = Integer.parseInt(parts[1]);
+            } else if (arg.startsWith("--delay-distribution=")) {
+                String[] parts = arg.split("=");
+                delayDistribution = parts[1];
+            } else if (arg.startsWith("--seed=")) {
+                String[] parts = arg.split("=");
+                seed = Long.parseLong(parts[1]);
+            } else if (arg.startsWith("--coordinator=")) {
+                String[] parts = arg.split("=");
+                coordinatorAsString = parts[1];
+            } else if (arg.startsWith("--flattened")) {
+                flattened = Boolean.TRUE;
+            } else if (arg.equals("--createXml=")) {
+                String[] parts = arg.split("=");
+                createXml = parts[1];
+            } else if (arg.startsWith("--log-filepath=")) {
+                String[] parts = arg.split("=");
+                logPath = parts[1];
+            }
+        }
+        if (model == null || width == null || depth == null) {
+            printUsage();
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
+    }
+
+    public static void printUsage() {
+        System.err.println(
+                "Usage: DevStone --model=model --width=width --depth=depth [--delay-distribution=distribution] [--seed=seed] [--coordinator=coordinator] [--flattened] [--createXml=path] [--loger-path=path]");
+        System.err.println("    --model: DEVStone model (LI, HI, HO, or HOmod)");
+        System.err.println("    --width: DEVStone model's width (it must be an integer)");
+        System.err.println("    --depth: DEVStone model's depth (it must be an integer)");
+        System.err.println(
+                "    --delay-distribution: Distribution used to compute transition delays. Possible values are Constant-V, which is a Constant distribution with fixed value V. ChiSquaredDistribution-V, with parameter V, and UniformRealDistribution-L-U that is a value between L and U. Default is Constant-0.");
+        System.err.println("    --seed: Seed for the distribution (Long), f.i. 1234");
+        System.err.println("    --flattened: if present, flattens the model.");
+        System.err.println("    --createXml: saves an XML file with the model defined.");
+        System.err.println("    --logger-path: path where the logger will be saved.");
+    }
+
 }
