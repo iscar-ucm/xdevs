@@ -42,7 +42,7 @@ public class Node {
                 String atomicName = args[1];                                        
                 CoupledDistributed gpt = new CoupledDistributed(xmlCoupled);
                 LOGGER.info("Run "+atomicName+" .....");
-                SimulatorDistributed node = new SimulatorDistributed(gpt, atomicName);
+                new SimulatorDistributed(gpt, atomicName);
             }else if(args.length==1){ // Coordinator
                 LOGGER.info("Run Coordinator .....");
                 CoupledDistributed gpt = new CoupledDistributed(xmlCoupled);

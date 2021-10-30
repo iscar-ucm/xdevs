@@ -53,12 +53,16 @@ public class CoordinatorParallel extends Coordinator {
         executor = Executors.newFixedThreadPool(numberOfThreads);
     }
 
-    public CoordinatorParallel(SimulationClock clock, Coupled model) {
-        this(clock, model, Runtime.getRuntime().availableProcessors());
+    public CoordinatorParallel(Coupled model, int numberOfThreads) {
+        this(new SimulationClock(), model, numberOfThreads);
     }
 
     public CoordinatorParallel(Coupled model) {
         this(new SimulationClock(), model, Runtime.getRuntime().availableProcessors());
+    }
+
+    public CoordinatorParallel(SimulationClock clock, Coupled model) {
+        this(clock, model, Runtime.getRuntime().availableProcessors());
     }
     
     @Override

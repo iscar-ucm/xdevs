@@ -6,6 +6,15 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Debug DevStone",
+            "request": "launch",
+            "mainClass": "xdevs.lib.performance.DevStone",
+            "projectName": "xdevs",
+            "args": "--model=HO --width=10 --depth=10 --coordinator=Coordinator --save-xml=HO_W10_D10_C0.xml"
+
+        },
+        {
+            "type": "java",
             "name": "Launch DevStoneXml",
             "request": "launch",
             "mainClass": "xdevs.lib.tmp_journal.DevStoneXml",
