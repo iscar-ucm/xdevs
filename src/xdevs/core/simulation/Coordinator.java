@@ -28,14 +28,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import xdevs.core.examples.efp.Efp;
-import xdevs.core.util.Constants;
+import xdevs.core.modeling.Atomic;
+import xdevs.core.modeling.Component;
+import xdevs.core.modeling.Coupled;
 import xdevs.core.modeling.Coupling;
 import xdevs.core.modeling.Port;
-import xdevs.core.modeling.Component;
-import xdevs.core.modeling.Atomic;
-import xdevs.core.modeling.Coupled;
+import xdevs.core.util.Constants;
 import xdevs.core.util.DevsLogger;
-import xdevs.core.util.Util;
 
 /**
  *
@@ -177,8 +176,7 @@ public class Coordinator extends AbstractSimulator {
      * @param port input port to inject the set of values
      * @param values set of values to inject
      */
-    @SuppressWarnings({"rawtypes"})
-    public void simInject(double e, Port port, Collection values) {
+    public void simInject(double e, Port<Object> port, Collection<Object> values) {
         double time = clock.getTime() + e;
         if (time <= tN) {
             port.addValues(values);
@@ -195,7 +193,7 @@ public class Coordinator extends AbstractSimulator {
      * @param port input port to inject the set of values
      * @param values set of values to inject
      */
-    public void simInject(Port<?> port, Collection<?> values) {
+    public void simInject(Port<Object> port, Collection<Object> values) {
         simInject(0.0, port, values);
     }
 
@@ -207,8 +205,8 @@ public class Coordinator extends AbstractSimulator {
      * @param port
      * @param value
      */
-    public void simInject(double e, Port port, Object value) {
-        LinkedList values = new LinkedList();
+    public void simInject(double e, Port<Object> port, Object value) {
+        LinkedList<Object> values = new LinkedList<>();
         values.add(value);
         simInject(e, port, values);
     }
@@ -221,7 +219,7 @@ public class Coordinator extends AbstractSimulator {
      * @param port
      * @param value
      */
-    public void simInject(Port port, Object value) {
+    public void simInject(Port<Object> port, Object value) {
         simInject(0.0, port, value);
     }
 

@@ -90,6 +90,7 @@ public class DevStoneAtomic extends Atomic {
     
     @Override
     public void deltext(double e) {
+        super.resume(e);
         NUM_DELT_EXTS++;
         Dhrystone.execute(extDelayTime);
         if (!iIn.isEmpty()) {

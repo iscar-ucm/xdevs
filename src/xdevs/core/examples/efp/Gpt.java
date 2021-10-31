@@ -49,7 +49,7 @@ public class Gpt extends Coupled {
     }
 
     public static void main(String args[]) {
-        DevsLogger.setup(Level.INFO);
+        DevsLogger.setup(Level.FINE);
         Gpt gpt = new Gpt("gpt", 1, 100);
         //CoordinatorParallel coordinator = new CoordinatorParallel(gpt);
         Coordinator coordinator = new Coordinator(gpt);

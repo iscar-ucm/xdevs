@@ -22,7 +22,7 @@ public class Transducer<E> extends Atomic {
 
     @Override
     public void deltext(double e) {
-
+        super.resume(e);
         if (!iIn.isEmpty()) {
             for(E value: iIn.getValues()) {
                 values.add(value);

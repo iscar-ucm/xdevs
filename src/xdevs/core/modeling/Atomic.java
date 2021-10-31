@@ -50,12 +50,16 @@ public abstract class Atomic extends Component {
 
     public abstract void deltext(double e);
 
-    public void deltcon() {
+    public void deltcon(double e) {
         deltint();
         deltext(0);
     }
 
     public abstract void lambda();
+
+    public void resume(double e) {
+        sigma = sigma - e;
+    }
 
     public void holdIn(String phase, double sigma) {
         this.phase = phase;

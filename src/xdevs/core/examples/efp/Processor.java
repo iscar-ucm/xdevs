@@ -42,7 +42,7 @@ public class Processor extends Atomic {
         super.addInPort(iIn);
         super.addOutPort(oOut);
         this.processingTime = processingTime;
-        this.clock = 1; // *
+        this.clock = 0; // *
 
     }
 
@@ -62,16 +62,18 @@ public class Processor extends Atomic {
 
     @Override
     public void deltint() {
+        clock += super.getSigma();
         super.passivate();
     }
 
     @Override
     public void deltext(double e) {
+        super.resume(e);
+        clock += e;
         if (super.phaseIs("passive")) {
             currentJob = iIn.getSingleValue();
             super.holdIn("active", processingTime);
-            currentJob.time = clock; // *
-            clock = clock + processingTime; // *
+            currentJob.time = clock;
         }
     }
 

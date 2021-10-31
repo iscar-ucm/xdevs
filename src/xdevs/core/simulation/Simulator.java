@@ -46,7 +46,7 @@ public class Simulator extends AbstractSimulator {
         tL = clock.getTime();
         tN = tL + model.ta();
     }
-    
+
     @Override
     public void exit() {
         model.exit();
@@ -61,20 +61,17 @@ public class Simulator extends AbstractSimulator {
     public void deltfcn() {
         double t = clock.getTime();
         boolean isInputEmpty = model.isInputEmpty();
-        if (isInputEmpty && t != tN) {
-            return;
-        } else if (!isInputEmpty && t != tN) {
+        if (!isInputEmpty) {
             double e = t - tL;
-            model.setSigma(model.getSigma() - e);
-            model.deltext(e);
-            //System.out.println("deltext" + model.getName());
-        } else if (isInputEmpty && t == tN) {
+            if (t == tN) {
+                model.deltcon(e);
+            } else {
+                model.deltext(e);
+            }
+        } else if (t == tN)
             model.deltint();
-            //System.out.println("deltint" + model.getName());
-        } else if (!isInputEmpty && t == tN) {
-            model.deltcon();
-            //System.out.println("deltcon" + model.getName());
-        }
+        else
+            return;
         tL = t;
         tN = tL + model.ta();
     }
@@ -82,7 +79,7 @@ public class Simulator extends AbstractSimulator {
     @Override
     public void lambda() {
         if (clock.getTime() == tN) {
-            //System.out.println("lambda" + model.getName());
+            // System.out.println("lambda" + model.getName());
             model.lambda();
         }
     }

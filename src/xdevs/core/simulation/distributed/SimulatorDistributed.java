@@ -6,14 +6,14 @@
 package xdevs.core.simulation.distributed;
 
 import java.text.DateFormat;
-import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.logging.Level;
+import java.util.Date;
 import java.util.logging.Logger;
-import xdevs.core.modeling.distributed.CoupledDistributed;
+
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Coupling;
+import xdevs.core.modeling.distributed.CoupledDistributed;
 import xdevs.core.simulation.SimulationClock;
 import xdevs.core.simulation.Simulator;
 

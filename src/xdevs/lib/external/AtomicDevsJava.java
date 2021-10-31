@@ -76,6 +76,7 @@ public class AtomicDevsJava extends Atomic {
 
     @Override
     public void deltext(double e) {
+        super.resume(e);
         genDevs.modeling.message msg = buildMessage();
         model.deltext(e, msg);
     }

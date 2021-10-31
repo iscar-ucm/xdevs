@@ -57,55 +57,8 @@ public class Coupled extends Component {
     }
 
     public Coupled(Element xmlCoupled) {
-        super(xmlCoupled.getAttribute("name"));
-        // Creamos los distintos elementos
-        NodeList xmlChildList = xmlCoupled.getChildNodes();
-        for (int i = 0; i < xmlChildList.getLength(); ++i) {
-            Node xmlNode = xmlChildList.item(i);
-            Element xmlChild;
-            String nodeName = xmlNode.getNodeName();
-            switch (nodeName) {
-            case "coupled":
-                xmlChild = (Element) xmlNode;
-                try {
-                    Class<?> coupledClass = Class.forName(xmlChild.getAttribute("class"));
-                    Constructor<?> constructor = coupledClass
-                            .getConstructor(new Class[] { String.class });
-                    Object coupledObject = constructor.newInstance(new Object[] { xmlChild.getAttribute("name") });
-                    this.addComponent((Coupled) coupledObject);
-                } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException
-                        | InstantiationException | NoSuchMethodException | SecurityException
-                        | InvocationTargetException ex) {
-                    LOGGER.severe(ex.getLocalizedMessage());
-                }
-                break;
-            case "atomic":
-                xmlChild = (Element) xmlNode;
-                try {
-                    Class<?> atomicClass = Class.forName(xmlChild.getAttribute("class"));
-                    Constructor<?> constructor = atomicClass
-                            .getConstructor(new Class[] { Class.forName("org.w3c.dom.Element") });
-                    Object atomicObject = constructor.newInstance(new Object[] { xmlChild });
-                    this.addComponent((Atomic) atomicObject);
-                } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException
-                        | InstantiationException | NoSuchMethodException | SecurityException
-                        | InvocationTargetException ex) {
-                    LOGGER.severe(ex.getLocalizedMessage());
-                }
-                break;
-            case "connection":
-                xmlChild = (Element) xmlNode;
-                String componentFrom = xmlChild.getAttribute("componentFrom");
-                String portFrom = xmlChild.getAttribute("portFrom");
-                String componentTo = xmlChild.getAttribute("componentTo");
-                String portTo = xmlChild.getAttribute("portTo");
-                this.addCoupling(componentFrom, portFrom, componentTo, portTo);
-                break;
-            default:
-                break;
-            }
-        }
-
+        this(xmlCoupled.getAttribute("name"));
+        this.addComponentsAndCouplings(xmlCoupled);
     }
 
     @Override
@@ -486,4 +439,57 @@ public class Coupled extends Component {
         return res;
     }
 
+    protected void addComponentsAndCouplings(Element xmlCoupled) {
+        // Creamos los distintos elementos
+        NodeList xmlChildList = xmlCoupled.getChildNodes();
+        for (int i = 0; i < xmlChildList.getLength(); ++i) {
+            Node xmlNode = xmlChildList.item(i);
+            Element xmlChild;
+            String nodeName = xmlNode.getNodeName();
+            switch (nodeName) {
+            case "coupled":
+                xmlChild = (Element) xmlNode;
+                try {
+                    Class<?> coupledClass = Class.forName(xmlChild.getAttribute("class"));
+                    Constructor<?> constructor = coupledClass
+                            .getConstructor(new Class[] { String.class });
+                    Object coupledObject = constructor.newInstance(new Object[] { xmlChild.getAttribute("name") });
+                    Coupled coupledChild = (Coupled)coupledObject;
+                    this.addComponent(coupledChild);
+                    coupledChild.addComponentsAndCouplings(xmlChild);
+                } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException
+                        | InstantiationException | NoSuchMethodException | SecurityException
+                        | InvocationTargetException ex) {
+                    LOGGER.severe(ex.getLocalizedMessage());
+                }
+                break;
+            case "atomic":
+                xmlChild = (Element) xmlNode;
+                try {
+                    Class<?> atomicClass = Class.forName(xmlChild.getAttribute("class"));
+                    Constructor<?> constructor = atomicClass
+                            .getConstructor(new Class[] { Class.forName("org.w3c.dom.Element") });
+                    Object atomicObject = constructor.newInstance(new Object[] { xmlChild });
+                    Atomic atomicChild = (Atomic)atomicObject;
+                    this.addComponent(atomicChild);
+                } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException
+                        | InstantiationException | NoSuchMethodException | SecurityException
+                        | InvocationTargetException ex) {
+                    LOGGER.severe(ex.getLocalizedMessage());
+                }
+                break;
+            case "connection":
+                xmlChild = (Element) xmlNode;
+                String componentFrom = xmlChild.getAttribute("componentFrom");
+                String portFrom = xmlChild.getAttribute("portFrom");
+                String componentTo = xmlChild.getAttribute("componentTo");
+                String portTo = xmlChild.getAttribute("portTo");
+                this.addCoupling(componentFrom, portFrom, componentTo, portTo);
+                break;
+            default:
+                break;
+            }
+        }
+
+    }
 }

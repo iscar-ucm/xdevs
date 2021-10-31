@@ -95,6 +95,7 @@ public class TransducerXDevs extends Atomic {
 
     @Override
     public void deltext(double e) {
+        super.resume(e);
         clock = clock + e;
         if (phaseIs("active")) {
             JobDevsJava job = null;

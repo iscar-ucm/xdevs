@@ -6,6 +6,14 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Debug save-xml-flattened",
+            "request": "launch",
+            "mainClass": "xdevs.lib.performance.DevStoneSimulation",
+            "projectName": "xdevs",
+            "args": "--model=HO --width=10 --depth=10 --coordinator=Coordinator --flattened --save-xml=HO_W10_D10_C0.xml"
+        },
+        {
+            "type": "java",
             "name": "Debug load-xml",
             "request": "launch",
             "mainClass": "xdevs.lib.performance.DevStoneSimulation",

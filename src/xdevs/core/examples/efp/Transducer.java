@@ -102,6 +102,7 @@ public class Transducer extends Atomic {
 
     @Override
     public void deltext(double e) {
+        super.resume(e);
         clock = clock + e;
         if (phaseIs("active")) {
             Job job = null;
