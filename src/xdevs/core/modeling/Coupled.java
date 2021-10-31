@@ -56,7 +56,6 @@ public class Coupled extends Component {
         this(Coupled.class.getSimpleName());
     }
 
-    @SuppressWarnings({ "rawtypes" })
     public Coupled(Element xmlCoupled) {
         super(xmlCoupled.getAttribute("name"));
         // Creamos los distintos elementos
@@ -66,17 +65,19 @@ public class Coupled extends Component {
             Element xmlChild;
             String nodeName = xmlNode.getNodeName();
             switch (nodeName) {
-            case "inport":
-                xmlChild = (Element) xmlNode;
-                super.addInPort(new Port(xmlChild.getAttribute("name")));
-                break;
-            case "outport":
-                xmlChild = (Element) xmlNode;
-                super.addOutPort(new Port(xmlChild.getAttribute("name")));
-                break;
             case "coupled":
                 xmlChild = (Element) xmlNode;
-                this.addComponent(new Coupled(xmlChild));
+                try {
+                    Class<?> coupledClass = Class.forName(xmlChild.getAttribute("class"));
+                    Constructor<?> constructor = coupledClass
+                            .getConstructor(new Class[] { String.class });
+                    Object coupledObject = constructor.newInstance(new Object[] { xmlChild.getAttribute("name") });
+                    this.addComponent((Coupled) coupledObject);
+                } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException
+                        | InstantiationException | NoSuchMethodException | SecurityException
+                        | InvocationTargetException ex) {
+                    LOGGER.severe(ex.getLocalizedMessage());
+                }
                 break;
             case "atomic":
                 xmlChild = (Element) xmlNode;

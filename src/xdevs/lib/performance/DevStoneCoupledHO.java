@@ -41,10 +41,14 @@ public class DevStoneCoupledHO extends DevStone {
     public Port<Integer> iInAux = new Port<>("inAux");
     public Port<Integer> oOutAux = new Port<>("outAux");
 
-    public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime) {
-        super(prefix + (depth - 1));
+    public DevStoneCoupledHO(String name) {
+        super(name);
         super.addInPort(iInAux);
         super.addOutPort(oOutAux);
+    }
+
+    public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, double intDelayTime, double extDelayTime) {
+        this(prefix + (depth - 1));
         if (depth == 1) {
             DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, intDelayTime, extDelayTime);
             super.addComponent(atomic);
@@ -71,9 +75,7 @@ public class DevStoneCoupledHO extends DevStone {
     }
 
     public DevStoneCoupledHO(String prefix, int width, int depth, double preparationTime, RealDistribution distribution) {
-        super(prefix + (depth - 1));
-        super.addInPort(iInAux);
-        super.addOutPort(oOutAux);
+        this(prefix + (depth - 1));
         if (depth == 1) {
             DevStoneAtomic atomic = new DevStoneAtomic("A1_" + name, preparationTime, distribution);
             super.addComponent(atomic);

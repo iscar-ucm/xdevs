@@ -119,6 +119,7 @@ public class DevStoneSimulation {
             } catch (IOException e) {
                 LOGGER.severe(e.getLocalizedMessage());
             }
+            return;
         }
 
         framework = new Coupled("DevStone" + model.toString());
@@ -272,18 +273,24 @@ public class DevStoneSimulation {
         double simulationTime = (simulationStop - simulationStart) / 1e3;
         LOGGER.info(
                 "MODEL,MAXEVENTS,WIDTH,DEPTH,NUM_DELT_INTS,NUM_DELT_EXTS,NUM_OF_EVENTS,SIMULATION_TIME,MODEL_CREATION_TIME,ENGINE_SETUP_TIME");
-        String stats;
+        String stats = "";
         if (DevStoneAtomic.NUM_DELT_INTS != numDeltInts || DevStoneAtomic.NUM_DELT_EXTS != numDeltExts
                 || DevStoneAtomic.NUM_OF_EVENTS != numOfEvents) {
             DevStoneAtomic.NUM_DELT_INTS = -DevStoneAtomic.NUM_DELT_INTS;
             DevStoneAtomic.NUM_DELT_EXTS = -DevStoneAtomic.NUM_DELT_EXTS;
             DevStoneAtomic.NUM_OF_EVENTS = -DevStoneAtomic.NUM_OF_EVENTS;
         }
-        stats = model.toString() + "," + MAX_EVENTS + "," + width + "," + depth + "," + DevStoneAtomic.NUM_DELT_INTS
-                + "," + DevStoneAtomic.NUM_DELT_EXTS + "," + DevStoneAtomic.NUM_OF_EVENTS + "," + simulationTime + ","
-                + modelCreationTime + "," + engineSetupTime;
-        LOGGER.info(stats);
+        if (stone != null) {
+            stats = model.toString() + "," + MAX_EVENTS + "," + width + "," + depth + "," + DevStoneAtomic.NUM_DELT_INTS
+                    + "," + DevStoneAtomic.NUM_DELT_EXTS + "," + DevStoneAtomic.NUM_OF_EVENTS + "," + simulationTime
+                    + "," + modelCreationTime + "," + engineSetupTime;
+        } else {
+            stats = loadXml + "," + MAX_EVENTS + "," + 0 + "," + 0 + "," + -DevStoneAtomic.NUM_DELT_INTS + ","
+                    + -DevStoneAtomic.NUM_DELT_EXTS + "," + -DevStoneAtomic.NUM_OF_EVENTS + "," + simulationTime + ","
+                    + modelCreationTime + "," + engineSetupTime;
 
+        }
+        LOGGER.info(stats);
     }
 
     private void saveXml() {
