@@ -1,3 +1,4 @@
+from types import NoneType
 from typing import Dict, List, NoReturn, Optional
 from xdevs.transducers import Transducer
 from .bad_dependencies_transducer import BadDependenciesTransducer
@@ -39,7 +40,7 @@ try:
         def create_known_data_types_map(self) -> Dict[type, TypeEngine]:
             return {str: String(self.string_length), int: Integer, float: Float}
 
-        def initialize(self) -> NoReturn:
+        def initialize(self) -> NoneType:
             metadata = MetaData()
             if self.target_components:
                 table_name: str = self.transducer_id + '_states'
@@ -58,14 +59,14 @@ try:
                 self.event_table = self.create_table(table_name, columns, self.event_mapper, metadata)
             metadata.create_all(self.engine)
 
-        def bulk_data(self, sim_time: float) -> NoReturn:
+        def bulk_data(self, sim_time: float) -> NoneType:
             with self.engine.connect() as conn:
                 for insertion in self._iterate_state_inserts(sim_time):
                     conn.execute(self.state_table.insert().values(**insertion))
                 for insertion in self._iterate_event_inserts(sim_time):
                     conn.execute(self.event_table.insert().values(**insertion))
 
-        def exit(self) -> NoReturn:
+        def exit(self) -> NoneType:
             self.engine.dispose()
 
         def create_table(self, table_name: str, columns: List[Column],

@@ -2,6 +2,7 @@ from __future__ import annotations
 import inspect
 import itertools
 import logging
+from types import NoneType
 import pkg_resources
 import re
 from abc import ABC, abstractmethod
@@ -67,7 +68,7 @@ class Transducer(ABC):
                         'It will automatically substitute these values by None'.format(self.transducer_id))
         self._remove_special_numbers = True
 
-    def add_target_component(self, component: Atomic or Coupled, *filters) -> NoReturn:
+    def add_target_component(self, component: Atomic or Coupled, *filters) -> NoneType:
         components = self._iterate_components(component)
         self.target_components |= self._apply_filters(filters, components)
 
@@ -80,7 +81,7 @@ class Transducer(ABC):
             for child_comp in root_comp.components:
                 yield from self._iterate_components(child_comp, include_coupled=include_coupled)
 
-    def add_target_port(self, port: Port) -> NoReturn:
+    def add_target_port(self, port: Port) -> NoneType:
         parent: Optional[Component] = port.parent
         if parent is None:
             raise ValueError('Port {} does not have a parent component'.format(port.name))
@@ -105,7 +106,7 @@ class Transducer(ABC):
     def filter_components(self, *filters):
         self.target_components = self._apply_filters(filters, self.target_components)
 
-    def add_event_field(self, field_name: str, field_type: Type[T], field_getter: Callable[[Any], T]) -> NoReturn:
+    def add_event_field(self, field_name: str, field_type: Type[T], field_getter: Callable[[Any], T]) -> NoneType:
         """
         Adds new event field to the event mapper.
         :param field_name: name of the new field.
@@ -119,7 +120,7 @@ class Transducer(ABC):
             raise KeyError('Field name {} is reserved for DEVS element name field'.format(field_name))
         self._add_field(self.event_mapper, field_name, field_type, field_getter)
 
-    def add_state_field(self, field_name: str, field_type: Type[T], field_getter: Callable[[Atomic], T]) -> NoReturn:
+    def add_state_field(self, field_name: str, field_type: Type[T], field_getter: Callable[[Atomic], T]) -> NoneType:
         """
         Adds new state field to the state mapper.
         :param field_name: name of the new field.
@@ -140,7 +141,7 @@ class Transducer(ABC):
             raise KeyError('Field name {} is already included in field mapper'.format(field_name))
         field_mapper[field_name] = (field_type, field_getter)
 
-    def drop_event_field(self, field_name: str) -> NoReturn:
+    def drop_event_field(self, field_name: str) -> NoneType:
         """
         Drops a field from the event mapper.
         :param field_name: name of the field to be removed.
@@ -194,12 +195,12 @@ class Transducer(ABC):
         pass
 
     @abstractmethod
-    def initialize(self) -> NoReturn:
+    def initialize(self) -> NoneType:
         """Executes any required action before starting simulation (e.g., creating output file)."""
         pass
 
     @abstractmethod
-    def exit(self) -> NoReturn:
+    def exit(self) -> NoneType:
         """Executes any required action after complete simulation (e.g., close output file)."""
         pass
 
@@ -256,7 +257,7 @@ class Transducer(ABC):
             extra_fields[field_id] = field_value
         return extra_fields
 
-    def _log_unknown_data(self, data_type: type, field_name: str) -> NoReturn:
+    def _log_unknown_data(self, data_type: type, field_name: str) -> NoneType:
         logging.warning('Transducer {} does not support data type {} of field {}. '
                         'It will cast it to string'.format(self.transducer_id, data_type, field_name))
 
@@ -268,7 +269,7 @@ class Transducers:
     }
 
     @staticmethod
-    def add_plugin(name: str, plugin: Type[Transducer]) -> NoReturn:
+    def add_plugin(name: str, plugin: Type[Transducer]) -> NoneType:
         if name in Transducers._plugins:
             raise ValueError('xDEVS transducer plugin with name "{}" already exists'.format(name))
         Transducers._plugins[name] = plugin
