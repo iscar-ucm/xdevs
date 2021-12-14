@@ -4,7 +4,6 @@ import inspect
 import pickle
 from abc import ABC, abstractmethod
 from collections import deque, defaultdict
-from types import NoneType
 from typing import Deque, Dict, Generator, Generic, Iterator, NoReturn, Optional, List, Tuple, Type, TypeVar
 
 from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
@@ -44,7 +43,7 @@ class Port(Generic[T]):
     def empty(self) -> bool:
         return not bool(self._values or self._bag)
 
-    def clear(self) -> NoneType:
+    def clear(self) -> None:
         self._values.clear()
         self._bag.clear()
 
@@ -65,7 +64,7 @@ class Port(Generic[T]):
         """
         return next(self.values)
 
-    def add(self, val: T) -> NoneType:
+    def add(self, val: T) -> None:
         """
         Adds a new value to the local value bag of the port.
         :param val: event to be added.
@@ -75,7 +74,7 @@ class Port(Generic[T]):
             raise TypeError("Value type is %s (%s expected)" % (type(val).__name__, self.p_type.__name__))
         self._values.append(val)
 
-    def extend(self, vals: Iterator[T]) -> NoneType:
+    def extend(self, vals: Iterator[T]) -> None:
         """
         Adds a set of new values to the local value bag of the port.
         :param vals: list containing all the values to be added.
@@ -84,7 +83,7 @@ class Port(Generic[T]):
         for val in vals:
             self.add(val)
 
-    def add_to_bag(self, port: Port[T]) -> NoneType:
+    def add_to_bag(self, port: Port[T]) -> None:
         """
         Adds a port that contains events to the message bag.
         :param port: port to be added to the bag.
@@ -113,11 +112,11 @@ class Component(ABC):
         return self.name
 
     @abstractmethod
-    def initialize(self) -> NoneType:
+    def initialize(self) -> None:
         pass
 
     @abstractmethod
-    def exit(self) -> NoneType:
+    def exit(self) -> None:
         pass
 
     def in_empty(self) -> bool:
@@ -136,7 +135,7 @@ class Component(ABC):
     def used_out_ports(self) -> Generator[Port, None, None]:
         return (port for port in self.out_ports if port)
 
-    def add_in_port(self, port: Port) -> NoneType:
+    def add_in_port(self, port: Port) -> None:
         """
         Adds an input port to the xDEVS model.
         :param port: port to be added to the model.
@@ -144,7 +143,7 @@ class Component(ABC):
         port.parent = self
         self.in_ports.append(port)
 
-    def add_out_port(self, port: Port) -> NoneType:
+    def add_out_port(self, port: Port) -> None:
         """
         Adds an output port to the xDEVS model
         :param port: port to be added to the model.
@@ -194,7 +193,7 @@ class Coupling(Generic[T]):
     def __repr__(self) -> str:
         return str(self)
 
-    def propagate(self) -> NoneType:
+    def propagate(self) -> None:
         """Copies messages from the transmitter port to the receiver port"""
         if self.host:
             if self.port_from:
@@ -224,12 +223,12 @@ class Atomic(Component, ABC):
         return "%s(%s, %s)" % (self.name, str(self.phase), self.sigma)
 
     @abstractmethod
-    def deltint(self) -> NoneType:
+    def deltint(self) -> None:
         """Describes the internal transitions of the atomic model."""
         pass
 
     @abstractmethod
-    def deltext(self, e: float) -> NoneType:
+    def deltext(self, e: float) -> None:
         """
         Describes the external transitions of the atomic model.
         :param e: elapsed time between last transition and the external transition.
@@ -237,11 +236,11 @@ class Atomic(Component, ABC):
         pass
 
     @abstractmethod
-    def lambdaf(self) -> NoneType:
+    def lambdaf(self) -> None:
         """Describes the output function of the atomic model."""
         pass
 
-    def deltcon(self, e: float) -> NoneType:
+    def deltcon(self, e: float) -> None:
         """
         Describes the confluent transitions of the atomic model. By default, the internal transition is triggered first.
         :param e: elapsed time between last transition and the confluent transition.
@@ -249,7 +248,7 @@ class Atomic(Component, ABC):
         self.deltint()
         self.deltext(0)
 
-    def hold_in(self, phase: str, sigma: float) -> NoneType:
+    def hold_in(self, phase: str, sigma: float) -> None:
         """
         Change atomic model's phase and next timeout.
         :param phase: atomic model's new phase.
@@ -258,7 +257,7 @@ class Atomic(Component, ABC):
         self.phase = phase
         self.sigma = sigma
 
-    def activate(self, phase: str = PHASE_ACTIVE) -> NoneType:
+    def activate(self, phase: str = PHASE_ACTIVE) -> None:
         """
         Sets next timeout to 0.
         :param phase: New phase. Defaults to "PHASE_ACTIVE".
@@ -266,7 +265,7 @@ class Atomic(Component, ABC):
         self.phase = phase
         self.sigma = 0
 
-    def passivate(self, phase: str = PHASE_PASSIVE) -> NoneType:
+    def passivate(self, phase: str = PHASE_PASSIVE) -> None:
         """
         Sets next timeout to 0 infinity.
         :param phase: New phase. Defaults to "PHASE_PASSIVE".
@@ -274,7 +273,7 @@ class Atomic(Component, ABC):
         self.phase = phase
         self.sigma = INFINITY
 
-    def continuef(self, e: float) -> NoneType:
+    def continuef(self, e: float) -> None:
         """
         Reduces the next timeout by e time units.
         :param e: elapsed time to be subtracted from sigma.
@@ -296,13 +295,13 @@ class Coupled(Component, ABC):
         self.eic: Dict[Port, Dict[Port, Coupling]] = dict()
         self.eoc: Dict[Port, Dict[Port, Coupling]] = dict()
 
-    def initialize(self) -> NoneType:
+    def initialize(self) -> None:
         pass
 
-    def exit(self) -> NoneType:
+    def exit(self) -> None:
         pass
 
-    def add_coupling(self, p_from: Port, p_to: Port, host=None) -> NoneType:
+    def add_coupling(self, p_from: Port, p_to: Port, host=None) -> None:
         """
         Adds coupling between two submodules of the coupled model.
         :param p_from: DEVS transmitter port.
@@ -323,7 +322,7 @@ class Coupled(Component, ABC):
             coupling_set[p_from] = dict()
         coupling_set[p_from][p_to] = Coupling(p_from, p_to, host)
 
-    def remove_coupling(self, coupling: Coupling) -> NoneType:
+    def remove_coupling(self, coupling: Coupling) -> None:
         """
         Removes coupling between two submodules of the coupled model.
         :param coupling: Couplings to be removed.
@@ -338,7 +337,7 @@ class Coupled(Component, ABC):
                 return
         raise ValueError("Coupling was not found in model definition")
 
-    def add_component(self, component: Component) -> NoneType:
+    def add_component(self, component: Component) -> None:
         """
         Adds component to coupled model.
         :param component: component to be added to the Coupled model.
@@ -387,7 +386,7 @@ class Coupled(Component, ABC):
 
         return new_comps_up, new_coups_up
 
-    def _remove_couplings_of_child(self, child: Coupled) -> NoneType:
+    def _remove_couplings_of_child(self, child: Coupled) -> None:
         for in_port in child.in_ports:
             self._remove_couplings(in_port, self.eic)
             self._remove_couplings(in_port, self.ic)
@@ -396,7 +395,7 @@ class Coupled(Component, ABC):
             self._remove_couplings(out_port, self.eoc)
 
     @staticmethod
-    def _remove_couplings(port: Port, couplings: Dict[Port, Dict[Port, Coupling]]) -> NoneType:
+    def _remove_couplings(port: Port, couplings: Dict[Port, Dict[Port, Coupling]]) -> None:
         # Remove port from couplings list
         couplings.pop(port, None)
         # For remaining ports, remove couplings which source is the port to be removed

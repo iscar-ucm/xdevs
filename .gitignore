@@ -18,3 +18,4 @@ xdevs.iml
 venv/
 .venv/
 xdevs/tests/Test*.csv
+.DS_Store

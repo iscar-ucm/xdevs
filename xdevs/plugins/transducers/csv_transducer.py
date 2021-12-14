@@ -1,6 +1,5 @@
 import csv
 import os
-from types import NoneType
 from typing import Any, List, NoReturn, Iterable, Type
 from ...transducers import Transducer
 
@@ -32,7 +31,7 @@ class CSVTransducer(Transducer):
     def create_known_data_types_map(self) -> Iterable[Type[Any]]:
         return [str, int, float, bool]
 
-    def initialize(self) -> NoneType:
+    def initialize(self) -> None:
         if self.target_components:
             self.state_header.extend(self.state_mapper)
             self.state_csv_file, self.state_csv_writer = self._create_csv_file(self.state_filename, self.state_header)

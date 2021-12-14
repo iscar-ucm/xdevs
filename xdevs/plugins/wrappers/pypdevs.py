@@ -1,5 +1,4 @@
 import logging
-from types import NoneType
 from typing import NoReturn
 from xdevs.models import Atomic, Port
 
@@ -49,7 +48,7 @@ class PyPDEVSWrapper(Atomic):
         self.phase = self.atomic.state = self.atomic.extTransition(self._inputs_to_dict())
         self.continuef(e)
 
-    def lambdaf(self) -> NoneType:
+    def lambdaf(self) -> None:
         outputs = self.atomic.outputFnc()
 
         for pypdevs_out_port, values in outputs.items():
@@ -57,10 +56,10 @@ class PyPDEVSWrapper(Atomic):
                 xdevs_out_port = self.xdevs_out_ports[pypdevs_out_port.name]
                 xdevs_out_port.extend(values)
 
-    def initialize(self) -> NoneType:
+    def initialize(self) -> None:
         pass
 
-    def exit(self) -> NoneType:
+    def exit(self) -> None:
         pass
 
     def _inputs_to_dict(self):

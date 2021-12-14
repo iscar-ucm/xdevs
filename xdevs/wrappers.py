@@ -1,5 +1,4 @@
 
-from types import NoneType
 from typing import Dict, NoReturn, Type
 import pkg_resources
 from xdevs.models import Atomic
@@ -9,7 +8,7 @@ class Wrappers:
                                          for ep in pkg_resources.iter_entry_points('xdevs.plugins.wrappers')}
 
     @staticmethod
-    def add_plugin(name: str, plugin: Type[Atomic]) -> NoneType:
+    def add_plugin(name: str, plugin: Type[Atomic]) -> None:
         if name in Wrappers._plugins:
             raise ValueError('xDEVS wrapper plugin with name "{}" already exists'.format(name))
         Wrappers._plugins[name] = plugin

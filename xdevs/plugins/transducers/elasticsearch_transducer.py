@@ -1,5 +1,4 @@
 import logging
-from types import NoneType
 from typing import Dict, NoReturn
 from ...transducers import Transducer
 from .bad_dependencies_transducer import BadDependenciesTransducer
@@ -33,7 +32,7 @@ try:
         def create_known_data_types_map(self) -> Dict[type, str]:
             return {str: 'text', int: 'integer', float: 'double', bool: 'boolean'}
 
-        def initialize(self) -> NoneType:
+        def initialize(self) -> None:
             if self.target_components:
                 fields = {self.sim_time_id: {'type': 'double'}}
                 if self.include_names:
@@ -47,13 +46,13 @@ try:
             if self.target_components or self.target_ports:
                 self.es = Elasticsearch([self.url])
 
-        def bulk_data(self, sim_time: float) -> NoneType:
+        def bulk_data(self, sim_time: float) -> None:
             for insertion in self._iterate_state_inserts(sim_time):
                 self.es.index(index=self.transducer_id + '_states', body=insertion)
             for insertion in self._iterate_event_inserts(sim_time):
                 self.es.index(index=self.transducer_id + '_events', body=insertion)
 
-        def exit(self) -> NoneType:
+        def exit(self) -> None:
             pass
 
         def create_index(self, index_name: str, field_properties: Dict[str, Dict[str, str]], others: Dict[str, tuple]):

@@ -7,7 +7,6 @@ import pickle
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from concurrent import futures
-from types import NoneType
 from typing import Dict, Generator, List, NoReturn, Optional, Union
 from xmlrpc.server import SimpleXMLRPCServer
 
@@ -51,11 +50,11 @@ class AbstractSimulator(ABC):
                         trans.add_imminent_port(port)
 
     @abstractmethod
-    def initialize(self) -> NoneType:
+    def initialize(self) -> None:
         pass
 
     @abstractmethod
-    def exit(self) -> NoneType:
+    def exit(self) -> None:
         pass
 
     @abstractmethod
@@ -63,7 +62,7 @@ class AbstractSimulator(ABC):
         pass
 
     @abstractmethod
-    def lambdaf(self) -> NoneType:
+    def lambdaf(self) -> None:
         pass
 
     @abstractmethod
@@ -71,7 +70,7 @@ class AbstractSimulator(ABC):
         pass
 
     @abstractmethod
-    def clear(self) -> NoneType:
+    def clear(self) -> None:
         pass
 
 
@@ -91,12 +90,12 @@ class Simulator(AbstractSimulator):
     def ta(self) -> float:
         return self.model.ta
 
-    def initialize(self) -> NoneType:
+    def initialize(self) -> None:
         self.model.initialize()
         self.time_last = self.clock.time
         self.time_next = self.time_last + self.model.ta
 
-    def exit(self) -> NoneType:
+    def exit(self) -> None:
         self.model.exit()
 
     def deltfcn(self) -> Optional[Simulator]:  # TODO
@@ -121,11 +120,11 @@ class Simulator(AbstractSimulator):
         self.time_next = self.time_last + self.model.ta
         return self
 
-    def lambdaf(self) -> NoneType:
+    def lambdaf(self) -> None:
         if self.clock.time == self.time_next:
             self.model.lambdaf()
 
-    def clear(self) -> NoneType:
+    def clear(self) -> None:
         for port in itertools.chain(self.model.in_ports, self.model.out_ports):
             port.clear()
 
@@ -250,7 +249,7 @@ class Coordinator(AbstractSimulator):
     def ta(self):
         return min((proc.time_next for proc in self.processors), default=INFINITY) - self.clock.time
 
-    def lambdaf(self) -> NoneType:
+    def lambdaf(self) -> None:
         for proc in self.processors:
             if self.clock.time == proc.time_next:
                 proc.lambdaf()
@@ -278,7 +277,7 @@ class Coordinator(AbstractSimulator):
             for coup in self.model.eic.get(port, dict()).values():
                 coup.propagate()
 
-    def clear(self) -> NoneType:
+    def clear(self) -> None:
         for port in itertools.chain(self.processors, self.model.in_ports, self.model.out_ports):
             port.clear()
 
