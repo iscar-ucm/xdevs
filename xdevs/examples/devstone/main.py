@@ -37,7 +37,6 @@ def parse_args():
     parser.add_argument('-i', '--int-cycles', type=int, default=0, help='Dhrystone cycles executed in internal transitions')
     parser.add_argument('-e', '--ext-cycles', type=int, default=0, help='Dhrystone cycles executed in external transitions')
     parser.add_argument('-f', '--flatten', action="store_true", help='Activate flattening on model')
-    parser.add_argument('-c', '--chained', action="store_true", help='Use chained coordinator')
 
     args = parser.parse_args()
 
@@ -66,7 +65,7 @@ if __name__ == '__main__':
     env = DEVStoneEnvironment("DEVStoneEnvironment", devstone_model)
     model_created_time = time.time()
 
-    coord = Coordinator(env, flatten=args.flatten, chain=args.chained)
+    coord = Coordinator(env, flatten=args.flatten)
     coord.initialize()
     engine_setup_time = time.time()
 

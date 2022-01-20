@@ -8,47 +8,31 @@
 
   - clone the git repository:
 
-    #+BEGIN_SRC shell
+    ```
       git clone git@github.com:iscar-ucm/xdevs.git
-    #+END_SRC
+    ```
 
-  - switch to the python branch
+  - switch to the python branch:
 
-    #+BEGIN_SRC shell
+    ```
       git checkout python
-    #+END_SRC
+    ```
 
-  - change directory (to the DEVStone example):
+  - install the xdevs package or **update it**:
 
-    #+BEGIN_SRC shell
-      cd src/xdevs/examples/DevStone 
-    #+END_SRC
-
-  - make
-
-    #+BEGIN_SRC shell
-      make
-    #+END_SRC
+    ```
+    pip3 install git+https://github.com/iscar-ucm/xdevs@python
+    ```
+    or
+    ```
+    pip3 install git+https://github.com/iscar-ucm/xdevs@python --upgrade
+    ```
 
   - and finally, run a DEVStone benchmark
 
-    #+BEGIN_SRC shell
-      ./devstone -w 100 -d 100 -b HO
-      STATS
-      Benchmark: HO (2)
-      PreparationTime: 0
-      Period: 1
-      MaxEvents: 1
-      Width: 100
-      Depth: 100
-      IntDelayTime: 0
-      ExtDelatTime: 0
-      Num delta_int: 490051, [490051]
-      Num delta_ext: 490051, [490051]
-      Num event_ext: 490051, [490051]
-      Model creation time (s): 0.0136859
-      Engine setup time (s): 0.00449369
-      Simulation time (s): 0.721096
-      TOTAL time (s): 0.739276
-      MEMORY (KiB): 11752
-    #+END_SRC
+    ```
+      python3 xdevs/examples/devstone/main.py -m HO -d 100 -w 100
+      Model creation time: 3.2901763916015625e-05
+      Engine setup time: 0.03270745277404785
+      Simulation time: 5.047549247741699 
+    ```
