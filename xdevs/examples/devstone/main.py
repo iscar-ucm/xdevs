@@ -4,7 +4,7 @@ import time
 
 from xdevs.sim import Coordinator
 
-from devstone import LI, HO, HI, HOmod
+from xdevs.examples.devstone.devstone import LI, HO, HI, HOmod
 from xdevs.models import Coupled
 from xdevs.utils import Generator
 

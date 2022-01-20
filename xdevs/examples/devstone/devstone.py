@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from xdevs.examples.devstone.pystone import pystones
+from pystone import pystones
 from xdevs.models import Atomic, Coupled, Port
 from xdevs.sim import Coordinator, ParallelProcessCoordinator
 from xdevs import PHASE_ACTIVE, get_logger
