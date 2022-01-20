@@ -1,7 +1,8 @@
+import logging
+
 from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, get_logger
 from xdevs.models import Atomic, Coupled, Port
 from xdevs.sim import Coordinator, ParallelCoordinator
-import logging
 
 logger = get_logger(__name__, logging.DEBUG)
 
@@ -158,8 +159,8 @@ class Gpt(Coupled):
 		if obs_time < 0:
 			raise ValueError("obs_time has to be greater or equal than 0")
 
-		gen = Generator("generator", 3*period)
-		proc = Processor("processor", period)
+		gen = Generator("generator", period)
+		proc = Processor("processor", 3*period)
 		trans = Transducer("transducer", obs_time)
 
 		self.add_component(gen)
@@ -182,11 +183,7 @@ class Wrap(Coupled):
 
 
 if __name__ == '__main__':
-	wrap = Wrap("gpt", 3, 1000)
-	parallel = False
-	if parallel:
-		coord = ParallelCoordinator(wrap, flatten=True)
-	else:
-		coord = Coordinator(wrap, flatten=True)
+	gpt = Gpt("gpt", 1, 100)
+	coord = Coordinator(gpt)
 	coord.initialize()
 	coord.simulate()
