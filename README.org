@@ -65,12 +65,11 @@ where:
 - Y			is the output set.
 - S			is the state set.
 - \delta_{int} : S \rightarrow S is the internal transition function.
-- δext:Q×X→S		is the external transition function, Q={(s,e):s∈S,e∈[0,ta(s)]} is 
-			total state set and e is the elapsed time since the last transition.
-λ:S→Y		is the output function.
-ta:S→R0+∪∞		is the time advance function.
+- \delta_{ext} : Q \times X \rightarrow S is the external transition function, Q={(s,e):s \in S, e \in [0,ta(s)]} is total state set and e is the elapsed time since the last transition.
+- \lambda : S \rightarrow Y is the output function.
+- ta : S \rightarrow R_0^+ \cup \infty is the time advance function.
 
-There are no restrictions on the sizes of the sets, which typically are product sets, i.e., S=S1×S2×⋯Sn. In the case of the state set S, this formalizes multiple concurrent parts of a system, while it formalizes multiple input and output ports in the case of sets X and Y. The time base T is not mentioned explicitly and is continuous. For a discrete-event model described by an atomic-DEVS M, the behavior is uniquely determined by the initial total state (s0,e0)∈Q and is obtained by means of the following iterative simulation procedure (refer to Figure 2):
+There are no restrictions on the sizes of the sets, which typically are product sets, i.e., S = S_1 \times S_2 \times \ldots S_n. In the case of the state set S, this formalizes multiple concurrent parts of a system, while it formalizes multiple input and output ports in the case of sets X and Y. The time base T is not mentioned explicitly and is continuous. For a discrete-event model described by an atomic-DEVS A, the behavior is uniquely determined by the initial total state (s0,e0) \in Q and is obtained by means of the following iterative simulation procedure (refer to Figure 2):
 
 At any given moment, a DEVS model is in state s ∈ S. In the absence of external events, it remains in that state for a period of time defined by ta(s). When ta(s) expires, the model outputs the value λ(s) through a port, and it then changes to a new state s1 given by δint(s). This transition is called an internal transition. Then, the process starts again (see bottom gray arrow in Figure 2). On the contrary, an external transition may occur due to the reception of external events through input ports. In this case, the external transition function determines the new state s2 given by δext(s,e,x), where s is the current state, e is the time elapsed since the last transition (external or internal), and x is the external event received. After an external transition, the model is re-scheduled and the process starts again (see left gray arrow), setting the elapsed time e to 0.
 
