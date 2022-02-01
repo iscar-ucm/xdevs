@@ -17,8 +17,6 @@
 
 * DEVS
 
-** DEVS formalism and variants
-
 The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
 
 The class of formalisms denoted as discrete-event is characterized by a continuous time base where only a finite number of events can occur during a finite time-span. This contrasts with Discrete Time System Specification (DTSS) formalisms where the time base is isomorphic to N, and with Differential Equation System Specification (DESS, or continuous-time) formalisms in which the state of the system may change continuously over time.
@@ -34,8 +32,6 @@ The closure property (under composition or coupling) of systems such as DEVS off
 
 Although some continuous-time formalisms (e.g., causal-block diagram simulation tools) allow model hierarchization, multi-rate integration mixes poorly with traditional approaches where discretization along the time-axis forces the simulator to work explicitly with the global time base. This, in contrast to discrete-event formalisms where the simulator is concerned with local state space changes, and the time base is dealt with implicitly. Discrete event concepts are thus better suited for parallel distributed simulation, and much effort has been devoted to the development of conservative (e.g., Chandy-Misra approach), optimistic (e.g., Time-Warp) and real-time (e.g., DARPA's Distributed Interactive Simulation) parallel discrete event simulation techniques. The relevance of DEVS in that context is illustrated by the concept of the DEVS bus which concerns the use of DEVS models as "wrappers" to enable a variety of models to inter operate in a networked simulation. The DEVS bus has been implemented on top of the DoD's High Level Architecture (HLA) standard, itself based on the Run-Time Infrastructure (RTI) protocol.
 
-Taking into account that DEVS is able to describe the behavior of other formalisms, our goal here is to introduce DEVS, focused to one particular form of this formalism: Parallel DEVS, and giving some details about other variants. The reader should refer to the book Theory of Modeling and Simulation [1], to understand the details behind the mathematical background of these techniques. 
-
 According to DEVS theory, the system of interest is seen as a model and the corresponding simulator. The model represents a simplified version of reality and its structure. The model is built considering the conditions of experimentation of the system of interest, including the work conditions of the real system and its application domain. Thus, the model is restricted to the experimental framework under which it was developed.
 
 This model is subsequently used to build a simulator. The simulator is able to change the state of the model by running all the necessary state transitions already defined in the model. All the transitions are executed in an appropriate order, according to the model definition.
@@ -45,7 +41,47 @@ DEVS was created for modeling and simulation of discrete-event dynamic systems. 
 The formal separation between model and simulator and the hierarchical and modular nature of the DEVS formalism have enabled carrying out of formal proofs on the different entities under study. One of them is the proof of composability of the subcomponents (including legitimacy and equivalence between multicomponent models). The second is the ability to conduct proofs of correctness of the simulation algorithms, which result in simulators rigorously verified. All the proofs are based on formal transformations between each of the representations, trying to prove the equivalence between the entities under study at different levels of abstraction. For instance, we can prove that the mathematical entity simulator is able to execute correctly the behavior described by the mathematical entity model, which represents the system.
 Different mathematical mechanisms are used to prove these points, including the mathematical manipulation of the abstraction hierarchy, observation of I/O trajectories (to ensure that different levels of specification correctly describe the system’ structure) and decomposition concepts (DEVS is closed under composition, which means that a composite model integrated by multiple components is equivalent to an atomic component).
 
-*** The DEVS formalism
+The reader should refer to the book Theory of Modeling and Simulation [1], to understand the details behind the mathematical background of these techniques. 
+
+
+*** The parallel DEVS formalism
+
+The parallel DEVS approach was introduced, after 15 years, as a revision of Classic DEVS. Currently, parallel DEVS is the prevalent DEVS, implemented in many libraries. In the following, unless it is explicitly noted, the use of DEVS implies parallel DEVS.
+
+DEVS enables the representation of a system by three sets and five functions: input set (X), output set (Y), state set (S), external transition function (\delta_{ext}), internal transition function (\delta_{int}), confluent function (\delta_{con}), output function (\lambda), and time advance function (ta). 
+
+DEVS models are of two types: atomic and coupled. Atomic DEVS processes input events based on their model's current state and condition, generates output events and transition to the next state. The coupled model is the aggregation/composition of two or more atomic and coupled models connected by explicit couplings. Particularly, an atomic model is defined by the following equation:
+
+A=< X, Y, S, \delta_{ext},  \delta_{int}, \delta_{con}, \lambda, ta >
+
+where:
+
+- X is the input set.
+- Y is the output set.
+- S is the state set.
+- \delta_{ext} : Q \times X^{b} \rightarrow S is the external transition function, Q={(s,e):s \in S, e \in [0,ta(s)]} is total state set and e is the elapsed time since the last transition, whereas X^{b} is the set of bags over elements in X. This function is automatically executed when an external event arrives, changing the current state if needed.
+- \delta_{int} : S \rightarrow S is the internal transition function. This function is executed right after the output (\lambda) function and is used to change the state S.
+- \delta_{con}: Q \times X^{b} \rightarrow S is the confluent function. This transition decides the next state in cases of collision between external and internal events, i.e., an external event is received and elapsed time equals time-advance. Typically, \delta_{con}(s,ta(s),x) = \delta_{ext}(\delta_{int}(s,0,x).
+- \lambda : S \rightarrow Y^{b} is the output function. Y^{b} is the set of bags over elements in Y. When the time elapsed since the last output function is equal to ta(s), then \lambda is automatically executed.
+- ta : S \rightarrow R_{0}^{+} \cup \infty is the time advance function.
+
+The formal definition of a coupled model is described as:
+\begin{equation}
+M = \langle X, Y, C, EIC, EOC, IC \rangle
+\end{equation}
+
+\noindent where:
+\begin{itemize}
+\item $X$ is the set of inputs described in terms of pairs port-value: $\left\{ p \in IPorts,v \in X_p \right\} $.
+\item $Y$ is the set of outputs, also described in terms of pairs port-value: $\left\{ p \in OPorts,v \in Y_p \right\} $.
+\item $C$ is a set of DEVS component models (atomic or coupled). Note that $C$ makes this definition recursive.
+\item $EIC$ is the external input coupling relation, from external inputs of $M$ to component inputs of $C$.
+\item $EOC$ is the external output coupling relation, from component outputs of $C$ to external outputs of $M$.
+\item $IC$ is the internal coupling relation, from component outputs of $c_i \in C$ to component outputs of $c_j \in C$, provided that $i \neq j$.
+\end{itemize}
+Given the recursive definition of $M$, a coupled model can itself be a part of a component in a larger coupled model system giving rise to a hierarchical DEVS model construction.
+
+
 
 We first introduce the original DEVS formalism known as classic DEVS. The question whether the formalism describes a "system" (i.e., under which conditions it is well-behaved is a system-theory sense) is also covered. It turns out that even a well-behaved DEVS model can behave in a counter-intuitive manner. Finally, the P-DEVS formalism, which removes some deficiencies of the original DEVS, is presented.
 
