@@ -19,16 +19,14 @@
 
 ** DEVS formalism and variants
 
-The Discrete EVent system Specification (DEVS) formalism was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
+The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
 
 The class of formalisms denoted as discrete-event is characterized by a continuous time base where only a finite number of events can occur during a finite time-span. This contrasts with Discrete Time System Specification (DTSS) formalisms where the time base is isomorphic to N, and with Differential Equation System Specification (DESS, or continuous-time) formalisms in which the state of the system may change continuously over time.
 
-The Formalism Transformation Graph (FTG) published by H. Vangheluwe in [2] and shown in Figure [[fig:ftg.png]], depicts behavior-conserving transformations between some important formalisms. The graph distinguishes between continuous-time formalisms on the left-hand side, and discrete formalisms (both discrete-time and discrete-event) on the right-hand side. Although the graph suggests that formalisms can be mapped onto a common formalism on their respective sides, very few transformations allow crossing the middle-line: this illustrates why hybrid systems (those that bring together both discrete and continuous systems) are difficult to solve.
+The Formalism Transformation Graph (FTG) published by H. Vangheluwe in [3] and shown in Figure 1, depicts behavior-conserving transformations between some important formalisms. The graph distinguishes between continuous-time formalisms on the left-hand side, and discrete formalisms (both discrete-time and discrete-event) on the right-hand side. Although the graph suggests that formalisms can be mapped onto a common formalism on their respective sides, very few transformations allow crossing the middle-line: this illustrates why hybrid systems (those that bring together both discrete and continuous systems) are difficult to solve.
 
-#+CAPTION: Figure 1. Formalism transformation graph.
-#+NAME: fig:ftg.png
 [[./images/ftg.png]]
-
+Figure 1. Formalism transformation graph (FTG) [3].
 
 The traditional approach to solve continuous-time problems is based on discretization, which approximates a continuous-time model by a discrete-time system (difference equations). A partitioning of the time-axis, as is the case in discretization, is however hard to harmonize with a partitioning of the state space, as is performed in discrete-event systems. In this regard, mapping continuous-time formalisms (ODEs and semi-explicit DAEs) onto the DEVS formalism (this corresponds to the arrow going from "scheduling-hybrid-DAE" to "DEVS" on the FTG) may be performed through quantization. 
 
@@ -36,7 +34,7 @@ The closure property (under composition or coupling) of systems such as DEVS off
 
 Although some continuous-time formalisms (e.g., causal-block diagram simulation tools) allow model hierarchization, multi-rate integration mixes poorly with traditional approaches where discretization along the time-axis forces the simulator to work explicitly with the global time base. This, in contrast to discrete-event formalisms where the simulator is concerned with local state space changes, and the time base is dealt with implicitly. Discrete event concepts are thus better suited for parallel distributed simulation, and much effort has been devoted to the development of conservative (e.g., Chandy-Misra approach), optimistic (e.g., Time-Warp) and real-time (e.g., DARPA's Distributed Interactive Simulation) parallel discrete event simulation techniques. The relevance of DEVS in that context is illustrated by the concept of the DEVS bus which concerns the use of DEVS models as "wrappers" to enable a variety of models to inter operate in a networked simulation. The DEVS bus has been implemented on top of the DoD's High Level Architecture (HLA) standard, itself based on the Run-Time Infrastructure (RTI) protocol.
 
-Taking into account that DEVS is able to describe the behavior of other formalisms, our goal here is to introduce DEVS, focused to one particular form of this formalism: Parallel DEVS, and giving some details about other variants. The reader should refer to the book Theory of Modeling and Simulation by Zeigler, B. P., T. G. Kim, et al. (2000) [1], to understand the details behind the mathematical background of these techniques. 
+Taking into account that DEVS is able to describe the behavior of other formalisms, our goal here is to introduce DEVS, focused to one particular form of this formalism: Parallel DEVS, and giving some details about other variants. The reader should refer to the book Theory of Modeling and Simulation [1], to understand the details behind the mathematical background of these techniques. 
 
 According to DEVS theory, the system of interest is seen as a model and the corresponding simulator. The model represents a simplified version of reality and its structure. The model is built considering the conditions of experimentation of the system of interest, including the work conditions of the real system and its application domain. Thus, the model is restricted to the experimental framework under which it was developed.
 
@@ -57,12 +55,15 @@ Classic DEVS is an intrinsically sequential formalism that allows for the descri
 
 ***** The atomic DEVS
 
-An atomic-DEVS M is specified by a 7-tuple
+An atomic-DEVS =A= is specified by a 7-tuple:
 
-$M=〈X,Y,S,δint,δext,λ,ta$
+\begin{equation}
+A=\langle X, Y, S, \delta_{\rm ext},  \delta_{\rm int}, \delta_{\rm con}, \lambda, ta\rangle
+\end{equation}
 
-where
-X			is the input set.
+where:
+
+- $X$ is the input set.
 Y			is the output set.
 S			is the state set.
 δint:S→S		is the internal transition function.
@@ -1112,3 +1113,9 @@ Simulation output
 
 
 We can appreciate that the jobs are generated and solved according to the specification of the generator (period of 1 second), and the processor (processing time of 2 seconds). However, note that we are working using virtual time. The wall clock time generate jobs as the real processor in the PC is able to execute all the Java sentences in the xDEVS simulator (in an order of milliseconds).
+
+** Bibliography
+
+   1. Zeigler, B. P.; Muzy, A. & Kofman, E. Theory of modeling and simulation: discrete event & iterative system computational foundations Academic press, 2018.
+   2. Mittal, S. & Risco-Martín, J. L. Netcentric system of systems engineering with DEVS unified process CRC Press, 2013.
+   3. Vangheluwe, H. DEVS as a common denominator for multi-formalism hybrid systems modelling CACSD. Conference Proceedings. IEEE International Symposium on Computer-Aided Control System Design (Cat. No.00TH8537), 2000, 129-134
