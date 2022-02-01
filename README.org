@@ -63,7 +63,7 @@ A=\langle X, Y, S, \delta_{\rm ext},  \delta_{\rm int}, \delta_{\rm con}, \lambd
 
 where:
 
-- $X$ is the input set.
+- $$X$$ is the input set.
 Y			is the output set.
 S			is the state set.
 δint:S→S		is the internal transition function.
