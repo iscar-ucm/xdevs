@@ -55,19 +55,17 @@ Classic DEVS is an intrinsically sequential formalism that allows for the descri
 
 ***** The atomic DEVS
 
-An atomic-DEVS =A= is specified by a 7-tuple:
+An atomic-DEVS A is specified by a 7-tuple:
 
-\begin{equation}
-A=\langle X, Y, S, \delta_{\rm ext},  \delta_{\rm int}, \delta_{\rm con}, \lambda, ta\rangle
-\end{equation}
+A=< X, Y, S, \delta_{ext},  \delta_{int}, \delta_{con}, \lambda, ta >
 
 where:
 
-- $$X$$ is the input set.
-Y			is the output set.
-S			is the state set.
-δint:S→S		is the internal transition function.
-δext:Q×X→S		is the external transition function, Q={(s,e):s∈S,e∈[0,ta(s)]} is 
+- X is the input set.
+- Y			is the output set.
+- S			is the state set.
+- \delta_{int} : S \rightarrow S is the internal transition function.
+- δext:Q×X→S		is the external transition function, Q={(s,e):s∈S,e∈[0,ta(s)]} is 
 			total state set and e is the elapsed time since the last transition.
 λ:S→Y		is the output function.
 ta:S→R0+∪∞		is the time advance function.
