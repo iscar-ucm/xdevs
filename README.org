@@ -108,7 +108,7 @@ Figure 2. A DEVS coupled model
 
 Following the previous coupled model definition, the model in Figure 2 can be formally defined as:
 
-N=〈X,Y,D,{Md|d∈D},EIC,EOC,IC〉
+N =〈 *X*, *Y*, *C*, *EIC*, *EOC*, *IC* 〉
 
 where:
 
