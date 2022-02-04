@@ -52,1100 +52,136 @@ DEVS enables the representation of a system by three sets and five functions: in
 
 DEVS models are of two types: atomic and coupled. Atomic DEVS processes input events based on their model's current state and condition, generates output events and transition to the next state. The coupled model is the aggregation/composition of two or more atomic and coupled models connected by explicit couplings. Particularly, an atomic model is defined by the following equation:
 
-A=< X, Y, S, \delta_{ext},  \delta_{int}, \delta_{con}, \lambda, ta >
+A=< *X*, *Y*, *S*, \delta_{ext},  \delta_{int}, \delta_{con}, \lambda, ta >
 
 where:
 
-- X is the input set.
-- Y is the output set.
-- S is the state set.
-- \delta_{ext} : Q \times X^{b} \rightarrow S is the external transition function, Q={(s,e):s \in S, e \in [0,ta(s)]} is total state set and e is the elapsed time since the last transition, whereas X^{b} is the set of bags over elements in X. This function is automatically executed when an external event arrives, changing the current state if needed.
+- *X* is the input set, usually defined as the set of pairs port-value (see DEVS with ports in [1]).
+- *Y* is the output set, usually defined as the set of pairs port-value (see DEVS with ports in [1])..
+- *S* is the state set.
+- \delta_{ext} : *Q* \times *X^{b}* \rightarrow *S* is the external transition function, Q={(s,e):s \in S, e \in [0,ta(s)]} is total state set and e is the elapsed time since the last transition, whereas X^{b} is the set of bags over elements in X. This function is automatically executed when an external event arrives, changing the current state if needed.
 - \delta_{int} : S \rightarrow S is the internal transition function. This function is executed right after the output (\lambda) function and is used to change the state S.
 - \delta_{con}: Q \times X^{b} \rightarrow S is the confluent function. This transition decides the next state in cases of collision between external and internal events, i.e., an external event is received and elapsed time equals time-advance. Typically, \delta_{con}(s,ta(s),x) = \delta_{ext}(\delta_{int}(s,0,x).
 - \lambda : S \rightarrow Y^{b} is the output function. Y^{b} is the set of bags over elements in Y. When the time elapsed since the last output function is equal to ta(s), then \lambda is automatically executed.
 - ta : S \rightarrow R_{0}^{+} \cup \infty is the time advance function.
 
 The formal definition of a coupled model is described as:
-\begin{equation}
-M = \langle X, Y, C, EIC, EOC, IC \rangle
-\end{equation}
 
-\noindent where:
-\begin{itemize}
-\item $X$ is the set of inputs described in terms of pairs port-value: $\left\{ p \in IPorts,v \in X_p \right\} $.
-\item $Y$ is the set of outputs, also described in terms of pairs port-value: $\left\{ p \in OPorts,v \in Y_p \right\} $.
-\item $C$ is a set of DEVS component models (atomic or coupled). Note that $C$ makes this definition recursive.
-\item $EIC$ is the external input coupling relation, from external inputs of $M$ to component inputs of $C$.
-\item $EOC$ is the external output coupling relation, from component outputs of $C$ to external outputs of $M$.
-\item $IC$ is the internal coupling relation, from component outputs of $c_i \in C$ to component outputs of $c_j \in C$, provided that $i \neq j$.
-\end{itemize}
-Given the recursive definition of $M$, a coupled model can itself be a part of a component in a larger coupled model system giving rise to a hierarchical DEVS model construction.
-
-
-
-We first introduce the original DEVS formalism known as classic DEVS. The question whether the formalism describes a "system" (i.e., under which conditions it is well-behaved is a system-theory sense) is also covered. It turns out that even a well-behaved DEVS model can behave in a counter-intuitive manner. Finally, the P-DEVS formalism, which removes some deficiencies of the original DEVS, is presented.
-
-**** The classic DEVS formalism
-
-Classic DEVS is an intrinsically sequential formalism that allows for the description of system behavior at two levels: at the lowest level, an atomic-DEVS describes the autonomous behavior of a discrete-event system as a sequence of deterministic transitions between states as well as how it reacts to external inputs. At the higher level, a coupled-DEVS describes a discrete-event system in terms of a network of coupled components, each an atomic-DEVS model (or a coupled-DEVS in its own right, as we see later).
-
-***** The atomic DEVS
-
-An atomic-DEVS A is specified by a 7-tuple:
-
-A=< X, Y, S, \delta_{ext},  \delta_{int}, \delta_{con}, \lambda, ta >
+M = < *X*, *Y*, *C*, *EIC*, *EOC*, *IC* >
 
 where:
 
-- X is the input set.
-- Y			is the output set.
-- S			is the state set.
-- \delta_{int} : S \rightarrow S is the internal transition function.
-- \delta_{ext} : Q \times X \rightarrow S is the external transition function, Q={(s,e):s \in S, e \in [0,ta(s)]} is total state set and e is the elapsed time since the last transition.
-- \lambda : S \rightarrow Y is the output function.
-- ta : S \rightarrow R_0^+ \cup \infty is the time advance function.
+- *X* is the input set, usually defined as the set of pairs port-value (see DEVS with ports in [1])..
+- *Y* is the output set, usually defined as the set of pairs port-value (see DEVS with ports in [1])..
+- *C* is the set of DEVS component models (atomic or coupled). Note that *C* makes this definition recursive.
+- *EIC* is the external input coupling relation, from external input ports of M to component input ports of *C*.
+- *EOC* is the external output coupling relation, from component output ports of *C* to external output ports of M.
+- *IC* is the internal coupling relation, from component output ports of c_{i} \in *C* to component output ports of c_{j} \in *C*, provided that i \neq j.
 
-There are no restrictions on the sizes of the sets, which typically are product sets, i.e., S = S_1 \times S_2 \times \ldots S_n. In the case of the state set S, this formalizes multiple concurrent parts of a system, while it formalizes multiple input and output ports in the case of sets X and Y. The time base T is not mentioned explicitly and is continuous. For a discrete-event model described by an atomic-DEVS A, the behavior is uniquely determined by the initial total state (s0,e0) \in Q and is obtained by means of the following iterative simulation procedure (refer to Figure 2):
+Given the recursive definition of *M*, a coupled model can itself be a part of a component in a larger coupled model system giving rise to a hierarchical DEVS model construction.
 
-At any given moment, a DEVS model is in state s ∈ S. In the absence of external events, it remains in that state for a period of time defined by ta(s). When ta(s) expires, the model outputs the value λ(s) through a port, and it then changes to a new state s1 given by δint(s). This transition is called an internal transition. Then, the process starts again (see bottom gray arrow in Figure 2). On the contrary, an external transition may occur due to the reception of external events through input ports. In this case, the external transition function determines the new state s2 given by δext(s,e,x), where s is the current state, e is the time elapsed since the last transition (external or internal), and x is the external event received. After an external transition, the model is re-scheduled and the process starts again (see left gray arrow), setting the elapsed time e to 0.
 
-Figure 2. State transitions of an atomic DEVS model (1/2).
 
-Following the previous definition, an atomic model has structure and behavior. Regarding the structure, we can find:
+**** EXAMPLE 1
 
-The set of input ports through which external events are received. The set of input events X is composed by a set of pairs input port and valid data: X={(p,v)|p∈InPorts,v∈Xp}, where InPorts represents the set of input ports and Xp represents the set of values for the input port p.
-The set of output ports through which external events are sent. The set of output events Y is composed by a set of pairs output port and valid data: Y={(p,v)|p∈OutPorts,v∈Yp}, where OutPorts represents the set of output ports and Yp represents the set of values for the output port p.
-The set of state variables and parameters: one state variables is always present, sigma (in the absence of external events the system stays in the current state for the time given by sigma: σ).
-
-With respect to the behavior, we can find:
-
-The time advance function which controls the timing of internal transitions – usually, this function just returns the value of sigma.
-The internal transition function which specifies to which next state the system will transit after the time given by the time advance function (sigma) has elapsed.
-The external transition function which specifies how the system changes state when an input is received – the effect is to place the system in a new state and sigma thus scheduling it for a next internal transition; the next state is computed on the basis of the present state, the input port and value of the external event, and the time that has elapsed in the current state.
-The output function which generates an external output just before an internal transition takes place.
-
-In summary, sigma holds the time remaining to the next internal transition. This is precisely the time-advance value to be produced by the time-advance function. In the absence of external events the system stays in the current state for the time given by sigma.
-
-The time advance function can take any real number between 0 and ∞. A state for which ta(s) = 0 is called transient state. In contrast, if ta(s) = ∞, then s is said to be a passive state, in which the system will remain perpetually unless an external event is received.
-
-EXAMPLE
-Consider the following timing diagrams:
-
-Figure 3. States transition of an atomic DEVS model (2/2)
-
-At any time t the system is in state s1 ∈S. No external event occurs, so system will stay in state s1 until the elapsed time e reaches ta(s1). The time left, σ = ta(s1) - e, is often introduced as an alternate way to check for the time until the next (internal) transition. The system then first produces the output value λ(s1) and makes a transition to state s3 = δint(s1). Next, an external event x ∈ X occurs before e reaches ta(s3), and the system interrupts its autonomous behavior and instantaneously goes to state s0 = δext((s3,e),x). Thus, the internal transition function dictates the system's new state based on its old state in the absence of external events. The external transition function dictates the system's new state whenever an external event occurs, based on this event x, the current state s and how long the system has been in this state, e. After both types of transitions, the elapsed time e is reset to 0.
-
-EXAMPLE
-A processor atomic model consumes a job j. When the processor receives a job through an input port, thus the processor remains busy until the processing time jp is finished. Then it sends the job through an output port.
+A processor atomic model consumes a job j. When the processor receives a job through an input port, thus the processor remains busy until the processing time j_{p} is finished. Then it sends the job through an output port.
 
 The processor model can be formally described as
 
-Processor=〈X,S,Y,δint,δext,λ,ta〉
-X={(in,j∈J)}, where J is a set of Jobs.
-S=(phase={"busy","passive"})×σ∈R0+×j∈J
-Y={(out,j∈ J)}
-ta(phase,σ,j)=σ
-λ(phase,σ,j)=j
-δint(phase,σ,j)=("passive",∞,∅)
-δext(phase,σ,j,e,(in,j'))={("busy",jp',j')  if  phase="passive" ("busy",σ-e,j)  if  phase="busy" 
+Processor=〈X,S,Y,δ_{int},δ_{ext},δ_{con},λ,ta〉
 
-The term collision refers to the situation where an external transition occurs at the same time as an internal transition. When such a collision occurs, the atomic-DEVS formalism specifies that the tie between the two transition functions shall be solved by first carrying out the internal, then the external transition function with e=0.
+- *X* = {(in, j ∈ *J*)}, where *J* is a set of Jobs.
+- *S* = phase={"busy","passive"} × σ ∈ R_{0}^{+} × j ∈ *J*
+- *Y* = {(out, j ∈ *J*)}
+- ta(phase,σ,j) = σ
+- λ(phase,σ,j) = j
+- δ_{int}(phase,σ,j) = ("passive", ∞, ∅)
+- δ_{ext}(phase,σ,j,e,(in,j')) = {("busy",j_{p}',j')  if  phase="passive", ("busy",σ-e,j)  if  phase="busy" 
+- δ_{con}(phase,σ,j,(in,j')) = δ_{ext}(δ_{int}(phase,σ,j),0,(in,j'))
 
-Outputs are associated only with internal transitions to impose a delay on the propagation of events.
-1.1.1.2 The coupled-DEVS
-A coupled-DEVS N is specified by a 7-tuple:
-N=〈X,Y,D,{Mi},{Ij},{Zj,k},γ〉
-Where:
-X				is the input set.
-Y				is the output set.
-D				is the set of component indexes.
-{Mi|i∈D}			is the set of components, each Mi being an atomic-DEVS:
-M=〈Xi,Yi,Si,δint,i,δext,i,λi,tai〉
-{Ij|j∈D∪{self}}		is the set of all influencer sets, where Ij⊆D∪{self},j∉D is
-			 	the influencer set of j.
-{Zj,k|j∈D∪{self},k∈Ij}	is the set of output-to-input translation functions, where:
-				Zj,k:X→Xk,  if j=self
-				Zj,k:Yj→Y,  if k=self
-				Zj,k:Yj→Xk,  otherwise
-γ:2D→D			is the select function.
+**** EXAMPLE 2
 
-The sets X and Y typically are product sets, which formalizes multiple input and output ports. To each atomic-DEVS in the network is assigned a unique identifier in the set D. This corresponds to model names or references in a modeling language. The coupled-DEVS N itself is referred to by means of self∉D. This provides a natural way of indexing the components in the set {Mi}, and to describe the sets {Ij}, which explicitly describes the network structure, and {Zj,k}.
+Figure 2 shows an example of a DEVS coupled model with three components, M1, M2 y M3, as well as their couplings. These models are interconnected through the corresponding I/O ports presented in the Figure. The models are connected to the external coupled models through the EIC and EOC connectors. M1, M2 and M3 can be atomic or coupled models.
 
-Figure 4. A coupled-DEVS
+[[./images/coupled.png]]
+Figure 2. A DEVS coupled model
 
-Figure 4 shows an example of a coupled-DEVS. In this case, IA={self}, IB={self,A}, and Iself={B}. For modularity reasons, a component may not be influenced by components outside its enclosing scope, defined as D∪{self}. The condition j∉Ij forbids a component to directly influence itself, to prevent instantaneous dependency cycles. The functions Zj,k describe how an influencer’s output is mapped onto an influencer’s input. The set of output-to-input transition functions implicitly describes the coupling network structure, which is sometimes divided into External Input Couplings (EIC, from the coupled-DEVS' input to a component's input ), External Output Couplings (EOC, from a component's output to the coupled-DEVS' output ), and Internal Couplings (IC, from a component's output to a component's input ).
-
-As a result of coupling concurrent components, multiple internal transitions may occur at the same simulation time t. Since in sequential simulation systems only one component can be activated at a given time, a tie-breaking mechanism to select which of the components should be handled first is required. The classic coupled-DEVS formalism uses the select function γ to choose a unique component from the set of imminent components, defined as:
-Πt={i|i∈D,σi=0}
-i.e., those components that have an internal transition scheduled at time t. The component returned by γ(Πt) will thus be activated first. For the other components in the imminent set, we are left with the following ambiguity: when an external event is received by a model at the same time as its scheduled internal transition, which elapsed time should be used by the external transition: e=0 of the new state, or e=ta(s) of the old state? These collisions are resolved by letting e=0 for the unique activated component, and e=ta(s) for all the others.
-1.1.2 The P-DEVS formalism
-Because of the inherent sequential nature of classic DEVS, modeling using this formalism requires extra care. As a matter of fact, resolving collisions by means of the select function γ might result in counter-intuitive behaviors.
-
-The Parallel-DEVS formalism (or P-DEVS, to distinguish it from parallel implementations of both classic DEVS and P-DEVS) was introduced to solve these problems by properly handling collisions between simultaneous internal and external events. As the name indicates, P-DEVS is a formalism whose semantics successfully describes (irrespective of sequential or parallel implementations) concurrent transitions of imminent components, without the need for a priority scheme.
-
-Just as in the case of classic DEVS, P-DEVS allows for the description of system behavior at the atomic and coupled levels. The formalism is closed under coupling, which leads to hierarchical model construction. Other concepts like legitimacy introduced later also apply to P-DEVS.
-
-The formalism uses a bag as the message structure: a bag Xb of elements in X is similar to a set except that multiple occurrences of elements are allowed (e.g., Xb={a,b,a}). As with sets, bags are unordered. Note that this is the only difference between a set and a bag. Thus either using sets or bags (i.e. classic DEVS or P-DEVS) to collect inputs sent to a component, we recognize that inputs can arrive from multiple sources and that more than one input with the same identity may arrive simultaneously.
-
-The atomic formalism for P-DEVS M is specified by an 8-tuple:
-
-M=〈X,Y,S,δint,δext,δcon,λ,ta〉
-
-The definition is almost identical to that of the classic version, except that we introduce the concept of a bag in the external transition and output functions:
-
-δext:Q×Xb→S
-λ:S→Yb
-
-This reflects the idea that more than one input can be received simultaneously, and similarly for the generation of outputs. P-DEVS also introduces the confluent transition function:
-
-δcon:S×Xb→S
-
-which gives the modeler complete control over the collision behavior when a component receives external events at the time of its internal transition. Rather than serializing model behavior at collision times through the select function g at the coupled level, P-DEVS leaves the decision of what serialization to use to the individual component. The default definition of the confluent function simply applies the internal transition function before applying the external transition function to the resulting state.
-
-EXAMPLE
-Our processor atomic model can be defined using P-DEVS as:
-
-Processor=〈X,S,Y,δint,δext,δcon,λ,ta〉
-X={(in,j∈J)}, where J is a set of Jobs.
-S=(phase={"busy","passive"})×σ∈R0+×j∈J
-Y={(out,j∈ J)}
-ta(phase,σ,j)=σ
-λ(phase,σ,j)=j
-δint(phase,σ,j)=("passive",∞,∅)
-δext(phase,σ,j,e,(in,j'))={("busy",jp',j')  if  phase="passive" ("busy",σ-e,j)  if  phase="busy" 
-δcon(phase,σ,j,(in,j'))=δext(δint(phase,σ,j),0,(in,j'))
-
-The coupled formalism for P-DEVS N is specified by a 6-tuple:
-N=〈X,Y,D,{Mi},{Ij},{Zj,k}〉
-We note the absence of the select function γ. All the remaining elements have the same interpretation as in the classic version, except that here again the bag concept must be introduced in the output-to-input translation functions {Zj,k}.
-
-The semantics of the formalism is simple: at any event time t, all components in the imminent set Πt first generate their output, which get assembled into bags at the proper inputs. Then, to each component in Πt is applied either the confluent or the internal transition function, depending whether it has received inputs or not. The external transition function is applied to those components that have received inputs and are outside the imminent set.
-
-A different definition of coupled models (that we use in the following) is:
+Following the previous coupled model definition, the model in Figure 2 can be formally defined as:
 
 N=〈X,Y,D,{Md|d∈D},EIC,EOC,IC〉
 
 where:
-X 	is the set of input events.
-Y 	is the set of output events.
-D 	is the set of component names (atomic or coupled).
-Md 	is a DEVS model for each d ∈ D.
-EIC 	is the set of the external input couplings.
-EOC 	is the set of the external output couplings.
-IC 	is the set of the internal couplings.
 
-Figure 5. A DEVS coupled model
+- *X* is the set of input events.
+- *Y* is the set of output events.
+- *C* = {M1,M2,M3}
+- *EIC* = {(N,in)→(M1,in)}
+- *EOC* = {(M3,out)→(N,out)}
+- *IC* = {(M1,out)→(M2,in),(M2,out)→(M3,in)}
 
-Figure 5 shows an example of a DEVS coupled model with three components, M1, M2 y M3, as well as their couplings. These models are interconnected through the corresponding I/O ports presented in the Figure. The models are connected to the external coupled models through the EIC and EOC connectors. M1, M2 and M3 can be atomic or coupled models.
+**** EXAMPLE 3
 
-Following the previous coupled model definition, the model in Figure 5 can be formally defined as:
-N=〈X,Y,D,{Md|d∈D},EIC,EOC,IC〉
-where:
-X = the set of input events.
-Y = the set of output events.
-D={M1,M2,M3}
-Md={MM1,MM2,MM3}
-EIC={(N,in)→(M1,in)}
-EOC={(M3,out)→(N,out)}
-IC={(M1,out)→(M2,in),(M2,out)→(M3,in)}
-1.2 Well-defined systems and legitimacy
-The DEVS formalism is closed under coupling: given a coupled model N with atomic-DEVS components, we can construct an equivalent atomic-DEVS M. The construction procedure is compliant with our intuition about concurrent behavior and resembles the implementation of event-scheduling simulators. At its core is the total time-order of all events in the system. By induction, closure under coupling leads to hierarchical model construction, where the components in a coupled model can themselves be coupled-DEVS. This means that the results developed for atomic-DEVS in this section also apply to coupled models.
+The Experimental frame – Processor model is usually presented as one of the initial examples to start to practice with DEVS modeling and simulation. It is a DEVS coupled model consisting of three atomic models and one coupled model (see Figure 3).
 
-In a modular construct, zero-time propagation could result in infinite instantaneous loops. Such ill-behaved systems can of course still be constructed using transitory states, despite only associating outputs with internal transitions. Thus, transitory states in a DEVS model could result in an ill-behaved system when zero-time advance cycles are present. Legitimacy is the property of DEVS that formalizes these notions.
+[[./images/efp.png]]
+Figure 3. Experimental frame (ef)-processor (p) model; boxes: models; arrows: couplings; arrow labels: input/output port names.
 
-For an atomic-DEVS M, legitimacy is defined by first introducing an iterative internal transition function δint+:S×N→S, that returns the state reached after n iterations starting at state s∈S when no external event intervenes. It is recursively defined as:
+The Generator atomic model generates job-messages at fixed time intervals and sends them via the "out" port. The Transducer atomic model accepts job-messages from the generator at its "arrived" port and remembers their arrival time instances. It also accepts job-messages at the "solved" port. When a message arrives at the "solved" port, the transducer matches this job with the previous job that had arrived on the "arrived" port earlier and calculates their time difference. Together, these two atomic models form an Experimental frame coupled model. The experimental frame sends the generators job messages on the "out" port and forwards the messages received on its "in" port to the transducers "solved" port. The transducer observes the response (in this case the turnaround time) of messages that are injected into an observed system. The observed system in this case is the Processor atomic model. A processor accepts jobs at its "in" port and sends them via "out" port again after some finite, but non-zero time period. If the processor is busy when a new job arrives, the processor discards it. Finally the transducer stops the generation of jobs by sending any event from its "out" port to the "stop" port at the generator, after a given simulation time interval.
 
-δint+(s,n)=δint(δint+(s,n-1))
-δint+(s,0)=0
+Based on Figure 3, we can define the coupled model for this example as:
 
-Next we introduce a function Γ:S×Z→R0+ that accumulates the time the system takes to make these n transitions:
-Γ(s,n)=Γ(s,n-1)+ta(δint+(s,n-1))=i=0n-1ta(δint+(s,i))
-Γ(s,0)=0
-
-With these definitions, we say that a DEVS is legitimate if for each s∈S:
-limn→∞ Γ(s,n) →∞
-
-Equivalently, legitimacy can be interpreted as a requirement that there are only a finite number of events in a finite time-span. It can be shown that the structure specified by a DEVS is a well-defined system if, and only if, the DEVS is legitimate.
-
-For atomic-DEVS M with S finite, a necessary and sufficient condition for legitimacy is that every cycle in the state diagram of δint contains at least one non-transitory state. For the case where S is infinite however, there exists only a stronger-than-necessary sufficient condition, namely, that there is a positive lower bound to the time advances, i.e., ∀s∈S,ta(s)>b.
-
-Actually, instantaneous loops are at the heart of the legitimacy issue. Since outputs are only generated in the absence of external events, the atomic-DEVS formalism is a Moore machine. From an implementation point of view, it is easy to emulate the effect of generating an output upon entering a state by using λ(δint(s)).
-1.3 A DEVS model example
-The Experimental frame – Processor model is usually presented as one of the initial examples to start to practice with DEVS modeling and simulation. It is a DEVS coupled model consisting of three atomic models and one coupled model (see Figure 6).
-
-Figure 6. Experimental frame (ef)-processor (p) model; boxes: models; arrows: couplings; arrow labels: input/output port names.
-
-The Generator atomic model generates job-messages at fixed time intervals and sends them via the “out” port. The Transducer atomic model accepts job-messages from the generator at its “arrived” port and remembers their arrival time instances. It also accepts job-messages at the “solved” port. When a message arrives at the “solved” port, the transducer matches this job with the previous job that had arrived on the “arrived” port earlier and calculates their time difference. Together, these two atomic models form an Experimental frame coupled model. The experimental frame sends the generators job messages on the “out” port and forwards the messages received on its “in” port to the transducers “solved” port. The transducer observes the response (in this case the turnaround time) of messages that are injected into an observed system. The observed system in this case is the Processor atomic model. A processor accepts jobs at its “in” port and sends them via “out” port again after some finite, but non-zero time period. If the processor is busy when a new job arrives, the processor discards it. Finally the transducer stops the generation of jobs by sending any event from its “out” port to the “stop” port at the generator, after a given simulation time interval.
-
-Based on Figure 6, we can define the coupled model for this example as:
-
-NEFP=〈X,Y,D,{Md|d∈D},EIC,EOC,IC〉
+EFP=〈 *X*, *Y*, *C*, *EIC*, *EOC*, *IC* 〉
 
 where:
-X=∅.
-Y=∅.
-D={EF,P}
-Md={MEF,MP}
-EIC=∅
-EOC=∅
-IC={(EF,out)→(P,in),(P,out)→(EF,in)}
+
+- *X* = ∅.
+- *Y* = ∅.
+- *C* = {EF,P}
+- *EIC* = ∅
+- *EOC* = ∅
+- *IC* = {(EF,out)→(P,in),(P,out)→(EF,in)}
 
 The Experimental Frame coupled model can be defined as:
 
-NEF=〈X,Y,D,{Md|d∈D},EIC,EOC,IC〉
+EF=〈 *X*, *Y*, *C*, *EIC*, *EOC*, *IC* 〉
 
 where:
-X={(in,j∈J)}, where J is a set of Jobs.
-Y={(out,j∈J)}, where J is a set of Jobs.
-D={G,T}
-Md={MG,MT}
-EIC={(EF,in)→(T,solved)}
-EOC={(G,out)→(EF,out)}
-IC={(G,out)→(T,arrived),(T,out)→(Generator,stop)}
+
+- *X* = {(in,j∈J)}, where J is a set of Jobs.
+- *Y* = {(out,j∈J)}, where J is a set of Jobs.
+- *C* = {G,T}
+- *EIC* = {(EF,in)→(T,solved)}
+- *EOC* = {(G,out)→(EF,out)}
+- *IC* = {(G,out)→(T,arrived),(T,out)→(Generator,stop)}
 
 We have defined the behavior of the Processor model in a previous example. Now, we describe the functionality of both the Generator and Transduced models. The Generator model can be formally described as
-Generator=〈X,S,Y,δint,δext,δcon,λ,ta〉
-X={(stop,ν)}, where ν is any event
-S=(phase={"active","passive"})×σ∈R0+×i=1,2,…,N:ji∈J
-Y={(out,ji∈ J)}
-ta(phase,σ,i)=σ
-λ(phase,σ,i)=ji
-δint(phase,σ,i)=("active",σ,i+1)
-δext(phase,σ,i,e,(in,ν))=("passive",∞,i)
-δcon(phase,σ,i,(in,ν))=δext(δint(phase,σ,i),0,(in,ν))
+
+Generator=〈 *X*, *S*, *Y*, δ_{int}, δ_{ext}, δ_{con}, λ, ta 〉
+
+- *X* = {(stop,ν)}, where ν is any event
+- *S* = (phase={"active","passive"})×σ∈R0+×i=1,2,…,N:ji∈J
+- *Y* = {(out,ji∈ J)}
+- ta(phase,σ,i) = σ
+- λ(phase,σ,i) = ji
+- δ_{int}(phase,σ,i) = ("active",σ,i+1)
+- δ_{ext}(phase,σ,i,e,(in,ν)) = ("passive",∞,i)
+- δ_{con}(phase,σ,i,(in,ν)) = δ_{ext}(δ_{int}(phase,σ,i),0,(in,ν))
 
 The Transducer model can be formally described as
-Transducer=〈X,S,Y,δint,δext,δcon,λ,ta〉
-X={(arrived,j∈J),(solved,j∈J}, where J is a set of jobs
-S=(phase={"active","passive"})×σ∈R0+×clock∈R0+×JA∈J×JS∈J
-Where JA and JS are sets of arrived and solved jobs, respectively.
-Y={(stop,ν)}, where ν is any event.
-ta(phase,σ,clock,JA,JS)=σ
-λ(phase,σ,clock,JA,JS)=ν
-δint(phase,σ,clock,JA,JS)=("passive",∞,clock+σ,JA,JS)
-δext(phase,σ,clock,JA,JS,e,(arrived,ja),(solved,js))=...
-...=(active,σ-e,clock+e,JA={ja,JA} if ja≠∅,JS={js,JS}:jts=clock if js≠∅)
-, where the time in which the job is solved is set to clock with jts=clock.
-δcon(phase,σ,clock,JA,JS,(arrived,ja),(solved,js))=δext(δint(phase,σ,clock,JA,JS),0,(arrived,ja),(solved,js))
-1.4 DEVS Representation of Quantized Systems
-Numerical analysis is concerned with the study of convergence and stability, and a suitable choice of the step-size h. For a difference approximation to be usable for a class of functions f(y,t), it is necessary that any function in this class satisfies three requirements:
 
-The existence and uniqueness of a solution. This is satisfied by explicit schemes, and can usually be ascertained for implicit schemes.
-For sufficiently small h, yi should be close in some sense to y(ti). Since the scheme we use is an approximation of the original problem, we expect it to introduce an error upon each iteration: assuming infinite precision arithmetic, we call this approximation error the local truncation error τi (from the truncation of the Taylor expansion). If we can prove for a given scheme that
-limh→0 τi =0
-then the method is said to be consistent (or accurate). However, we are interested in the accumulation of these errors: we write yi=y(ti)+ei, where ei is the global truncation error (equivalent to summing ti under the assumption that e0=0). If we can show for a given system that
-limh→0 ei =0
-then the method is said to be convergent. For instance, we can find for the Euler-Cauchy method that |τi|=O(h2) (consistent of order 2), and |ei|=O(h) (convergent of order 1).
-The solution should be “effectively computable”. This concerns, on the one hand, the computational efficiency of the implemented method; on the other, since we cannot assume infinite precision arithmetic in practice, we want to estimate the growth of round-off errors in the solution. This is related to stability of the method, which is actually a much more general concept: a method is said to be unstable if, during the solution procedure, the result becomes unbounded. This phenomenon arises when the difference equations themselves tend to amplify errors to the point that they obliterate the solution itself. A method is said to be stable (or 0-stable) if the corresponding difference equation is stable. 
-
-As an alternative to the traditional discretization approach to the solution of ODEs, Zeigler proposed an approach based on partitioning of the state space rather than of the time domain. This quantization approach requires a change in viewpoint. The question “at which point in the future is the system going to be in a given state” is now asked instead of “in which state is the system going to be at a given future time”. In both questions a numerical procedure to produce the answer is derived from the Ordinary Differential Equations (ODEs) model.
-
-When applied to a continuous signal, both quantization and discretization approaches yield an exact representation of the original signal only in the limit case where the partition size goes to zero (assuming a well-posed problem). Whereas DTSS seem to match discretized signals well, it turns out that DEVS is an appropriate formalism for quantized systems.
-
-A simple quantization of an interval Y over R can be defined as follows: we first introduce the sets di={y∈Y ,q2(2i-1)≤y<q2(2i+1)},i∈Z. Each denotes a quantum (or cell, block) of Y, where q is the quantum-size. In general, the sets di represent a tessellation of the space Y, i.e., ⋃idi=Y and ∀i≠j,di∩dj=∅. This can be extended to higher dimensions, defining tiles of arbitrary shapes, or of non-uniform sizes.
-
-In each quantum a representative item yi is designated. Usually the middle element of the quantum is chosen, yi=q⋅i.
-
-For a time base T=R, a function f defined in an (open or closed) interval f:[ta,tb]→Y is called a segment over Y and T. Using the simple quantization scheme introduced above, we define the quantization of a segment f[t0,tn] as the piecewise-continuous segment:
-f*[t0,tn]=f1[t0,t1]⋅f2[t1,t2]⋅⋅⋅fn[tn-1,tn]
-where each fi[ti-1,ti] is a constant segment of value yj, such that the range of the corresponding segment f[ti-1,ti] lies entirely in quantum dj (see Figure 7).
-
-Quantization suggests a new approach to solving ODEs, where a system updates its output only when a “sufficiently important” change has occurred in its state.
-
-Figure 7. Discretization (a) and Quantization (b) of the same segment.
-
-Quantization of systems is a general concept that imposes no constraints on the internal system. We will assume for our present purpose that it represents a continuous-time system. The quantized system is equivalent to the internal system only in the limit case where the quantum tends to 0.
-
-It turns out that every quantized system can be simulated, without error, by a DEVS model. To represent a quantized system by a DEVS model, we allow the model to remember its last (quantized) input. The time advance function ta is then the time to the next change in output produced by the quantized output. The output function λ outputs the representative of the new quanta, whereas the internal transition function δint updates the state accordingly. If a new input x’ is received, δext updates the DEVS state as specified in the system.
-
-There is a first consequence of this example: a quantized ODE can be simulated by a DEVS model. We derive some interesting perspectives. Since DEVS is closed under coupling, a quantized ODE can be coupled with purely discrete-event components. However, some care must be taken to avoid sending a quantized signal to a quantizer with a different quantum size, which could result in unexpected results. This requirement is called partition refinement.
-
-EXAMPLE
-The autonomous, first-order form of an ODE is:
-x=f(x) x(t0)=x0 
-Integrating both sides of the ODE, it can be rewritten as
-x(t1)=x(t0)+t0t1f(x(t))dt
-In causal-block diagram simulation systems, this system can be implemented as an integrator block with feedback, as Figure 8 depicts.
-
-Figure 8. Causal-Block Diagram of an ODE.
-
-The Euler-Cauchy method can be obtained discretizing the equation, after approximating the integral function by (t1-t0)⋅f(x(t0)). Using a DEVS quantized integrator instead of the Euler-Cauchy approximation, we approximate the integral by e⋅r, where e is the elapsed time and r is the last input. It follows that when the system enters into a new state (either after an external or internal transition), the time of residency in that state, i.e. the time advance function, is obtained by solving the equation for the time until the current quantum is departed. As a result, the DEVS quantized integrator is defined as follows:
-
-The same quantum size q is used for both the input and output of the integrator.
-The state of the integrator is defined as s=(x,r,y), x is the state itself, r stores the last input received and y is the representative item for the current quantum.
-The time advance function returns the time to the next output and internal transition, i.e., the time till the current quantum is departed
-ta(x,r,y)= +∞ if r=0  |x-(y+q2⋅sign(r))||r| otherwise, 
-where the numerator is the distance between the state x and the relevant quanta interface.
-The internal transition function brings the state component x to the quanta interface “above” or “below”, depending on the sign of the slope r:
-δint(x,r,y)=(y+q2⋅sign(r),r,y+q⋅sign(r))
-The external transition function applies the Euler-Cauchy approximation of the integral function, and stores the input received:
-δext((x,r,y),e,r')=(x+er,r',y)
-The output function returns the representative of the quantum state is entering:
-λ(x,r,y)=y+q⋅sign(r)
-
-Figure 9. DEVS Quantized Integrator.
-
-Figure 9 depicts an example of the behavior defined by the DEVS quantized integrator. Suppose that at a certain instant the input r is greater than 0. In this case both the state x and the output y increase their values in time. However, if at a time instant t5 the integrator receives an input less than 0, the new state is computed and both the state and the output decrease in time.
-
-1.5 DEVS representation of systems
-In this section we provide the DEVS formulation of other two discrete systems: Discrete Time System Specification (DTSS) and Differential Equation System Specification (DESS)
-1.5.1 DTSS models
-Here we define the Discrete Time System Specification (DTSS) formalism. A DTSS model is a structure:
-DTSS M=〈XM,YM,SM,δM,λM,h〉
-where
-XM			is the input set.
-YM			is the output set.
-SM			is the state set.
-δM:SM×XM→SM	is the transition function.
-λM 			is the output function, there are two possibilities:
-λM:SM→YM		Moore-type.
-λM:SM×XM→YM	Mealy-type
-h			is a constant employed for the specification of the time base, where
-t=k⋅h, with k integer.
-Regarding the structure of a DTSS coupled model, there are four types of DTSS components to consider:
-Input Free Moore DTSS: These components drive the simulation forward as the ultimate generators of the inputs in a closed coupled model.
-Multi-ported memoryless FuNction Specified Systems (FNSS): These collect outputs from Moore components and transform them into inputs without using any state information.
-Moore DTSS with input: The outputs are generated for the next cycle based on the current input.
-Mealy DTSS: They include memoryless FNSS. In a well-defined coupled they form a directed acyclic graph of computations, taking zero time and propagating from Moore outputs back to Moore inputs.
-We examine each of them in turn.
-Input Free Moore DTSS
-These input-free systems are sometimes called autonomous systems. There is no input, so we could name these systems as subclass of source systems. They have the following sub-structure of a DTSS:
-
-DTSS M=〈YM,SM,δM,λM,h〉
-
-A step signal with given values for the initial and final step values (yi, yf) and the instant of change tc, can be built as an asynchronous signal generator with the output given the initial value and changing only when the step time arrives, and as a synchronous signal generator given the value of the output at every time step kh.
-A DEVS representation of an input-free Moore system is straightforward, since the input-free system acts as an uninterruptable generator with a fixed generation period. Thus given the previous DTSS system, define:
-
-DEVS M=〈Y,S,δint,λ,ta〉
-
-where
-Y=YM
-S=SM×R∞+=(sM,σ)
-δint(sM,σ)=(δM(sM,∅),h)
-λ(sM,σ)=λM(sM)
-ta(sM,σ)=σ
-
-The reason to retain the sigma variable even though it is apparently always set to the predictable step time, h, is that initialization of coupled model DEVS simulations requires setting sigma initially to zero in order to output the initial value.
-Multi-ported FNSS
-Another special type of DTSSs is the memory-less or FuNction Specified Systems (FNSS). These systems do not have a state transition function and the output is a function of input only. We can consider them as Mealy-type systems with only one state that can be omitted entirely.
-
-They have the following sub-structure of a DTSS:
-
-DTSS M=〈XM,YM,λM〉
-
-DEVS simulation of a single input FNSS is straightforward. When receiving the input value, the model goes into a transitory state and outputs the computed output value. However, if there are multiple input ports, the system must wait until one of the inputs changes its value before going into the output mode. Since inputs may be generated at different points in the processing, we cannot assume that all inputs come in the same message. We formulate a FNSS with multiple input ports and define a DEVS model to simulate it:
-
-DTSS M=〈XM,YM,λM〉, where:
-
-XM={p∈InPorts,v∈V} is the set of input ports and values (we assume that all ports accept the same value set, for simplicity).
-YM={(p,v)|p∈OutPorts, v∈Vout} is the single output port and its values.
-We define
-DEVS M=〈X,Y,S,δext,δint,δcon,λ,ta〉
-where:
-X=XM
-Y=YM
-S={xp:p∈InPorts}×R∞+, initially: s0=({xp=∅:p∈InPorts},σ=∞)
-δext({xp},∞,e,(p1,x1'),(p2,x2'),…,(pn,xn'))=if xi≠xi'⇒xi=xi'∧σ=0,i=1,…,n
-δint({xp},0)=({xp},∞)
-λ({xp},0)=λM(∅,{xp})⇔∀p∈InPorts,xp≠∅
-ta({xp},σ)=σ
-
-Since inputs might not all arrive together, we cache each arriving input. When one of the inputs changes its state and each input has been received at least once, then the output is computed. The initial transition function resets the sigma state variable to infinity, waiting for the change in one of the inputs.
-Moore DTSS with input
-The DEVS representation of a Moore DTSS with input combines features of the memoryless and input free representations. The DEVS waits for a change in an input port to be heard from before computing the next state of the DTSS and scheduling its next output by setting σ to h. This guarantees an output departure to trigger the next cycle. In the subsequent internal transition the DEVS continues holding in the new DTSS state waiting for another change in one of the inputs. The initial output must be given (or the initial state or both), in order to provide outputs even when not all the inputs have been received. These systems have the full structure of the general DTSS described above, DTSS M=〈XM,YM,SM,δM,λM,h〉. A possible DEVS formulation is:
-
-DEVS M=〈X,Y,S,δext,δint,δcon,λ,ta〉
-
-where
-X=XM
-Y=YM
-S=SM×{xp:p∈InPorts}×R∞+=(sM,{xp},σ), the initial state s0 (usually with σ=0) is provided.
-δext(sM, {xp},σ,e,(p1,x1'),(p2,x2'),…,(pn,xn'))={if xi≠xi'⇒xi=xi',i=1,…,n sM=δ(sM,{xp}) σ=σ-e 
-δint(sM,{xp},σ)=(sM,{xp},h)
-λ(sM,{xp},σ)=λM(sM)
-ta(sM,{xp},σ)=σ
-Mealy DTSS
-A mealy DTSS is represented as a DEVS in a manner similar to a memoryless function with the difference that the state is updated when one of the inputs change. However, the output cannot be prescheduled for the next cycle. So the Mealy DEVS passivates (remanins in a state with σ=∞) after a state update just as if it were a memoryless element. Thus, given a Mealy DTSS M=〈XM,YM,SM,δM,λM,h〉, one possible DEVS representation is:
-DEVS M=〈X,Y,S,δext,δint,δcon,λ,ta〉
-X=XM
-Y=YM
-S=SM×{xp:p∈InPorts}×R∞+, initially: s0=(sM,0,{xp=∅:p∈InPorts},σ=∞)
-δext(sM,{xp},∞,e,(p1,x1'),(p2,x2'),…,(pn,xn'))={if xi≠xi'⇒xi=xi',i=1,…,n sM=δ(sM,{xp}) σ=0 
-δint(sM,{xp},σ)=(sM,{xp},∞)
-λ(sM,{xp},0)=λM(sM,{xp})
-ta({xp},σ)=σ
-1.5.2 DESS models
-A Differential Equation System Specification (DESS) is an M&S formalism described using mathematical set theory. A DESS specification is a structure:
-DESS M=〈XM,YM,SM,δM,λM〉
-where
-XM is the set of inputs
-YM is the set of outputs
-SM is the set of states
-δM:SM×XM→SM is the transition function
-and the output function is
-λM:SM→YM (Moore-type)
-λM:SM×XM→YM (Mealy type)
-
-The transition function can be defined for every state s and bounded continuous input segment, as the solution of the state differential equation obtained integrating from the initial time to the final time, with the given initial state and given input segment from initial time to final time, [ti,tf]:
-dsdt=δM(s,x[ti,tf]), with known s(ti),x[ti,tf], and being s(tf) the solution to the differential equation.
-
-There are two approaches to DEVS representation of DESS. The first is to employ standard numerical methods that result in a DTSS simulation of the DESS. To this end, the DESS transition function is approximated using (for example) the Euler-Cauchy method and then simulated as a Moore DTSS with inputs. This DTSS system can be easily formulated as a DEVS model. The second approach is quite similar, but in this case the differential equation is approximated using quantization. As shown in previous sections, a quantized system can be modeled by a DEVS system.
-Bibliography
-[1]	B. P. Zeigler, T. G. Kim, and H. Praehofer, Theory of Modeling and Simulation. New York: Academic Press, 2000.
-[2]	H. L. M. Vangheluwe, “DEVS as a common denominator for multi-formalism hybrid systems modelling,” Proceedings of the 2000 Ieee International Symposium on Computer-Aided Control System Design, pp. 129-134, 2000. 
-
-
-
-2 DEVS Software: The model and the simulator
-2.1 Introduction
-In this chapter, we present through several examples how to use our xDEVS library. To this end, we have selected NetBeans as the Integrated Development Environment. It is free and open-source. Besides, it includes all the tools needed to create professional desktop, enterprise, web, and mobile applications with the Java platform, as well as with C/C++, PHP, JavaScript and Groovy (“NetBeans,” n.d.).
-The Java SE Development Kit (JDK) is required to install NetBeans IDE. On the NetBeans IDE Download page, one of several installers can be obtained, each of which contains the base IDE and additional tools, we recommend one of these two:
-Java SE. Supports all standard Java SE development features as well as support for NetBeans RCP development platform.
-Java EE. Provides tools for developing Java SE and Java EE applications as well as support for NetBeans RCP development platform.
-Once NetBeans is installed, we start with the development of several DEVS M&S examples. To this end, open NetBeans and select File→New Project … In the new window select a “Java Application” and click Next.
-
-Figure 1. New Java project in NetBeans.
-
-In the next window, introduce “MicroSim” as the name of the new project, as well as the target directory for the project. Uncheck the Create Main Class option, and then press Finish.
-
-Figure 2. Project name: MicroSim.
-Once the project is opened, create a folder named “lib” inside the project folder (MicroSim/lib) and copy there the xDEVS .jar file (unzip the xDEVS .zip release file and move the .jar file into the aforementioned folder). Next, right click on the “Libraries” subfolder in the NetBeans project and select “Add JAR/folder …”, selecting the xDEVS .jar file after that:
-
-
-
-Figure 3. MicroSim with xDEVS library
-2.2 The DEVS modeling meta-model
-We first briefly describe the DEVS modeling meta-model. As seen in previous chapters, DEVS is formed basically by coupled and atomic models, connections, ports and states. We can start with the Atomic model definition:
-M=〈X,Y,S,δint,δext,δcon,λ,ta〉
-Both inputs and outputs are defined in terms of pairs (port, value). Thus, we need a class Port to store those values. Besides, the Atomic model itself needs its own class Atomic. We also need five functions, three transition functions (δint,δext,δcon), the output function (λ) and the time advance function (ta). Regarding the state, we may consider that the set of attributes in the Atomic class will represent its state. Thus, we do not need a class representation for the state.
-With respect to the Coupled model definition:
-N=〈X,Y,D,{Md|d∈D},EIC,EOC,IC〉
-As in the Atomic model, both X and Y are implicitly defined by the Port class. The coupled model also needs its class Coupled. We also need a class Coupling to define a single connection. Finally, the coupled model is a container, i.e., the coupled model can contain connections, as well as atomic and coupled models. We will use a super-class Component to define a component in the model that can be an atomic or coupled. Thus Md will be a set of components.
-A Port object will belong to a connection. Furthermore, when we create an Atomic or Coupled model, it will have ports as part of their attributes. In our case, a DEVS port contains a name and a bag of values. The Port class is also generic; it means that the elements in the bag of values can belong to any Java class. Around these two attributes, there is a set of methods that operates over them.
-The Coupling class is only responsible of storing one connection in the DEVS model. This class contains, as attributes, the starting port of the connection, the ending port, and their respective components.
-The Component class contains the name of the component, as well as input and output ports. Note that both Atomic and Coupled models are also components. Thus, both Atomic and Coupled classes extend Component. Next, the source code of this class is shown.
-The Atomic class is an abstract class that contains the basic P-DEVS functionality. It contains no ports and the minimal state possible: phase and sigma.
-A coupled model is basically a container class. It contains other components that can be atomic or coupled, and three additional sets: the internal, external input and external output connections. In the same order, the attributes responsible of storing these elements are componens, ic, eic, and eoc.
-Now, with Port, Component, Atomic, Coupling and Coupled classes defined we are ready to see some examples.
-2.2.1 Step
-The Step atomic model provides a step between two definable levels at a specified time. If the simulation time is less than the step time parameter value (stepTime), the block’s output is the initial value parameter value (initialValue). For simulation time greater than or equal to the step time, the output is the final value parameter value (finalValue). Step time specifies the time when the output jumps from the initial value parameter to the final value parameter. Initial value specifies the block output until the simulation time reaches the step time parameter. Final value defines the block output when the simulation time reaches and exceeds the step time parameter.
-Thus, we have the following structure and behavior for the Step model:
-Output ports:
-	portOut
-Primary states:
-	Phases: “initialValue”, “finalValue”
-	Sigma: Any non-negative number
-Secondary states:
-	initialValue: Any real number
-	finalValue: Any real number
-Parameters:
-	stepTime: Any positive number
-Initialization:
-	Initial state is (“initialValue”, 0.0, initialValue, finalValue)
-	stepTime is also initialized
-Output function:
-	If (phase==”initialValue”) send initialValue to output port portOut
-	Else if (phase==”finalValue”) send finalValue to the same port.
-Internal transition function:
-	If (phase==”initialValue”) hold-in “finalValue” for stepTime
-Else if (phase==”finalValue”) hold-in “passive” for infinity.
-The behavior of the Step atomic model is specified as a UML state machine diagram in the following Figure.
-
-Step model machine specification.
-Exercise: Write a P-DEVS formal specification for the Step atomic model.
-Given the structure and behavior of the Step atomic model, the implementation is straightforward:
-MyStep.java
-public class MyStep extends Atomic {
-
-    public OutPort<Double> oOut = new OutPort<>("out");
-    protected double initialValue;
-    protected double stepTime;
-    protected double finalValue;
-
-    public MyStep(String name, double initialValue, double stepTime, double finalValue) {
-        super(name);
-        super.addOutPort(oOut);
-        this.initialValue = initialValue;
-        this.stepTime = stepTime;
-        this.finalValue = finalValue;
-    }
-
-    @Override
-    public void initialize() {
-        super.holdIn("initialValue", 0.0);
-
-    }
-
-    @Override
-    public void exit() {
-    }
-
-    @Override
-    public void deltint() {
-        if (super.phaseIs("initialValue")) {
-            super.holdIn("finalValue", stepTime);
-        } else if (super.phaseIs("finalValue")) {
-            super.passivate();
-        }
-    }
-
-    @Override
-    public void deltext(double e) {
-    }
-
-    @Override
-    public void lambda() {
-        if (super.phaseIs("initialValue")) {
-            oOut.addValue(initialValue);
-        } else if (super.phaseIs("finalValue")) {
-            oOut.addValue(finalValue);
-        }
-    }
-
-}
-
-
-We can see that the external transition function is empty. It is because this atomic model will never receive an event since it does not have input ports.
-2.2.2 Pulse generator
-The Pulse generator block generates square wave pulses at regular intervals. The block’s waveform parameters, amplitude, pulse width (state variable pulseWidth), period, and phase delay (state variable phaseDelay), determine the shape of the output waveform. The following diagram shows how each parameter affects the waveform.
-
-Pulse generator waveform.
-Amplitude is the pulse amplitude. Period is the pulse period. Pulse width is the duty cycle. Phase delay is the delay before the pulse is generated.
-
-Pulse state machine diagram.
-Previous Figure shows the behavior of the Pulse model as a state machine. The model stays in phase “delay” for 0.0 seconds. Immediately, the output is 0.0 and an internal transition happens. Then, the primary state of the model goes into “high” for phaseDelay seconds. After that, the output is amplitude and the state changes again into “low” for pulseWith seconds. Then, the model enters in a loop, where the pulse takes its periodic form.
-Following the state machine diagram in the previous Figure, the implementation is simple:
-MyPulseGenerator.java
-public class MyPulseGenerator extends Atomic {
-
-    public OutPort<Double> oOut = new OutPort<>("out");
-    protected double amplitude;
-    protected double pulseWidth;
-    protected double period;
-    protected double phaseDelay;
-
-    public MyPulseGenerator(String name, double amplitude, double pulseWidth, double period, double phaseDelay) {
-        super(name);
-        super.addOutPort(oOut);
-        this.amplitude = amplitude;
-        this.pulseWidth = pulseWidth;
-        this.period = period;
-        this.phaseDelay = phaseDelay;
-    }
-
-    @Override
-    public void initialize() {
-        super.holdIn("delay", 0);
-    }
-
-    @Override
-    public void exit() {
-    }
-
-    @Override
-    public void deltint() {
-        if (super.phaseIs("delay")) {
-            super.holdIn("high", phaseDelay);
-        } else if (super.phaseIs("high")) {
-            super.holdIn("low", pulseWidth);
-        } else if (super.phaseIs("low")) {
-            super.holdIn("high", period - pulseWidth);
-        }
-    }
-
-    @Override
-    public void deltext(double e) {
-    }
-
-    @Override
-    public void lambda() {
-        if (super.phaseIs("delay")) {
-            oOut.addValue(0.0);
-        } else if (super.phaseIs("high")) {
-            oOut.addValue(amplitude);
-        } else if (super.phaseIs("low")) {
-            oOut.addValue(0.0);
-        }
-    }
-}
-
-
-2.2.3 Ramp
-The Ramp atomic model generates a signal that starts at a specified time and value and changes by a specified rate. The block’s slope, start time (startTime attribute), and initial output (initialOutput attribute) parameters determine the characteristics of the output signal. Slope specifies the rate of change of the generated signal. Start time defines the time at which the block begins generating the signal. Initial output specifies the initial value of the output signal. Although we could use a quantified ramp, for the sack of clarity in this example we use a sample time parameter (sampleTime) to generate the output after the start time parameter. This is then a DTSS atomic model, which of course can be defined using P-DEVS.
-
-Ramp state machine diagram.
-Previous Figure depicts the Ramp state machine diagram. The model output two values before enter in a periodic state. The first is the initialOutput when the model is initialized. The second is the same value, just before the ramp starts. After that a point in the ramp is generated every sampleTime seconds. The implementation follows the state machine diagram:
-MyRamp.java
-public class MyRamp extends Atomic {
-
-    public OutPort<Double> oOut = new OutPort<>("out");
-    protected double startTime;
-    protected double slope;
-    protected double sampleTime;
-    protected double nextOutput;
-
-    public MyRamp(String name, double initialOutput, double startTime, double slope, double sampleTime) {
-        super(name);
-        super.addOutPort(oOut);
-        this.nextOutput = initialOutput;
-        this.startTime = startTime;
-        this.slope = slope;
-        this.sampleTime = sampleTime;
-    }
-
-    @Override
-    public void initialize() {
-        super.holdIn("initialOutput", 0.0);
-    }
-
-    @Override
-    public void exit() {
-    }
-
-    @Override
-    public void deltint() {
-        if (super.phaseIs("initialOutput")) {
-            super.holdIn("startTime", startTime);
-        } else {
-            nextOutput += slope * sampleTime;
-            super.holdIn("active", sampleTime);
-        }
-    }
-
-    @Override
-    public void deltext(double e) {
-    }
-
-    @Override
-    public void lambda() {
-        oOut.addValue(nextOutput);
-    }
-}
-
-
-2.3 The DEVS simulation meta-model
-DEVS treats a model and its simulator as two distinct elements. The DEVS simulation protocol describes how a DEVS model should be simulated; whether in standalone fashion or in a coupled model. Such a protocol is implemented by a processor, which can be a simulator or a coordinator. As illustrated in the following Figure, the DEVS protocol is executed as follows:
-
-DEVS simulation protocol.
-First the hierarchy is built. Note in the previous Figure that the simulation is performed over a root coupled model. Besides, one of the child components can be a coupled model and as a consequence, a Simulator in the Figure should be a Coordinator. 
-A cycle is then entered in which the coordinator requests that each simulator provide its time of next event and determines the minimum of the returned values to obtain the global time of next event. Current global (and virtual) time is fixed to this value: t=min⁡(tNi). In the Figure, i=2.
-These simulators with t=tNi applies in the corresponding model the λi method to produce an output.
-In this step, output propagation is carried out. The propagation is performed in all ports in which the corresponding model has left one or more values. Thus, after a simulator i has executed λi, it there is output, then this output is propagated.
-All the simulators execute a special transition function that tries to determine the combined effect of the propagated output and internal scheduling on its state.
-A side effect of the execution of this transition function is to produce the time of next event, tN—for DEVS simulators this state change is computed according to the DEVS formalism and the tN is updated using the time advance of its model.
-Finally, the coordinator obtains the next global time of next event and the cycle repeats in point 2.
-It should be noted that although the Coordinator class will be unique, its actual implementations can be quite different. This is not only because of software design, but also because of the coordinator itself. The coordinator does not impose any strict ordering for the messages sent/received when multiple components are scheduled to receive inputs at the same time. For example, when the coordinator requests are sent to two or more simulators, the order in which the λi responses are received can be arbitrary. This is expected since the parallel DEVS formalism is defined to assume no dependency between two messages received from one or more components. Therefore, there cannot be any dependencies between two coordinators (or simulators) that are used together in distributed fashion.
-Following the simulation process in the Figure above, one coordinator may contain simulators and coordinators. Thus, as in the DEVS modeling meta-model occurs with the Component class, we would need an abstract base class AbstractSimulator. Both Simulator (for atomic models) and Coordinator (for coupled models) classes would extend the AbstractSimulator class. Regarding attributes, AbstractSimulator should contain the common set of attributes to both Simulator and Coordinator. These are tL (time of last event) and tN (time to next event). With respect to the methods implemented in AbstractSimulator, we should follow the process described in the previous Figure. Propagation of events is only performed in Coordinator. Thus, we have initialization, output function, transition function and time advance function. Note that the protocol is quite equivalent to the DEVS modeling formalism. Indeed, we try to simulate a DEVS model using a DEVS structure. 
-The Simulator class just adds an Atomic model to the list of attributes. The Coordinator, instead, has in addition to the associated coupled model, a set of simulators (each one being either a Simulator or Coordinator). There are two versions of the simulate method. The first one just runs the points 2 to 6 in the simulation recipe for numIterations times. The second one simulates the coupled model for a time interval.
-2.4 Simulation of coupled models
-A simulation always needs to synthesize some results to the engineer in order to check the output of the model. In this Section, we first show how to quickly build a CsvConsole, an atomic model that will print numerical values in CSV format.
-MyCsvConsole.java
-public class MyCsvConsole extends Atomic {
-    
-    public InPort<Number> iIn = new InPort<>("in");
-    protected double time;
-
-    public MyCsvConsole(String csvPath) {
-        super("CsvConsole");
-        super.addInPort(iIn);
-    }
-    
-    @Override
-    public void initialize() {
-        this.time = 0.0;
-        super.passivate();
-    }
-
-    @Override
-    public void exit() {
-    }
-
-    @Override
-    public void deltint() {
-        time += super.getSigma();
-        super.passivate();
-    }
-
-    @Override
-    public void deltext(double e) {
-        time += e;
-        if (!iIn.isEmpty()) {
-            System.out.println(time + ";" + iIn.getSingleValue().doubleValue());
-        }
-    }
-
-    @Override
-    public void lambda() {
-    }    
-}
-
-
-As can be seen, the CsvConsole atomic model is in idle state. The output function does nothing, since there is no output port. The internal transition function just updates the global clock and passivates the model. The external transition function updates the global clock and sends the computed time and the number received to stdout.
-2.4.1 Pulse
-Now we show how to simulate the Pulse atomic model with the Scope atomic model. To simulate a DEVS model, we first need to build a root coupled model containing all the components involved in the simulation.
-
-PulseGeneratorExample coupled model.
-The previous figure depicts a scheme of the root coupled model. It can be develop with a class extending the Coupled model. The implementation is straightforward:
-MyPulseGeneratorExample.java
-public class MyPulseGeneratorExample extends Coupled {
-  public MyPulseGeneratorExample() {
-    super("PulseGeneratorExample");
-    MyPulseGenerator pulse = new MyPulseGenerator("Pulse", 10, 3, 5, 5);
-    super.addComponent(pulse);    
-    MyCsvConsole scope = new MyCsvConsole("CSV");
-    super.addComponent(scope);
-    super.addCoupling(pulse, pulse.oOut, scope, scope.iIn);
-  }
-  
-  public static void main(String[] args) {
-    MyPulseGeneratorExample pulseExample = new MyPulseGeneratorExample();
-    Coordinator coordinator = new Coordinator(pulseExample);
-    coordinator.initialize();
-    coordinator.simulate(30.0);
-    coordinator.exit();
-  }
-}
-
-
-As can be seen, the constructor just creates both atomic models as well as their connections. The Scope only needs the title of the y axis in the step chart. Furthermore, we have created a Pulse atomic model with amplitude equal to 10, pulse width of 3, period equal to 5 and a phase delay of 5. 
-There is also a main function that creates an instance of the coupled model and run the simulation using the coordinator previously developed. In NetBeans, just click with the right mouse button over the MyPulseGeneratorExample class and select Run… It will appear data showing the simulation results, which can be represented using a spreadsheet, for example.
-
-Pulse generator simulation output.
-2.4.2 Ramp
-An example to simulate the Ramp atomic model is performed in identical way:
-
-RampExample coupled model.
-
-MyRampExample.java
-public class MyRampExample extends Coupled {
-  public MyRampExample() {
-    super("MyRampExample");
-    MyRamp ramp = new MyRamp("MyRamp", 2, 10, 2, 0.1);
-    super.addComponent(ramp);    
-    MyCsvConsole scope = new MyCsvConsole("CSV");
-    super.addComponent(scope);
-    super.addCoupling(ramp, ramp.oOut, scope, scope.iIn);
-  }
-  
-  public static void main(String[] args) {
-    MyRampExample example = new MyRampExample();
-    Coordinator coordinator = new Coordinator(example);
-    coordinator.initialize();
-    coordinator.simulate(30.0);
-    coordinator.exit();
-  }
-}
-
-
-In this case the ramp has an initial output equal to 2, the start time is 10, slope is 2 and the sample time is set to 0.1. This Figure shows the output of the simulation.
-
-Ramp simulation output.
-2.4.3 Experimental frame and processor model
-We have already presented the EFP model in the previous chapter Indeed, we have written the DEVS specification for all the components in the model. In this Section, we build and simulate the EFP model using xDEVS.
-
-EFP structure.
-The Figure above shows the structure of the EFP model. From an implementation point of view, we need two coupled models (the root coupled model EFP and the experimental frame EF), three atomic models (Generator, Processor and Transducer) and one Job class.
-Job
-The Job class contains a string to uniquely name the job and an attributed called time, just to first save the time in which the job was generated and second the time in which the job was solved (overwriting the first value):
-MyJob.java
-public class MyJob extends Entity {
-
-    protected String id;
-    protected double time;
-
-    public MyJob(String name) {
-        this.id = name;
-        this.time = 0.0;
-    }
-}
-
-
-Generator atomic model
-The generator has a period for job generation. In order to stop the generator, we add an input port called stop. If an event is received the generator will pass from active to idle. We also add a counter to generate a different name for each job. The implementation just follows the DEVS description already given:
-MyGenerator.java
-public class MyGenerator extends Atomic {
-
-    protected InPort<MyJob> iStart = new InPort<>("iStart");
-    protected InPort<MyJob> iStop = new InPort<>("iStop");
-    protected OutPort<MyJob> oOut = new OutPort<>("oOut");
-    protected int jobCounter;
-    protected double period;
-
-    public MyGenerator(String name, double period) {
-        super(name);
-        super.addInPort(iStop);
-        super.addInPort(iStart);
-        super.addOutPort(oOut);
-        this.period = period;
-    }
-
-    @Override
-    public void initialize() {
-        jobCounter = 1;
-        this.holdIn("active", period);
-    }
-
-    @Override
-    public void exit() {
-    }
-
-    @Override
-    public void deltint() {
-        jobCounter++;
-        this.holdIn("active", period);
-    }
-
-    @Override
-    public void deltext(double e) {
-        super.passivate();
-    }
-
-    @Override
-    public void lambda() {
-        MyJob job = new MyJob("" + jobCounter + "");
-        oOut.addValue(job);
-    }
-}
-
-
-Processor atomic model
-The processor has two ports, one to receive jobs and the other to send processed jobs. For simplicity, every job is solved in the same interval processingTime. The processor does not accept jobs if there is a current job (currentJob) being processed:
-MyProcessor.java
-public class MyProcessor extends Atomic {
-
-    protected InPort<MyJob> iIn = new InPort<>("iIn");
-    protected OutPort<MyJob> oOut = new OutPort<>("oOut");
-    protected MyJob currentJob = null;
-    protected double processingTime;
-
-    public MyProcessor(String name, double processingTime) {
-        super(name);
-        super.addInPort(iIn);
-        super.addOutPort(oOut);
-        this.processingTime = processingTime;
-    }
-
-    @Override
-    public void initialize() {
-        super.passivate();
-    }
-
-    @Override
-    public void exit() {
-    }
-
-    @Override
-    public void deltint() {
-        super.passivate();
-    }
-
-    @Override
-    public void deltext(double e) {
-        if (super.phaseIs("passive")) {
-            MyJob job = iIn.getSingleValue();
-            currentJob = job;
-            super.holdIn("active", processingTime);
-        }
-    }
-
-    @Override
-    public void lambda() {
-        oOut.addValue(currentJob);
-    }
-}
-
-
-Transducer atomic model
-The transducer has two input ports, one for jobs generated and other for the set of jobs solved. It also stores these jobs (arrived and solved) in two separated linked lists. Additionally, there is a global clock (clock) to know the global instant of time (and thus updated in both transition functions). The totalTa parameter accumulates the time needed to solve each job. When the transducer operates for a given observation time, it sends an output to the generator to stop the simulation. Note that in the implementation, we are using a Java Logger object to see the result:
-MyTransducer.java
-public class MyTransducer extends Atomic {
-
-    private static final Logger logger = Logger.getLogger(MyTransducer.class.getName());
-
-    protected InPort<MyJob> iArrived = new InPort<>("iArrived");
-    protected InPort<MyJob> iSolved = new InPort<>("iSolved");
-    protected OutPort<MyJob> oOut = new OutPort<>("oOut");
-
-    protected LinkedList<MyJob> jobsArrived = new LinkedList<>();
-    protected LinkedList<MyJob> jobsSolved = new LinkedList<>();
-    protected double observationTime;
-    protected double totalTa;
-    protected double clock;
-
-    public MyTransducer(String name, double observationTime) {
-        super(name);
-        super.addInPort(iArrived);
-        super.addInPort(iSolved);
-        super.addOutPort(oOut);
-        totalTa = 0;
-        clock = 0;
-        this.observationTime = observationTime;
-    }
-
-    @Override
-    public void initialize() {
-        super.holdIn("active", observationTime);
-    }
-
-    @Override
-    public void exit() {
-    }
-
-    @Override
-    public void deltint() {
-        clock = clock + getSigma();
-        double throughput;
-        double avgTaTime;
-        if (phaseIs("active")) {
-            if (!jobsSolved.isEmpty()) {
-                avgTaTime = totalTa / jobsSolved.size();
-                if (clock > 0.0) {
-                    throughput = jobsSolved.size() / clock;
-                } else {
-                    throughput = 0.0;
-                }
-            } else {
-                avgTaTime = 0.0;
-                throughput = 0.0;
-            }
-            logger.info("End time: " + clock);
-            logger.info("Jobs arrived : " + jobsArrived.size());
-            logger.info("Jobs solved : " + jobsSolved.size());
-            logger.info("Average TA = " + avgTaTime);
-            logger.info("Throughput = " + throughput);
-            holdIn("done", 0);
-        } else {
-            passivate();
-        }
-        //logger.info("####deltint: "+showState());
-    }
-
-    @Override
-    public void deltext(double e) {
-        clock = clock + e;
-        if (phaseIs("active")) {
-            MyJob job = null;
-            if (!iArrived.isEmpty()) {
-                job = iArrived.getSingleValue();
-                logger.fine("Start job " + job.id + " @ t = " + clock);
-                job.time = clock;
-                jobsArrived.add(job);
-            }
-            if (!iSolved.isEmpty()) {
-                job = iSolved.getSingleValue();
-                totalTa += (clock - job.time);
-                logger.fine("Finish job " + job.id + " @ t = " + clock);
-                job.time = clock;
-                jobsSolved.add(job);
-            }
-        }
-        //logger.info("###Deltext: "+showState());
-    }
-
-    @Override
-    public void lambda() {
-        if (phaseIs("done")) {
-            MyJob job = new MyJob("null");
-            oOut.addValue(job);
-        }
-    }
-}
-
-
-Experimental frame coupled model
-The experimental frame coupled model contains the generator and the transducer as well as one input port and one output port, the implementation is straightforward, since we must follow the graphical description and add components and connections:
-MyEf.java
-public class MyEf extends Coupled {
-
-    protected InPort<MyJob> iStart = new InPort<>("iStart");
-    protected InPort<MyJob> iIn = new InPort<>("iIn");
-    protected OutPort<MyJob> oOut = new OutPort<>("oOut");
-
-    public MyEf(String name, double period, double observationTime) {
-        super(name);
-        super.addInPort(iIn);
-        super.addInPort(iStart);
-        super.addOutPort(oOut);
-        MyGenerator generator = new MyGenerator("generator", period);
-        addComponent(generator);
-        MyTransducer transducer = new MyTransducer("transducer", observationTime);
-        addComponent(transducer);
-
-        addCoupling(this.iIn, transducer.iSolved);
-        addCoupling(generator.oOut, this.oOut);
-        addCoupling(generator.oOut, transducer.iArrived);
-        addCoupling(transducer.oOut, generator.iStop);
-        addCoupling(this.iStart, generator.iStart);
-    }
-}
-
-
-Experimental frame – processor coupled model
-As with the previous coupled model, we follow the graphical representation given above to develop this class. Additionally, we include a main static function to simulate this root coupled model. Note that the simulation is configured for an infinity number of cycles. It does not represent a problem, since the transducer will passivate the generator, which is the only Moore DTSS model in the system.
-MyEfp.java
-public class MyEfp extends Coupled {
-
-    public MyEfp(String name, double generatorPeriod, double processorPeriod, double transducerPeriod) {
-        super(name);
-
-        MyEf ef = new MyEf("ef", generatorPeriod, transducerPeriod);
-        addComponent(ef);
-        MyProcessor processor = new MyProcessor("processor", processorPeriod);
-        addComponent(processor);
-
-        addCoupling(ef.oOut, processor.iIn);
-        addCoupling(processor.oOut, ef.iIn);
-    }
-
-    public static void main(String args[]) {
-        DevsLogger.setup(Level.FINE);
-        MyEfp efp = new MyEfp("efp", 1, 3, 100);
-        Coordinator coordinator = new Coordinator(efp);
-        coordinator.initialize();
-        coordinator.simulate(Long.MAX_VALUE);
-        coordinator.exit();
-    }
-}
-
-
-We can see the simulation output in the NetBeans Output tab. We have formatted the Java Logger to see the wall clock time of the simulation:
-Simulation output
-[INFO-main|00:00:00.008]: Start job 1 @ t = 1.0 
-[INFO-main|00:00:00.025]: Start job 2 @ t = 2.0 
-[INFO-main|00:00:00.025]: Start job 3 @ t = 3.0 
-[INFO-main|00:00:00.026]: Finish job 1 @ t = 3.0 
-[INFO-main|00:00:00.027]: Start job 4 @ t = 4.0 
-[INFO-main|00:00:00.027]: Start job 5 @ t = 5.0 
-[INFO-main|00:00:00.028]: Finish job 3 @ t = 5.0 
-[INFO-main|00:00:00.028]: Start job 6 @ t = 6.0 
-[INFO-main|00:00:00.029]: Start job 7 @ t = 7.0 
-[INFO-main|00:00:00.030]: Finish job 5 @ t = 7.0 
-[INFO-main|00:00:00.030]: Start job 8 @ t = 8.0 
-[INFO-main|00:00:00.031]: Start job 9 @ t = 9.0 
-[INFO-main|00:00:00.031]: Finish job 7 @ t = 9.0 
-[INFO-main|00:00:00.032]: Start job 10 @ t = 10.0 
-[INFO-main|00:00:00.032]: Start job 11 @ t = 11.0 
-[INFO-main|00:00:00.033]: Finish job 9 @ t = 11.0 
-[INFO-main|00:00:00.033]: Start job 12 @ t = 12.0 
-[INFO-main|00:00:00.034]: Start job 13 @ t = 13.0 
-[INFO-main|00:00:00.034]: Finish job 11 @ t = 13.0 
-[INFO-main|00:00:00.034]: Start job 14 @ t = 14.0 
-[INFO-main|00:00:00.035]: Start job 15 @ t = 15.0 
-[INFO-main|00:00:00.035]: Finish job 13 @ t = 15.0 
-[INFO-main|00:00:00.036]: Start job 16 @ t = 16.0 
-[INFO-main|00:00:00.036]: Start job 17 @ t = 17.0 
-[INFO-main|00:00:00.037]: Finish job 15 @ t = 17.0 
-[INFO-main|00:00:00.037]: Start job 18 @ t = 18.0 
-[INFO-main|00:00:00.037]: Start job 19 @ t = 19.0 
-[INFO-main|00:00:00.038]: Finish job 17 @ t = 19.0 
-[INFO-main|00:00:00.038]: End time: 19.0 
-[INFO-main|00:00:00.039]: Jobs arrived : 19 
-[INFO-main|00:00:00.039]: Jobs solved : 9 
-[INFO-main|00:00:00.039]: Average TA = 2.0 
-[INFO-main|00:00:00.040]: Throughput = 0.47368421052631576 
-
-
-We can appreciate that the jobs are generated and solved according to the specification of the generator (period of 1 second), and the processor (processing time of 2 seconds). However, note that we are working using virtual time. The wall clock time generate jobs as the real processor in the PC is able to execute all the Java sentences in the xDEVS simulator (in an order of milliseconds).
+Transducer=〈 *X*, *S*, *Y*, δ_{int}, δ_{ext}, δ_{con}, λ, ta 〉
+
+- *X* = {(arrived,j∈J),(solved,j∈J}, where J is a set of jobs
+- *S* = (phase = {"active","passive"}) × (σ ∈ R_{0}^{+ }) × (clock ∈ R_{0}^{+} × J_{A}∈J × J_{S}∈J
+  where J_{A} and J_{S} are sets of arrived and solved jobs, respectively.
+- *Y* = {(stop,ν)}, where ν is any event.
+- ta(phase,σ,clock,J_{A},J_{S}) = σ
+- λ(phase,σ,clock,J_{A},J_{S}) = ν
+- δ_{int}(phase,σ,clock,J_{A},J_{S}) = ("passive",∞,clock+σ,J_{A},J_{S})
+- δext(phase,σ,clock,J_{A},J_{S},e,(arrived,j^{a}),(solved,j^{s}))= ...
+  ... = (active,σ-e,clock+e,J_{A}={j^{a},J_{A}} if j^{a}≠∅, J_{S}={j^{s},J_{S}}:j_{t}^{s}=clock if j^{s}≠∅)
+  , where the time in which the job is solved is set to clock with j_{t}^{s} = clock.
+- δ_{con}(phase,σ,clock,J_{A},J_{S},(arrived,j^{a}),(solved,j^{s}))=δ_{ext}(δ_{int}(phase,σ,clock,J_{A},J_{S}),0,(arrived,j^{a}),(solved,j^{s}))
 
 ** Bibliography
 
