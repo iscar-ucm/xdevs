@@ -1,6 +1,7 @@
+from __future__ import annotations
 import csv
 import os
-from typing import Any, List, NoReturn, Iterable, Type
+from typing import Any, Iterable, Type
 from ...transducers import Transducer
 
 
@@ -17,8 +18,8 @@ class CSVTransducer(Transducer):
         self.state_filename = os.path.join(output_dir, self.transducer_id + '_states.csv')
         self.event_filename = os.path.join(output_dir, self.transducer_id + '_events.csv')
 
-        self.state_header: List[str] = [self.sim_time_id]
-        self.event_header: List[str] = [self.sim_time_id]
+        self.state_header: list[str] = [self.sim_time_id]
+        self.event_header: list[str] = [self.sim_time_id]
         if self.include_names:
             self.state_header.append(self.model_name_id)
             self.event_header.extend((self.model_name_id, self.port_name_id))
@@ -52,7 +53,7 @@ class CSVTransducer(Transducer):
         for event_insert in self._iterate_event_inserts(sim_time):
             self.event_csv_writer.writerow([event_insert[field] for field in self.event_header])
 
-    def _create_csv_file(self, filename: str, header: List[str]):
+    def _create_csv_file(self, filename: str, header: list[str]):
         # 1. If output file already exist, we ask the use if he/she wants to overwrite it.
         # if os.path.exists(filename):
         #     print('Transducer output file {} already exists.'.format(filename))

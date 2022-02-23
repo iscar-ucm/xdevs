@@ -1,5 +1,4 @@
 import logging
-from typing import NoReturn
 from xdevs.models import Atomic, Port
 
 try:

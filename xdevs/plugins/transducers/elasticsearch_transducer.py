@@ -1,5 +1,5 @@
+from __future__ import annotations
 import logging
-from typing import Dict, NoReturn
 from ...transducers import Transducer
 from .bad_dependencies_transducer import BadDependenciesTransducer
 
@@ -8,8 +8,7 @@ try:
 
 
     class ElasticsearchTransducer(Transducer):
-
-        supported_data_types: Dict[type, str]
+        supported_data_types: dict[type, str]
 
         def __init__(self, **kwargs):
             """
@@ -29,7 +28,7 @@ try:
 
             self.es = None
 
-        def create_known_data_types_map(self) -> Dict[type, str]:
+        def create_known_data_types_map(self) -> dict[type, str]:
             return {str: 'text', int: 'integer', float: 'double', bool: 'boolean'}
 
         def initialize(self) -> None:
@@ -55,7 +54,7 @@ try:
         def exit(self) -> None:
             pass
 
-        def create_index(self, index_name: str, field_properties: Dict[str, Dict[str, str]], others: Dict[str, tuple]):
+        def create_index(self, index_name: str, field_properties: dict[str, dict[str, str]], others: dict[str, tuple]):
             es = Elasticsearch([self.url])
             # 1. When index exist, we overwrite it
             if es.indices.exists(index=index_name):

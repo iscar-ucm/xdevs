@@ -1,4 +1,4 @@
-from typing import Dict, List, NoReturn, Optional
+from __future__ import annotations
 from xdevs.transducers import Transducer
 from .bad_dependencies_transducer import BadDependenciesTransducer
 
@@ -9,7 +9,7 @@ try:
 
     class SQLTransducer(Transducer):
 
-        supported_data_types: Dict[type, TypeEngine]
+        supported_data_types: dict[type, TypeEngine]
 
         def __init__(self, **kwargs):
             """
@@ -33,10 +33,10 @@ try:
             pool_recycle: int = kwargs.get('pool_recycle', -1)
             self.engine = create_engine(url, echo=echo, pool_pre_ping=pool_pre_ping, pool_recycle=pool_recycle)
 
-            self.state_table: Optional[Table] = None
-            self.event_table: Optional[Table] = None
+            self.state_table: Table | None = None
+            self.event_table: Table | None = None
 
-        def create_known_data_types_map(self) -> Dict[type, TypeEngine]:
+        def create_known_data_types_map(self) -> dict[type, TypeEngine]:
             return {str: String(self.string_length), int: Integer, float: Float}
 
         def initialize(self) -> None:
@@ -68,8 +68,8 @@ try:
         def exit(self) -> None:
             self.engine.dispose()
 
-        def create_table(self, table_name: str, columns: List[Column],
-                         columns_mapper: Dict[str, tuple], metadata: MetaData) -> Table:
+        def create_table(self, table_name: str, columns: list[Column],
+                         columns_mapper: dict[str, tuple], metadata: MetaData) -> Table:
             # 1. Remove table if already exists
             with self.engine.connect() as conn:
                 conn.execute('DROP TABLE IF EXISTS {}'.format(table_name))
