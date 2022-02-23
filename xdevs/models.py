@@ -1,10 +1,9 @@
 from __future__ import annotations
-
 import inspect
 import pickle
 from abc import ABC, abstractmethod
 from collections import deque, defaultdict
-from typing import Deque, Dict, Generator, Generic, Iterator, NoReturn, Optional, List, Tuple, Type, TypeVar
+from typing import Generator, Generic, Iterator, Type, TypeVar
 
 from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, INFINITY
 
@@ -14,7 +13,7 @@ T = TypeVar('T')
 
 class Port(Generic[T]):
 
-    def __init__(self, p_type: Type[T] = None, name: Optional[str] = None, serve: bool = False):
+    def __init__(self, p_type: Type[T] = None, name: str = None, serve: bool = False):
         """
         xDEVS implementation of DEVS Port.
         :param p_type: data type of events to be sent/received via the new port instance.
@@ -24,9 +23,9 @@ class Port(Generic[T]):
         self.name: str = name if name else self.__class__.__name__
         self.p_type: Type[T] = p_type
         self.serve: bool = serve
-        self.parent: Optional[Component] = None  # xDEVS Component that owns the port
-        self._values: Deque[T] = deque()         # Bag containing events directly written to the port
-        self._bag: List[Port[T]] = list()        # Bag containing coupled ports containing events
+        self.parent: Component | None = None  # xDEVS Component that owns the port
+        self._values: deque[T] = deque()      # Bag containing events directly written to the port
+        self._bag: list[Port[T]] = list()     # Bag containing coupled ports containing events
 
     def __bool__(self) -> bool:
         return not self.empty()
@@ -93,15 +92,15 @@ class Port(Generic[T]):
 
 
 class Component(ABC):
-    def __init__(self, name: Optional[str] = None):
+    def __init__(self, name: str = None):
         """
         Abstract Base Class for an xDEVS model.
         :param name: name of the xDEVS model. Defaults to the name of the component's class.
         """
         self.name: str = name if name else self.__class__.__name__
-        self.parent: Optional[Coupled] = None  # Parent component of this component
-        self.in_ports: List[Port] = list()  # List containing all the component's input ports
-        self.out_ports: List[Port] = list()  # List containing all the component's output ports
+        self.parent: Coupled | None = None   # Parent component of this component
+        self.in_ports: list[Port] = list()   # List containing all the component's input ports
+        self.out_ports: list[Port] = list()  # List containing all the component's output ports
 
     def __str__(self) -> str:
         in_str = " ".join([p.name for p in self.in_ports])
@@ -151,13 +150,13 @@ class Component(ABC):
         port.parent = self
         self.out_ports.append(port)
 
-    def get_in_port(self, name) -> Optional[Port]:
+    def get_in_port(self, name) -> Port | None:
         for port in self.in_ports:
             if port.name == name:
                 return port
         return None
 
-    def get_out_port(self, name) -> Optional[Port]:
+    def get_out_port(self, name) -> Port | None:
         for port in self.out_ports:
             if port.name == name:
                 return port
@@ -290,10 +289,10 @@ class Coupled(Component, ABC):
         super().__init__(name)
         self.chain: bool = False
 
-        self.components: List[Component] = list()
-        self.ic: Dict[Port, Dict[Port, Coupling]] = dict()
-        self.eic: Dict[Port, Dict[Port, Coupling]] = dict()
-        self.eoc: Dict[Port, Dict[Port, Coupling]] = dict()
+        self.components: list[Component] = list()
+        self.ic: dict[Port, dict[Port, Coupling]] = dict()
+        self.eic: dict[Port, dict[Port, Coupling]] = dict()
+        self.eoc: dict[Port, dict[Port, Coupling]] = dict()
 
     def initialize(self) -> None:
         pass
@@ -345,15 +344,15 @@ class Coupled(Component, ABC):
         component.parent = self
         self.components.append(component)
 
-    def flatten(self) -> Tuple[List[Atomic], List[Coupling]]:
+    def flatten(self) -> tuple[list[Atomic], list[Coupling]]:
         """
         Flattens coupled model (i.e., parent coupled model inherits the connection of the model).
         :return: Components and couplings to be transferred to parent
         """
-        new_comps_up: List[Atomic] = list()  # list with children components to be inherited by parent
-        new_coups_up: List[Coupling] = list()  # list with couplings to be inherited by parent
+        new_comps_up: list[Atomic] = list()  # list with children components to be inherited by parent
+        new_coups_up: list[Coupling] = list()  # list with couplings to be inherited by parent
 
-        old_comps: List[Coupled] = list()  # list with children coupled models to be deleted
+        old_comps: list[Coupled] = list()  # list with children coupled models to be deleted
 
         for comp in self.components:
             if isinstance(comp, Coupled):  # Propagate flattening to children coupled models
@@ -395,7 +394,7 @@ class Coupled(Component, ABC):
             self._remove_couplings(out_port, self.eoc)
 
     @staticmethod
-    def _remove_couplings(port: Port, couplings: Dict[Port, Dict[Port, Coupling]]) -> None:
+    def _remove_couplings(port: Port, couplings: dict[Port, dict[Port, Coupling]]) -> None:
         # Remove port from couplings list
         couplings.pop(port, None)
         # For remaining ports, remove couplings which source is the port to be removed
@@ -403,7 +402,7 @@ class Coupled(Component, ABC):
             coups.pop(port, None)
         return
 
-    def _create_left_bridge(self, pc) -> Dict[Port, List[Port]]:
+    def _create_left_bridge(self, pc) -> dict[Port, list[Port]]:
         bridge = defaultdict(list)
         for in_port in self.in_ports:
             for port_from in pc:
@@ -412,7 +411,7 @@ class Coupled(Component, ABC):
 
         return bridge
 
-    def _create_right_bridge(self, pc) -> Dict[Port, List[Port]]:
+    def _create_right_bridge(self, pc) -> dict[Port, list[Port]]:
         bridge = defaultdict(list)
         for out_port in self.out_ports:
             for port_from in pc:
@@ -421,7 +420,7 @@ class Coupled(Component, ABC):
                         bridge[out_port].append(port_to)
         return bridge
 
-    def _complete_left_bridge(self, bridge: Dict[Port, List[Port]]) -> List[Coupling]:
+    def _complete_left_bridge(self, bridge: dict[Port, list[Port]]) -> list[Coupling]:
         couplings = list()
         for coup_list in self.eic.values():
             for coup in coup_list.values():
@@ -430,7 +429,7 @@ class Coupled(Component, ABC):
                     couplings.append(Coupling(port, coup.port_to))
         return couplings
 
-    def _complete_right_bridge(self, bridge: Dict[Port, List[Port]]) -> List[Coupling]:
+    def _complete_right_bridge(self, bridge: dict[Port, list[Port]]) -> list[Coupling]:
         couplings = list()
         for coup_list in self.eoc.values():
             for coup in coup_list.values():

@@ -39,7 +39,6 @@ if __name__ == '__main__':
     mean_generator = 10
     stddev_employees = 0
     stddev_clients = 0
-    force_chain = False
 
     if len(sys.argv) > 8:
         print("Program used with more arguments than accepted. Last arguments will be ignored.")
@@ -64,13 +63,12 @@ if __name__ == '__main__':
     print("\tNumber of Employees: {}".format(n_employees))
     print("\tMean time required by employee to dispatch clients: {} seconds (standard deviation of {})".format(mean_employees, stddev_employees))
     print("\tMean time between new clients: {} seconds (standard deviation of {})".format(mean_generator, stddev_employees))
-    print("\tChaining enabled: {}\n".format(force_chain))
 
     start = time.time()
     store = StoreCashier(n_employees, mean_employees, mean_generator, stddev_employees, stddev_clients)
     middle = time.time()
     print("Model Created. Elapsed time: {} sec".format(middle - start))
-    coord = Coordinator(store, flatten=True, chain=force_chain)
+    coord = Coordinator(store, flatten=True)
     coord.initialize()
     middle = time.time()
     print("Coordinator Created. Elapsed time: {} sec".format(middle - start))

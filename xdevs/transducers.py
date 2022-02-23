@@ -6,7 +6,7 @@ import pkg_resources
 import re
 from abc import ABC, abstractmethod
 from math import isinf, isnan
-from typing import Any, Callable, Dict, List, NoReturn, Optional, Set, Tuple, Type, TypeVar, Iterable
+from typing import Any, Callable, ClassVar, Type, TypeVar, Iterable
 from xdevs.models import Atomic, Component, Coupled, Port
 
 
@@ -16,14 +16,14 @@ T = TypeVar('T')
 class Transducible(ABC):
     @staticmethod
     @abstractmethod
-    def transducer_map() -> Dict[str, Tuple[Type[T], Callable[[Any], T]]]:
+    def transducer_map() -> dict[str, tuple[Type[T], Callable[[Any], T]]]:
         pass
 
 
 class Transducer(ABC):
 
-    state_mapper: Dict[str, Tuple[Type[T], Callable[[Atomic], T]]]
-    event_mapper: Dict[str, Tuple[Type[T], Callable[[Any], T]]]
+    state_mapper: dict[str, tuple[Type[T], Callable[[Atomic], T]]]
+    event_mapper: dict[str, tuple[Type[T], Callable[[Any], T]]]
 
     def __init__(self, **kwargs):
         """
@@ -47,13 +47,13 @@ class Transducer(ABC):
         self.port_name_id: str = kwargs.get('port_name_id', 'port_name')
 
         self.exhaustive: bool = kwargs.get('exhaustive', False)
-        self.target_components: Set[Atomic] = set()
-        self.target_ports: Set[Port] = set()
-        self.imminent_components: Optional[List[Atomic]] = None if self.exhaustive else []
-        self.imminent_ports: Optional[List[Port]] = None if self.exhaustive else []
+        self.target_components: set[Atomic] = set()
+        self.target_ports: set[Port] = set()
+        self.imminent_components: list[Atomic] | None = None if self.exhaustive else []
+        self.imminent_ports: list[Port] | None = None if self.exhaustive else []
 
         self.state_mapper = {'phase': (str, lambda x: x.phase), 'sigma': (float, lambda x: x.sigma)}
-        event_type: Optional[Type[T]] = kwargs.get('event_type')
+        event_type: Type[T] | None = kwargs.get('event_type')
         if event_type is not None and issubclass(event_type, Transducible):
             self.event_mapper = event_type.transducer_map()
         else:
@@ -81,7 +81,7 @@ class Transducer(ABC):
                 yield from self._iterate_components(child_comp, include_coupled=include_coupled)
 
     def add_target_port(self, port: Port) -> None:
-        parent: Optional[Component] = port.parent
+        parent: Component | None = port.parent
         if parent is None:
             raise ValueError('Port {} does not have a parent component'.format(port.name))
         self.target_ports.add(port)
@@ -134,7 +134,7 @@ class Transducer(ABC):
         self._add_field(self.state_mapper, field_name, field_type, field_getter)
 
     @staticmethod
-    def _add_field(field_mapper: Dict[str, Tuple[Type[T], Callable[[Any], T]]],
+    def _add_field(field_mapper: dict[str, tuple[Type[T], Callable[[Any], T]]],
                    field_name: str, field_type: Type[T], field_getter: Callable[[Any], T]):
         if field_name in field_mapper:
             raise KeyError('Field name {} is already included in field mapper'.format(field_name))
@@ -211,14 +211,12 @@ class Transducer(ABC):
     def trigger(self, sim_time: float):
         if self.active:
             self.bulk_data(sim_time)
-
             if not self.exhaustive:
                 self.imminent_components.clear()
                 self.imminent_ports.clear()
 
     def _iterate_state_inserts(self, sim_time: float):
         components = self.target_components if self.exhaustive else self.imminent_components
-
         # TODO: filter actually changed states
         for component in components:
             fields = {self.sim_time_id: sim_time}
@@ -238,14 +236,14 @@ class Transducer(ABC):
                 extra_fields = self.map_extra_fields(event, self.event_mapper)
                 yield {**fields, **extra_fields}
 
-    def map_extra_fields(self, target: Any, field_mapper: dict) -> Dict[str, Any]:
+    def map_extra_fields(self, target: Any, field_mapper: dict) -> dict[str, Any]:
         """
         Maps fields from target object according to a field mapper.
         :param target: target object that contains the additional data.
         :param field_mapper: field mapper. It has the following structure: {'field_id': (data_type, getter_function)}.
         :return: dictionary with the values to be bulked to the destination.
         """
-        extra_fields: Dict[str, Any] = dict()
+        extra_fields: dict[str, Any] = dict()
         for field_id, (field_type, field_mapper) in field_mapper.items():
             field_value = field_mapper(target)  # subtract extra field from target
             if field_type not in self.supported_data_types:
@@ -263,7 +261,7 @@ class Transducer(ABC):
 
 class Transducers:
 
-    _plugins: Dict[str, Type[Transducer]] = {
+    _plugins: ClassVar[dict[str, Type[Transducer]]] = {
         ep.name: ep.load() for ep in pkg_resources.iter_entry_points('xdevs.plugins.transducers')
     }
 

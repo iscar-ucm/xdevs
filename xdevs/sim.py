@@ -7,7 +7,7 @@ import pickle
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from concurrent import futures
-from typing import Dict, Generator, List, NoReturn, Optional, Union
+from typing import Generator
 from xmlrpc.server import SimpleXMLRPCServer
 
 from xdevs import INFINITY
@@ -22,15 +22,15 @@ class SimulationClock:
 
 class AbstractSimulator(ABC):
     def __init__(self, model: Component, clock: SimulationClock,
-                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None):
+                 event_transducers_mapping: dict[Port, list[Transducer]] = None):
         self.model: Component = model
         self.clock: SimulationClock = clock
         self.time_last: float = 0
         self.time_next: float = 0
 
-        self.event_transducers: Optional[Dict[Port, List[Transducer]]] = None
+        self.event_transducers: dict[Port, list[Transducer]] | None = None
         if event_transducers_mapping:
-            port_transducers: Dict[Port, List[Transducer]] = dict()
+            port_transducers: dict[Port, list[Transducer]] = dict()
             for port in itertools.chain(self.model.in_ports, self.model.out_ports):
                 transducers = event_transducers_mapping.get(port, None)
                 if transducers:
@@ -66,7 +66,7 @@ class AbstractSimulator(ABC):
         pass
 
     @abstractmethod
-    def deltfcn(self) -> Optional[AbstractSimulator]:
+    def deltfcn(self) -> AbstractSimulator | None:
         pass
 
     @abstractmethod
@@ -79,10 +79,10 @@ class Simulator(AbstractSimulator):
     model: Atomic
 
     def __init__(self, model: Atomic, clock: SimulationClock,
-                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None,
-                 state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]] = None):
+                 event_transducers_mapping: dict[Port, list[Transducer]] = None,
+                 state_transducers_mapping: dict[Atomic, list[Transducer]] = None):
         super().__init__(model, clock, event_transducers_mapping)
-        self.state_transducers: Optional[List[Transducer]] = None
+        self.state_transducers: list[Transducer] | None = None
         if state_transducers_mapping:
             self.state_transducers = state_transducers_mapping.get(self.model, None)
 
@@ -98,7 +98,7 @@ class Simulator(AbstractSimulator):
     def exit(self) -> None:
         self.model.exit()
 
-    def deltfcn(self) -> Optional[Simulator]:  # TODO
+    def deltfcn(self) -> Simulator | None:  # TODO
         if not self.model.in_empty():
             e = self.clock.time - self.time_last
             if self.clock.time == self.time_next:
@@ -134,20 +134,20 @@ class Coordinator(AbstractSimulator):
     model: Coupled
 
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False,
-                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None,
-                 state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]] = None):
+                 event_transducers_mapping: dict[Port, list[Transducer]] = None,
+                 state_transducers_mapping: dict[Atomic, list[Transducer]] = None):
         super().__init__(model, clock or SimulationClock(), event_transducers_mapping)
 
-        self.coordinators: List[Coordinator] = list()
-        self.simulators: List[Simulator] = list()
-        self._transducers: Optional[List[Transducer]] = [] if self.root_coordinator else None
+        self.coordinators: list[Coordinator] = list()
+        self.simulators: list[Simulator] = list()
+        self._transducers: list[Transducer] = [] if self.root_coordinator else None
 
         if flatten:
             self.model.flatten()
         self.ports_to_serve = dict()
 
-        self.__event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None
-        self.__state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]] = None
+        self.__event_transducers_mapping: dict[Port, list[Transducer]] | None = None
+        self.__state_transducers_mapping: dict[Atomic, list[Transducer]] | None = None
         if not self.root_coordinator:
             # Only non-root coordinators will load the transducers mapping in the constructor.
             # Root coordinator ignores them, as it is in charge of building them in _build_hierarchy
@@ -159,20 +159,20 @@ class Coordinator(AbstractSimulator):
         return self.model.parent is None
 
     @property
-    def event_transducers_mapping(self) -> Optional[Dict[Port, List[Transducer]]]:
+    def event_transducers_mapping(self) -> dict[Port, list[Transducer]] | None:
         return self.__event_transducers_mapping
 
     @property
-    def state_transducers_mapping(self) -> Optional[Dict[Atomic, List[Transducer]]]:
+    def state_transducers_mapping(self) -> dict[Atomic, list[Transducer]] | None:
         return self.__state_transducers_mapping
 
     @event_transducers_mapping.setter
-    def event_transducers_mapping(self, event_transducers_mapping: Optional[Dict[Port, List[Transducer]]]):
+    def event_transducers_mapping(self, event_transducers_mapping: dict[Port, list[Transducer]] | None):
         if event_transducers_mapping:
             self.__event_transducers_mapping = event_transducers_mapping
 
     @state_transducers_mapping.setter
-    def state_transducers_mapping(self, state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]]):
+    def state_transducers_mapping(self, state_transducers_mapping: dict[Atomic, list[Transducer]] | None):
         if state_transducers_mapping:
             self.__state_transducers_mapping = state_transducers_mapping
 
@@ -203,8 +203,8 @@ class Coordinator(AbstractSimulator):
     def _build_hierarchy(self):
         if self.root_coordinator and self._transducers:
             # The root coordinator is in charge of
-            ports_to_transducers: Dict[Port, List[Transducer]] = defaultdict(list)
-            models_to_transducers: Dict[Atomic, List[Transducer]] = defaultdict(list)
+            ports_to_transducers: dict[Port, list[Transducer]] = defaultdict(list)
+            models_to_transducers: dict[Atomic, list[Transducer]] = defaultdict(list)
             for transducer in self._transducers:
                 for model in transducer.target_components:
                     models_to_transducers[model].append(transducer)
@@ -281,7 +281,7 @@ class Coordinator(AbstractSimulator):
         for port in itertools.chain(self.processors, self.model.in_ports, self.model.out_ports):
             port.clear()
 
-    def inject(self, port: Union[str, Port[T]], values: Union[T, List[T]], e: float = 0) -> bool:
+    def inject(self, port: str | Port[T], values: T | list[T], e: float = 0) -> bool:
         # TODO enable any iterable as values (careful with str)
         time = self.time_last + e
 
@@ -344,12 +344,10 @@ class Coordinator(AbstractSimulator):
 
 
 # TODO we should review the parallel implementation
-
-
 class ParallelCoordinator(Coordinator):
     def __init__(self, model: Coupled, clock: SimulationClock = None, flatten: bool = False,
-                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None,
-                 state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]] = None, executor=None):
+                 event_transducers_mapping: dict[Port, list[Transducer]] = None,
+                 state_transducers_mapping: dict[Atomic, list[Transducer]] = None, executor=None):
         super().__init__(model, clock, flatten, event_transducers_mapping=event_transducers_mapping,
                          state_transducers_mapping=state_transducers_mapping)
 
@@ -393,11 +391,11 @@ class ParallelCoordinator(Coordinator):
 
 class ParallelProcessCoordinator(Coordinator):
 
-    coordinators: List[ParallelProcessCoordinator]
+    coordinators: list[ParallelProcessCoordinator]
 
     def __init__(self, model: Coupled, clock: SimulationClock = None,
-                 event_transducers_mapping: Optional[Dict[Port, List[Transducer]]] = None,
-                 state_transducers_mapping: Optional[Dict[Atomic, List[Transducer]]] = None,
+                 event_transducers_mapping: dict[Port, list[Transducer]] = None,
+                 state_transducers_mapping: dict[Atomic, list[Transducer]] = None,
                  master=True, executor=None, executor_futures=None):
         super().__init__(model, clock, event_transducers_mapping=event_transducers_mapping,
                          state_transducers_mapping=state_transducers_mapping)

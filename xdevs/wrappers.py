@@ -1,11 +1,13 @@
-
-from typing import Dict, NoReturn, Type
+from __future__ import annotations
 import pkg_resources
+from typing import ClassVar, Type
 from xdevs.models import Atomic
 
+
 class Wrappers:
-    _plugins: Dict[str, Type[Atomic]] = {ep.name: ep.load()
-                                         for ep in pkg_resources.iter_entry_points('xdevs.plugins.wrappers')}
+    _plugins: ClassVar[dict[str, Type[Atomic]]] = {
+        ep.name: ep.load() for ep in pkg_resources.iter_entry_points('xdevs.plugins.wrappers')
+    }
 
     @staticmethod
     def add_plugin(name: str, plugin: Type[Atomic]) -> None:
