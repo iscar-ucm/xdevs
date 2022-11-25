@@ -11,7 +11,7 @@ Research in the xDEVS interface can be found in [[https://doi.org/10.1002/spe.31
 There are six repositories associated with xDEVS,  each one offering the equivalent simulation interface for each corresponding programming language.
 
 - xDEVS/C ([[https://github.com/iscar-ucm/xdevs.c][xdevs.c]])
-- xDEVS/C++ (xdevs.cpp - *work in progress*)
+- xDEVS/C++ ([[https://github.com/iscar-ucm/xdevs.cpp][xdevs.cpp]])
 - xDEVS/Go ([[https://github.com/iscar-ucm/xdevs.go][xdevs.go]])
 - xDEVS/Java ([[https://github.com/iscar-ucm/xdevs.java][xdevs.java]])
 - xDEVS/Python ([[https://github.com/iscar-ucm/xdevs.py][xdevs.py]])
