@@ -2,16 +2,17 @@
 
 ** Introduction
 
-xDEVS stands for /A cross-platform (x) Discrete EVent System simulator/. This library includes a set of C, C++, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism /Discrete Event System Specification (DEVS)/. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
+xDEVS stands for /A cross-platform (x) Discrete EVent System simulator/. This library includes a set of C, C++, C#, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism /Discrete Event System Specification (DEVS)/. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
 
 Research in the xDEVS interface can be found in [[https://doi.org/10.1002/spe.3168][xDEVS: A toolkit for interoperable modeling and simulation of formal discrete event systems]]. Please, cite our article in case you find xDEVS useful. This way we can gain visibility:
 
 - Risco-Martín, JL, Mittal, S, Henares, K, Cardenas, R, Arroba, P. xDEVS: A toolkit for interoperable modeling and simulation of formal discrete event systems. Softw Pract Exper. 2022; 1- 42. doi:10.1002/spe.3168
 
-There are six repositories associated with xDEVS,  each one offering the equivalent simulation interface for each corresponding programming language.
+There are seven repositories associated with xDEVS,  each one offering the equivalent simulation interface for each corresponding programming language.
 
 - xDEVS/C ([[https://github.com/iscar-ucm/xdevs.c][xdevs.c]])
 - xDEVS/C++ ([[https://github.com/iscar-ucm/xdevs.cpp][xdevs.cpp]])
+- xDEVS/C# ([[https://github.com/iscar-ucm/xdevs.cs][xdevs.cs]])
 - xDEVS/Go ([[https://github.com/iscar-ucm/xdevs.go][xdevs.go]])
 - xDEVS/Java ([[https://github.com/iscar-ucm/xdevs.java][xdevs.java]])
 - xDEVS/Python ([[https://github.com/iscar-ucm/xdevs.py][xdevs.py]])
