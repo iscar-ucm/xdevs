@@ -29,7 +29,7 @@ All the repositories are included as submodules inside this main repository (*wo
 
 ** Quick start
 
-Swith to the corresponding particular language. A README file will be found to start with minimal examples and demos.
+Switch to the corresponding particular language. A README file will be found to start with minimal examples and demos.
 
 * The DEVS formalism
 
