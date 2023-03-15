@@ -19,3 +19,9 @@
 [submodule "xdevs.c"]
 	path = simulators/xdevs.c
 	url = git@github.com:iscar-ucm/xdevs.c.git
+[submodule "xdevs_utils.java"]
+	path = utils/xdevs_utils.java
+	url = git@github.com:iscar-ucm/xdevs_utils.java.git
+[submodule "xdevs_utils.rs"]
+	path = utils/xdevs_utils.rs
+	url = git@github.com:iscar-ucm/xdevs_utils.rs.git
