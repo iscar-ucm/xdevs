@@ -1,21 +1,21 @@
 [submodule "xdevs.cpp"]
-	path = xdevs.cpp
+	path = simulators/xdevs.cpp
 	url = git@github.com:iscar-ucm/xdevs.cpp.git
 [submodule "xdevs.cs"]
-	path = xdevs.cs
+	path = simulators/xdevs.cs
 	url = git@github.com:iscar-ucm/xdevs.cs.git
 [submodule "xdevs.go"]
-	path = xdevs.go
+	path = simulators/xdevs.go
 	url = git@github.com:iscar-ucm/xdevs.go.git
 [submodule "xdevs.java"]
-	path = xdevs.java
+	path = simulators/xdevs.java
 	url = git@github.com:iscar-ucm/xdevs.java.git
 [submodule "xdevs.py"]
-	path = xdevs.py
+	path = simulators/xdevs.py
 	url = git@github.com:iscar-ucm/xdevs.py.git
 [submodule "xdevs.rs"]
-	path = xdevs.rs
+	path = simulators/xdevs.rs
 	url = git@github.com:iscar-ucm/xdevs.rs.git
 [submodule "xdevs.c"]
-	path = xdevs.c
+	path = simulators/xdevs.c
 	url = git@github.com:iscar-ucm/xdevs.c.git
