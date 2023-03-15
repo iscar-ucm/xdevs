@@ -1,0 +1,3 @@
+[submodule "xdevs.cpp"]
+	path = xdevs.cpp
+	url = git@github.com:iscar-ucm/xdevs.cpp.git
