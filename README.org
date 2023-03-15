@@ -8,7 +8,7 @@ Research in the xDEVS interface can be found in [[https://doi.org/10.1002/spe.31
 
 - Risco-Martín, JL, Mittal, S, Henares, K, Cardenas, R, Arroba, P. xDEVS: A toolkit for interoperable modeling and simulation of formal discrete event systems. Softw Pract Exper. 2022; 1- 42. doi:10.1002/spe.3168
 
-There are seven repositories associated with xDEVS,  each one offering the equivalent simulation interface for each corresponding programming language.
+There are seven repositories associated with xDEVS, each one offering the equivalent simulation interface for each corresponding programming language.
 
 - xDEVS/C ([[https://github.com/iscar-ucm/xdevs.c][xdevs.c]])
 - xDEVS/C++ ([[https://github.com/iscar-ucm/xdevs.cpp][xdevs.cpp]])
@@ -18,7 +18,7 @@ There are seven repositories associated with xDEVS,  each one offering the equiv
 - xDEVS/Python ([[https://github.com/iscar-ucm/xdevs.py][xdevs.py]])
 - xDEVS/Rust ([[https://github.com/iscar-ucm/xdevs.rs][xdevs.rs]])
 
-All the repositories are included as submodules inside this main repository (*work in progress*).
+All the repositories are included as submodules inside this main repository.
 
 ** Top features
 
