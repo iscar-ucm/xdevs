@@ -14,7 +14,7 @@ There are seven repositories associated with xDEVS, each one offering the equiva
 - xDEVS/C++ ([[https://github.com/iscar-ucm/xdevs.cpp][xdevs.cpp]])
 - xDEVS/C# ([[https://github.com/iscar-ucm/xdevs.cs][xdevs.cs]])
 - xDEVS/Go ([[https://github.com/iscar-ucm/xdevs.go][xdevs.go]])
-- xDEVS/Java ([[https://github.com/iscar-ucm/xdevs.java][xdevs.java]]) - [API documentation](https://iscar-ucm.github.io/xdevs.java/apidocs)
+- xDEVS/Java ([[https://github.com/iscar-ucm/xdevs.java][xdevs.java]]) - [[https://iscar-ucm.github.io/xdevs.java/apidocs][API documentation]]
 - xDEVS/Python ([[https://github.com/iscar-ucm/xdevs.py][xdevs.py]])
 - xDEVS/Rust ([[https://github.com/iscar-ucm/xdevs.rs][xdevs.rs]])
 
