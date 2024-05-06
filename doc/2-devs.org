@@ -1,36 +1,3 @@
-* xDEVS
-
-** Introduction
-
-xDEVS stands for /A cross-platform (x) Discrete EVent System simulator/. This library includes a set of C, C++, C#, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism /Discrete Event System Specification (DEVS)/. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
-
-Research in the xDEVS interface can be found in [[https://doi.org/10.1002/spe.3168][xDEVS: A toolkit for interoperable modeling and simulation of formal discrete event systems]]. Please, cite our article in case you find xDEVS useful. This way we can gain visibility:
-
-- Risco-Martín, JL, Mittal, S, Henares, K, Cardenas, R, Arroba, P. xDEVS: A toolkit for interoperable modeling and simulation of formal discrete event systems. Softw Pract Exper. 2022; 1- 42. doi:10.1002/spe.3168
-
-There are seven repositories associated with xDEVS, each one offering the equivalent simulation interface for each corresponding programming language.
-
-- xDEVS/C ([[https://github.com/iscar-ucm/xdevs.c][xdevs.c]])
-- xDEVS/C++ ([[https://github.com/iscar-ucm/xdevs.cpp][xdevs.cpp]])
-- xDEVS/C# ([[https://github.com/iscar-ucm/xdevs.cs][xdevs.cs]])
-- xDEVS/Go ([[https://github.com/iscar-ucm/xdevs.go][xdevs.go]])
-- xDEVS/Java ([[https://github.com/iscar-ucm/xdevs.java][xdevs.java]]) - [[https://iscar-ucm.github.io/xdevs.java/apidocs][API documentation]]
-- xDEVS/Python ([[https://github.com/iscar-ucm/xdevs.py][xdevs.py]])
-- xDEVS/Rust ([[https://github.com/iscar-ucm/xdevs.rs][xdevs.rs]])
-
-All the repositories are included as submodules inside this main repository.
-
-** Top features
-
-- PDEVS Modeling and Simulation formalism
-- Object-Oriented Programming
-- Support for sequential, parallel and distributed (this last feature only in Java and Python, for now) architectures.
-- Good performance, compared to other simulation engines
-
-** Quick start
-
-Switch to the corresponding particular language. A README file will be found to start with minimal examples and demos.
-
 * The DEVS formalism
 
 The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
@@ -58,7 +25,6 @@ The formal separation between model and simulator and the hierarchical and modul
 Different mathematical mechanisms are used to prove these points, including the mathematical manipulation of the abstraction hierarchy, observation of I/O trajectories (to ensure that different levels of specification correctly describe the system’ structure) and decomposition concepts (DEVS is closed under composition, which means that a composite model integrated by multiple components is equivalent to an atomic component).
 
 The reader should refer to the book Theory of Modeling and Simulation [1], to understand the details behind the mathematical background of these techniques. 
-
 
 *** The parallel DEVS formalism
 

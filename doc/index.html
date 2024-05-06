@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-05-06 lun 17:58 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>xDEVS user's manual</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="José L. Risco-Martín" />
+<meta name="keywords" content="devs, simulation, xdevs, discrete event system" />
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/readtheorg.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2020 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">xDEVS user's manual</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org611a06f">Introduction to xDEVS</a>
+<ul>
+<li><a href="#orgeca4d30">Overview</a></li>
+<li><a href="#org425cde8">Top features</a></li>
+<li><a href="#org56b90b6">Quick start</a></li>
+</ul>
+</li>
+<li><a href="#orgca7be1e">The DEVS formalism</a>
+<ul>
+<li><a href="#org1613be8">Bibliography</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org611a06f" class="outline-2">
+<h2 id="org611a06f">Introduction to xDEVS</h2>
+<div class="outline-text-2" id="text-org611a06f">
+</div>
+<div id="outline-container-orgeca4d30" class="outline-3">
+<h3 id="orgeca4d30">Overview</h3>
+<div class="outline-text-3" id="text-orgeca4d30">
+<p>
+xDEVS stands for <i>A cross-platform (x) Discrete EVent System simulator</i>. This library includes a set of C, C++, C#, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism <i>Discrete Event System Specification (DEVS)</i>. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
+</p>
+
+<p>
+Research in the xDEVS interface can be found in <a href="https://doi.org/10.1002/spe.3168">xDEVS: A toolkit for interoperable modeling and simulation of formal discrete event systems</a>. Please, cite our article in case you find xDEVS useful. This way we can gain visibility:
+</p>
+
+<ul class="org-ul">
+<li>Risco-Martín, JL, Mittal, S, Henares, K, Cardenas, R, Arroba, P. xDEVS: A toolkit for interoperable modeling and simulation of formal discrete event systems. Softw Pract Exper. 2022; 1- 42. <a href="10.1002/spe.3168">10.1002/spe.3168</a></li>
+</ul>
+
+<p>
+There are seven repositories associated with xDEVS, each one offering the equivalent simulation interface for each corresponding programming language.
+</p>
+
+<ul class="org-ul">
+<li>xDEVS/C (<a href="https://github.com/iscar-ucm/xdevs.c">xdevs.c</a>)</li>
+<li>xDEVS/C++ (<a href="https://github.com/iscar-ucm/xdevs.cpp">xdevs.cpp</a>)</li>
+<li>xDEVS/C# (<a href="https://github.com/iscar-ucm/xdevs.cs">xdevs.cs</a>)</li>
+<li>xDEVS/Go (<a href="https://github.com/iscar-ucm/xdevs.go">xdevs.go</a>)</li>
+<li>xDEVS/Java (<a href="https://github.com/iscar-ucm/xdevs.java">xdevs.java</a>) - <a href="https://iscar-ucm.github.io/xdevs.java/apidocs">API documentation</a></li>
+<li>xDEVS/Python (<a href="https://github.com/iscar-ucm/xdevs.py">xdevs.py</a>)</li>
+<li>xDEVS/Rust (<a href="https://github.com/iscar-ucm/xdevs.rs">xdevs.rs</a>)</li>
+</ul>
+
+<p>
+All the repositories are included as submodules inside this main repository.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org425cde8" class="outline-3">
+<h3 id="org425cde8">Top features</h3>
+<div class="outline-text-3" id="text-org425cde8">
+<ul class="org-ul">
+<li>PDEVS Modeling and Simulation formalism</li>
+<li>Object-Oriented Programming</li>
+<li>Support for sequential, parallel and distributed (this last feature only in Java and Python, for now) architectures.</li>
+<li>Good performance, compared to other simulation engines</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org56b90b6" class="outline-3">
+<h3 id="org56b90b6">Quick start</h3>
+<div class="outline-text-3" id="text-org56b90b6">
+<p>
+Switch to the corresponding particular language. A README file will be found to start with minimal examples and demos.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgca7be1e" class="outline-2">
+<h2 id="orgca7be1e">The DEVS formalism</h2>
+<div class="outline-text-2" id="text-orgca7be1e">
+<p>
+The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
+</p>
+
+<p>
+The class of formalisms denoted as discrete-event is characterized by a continuous time base where only a finite number of events can occur during a finite time-span. This contrasts with Discrete Time System Specification (DTSS) formalisms where the time base is isomorphic to N, and with Differential Equation System Specification (DESS, or continuous-time) formalisms in which the state of the system may change continuously over time.
+</p>
+
+<p>
+The Formalism Transformation Graph (FTG) published by H. Vangheluwe in [3] and shown in Figure 1, depicts behavior-conserving transformations between some important formalisms. The graph distinguishes between continuous-time formalisms on the left-hand side, and discrete formalisms (both discrete-time and discrete-event) on the right-hand side. Although the graph suggests that formalisms can be mapped onto a common formalism on their respective sides, very few transformations allow crossing the middle-line: this illustrates why hybrid systems (those that bring together both discrete and continuous systems) are difficult to solve.
+</p>
+
+<p>
+<img src="./fig/ftg.png" alt="ftg.png" />
+Figure 1. Formalism transformation graph (FTG) [3].
+</p>
+
+<p>
+The traditional approach to solve continuous-time problems is based on discretization, which approximates a continuous-time model by a discrete-time system (difference equations). A partitioning of the time-axis, as is the case in discretization, is however hard to harmonize with a partitioning of the state space, as is performed in discrete-event systems. In this regard, mapping continuous-time formalisms (ODEs and semi-explicit DAEs) onto the DEVS formalism (this corresponds to the arrow going from "scheduling-hybrid-DAE" to "DEVS" on the FTG) may be performed through quantization. 
+</p>
+
+<p>
+The closure property (under composition or coupling) of systems such as DEVS offers the possibility to describe a model as a hierarchical composition of simpler sub-components. Apart from the obvious advantages associated with modularity (conceptual level, component reusability), a significant gain in the efficiency of simulating large, complex dynamic systems can also be achieved by using multi-rate integration (employing different integration frame rates for the simulation of fast and slow sub-components), either on a single or on multiple processors (parallelization).
+</p>
+
+<p>
+Although some continuous-time formalisms (e.g., causal-block diagram simulation tools) allow model hierarchization, multi-rate integration mixes poorly with traditional approaches where discretization along the time-axis forces the simulator to work explicitly with the global time base. This, in contrast to discrete-event formalisms where the simulator is concerned with local state space changes, and the time base is dealt with implicitly. Discrete event concepts are thus better suited for parallel distributed simulation, and much effort has been devoted to the development of conservative (e.g., Chandy-Misra approach), optimistic (e.g., Time-Warp) and real-time (e.g., DARPA's Distributed Interactive Simulation) parallel discrete event simulation techniques. The relevance of DEVS in that context is illustrated by the concept of the DEVS bus which concerns the use of DEVS models as "wrappers" to enable a variety of models to inter operate in a networked simulation. The DEVS bus has been implemented on top of the DoD's High Level Architecture (HLA) standard, itself based on the Run-Time Infrastructure (RTI) protocol.
+</p>
+
+<p>
+According to DEVS theory, the system of interest is seen as a model and the corresponding simulator. The model represents a simplified version of reality and its structure. The model is built considering the conditions of experimentation of the system of interest, including the work conditions of the real system and its application domain. Thus, the model is restricted to the experimental framework under which it was developed.
+</p>
+
+<p>
+This model is subsequently used to build a simulator. The simulator is able to change the state of the model by running all the necessary state transitions already defined in the model. All the transitions are executed in an appropriate order, according to the model definition.
+</p>
+
+<p>
+DEVS was created for modeling and simulation of discrete-event dynamic systems. As a result, it defines a formal way to define systems whose states change either upon the reception of an input event or due to the expiration of a time delay. In order to deal with the system under study, the model can be organized hierarchically in such a way that higher-level components in a system are decomposed into simpler elements. 
+</p>
+
+<p>
+The formal separation between model and simulator and the hierarchical and modular nature of the DEVS formalism have enabled carrying out of formal proofs on the different entities under study. One of them is the proof of composability of the subcomponents (including legitimacy and equivalence between multicomponent models). The second is the ability to conduct proofs of correctness of the simulation algorithms, which result in simulators rigorously verified. All the proofs are based on formal transformations between each of the representations, trying to prove the equivalence between the entities under study at different levels of abstraction. For instance, we can prove that the mathematical entity simulator is able to execute correctly the behavior described by the mathematical entity model, which represents the system.
+Different mathematical mechanisms are used to prove these points, including the mathematical manipulation of the abstraction hierarchy, observation of I/O trajectories (to ensure that different levels of specification correctly describe the system’ structure) and decomposition concepts (DEVS is closed under composition, which means that a composite model integrated by multiple components is equivalent to an atomic component).
+</p>
+
+<p>
+The reader should refer to the book Theory of Modeling and Simulation [1], to understand the details behind the mathematical background of these techniques. 
+</p>
+</div>
+
+<div id="outline-container-orge8a8f57" class="outline-4">
+<h4 id="orge8a8f57">The parallel DEVS formalism</h4>
+<div class="outline-text-4" id="text-orge8a8f57">
+<p>
+The parallel DEVS approach was introduced, after 15 years, as a revision of Classic DEVS. Currently, parallel DEVS is the prevalent DEVS, implemented in many libraries. In the following, unless it is explicitly noted, the use of DEVS implies parallel DEVS.
+</p>
+
+<p>
+DEVS enables the representation of a system by three sets and five functions: input set (X), output set (Y), state set (S), external transition function (&delta;<sub>ext</sub>), internal transition function (&delta;<sub>int</sub>), confluent function (&delta;<sub>con</sub>), output function (&lambda;), and time advance function (ta). 
+</p>
+
+<p>
+DEVS models are of two types: atomic and coupled. Atomic DEVS processes input events based on their model's current state and condition, generates output events and transition to the next state. The coupled model is the aggregation/composition of two or more atomic and coupled models connected by explicit couplings. Particularly, an atomic model is defined by the following equation:
+</p>
+
+<p>
+A=&lt; <b>X</b>, <b>Y</b>, <b>S</b>, &delta;<sub>ext</sub>,  &delta;<sub>int</sub>, &delta;<sub>con</sub>, &lambda;, ta &gt;
+</p>
+
+<p>
+where:
+</p>
+
+<ul class="org-ul">
+<li><b>X</b> is the input set, usually defined as the set of pairs port-value (see DEVS with ports in [1]).</li>
+<li><b>Y</b> is the output set, usually defined as the set of pairs port-value (see DEVS with ports in [1])..</li>
+<li><b>S</b> is the state set.</li>
+<li>&delta;<sub>ext</sub> : <b>Q</b> &times; <b>X<sup>b</sup></b> &rarr; <b>S</b> is the external transition function, Q={(s,e):s &isin; S, e &isin; [0,ta(s)]} is total state set and e is the elapsed time since the last transition, whereas X<sup>b</sup> is the set of bags over elements in X. This function is automatically executed when an external event arrives, changing the current state if needed.</li>
+<li>&delta;<sub>int</sub> : S &rarr; S is the internal transition function. This function is executed right after the output (&lambda;) function and is used to change the state S.</li>
+<li>&delta;<sub>con</sub>: Q &times; X<sup>b</sup> &rarr; S is the confluent function. This transition decides the next state in cases of collision between external and internal events, i.e., an external event is received and elapsed time equals time-advance. Typically, &delta;<sub>con</sub>(s,ta(s),x) = &delta;<sub>ext</sub>(&delta;<sub>int</sub>(s,0,x).</li>
+<li>&lambda; : S &rarr; Y<sup>b</sup> is the output function. Y<sup>b</sup> is the set of bags over elements in Y. When the time elapsed since the last output function is equal to ta(s), then &lambda; is automatically executed.</li>
+<li>ta : S &rarr; R<sub>0</sub><sup>+</sup> &cup; &infin; is the time advance function.</li>
+</ul>
+
+<p>
+The formal definition of a coupled model is described as:
+</p>
+
+<p>
+M = &lt; <b>X</b>, <b>Y</b>, <b>C</b>, <b>EIC</b>, <b>EOC</b>, <b>IC</b> &gt;
+</p>
+
+<p>
+where:
+</p>
+
+<ul class="org-ul">
+<li><b>X</b> is the input set, usually defined as the set of pairs port-value (see DEVS with ports in [1])..</li>
+<li><b>Y</b> is the output set, usually defined as the set of pairs port-value (see DEVS with ports in [1])..</li>
+<li><b>C</b> is the set of DEVS component models (atomic or coupled). Note that <b>C</b> makes this definition recursive.</li>
+<li><b>EIC</b> is the external input coupling relation, from external input ports of M to component input ports of <b>C</b>.</li>
+<li><b>EOC</b> is the external output coupling relation, from component output ports of <b>C</b> to external output ports of M.</li>
+<li><b>IC</b> is the internal coupling relation, from component output ports of c<sub>i</sub> &isin; <b>C</b> to component output ports of c<sub>j</sub> &isin; <b>C</b>, provided that i &ne; j.</li>
+</ul>
+
+<p>
+Given the recursive definition of <b>M</b>, a coupled model can itself be a part of a component in a larger coupled model system giving rise to a hierarchical DEVS model construction.
+</p>
+</div>
+
+
+
+<div id="outline-container-org28be499" class="outline-5">
+<h5 id="org28be499">EXAMPLE 1</h5>
+<div class="outline-text-5" id="text-org28be499">
+<p>
+A processor atomic model consumes a job j. When the processor receives a job through an input port, thus the processor remains busy until the processing time j<sub>p</sub> is finished. Then it sends the job through an output port.
+</p>
+
+<p>
+The processor model can be formally described as
+</p>
+
+<p>
+Processor=〈X,S,Y,δ<sub>int</sub>,δ<sub>ext</sub>,δ<sub>con</sub>,λ,ta〉
+</p>
+
+<ul class="org-ul">
+<li><b>X</b> = {(in, j ∈ <b>J</b>)}, where <b>J</b> is a set of Jobs.</li>
+<li><b>S</b> = phase={"busy","passive"} × σ ∈ R<sub>0</sub><sup>+</sup> × j ∈ <b>J</b></li>
+<li><b>Y</b> = {(out, j ∈ <b>J</b>)}</li>
+<li>ta(phase,σ,j) = σ</li>
+<li>λ(phase,σ,j) = j</li>
+<li>δ<sub>int</sub>(phase,σ,j) = ("passive", ∞, ∅)</li>
+<li>δ<sub>ext</sub>(phase,σ,j,e,(in,j')) = {("busy",j<sub>p</sub>',j')  if  phase="passive", ("busy",σ-e,j)  if  phase="busy"</li>
+<li>δ<sub>con</sub>(phase,σ,j,(in,j')) = δ<sub>ext</sub>(δ<sub>int</sub>(phase,σ,j),0,(in,j'))</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org54b1d84" class="outline-5">
+<h5 id="org54b1d84">EXAMPLE 2</h5>
+<div class="outline-text-5" id="text-org54b1d84">
+<p>
+Figure 2 shows an example of a DEVS coupled model with three components, M1, M2 y M3, as well as their couplings. These models are interconnected through the corresponding I/O ports presented in the Figure. The models are connected to the external coupled models through the EIC and EOC connectors. M1, M2 and M3 can be atomic or coupled models.
+</p>
+
+<p>
+<img src="./fig/coupled.png" alt="coupled.png" />
+Figure 2. A DEVS coupled model
+</p>
+
+<p>
+Following the previous coupled model definition, the model in Figure 2 can be formally defined as:
+</p>
+
+<p>
+N =〈 <b>X</b>, <b>Y</b>, <b>C</b>, <b>EIC</b>, <b>EOC</b>, <b>IC</b> 〉
+</p>
+
+<p>
+where:
+</p>
+
+<ul class="org-ul">
+<li><b>X</b> is the set of input events.</li>
+<li><b>Y</b> is the set of output events.</li>
+<li><b>C</b> = {M1,M2,M3}</li>
+<li><b>EIC</b> = {(N,in)→(M1,in)}</li>
+<li><b>EOC</b> = {(M3,out)→(N,out)}</li>
+<li><b>IC</b> = {(M1,out)→(M2,in),(M2,out)→(M3,in)}</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org820ce9f" class="outline-5">
+<h5 id="org820ce9f">EXAMPLE 3</h5>
+<div class="outline-text-5" id="text-org820ce9f">
+<p>
+The Experimental frame – Processor model is usually presented as one of the initial examples to start to practice with DEVS modeling and simulation. It is a DEVS coupled model consisting of three atomic models and one coupled model (see Figure 3).
+</p>
+
+<p>
+<img src="./fig/efp.png" alt="efp.png" />
+Figure 3. Experimental frame (ef)-processor (p) model; boxes: models; arrows: couplings; arrow labels: input/output port names.
+</p>
+
+<p>
+The Generator atomic model generates job-messages at fixed time intervals and sends them via the "out" port. The Transducer atomic model accepts job-messages from the generator at its "arrived" port and remembers their arrival time instances. It also accepts job-messages at the "solved" port. When a message arrives at the "solved" port, the transducer matches this job with the previous job that had arrived on the "arrived" port earlier and calculates their time difference. Together, these two atomic models form an Experimental frame coupled model. The experimental frame sends the generators job messages on the "out" port and forwards the messages received on its "in" port to the transducers "solved" port. The transducer observes the response (in this case the turnaround time) of messages that are injected into an observed system. The observed system in this case is the Processor atomic model. A processor accepts jobs at its "in" port and sends them via "out" port again after some finite, but non-zero time period. If the processor is busy when a new job arrives, the processor discards it. Finally the transducer stops the generation of jobs by sending any event from its "out" port to the "stop" port at the generator, after a given simulation time interval.
+</p>
+
+<p>
+Based on Figure 3, we can define the coupled model for this example as:
+</p>
+
+<p>
+EFP=〈 <b>X</b>, <b>Y</b>, <b>C</b>, <b>EIC</b>, <b>EOC</b>, <b>IC</b> 〉
+</p>
+
+<p>
+where:
+</p>
+
+<ul class="org-ul">
+<li><b>X</b> = ∅.</li>
+<li><b>Y</b> = ∅.</li>
+<li><b>C</b> = {EF,P}</li>
+<li><b>EIC</b> = ∅</li>
+<li><b>EOC</b> = ∅</li>
+<li><b>IC</b> = {(EF,out)→(P,in),(P,out)→(EF,in)}</li>
+</ul>
+
+<p>
+The Experimental Frame coupled model can be defined as:
+</p>
+
+<p>
+EF=〈 <b>X</b>, <b>Y</b>, <b>C</b>, <b>EIC</b>, <b>EOC</b>, <b>IC</b> 〉
+</p>
+
+<p>
+where:
+</p>
+
+<ul class="org-ul">
+<li><b>X</b> = {(in,j∈J)}, where J is a set of Jobs.</li>
+<li><b>Y</b> = {(out,j∈J)}, where J is a set of Jobs.</li>
+<li><b>C</b> = {G,T}</li>
+<li><b>EIC</b> = {(EF,in)→(T,solved)}</li>
+<li><b>EOC</b> = {(G,out)→(EF,out)}</li>
+<li><b>IC</b> = {(G,out)→(T,arrived),(T,out)→(Generator,stop)}</li>
+</ul>
+
+<p>
+We have defined the behavior of the Processor model in a previous example. Now, we describe the functionality of both the Generator and Transduced models. The Generator model can be formally described as
+</p>
+
+<p>
+Generator=〈 <b>X</b>, <b>S</b>, <b>Y</b>, δ<sub>int</sub>, δ<sub>ext</sub>, δ<sub>con</sub>, λ, ta 〉
+</p>
+
+<ul class="org-ul">
+<li><b>X</b> = {(stop,ν)}, where ν is any event</li>
+<li><b>S</b> = (phase={"active","passive"})×σ∈R0+×i=1,2,…,N:ji∈J</li>
+<li><b>Y</b> = {(out,ji∈ J)}</li>
+<li>ta(phase,σ,i) = σ</li>
+<li>λ(phase,σ,i) = ji</li>
+<li>δ<sub>int</sub>(phase,σ,i) = ("active",σ,i+1)</li>
+<li>δ<sub>ext</sub>(phase,σ,i,e,(in,ν)) = ("passive",∞,i)</li>
+<li>δ<sub>con</sub>(phase,σ,i,(in,ν)) = δ<sub>ext</sub>(δ<sub>int</sub>(phase,σ,i),0,(in,ν))</li>
+</ul>
+
+<p>
+The Transducer model can be formally described as
+</p>
+
+<p>
+Transducer=〈 <b>X</b>, <b>S</b>, <b>Y</b>, δ<sub>int</sub>, δ<sub>ext</sub>, δ<sub>con</sub>, λ, ta 〉
+</p>
+
+<ul class="org-ul">
+<li><b>X</b> = {(arrived,j∈J),(solved,j∈J}, where J is a set of jobs</li>
+<li><b>S</b> = (phase = {"active","passive"}) × (σ ∈ R<sub>0</sub><sup>+ </sup>) × (clock ∈ R<sub>0</sub><sup>+</sup> × J<sub>A</sub>∈J × J<sub>S</sub>∈J
+where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respectively.</li>
+<li><b>Y</b> = {(stop,ν)}, where ν is any event.</li>
+<li>ta(phase,σ,clock,J<sub>A</sub>,J<sub>S</sub>) = σ</li>
+<li>λ(phase,σ,clock,J<sub>A</sub>,J<sub>S</sub>) = ν</li>
+<li>δ<sub>int</sub>(phase,σ,clock,J<sub>A</sub>,J<sub>S</sub>) = ("passive",∞,clock+σ,J<sub>A</sub>,J<sub>S</sub>)</li>
+<li>δext(phase,σ,clock,J<sub>A</sub>,J<sub>S</sub>,e,(arrived,j<sup>a</sup>),(solved,j<sup>s</sup>))= &#x2026;
+&#x2026; = (active,σ-e,clock+e,J<sub>A</sub>={j<sup>a</sup>,J<sub>A</sub>} if j<sup>a</sup>≠∅, J<sub>S</sub>={j<sup>s</sup>,J<sub>S</sub>}:j<sub>t</sub><sup>s</sup>=clock if j<sup>s</sup>≠∅)
+, where the time in which the job is solved is set to clock with j<sub>t</sub><sup>s</sup> = clock.</li>
+<li>δ<sub>con</sub>(phase,σ,clock,J<sub>A</sub>,J<sub>S</sub>,(arrived,j<sup>a</sup>),(solved,j<sup>s</sup>))=δ<sub>ext</sub>(δ<sub>int</sub>(phase,σ,clock,J<sub>A</sub>,J<sub>S</sub>),0,(arrived,j<sup>a</sup>),(solved,j<sup>s</sup>))</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1613be8" class="outline-3">
+<h3 id="org1613be8">Bibliography</h3>
+<div class="outline-text-3" id="text-org1613be8">
+<ol class="org-ol">
+<li>Zeigler, B. P.; Muzy, A. &amp; Kofman, E. Theory of modeling and simulation: discrete event &amp; iterative system computational foundations Academic press, 2018.</li>
+<li>Mittal, S. &amp; Risco-Martín, J. L. Netcentric system of systems engineering with DEVS unified process CRC Press, 2013.</li>
+<li>Vangheluwe, H. DEVS as a common denominator for multi-formalism hybrid systems modelling CACSD. Conference Proceedings. IEEE International Symposium on Computer-Aided Control System Design (Cat. No.00TH8537), 2000, 129-134</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: José L. Risco-Martín</p>
+<p class="date">Created: 2024-05-06 lun 17:58</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
