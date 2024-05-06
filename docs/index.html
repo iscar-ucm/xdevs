@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-05-06 lun 17:58 -->
+<!-- 2024-05-06 lun 18:25 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>xDEVS user's manual</title>
@@ -70,29 +70,29 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org611a06f">Introduction to xDEVS</a>
+<li><a href="#org803128a">Introduction to xDEVS</a>
 <ul>
-<li><a href="#orgeca4d30">Overview</a></li>
-<li><a href="#org425cde8">Top features</a></li>
-<li><a href="#org56b90b6">Quick start</a></li>
+<li><a href="#org3001495">Introduction</a></li>
+<li><a href="#org7f3fd3c">Top features</a></li>
+<li><a href="#org3a2ab67">Quick start</a></li>
 </ul>
 </li>
-<li><a href="#orgca7be1e">The DEVS formalism</a>
+<li><a href="#org9b75475">The DEVS formalism</a>
 <ul>
-<li><a href="#org1613be8">Bibliography</a></li>
+<li><a href="#org74a46f2">Bibliography</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org611a06f" class="outline-2">
-<h2 id="org611a06f">Introduction to xDEVS</h2>
-<div class="outline-text-2" id="text-org611a06f">
+<div id="outline-container-org803128a" class="outline-2">
+<h2 id="org803128a">Introduction to xDEVS</h2>
+<div class="outline-text-2" id="text-org803128a">
 </div>
-<div id="outline-container-orgeca4d30" class="outline-3">
-<h3 id="orgeca4d30">Overview</h3>
-<div class="outline-text-3" id="text-orgeca4d30">
+<div id="outline-container-org3001495" class="outline-3">
+<h3 id="org3001495">Introduction</h3>
+<div class="outline-text-3" id="text-org3001495">
 <p>
 xDEVS stands for <i>A cross-platform (x) Discrete EVent System simulator</i>. This library includes a set of C, C++, C#, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism <i>Discrete Event System Specification (DEVS)</i>. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
 </p>
@@ -114,7 +114,7 @@ There are seven repositories associated with xDEVS, each one offering the equiva
 <li>xDEVS/C++ (<a href="https://github.com/iscar-ucm/xdevs.cpp">xdevs.cpp</a>)</li>
 <li>xDEVS/C# (<a href="https://github.com/iscar-ucm/xdevs.cs">xdevs.cs</a>)</li>
 <li>xDEVS/Go (<a href="https://github.com/iscar-ucm/xdevs.go">xdevs.go</a>)</li>
-<li>xDEVS/Java (<a href="https://github.com/iscar-ucm/xdevs.java">xdevs.java</a>) - <a href="https://iscar-ucm.github.io/xdevs.java/apidocs">API documentation</a></li>
+<li>xDEVS/Java (<a href="https://github.com/iscar-ucm/xdevs.java">xdevs.java</a>) - <a href="https://iscar-ucm.github.io/xdevs.java">API documentation</a></li>
 <li>xDEVS/Python (<a href="https://github.com/iscar-ucm/xdevs.py">xdevs.py</a>)</li>
 <li>xDEVS/Rust (<a href="https://github.com/iscar-ucm/xdevs.rs">xdevs.rs</a>)</li>
 </ul>
@@ -125,9 +125,9 @@ All the repositories are included as submodules inside this main repository.
 </div>
 </div>
 
-<div id="outline-container-org425cde8" class="outline-3">
-<h3 id="org425cde8">Top features</h3>
-<div class="outline-text-3" id="text-org425cde8">
+<div id="outline-container-org7f3fd3c" class="outline-3">
+<h3 id="org7f3fd3c">Top features</h3>
+<div class="outline-text-3" id="text-org7f3fd3c">
 <ul class="org-ul">
 <li>PDEVS Modeling and Simulation formalism</li>
 <li>Object-Oriented Programming</li>
@@ -137,9 +137,9 @@ All the repositories are included as submodules inside this main repository.
 </div>
 </div>
 
-<div id="outline-container-org56b90b6" class="outline-3">
-<h3 id="org56b90b6">Quick start</h3>
-<div class="outline-text-3" id="text-org56b90b6">
+<div id="outline-container-org3a2ab67" class="outline-3">
+<h3 id="org3a2ab67">Quick start</h3>
+<div class="outline-text-3" id="text-org3a2ab67">
 <p>
 Switch to the corresponding particular language. A README file will be found to start with minimal examples and demos.
 </p>
@@ -147,9 +147,9 @@ Switch to the corresponding particular language. A README file will be found to 
 </div>
 </div>
 
-<div id="outline-container-orgca7be1e" class="outline-2">
-<h2 id="orgca7be1e">The DEVS formalism</h2>
-<div class="outline-text-2" id="text-orgca7be1e">
+<div id="outline-container-org9b75475" class="outline-2">
+<h2 id="org9b75475">The DEVS formalism</h2>
+<div class="outline-text-2" id="text-org9b75475">
 <p>
 The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
 </p>
@@ -201,9 +201,9 @@ The reader should refer to the book Theory of Modeling and Simulation [1], to un
 </p>
 </div>
 
-<div id="outline-container-orge8a8f57" class="outline-4">
-<h4 id="orge8a8f57">The parallel DEVS formalism</h4>
-<div class="outline-text-4" id="text-orge8a8f57">
+<div id="outline-container-orgf4b076d" class="outline-4">
+<h4 id="orgf4b076d">The parallel DEVS formalism</h4>
+<div class="outline-text-4" id="text-orgf4b076d">
 <p>
 The parallel DEVS approach was introduced, after 15 years, as a revision of Classic DEVS. Currently, parallel DEVS is the prevalent DEVS, implemented in many libraries. In the following, unless it is explicitly noted, the use of DEVS implies parallel DEVS.
 </p>
@@ -263,9 +263,9 @@ Given the recursive definition of <b>M</b>, a coupled model can itself be a part
 
 
 
-<div id="outline-container-org28be499" class="outline-5">
-<h5 id="org28be499">EXAMPLE 1</h5>
-<div class="outline-text-5" id="text-org28be499">
+<div id="outline-container-orgbc82942" class="outline-5">
+<h5 id="orgbc82942">EXAMPLE 1</h5>
+<div class="outline-text-5" id="text-orgbc82942">
 <p>
 A processor atomic model consumes a job j. When the processor receives a job through an input port, thus the processor remains busy until the processing time j<sub>p</sub> is finished. Then it sends the job through an output port.
 </p>
@@ -291,9 +291,9 @@ Processor=〈X,S,Y,δ<sub>int</sub>,δ<sub>ext</sub>,δ<sub>con</sub>,λ,ta〉
 </div>
 </div>
 
-<div id="outline-container-org54b1d84" class="outline-5">
-<h5 id="org54b1d84">EXAMPLE 2</h5>
-<div class="outline-text-5" id="text-org54b1d84">
+<div id="outline-container-org889892e" class="outline-5">
+<h5 id="org889892e">EXAMPLE 2</h5>
+<div class="outline-text-5" id="text-org889892e">
 <p>
 Figure 2 shows an example of a DEVS coupled model with three components, M1, M2 y M3, as well as their couplings. These models are interconnected through the corresponding I/O ports presented in the Figure. The models are connected to the external coupled models through the EIC and EOC connectors. M1, M2 and M3 can be atomic or coupled models.
 </p>
@@ -326,9 +326,9 @@ where:
 </div>
 </div>
 
-<div id="outline-container-org820ce9f" class="outline-5">
-<h5 id="org820ce9f">EXAMPLE 3</h5>
-<div class="outline-text-5" id="text-org820ce9f">
+<div id="outline-container-org450167d" class="outline-5">
+<h5 id="org450167d">EXAMPLE 3</h5>
+<div class="outline-text-5" id="text-org450167d">
 <p>
 The Experimental frame – Processor model is usually presented as one of the initial examples to start to practice with DEVS modeling and simulation. It is a DEVS coupled model consisting of three atomic models and one coupled model (see Figure 3).
 </p>
@@ -428,9 +428,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-org1613be8" class="outline-3">
-<h3 id="org1613be8">Bibliography</h3>
-<div class="outline-text-3" id="text-org1613be8">
+<div id="outline-container-org74a46f2" class="outline-3">
+<h3 id="org74a46f2">Bibliography</h3>
+<div class="outline-text-3" id="text-org74a46f2">
 <ol class="org-ol">
 <li>Zeigler, B. P.; Muzy, A. &amp; Kofman, E. Theory of modeling and simulation: discrete event &amp; iterative system computational foundations Academic press, 2018.</li>
 <li>Mittal, S. &amp; Risco-Martín, J. L. Netcentric system of systems engineering with DEVS unified process CRC Press, 2013.</li>
@@ -442,7 +442,7 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: José L. Risco-Martín</p>
-<p class="date">Created: 2024-05-06 lun 17:58</p>
+<p class="date">Created: 2024-05-06 lun 18:25</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
