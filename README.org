@@ -20,6 +20,8 @@ There are seven repositories associated with xDEVS, each one offering the equiva
 
 All the repositories are included as submodules inside this main repository.
 
+The xDEVS user's manual can be found [[https://iscar-ucm.github.io/xdevs/][here]].
+
 ** Top features
 
 - PDEVS Modeling and Simulation formalism

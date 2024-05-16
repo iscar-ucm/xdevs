@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-05-16 jue 18:42 -->
+<!-- 2024-05-16 jue 18:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>xDEVS user's manual</title>
@@ -92,38 +92,38 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgf4b821a">Introduction to xDEVS</a>
+<li><a href="#org05b6407">Introduction to xDEVS</a>
 <ul>
-<li><a href="#orgb124e31">Introduction</a></li>
-<li><a href="#org0bb3a89">Top features</a></li>
-<li><a href="#org6598c72">Quick start</a></li>
+<li><a href="#org5bd5e87">Introduction</a></li>
+<li><a href="#orgf742176">Top features</a></li>
+<li><a href="#orge3e0377">Quick start</a></li>
 </ul>
 </li>
-<li><a href="#orgf1f498e">The DEVS formalism</a>
+<li><a href="#org13194ae">The DEVS formalism</a>
 <ul>
-<li><a href="#org4801a55">Bibliography</a></li>
+<li><a href="#org56d3e0d">Bibliography</a></li>
 </ul>
 </li>
-<li><a href="#org2040497">Getting started with xDEVS</a>
+<li><a href="#orga392e9d">Getting started with xDEVS</a>
 <ul>
-<li><a href="#org6d2ac94">Output Function</a></li>
-<li><a href="#org6f45b15">Internal Transition Function</a></li>
-<li><a href="#org4fce688">External Transition Function</a></li>
-<li><a href="#orgcf98ed9">Complete model implementation</a></li>
-<li><a href="#org91b6365">Running the model</a></li>
+<li><a href="#org58bc9ba">Output Function</a></li>
+<li><a href="#org1f7e4f4">Internal Transition Function</a></li>
+<li><a href="#org2829a71">External Transition Function</a></li>
+<li><a href="#org6d0808e">Complete model implementation</a></li>
+<li><a href="#orgf9b29de">Running the model</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgf4b821a" class="outline-2">
-<h2 id="orgf4b821a">Introduction to xDEVS</h2>
-<div class="outline-text-2" id="text-orgf4b821a">
+<div id="outline-container-org05b6407" class="outline-2">
+<h2 id="org05b6407">Introduction to xDEVS</h2>
+<div class="outline-text-2" id="text-org05b6407">
 </div>
-<div id="outline-container-orgb124e31" class="outline-3">
-<h3 id="orgb124e31">Introduction</h3>
-<div class="outline-text-3" id="text-orgb124e31">
+<div id="outline-container-org5bd5e87" class="outline-3">
+<h3 id="org5bd5e87">Introduction</h3>
+<div class="outline-text-3" id="text-org5bd5e87">
 <p>
 xDEVS stands for <i>A cross-platform (x) Discrete EVent System simulator</i>. This library includes a set of C, C++, C#, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism <i>Discrete Event System Specification (DEVS)</i>. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
 </p>
@@ -153,12 +153,16 @@ There are seven repositories associated with xDEVS, each one offering the equiva
 <p>
 All the repositories are included as submodules inside this main repository.
 </p>
+
+<p>
+The xDEVS user's manual can be found <a href="https://iscar-ucm.github.io/xdevs/">here</a>.
+</p>
 </div>
 </div>
 
-<div id="outline-container-org0bb3a89" class="outline-3">
-<h3 id="org0bb3a89">Top features</h3>
-<div class="outline-text-3" id="text-org0bb3a89">
+<div id="outline-container-orgf742176" class="outline-3">
+<h3 id="orgf742176">Top features</h3>
+<div class="outline-text-3" id="text-orgf742176">
 <ul class="org-ul">
 <li>PDEVS Modeling and Simulation formalism</li>
 <li>Object-Oriented Programming</li>
@@ -168,9 +172,9 @@ All the repositories are included as submodules inside this main repository.
 </div>
 </div>
 
-<div id="outline-container-org6598c72" class="outline-3">
-<h3 id="org6598c72">Quick start</h3>
-<div class="outline-text-3" id="text-org6598c72">
+<div id="outline-container-orge3e0377" class="outline-3">
+<h3 id="orge3e0377">Quick start</h3>
+<div class="outline-text-3" id="text-orge3e0377">
 <p>
 Switch to the corresponding particular language. A README file will be found to start with minimal examples and demos.
 </p>
@@ -178,9 +182,9 @@ Switch to the corresponding particular language. A README file will be found to 
 </div>
 </div>
 
-<div id="outline-container-orgf1f498e" class="outline-2">
-<h2 id="orgf1f498e">The DEVS formalism</h2>
-<div class="outline-text-2" id="text-orgf1f498e">
+<div id="outline-container-org13194ae" class="outline-2">
+<h2 id="org13194ae">The DEVS formalism</h2>
+<div class="outline-text-2" id="text-org13194ae">
 <p>
 The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
 </p>
@@ -232,9 +236,9 @@ The reader should refer to the book Theory of Modeling and Simulation [1], to un
 </p>
 </div>
 
-<div id="outline-container-orgeccda96" class="outline-4">
-<h4 id="orgeccda96">The parallel DEVS formalism</h4>
-<div class="outline-text-4" id="text-orgeccda96">
+<div id="outline-container-orgfb33a57" class="outline-4">
+<h4 id="orgfb33a57">The parallel DEVS formalism</h4>
+<div class="outline-text-4" id="text-orgfb33a57">
 <p>
 The parallel DEVS approach was introduced, after 15 years, as a revision of Classic DEVS. Currently, parallel DEVS is the prevalent DEVS, implemented in many libraries. In the following, unless it is explicitly noted, the use of DEVS implies parallel DEVS.
 </p>
@@ -294,9 +298,9 @@ Given the recursive definition of <b>M</b>, a coupled model can itself be a part
 
 
 
-<div id="outline-container-orgae8fba3" class="outline-5">
-<h5 id="orgae8fba3">EXAMPLE 1</h5>
-<div class="outline-text-5" id="text-orgae8fba3">
+<div id="outline-container-org20d0443" class="outline-5">
+<h5 id="org20d0443">EXAMPLE 1</h5>
+<div class="outline-text-5" id="text-org20d0443">
 <p>
 A processor atomic model consumes a job j. When the processor receives a job through an input port, thus the processor remains busy until the processing time j<sub>p</sub> is finished. Then it sends the job through an output port.
 </p>
@@ -322,9 +326,9 @@ Processor=〈X,S,Y,δ<sub>int</sub>,δ<sub>ext</sub>,δ<sub>con</sub>,λ,ta〉
 </div>
 </div>
 
-<div id="outline-container-org899f9d8" class="outline-5">
-<h5 id="org899f9d8">EXAMPLE 2</h5>
-<div class="outline-text-5" id="text-org899f9d8">
+<div id="outline-container-org8c0663b" class="outline-5">
+<h5 id="org8c0663b">EXAMPLE 2</h5>
+<div class="outline-text-5" id="text-org8c0663b">
 <p>
 Figure 2 shows an example of a DEVS coupled model with three components, M1, M2 y M3, as well as their couplings. These models are interconnected through the corresponding I/O ports presented in the Figure. The models are connected to the external coupled models through the EIC and EOC connectors. M1, M2 and M3 can be atomic or coupled models.
 </p>
@@ -357,9 +361,9 @@ where:
 </div>
 </div>
 
-<div id="outline-container-orgd4ef6fc" class="outline-5">
-<h5 id="orgd4ef6fc">EXAMPLE 3</h5>
-<div class="outline-text-5" id="text-orgd4ef6fc">
+<div id="outline-container-org541764e" class="outline-5">
+<h5 id="org541764e">EXAMPLE 3</h5>
+<div class="outline-text-5" id="text-org541764e">
 <p>
 The Experimental frame – Processor model is usually presented as one of the initial examples to start to practice with DEVS modeling and simulation. It is a DEVS coupled model consisting of three atomic models and one coupled model (see Figure 3).
 </p>
@@ -459,9 +463,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-org4801a55" class="outline-3">
-<h3 id="org4801a55">Bibliography</h3>
-<div class="outline-text-3" id="text-org4801a55">
+<div id="outline-container-org56d3e0d" class="outline-3">
+<h3 id="org56d3e0d">Bibliography</h3>
+<div class="outline-text-3" id="text-org56d3e0d">
 <ol class="org-ol">
 <li>Zeigler, B. P.; Muzy, A. &amp; Kofman, E. Theory of modeling and simulation: discrete event &amp; iterative system computational foundations Academic press, 2018.</li>
 <li>Mittal, S. &amp; Risco-Martín, J. L. Netcentric system of systems engineering with DEVS unified process CRC Press, 2013.</li>
@@ -471,9 +475,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-org2040497" class="outline-2">
-<h2 id="org2040497">Getting started with xDEVS</h2>
-<div class="outline-text-2" id="text-org2040497">
+<div id="outline-container-orga392e9d" class="outline-2">
+<h2 id="orga392e9d">Getting started with xDEVS</h2>
+<div class="outline-text-2" id="text-orga392e9d">
 <p>
 In this section, we introduce the basics of xDEVS by developing a simple Ping Pong model. This model is inspired by the DEVS formalism as described on Wikipedia: <a href="https://en.wikipedia.org/wiki/DEVS">https://en.wikipedia.org/wiki/DEVS</a>
 </p>
@@ -489,9 +493,9 @@ The Ping Pong model simulates two players hitting a ball back and forth. We will
 </p>
 </div>
 
-<div id="outline-container-org6d2ac94" class="outline-3">
-<h3 id="org6d2ac94">Output Function</h3>
-<div class="outline-text-3" id="text-org6d2ac94">
+<div id="outline-container-org58bc9ba" class="outline-3">
+<h3 id="org58bc9ba">Output Function</h3>
+<div class="outline-text-3" id="text-org58bc9ba">
 <p>
 The output function \(\lambda\) determines the output based on the current state:
 </p>
@@ -525,9 +529,9 @@ This is implemented in Python as follows:
 </div>
 </div>
 
-<div id="outline-container-org6f45b15" class="outline-3">
-<h3 id="org6f45b15">Internal Transition Function</h3>
-<div class="outline-text-3" id="text-org6f45b15">
+<div id="outline-container-org1f7e4f4" class="outline-3">
+<h3 id="org1f7e4f4">Internal Transition Function</h3>
+<div class="outline-text-3" id="text-org1f7e4f4">
 <p>
 The internal transition function \(\delta_{int}\) updates the state based on the elapsed time:
 </p>
@@ -566,9 +570,9 @@ Implemented in Python:
 </div>
 </div>
 
-<div id="outline-container-org4fce688" class="outline-3">
-<h3 id="org4fce688">External Transition Function</h3>
-<div class="outline-text-3" id="text-org4fce688">
+<div id="outline-container-org2829a71" class="outline-3">
+<h3 id="org2829a71">External Transition Function</h3>
+<div class="outline-text-3" id="text-org2829a71">
 <p>
 The external transition function \(\delta_{ext}\) modifies the state in response to external events:
 </p>
@@ -601,9 +605,9 @@ Python implementation:
 </div>
 </div>
 
-<div id="outline-container-orgcf98ed9" class="outline-3">
-<h3 id="orgcf98ed9">Complete model implementation</h3>
-<div class="outline-text-3" id="text-orgcf98ed9">
+<div id="outline-container-org6d0808e" class="outline-3">
+<h3 id="org6d0808e">Complete model implementation</h3>
+<div class="outline-text-3" id="text-org6d0808e">
 <p>
 The complete Python implementation of the Ping Pong model using xDEVS is as follows:
 </p>
@@ -674,9 +678,9 @@ PHASE_WAIT:<span style="color: #f08080;">str</span> = <span style="color: #deb88
 </div>
 </div>
 
-<div id="outline-container-org91b6365" class="outline-3">
-<h3 id="org91b6365">Running the model</h3>
-<div class="outline-text-3" id="text-org91b6365">
+<div id="outline-container-orgf9b29de" class="outline-3">
+<h3 id="orgf9b29de">Running the model</h3>
+<div class="outline-text-3" id="text-orgf9b29de">
 <p>
 To run the model, follow these steps on Ubuntu 22.04:
 </p>
@@ -700,7 +704,7 @@ Player B receives the ball
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: José L. Risco-Martín</p>
-<p class="date">Created: 2024-05-16 jue 18:42</p>
+<p class="date">Created: 2024-05-16 jue 18:50</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
