@@ -1,0 +1,174 @@
+* Getting started with xDEVS
+
+In this section, we introduce the basics of xDEVS by developing a simple Ping Pong model. This model is inspired by the DEVS formalism as described on Wikipedia: https://en.wikipedia.org/wiki/DEVS
+
+[[./fig/devs-pingpong.jpg]]
+
+The Ping Pong model simulates two players hitting a ball back and forth. We will define the model's behavior using output, internal transition, and external transition functions.
+
+** Output Function
+
+The output function \(\lambda\) determines the output based on the current state:
+
+\[
+\lambda(\text{Send}, \sigma) = !\text{send}
+\]
+\[
+\lambda(\text{Wait}, \sigma) = \emptyset
+\]
+
+This is implemented in Python as follows:
+
+#+begin_src python
+# Version 1.0
+def lambdaf(self):
+    if self.phase_is("Send"):
+        self.o_send.add("!send")
+        print(f"{self.name} sends the ball")
+
+# Version 2.0
+def lambdaf(self):
+    self.o_send.add("!send")
+    print(f"{self.name} sends the ball")
+#+end_src
+
+** Internal Transition Function
+
+The internal transition function \(\delta_{int}\) updates the state based on the elapsed time:
+
+\[
+\delta_{int}(\text{Send}, \sigma) = (\text{Wait}, \infty)
+\]
+\[
+\delta_{int}(\text{Wait}, \sigma) = (\text{Send}, 0.1)
+\]
+
+Implemented in Python:
+
+#+begin_src python
+# Version 1.0
+def deltint(self):
+    if (self.phase == "Wait"):
+        self.hold_in("Send", 0.1)
+    elif (self.phase == "Send"):
+        self.hold_in("Wait", INFINITY)
+
+# Version 2.0
+def deltint(self):
+    if (self.phase == "Send"):
+        self.hold_in("Wait", INFINITY)
+
+# Version 3.0
+def deltint(self):
+    self.hold_in("Wait", INFINITY)
+#+end_src
+
+** External Transition Function
+
+The external transition function \(\delta_{ext}\) modifies the state in response to external events:
+
+\[
+\delta_{ext}(((\text{Wait}, \sigma), t_e), ?\text{receive}) = (\text{Send}, 0.1)
+\]
+
+Python implementation:
+
+#+begin_src python
+# Version 1.0
+def deltext(self, e):
+    self.continuef(e) # VERY IMPORTANT!!!
+    print(f"{self.name} receives the ball")
+    if self.i_receive:
+        self.hold_in("Send", 0.1)
+
+# Version 2.0
+def deltext(self, e):
+    self.continuef(e) # VERY IMPORTANT!!!
+    print(f"{self.name} receives the ball")
+    self.hold_in("Send", 0.1)
+#+end_src
+
+** Complete model implementation
+
+The complete Python implementation of the Ping Pong model using xDEVS is as follows:
+
+#+begin_src python
+import logging
+
+from xdevs import get_logger
+from xdevs.models import Atomic, Coupled, Port, INFINITY
+from xdevs.sim import Coordinator
+
+logger = get_logger(__name__, logging.INFO)
+
+PHASE_SEND:str = "Send"
+PHASE_WAIT:str = "Wait"
+
+class Player(Atomic):
+    def __init__(self, name, sender:bool=False):
+        Atomic.__init__(self, name)
+        self.sender = sender
+        self.i_receive = Port(str, "i_receive")
+        self.o_send = Port(str, "o_send")
+        self.add_in_port(self.i_receive)
+        self.add_out_port(self.o_send)
+
+    def initialize(self):
+        if (self.sender):
+            self.hold_in(PHASE_SEND, 0.1)
+        else:
+            self.hold_in(PHASE_WAIT, INFINITY)
+
+    def exit(self):
+        pass
+
+    def lambdaf(self):
+        if (self.phase == PHASE_SEND):
+            self.o_send.add("!send")
+            logger.info(f"{self.name} sends the ball")
+
+    def deltint(self):
+        if (self.phase == PHASE_SEND):
+            self.hold_in(PHASE_WAIT, INFINITY)
+
+    def deltext(self, e):
+        self.continuef(e)
+        logger.info(f"{self.name} receives the ball")
+        if self.i_receive:
+            self.hold_in(PHASE_SEND, 0.1)
+
+class PingPong(Coupled):
+    def __init__(self):
+        Coupled.__init__(self)
+        player1 = Player("Player A", True)
+        player2 = Player("Player B")
+        self.add_component(player1)
+        self.add_component(player2)
+        self.add_coupling(player1.o_send, player2.i_receive)
+        self.add_coupling(player2.o_send, player1.i_receive)
+
+if __name__ == "__main__":
+    model = PingPong()
+    coord = Coordinator(model)
+    coord.initialize()
+    coord.simulate(num_iters=10)
+    coord.exit()
+#+end_src
+
+** Running the model
+
+To run the model, follow these steps on Ubuntu 22.04:
+
+#+begin_example
+sudo apt install python3 python3-pip
+pip3 install -U xdevs
+python3 ping-pong.py
+
+Player A sends the ball
+Player B receives the ball
+Player B sends the ball
+Player A receives the ball
+Player A sends the ball
+Player B receives the ball
+...
+#+end_example

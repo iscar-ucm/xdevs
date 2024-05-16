@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-05-06 lun 18:25 -->
+<!-- 2024-05-16 jue 18:42 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>xDEVS user's manual</title>
@@ -62,6 +62,28 @@ for the JavaScript code in this tag.
  }
 /*]]>*///-->
 </script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
 </head>
 <body>
 <div id="content">
@@ -70,29 +92,38 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org803128a">Introduction to xDEVS</a>
+<li><a href="#orgf4b821a">Introduction to xDEVS</a>
 <ul>
-<li><a href="#org3001495">Introduction</a></li>
-<li><a href="#org7f3fd3c">Top features</a></li>
-<li><a href="#org3a2ab67">Quick start</a></li>
+<li><a href="#orgb124e31">Introduction</a></li>
+<li><a href="#org0bb3a89">Top features</a></li>
+<li><a href="#org6598c72">Quick start</a></li>
 </ul>
 </li>
-<li><a href="#org9b75475">The DEVS formalism</a>
+<li><a href="#orgf1f498e">The DEVS formalism</a>
 <ul>
-<li><a href="#org74a46f2">Bibliography</a></li>
+<li><a href="#org4801a55">Bibliography</a></li>
+</ul>
+</li>
+<li><a href="#org2040497">Getting started with xDEVS</a>
+<ul>
+<li><a href="#org6d2ac94">Output Function</a></li>
+<li><a href="#org6f45b15">Internal Transition Function</a></li>
+<li><a href="#org4fce688">External Transition Function</a></li>
+<li><a href="#orgcf98ed9">Complete model implementation</a></li>
+<li><a href="#org91b6365">Running the model</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org803128a" class="outline-2">
-<h2 id="org803128a">Introduction to xDEVS</h2>
-<div class="outline-text-2" id="text-org803128a">
+<div id="outline-container-orgf4b821a" class="outline-2">
+<h2 id="orgf4b821a">Introduction to xDEVS</h2>
+<div class="outline-text-2" id="text-orgf4b821a">
 </div>
-<div id="outline-container-org3001495" class="outline-3">
-<h3 id="org3001495">Introduction</h3>
-<div class="outline-text-3" id="text-org3001495">
+<div id="outline-container-orgb124e31" class="outline-3">
+<h3 id="orgb124e31">Introduction</h3>
+<div class="outline-text-3" id="text-orgb124e31">
 <p>
 xDEVS stands for <i>A cross-platform (x) Discrete EVent System simulator</i>. This library includes a set of C, C++, C#, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism <i>Discrete Event System Specification (DEVS)</i>. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
 </p>
@@ -125,9 +156,9 @@ All the repositories are included as submodules inside this main repository.
 </div>
 </div>
 
-<div id="outline-container-org7f3fd3c" class="outline-3">
-<h3 id="org7f3fd3c">Top features</h3>
-<div class="outline-text-3" id="text-org7f3fd3c">
+<div id="outline-container-org0bb3a89" class="outline-3">
+<h3 id="org0bb3a89">Top features</h3>
+<div class="outline-text-3" id="text-org0bb3a89">
 <ul class="org-ul">
 <li>PDEVS Modeling and Simulation formalism</li>
 <li>Object-Oriented Programming</li>
@@ -137,9 +168,9 @@ All the repositories are included as submodules inside this main repository.
 </div>
 </div>
 
-<div id="outline-container-org3a2ab67" class="outline-3">
-<h3 id="org3a2ab67">Quick start</h3>
-<div class="outline-text-3" id="text-org3a2ab67">
+<div id="outline-container-org6598c72" class="outline-3">
+<h3 id="org6598c72">Quick start</h3>
+<div class="outline-text-3" id="text-org6598c72">
 <p>
 Switch to the corresponding particular language. A README file will be found to start with minimal examples and demos.
 </p>
@@ -147,9 +178,9 @@ Switch to the corresponding particular language. A README file will be found to 
 </div>
 </div>
 
-<div id="outline-container-org9b75475" class="outline-2">
-<h2 id="org9b75475">The DEVS formalism</h2>
-<div class="outline-text-2" id="text-org9b75475">
+<div id="outline-container-orgf1f498e" class="outline-2">
+<h2 id="orgf1f498e">The DEVS formalism</h2>
+<div class="outline-text-2" id="text-orgf1f498e">
 <p>
 The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
 </p>
@@ -201,9 +232,9 @@ The reader should refer to the book Theory of Modeling and Simulation [1], to un
 </p>
 </div>
 
-<div id="outline-container-orgf4b076d" class="outline-4">
-<h4 id="orgf4b076d">The parallel DEVS formalism</h4>
-<div class="outline-text-4" id="text-orgf4b076d">
+<div id="outline-container-orgeccda96" class="outline-4">
+<h4 id="orgeccda96">The parallel DEVS formalism</h4>
+<div class="outline-text-4" id="text-orgeccda96">
 <p>
 The parallel DEVS approach was introduced, after 15 years, as a revision of Classic DEVS. Currently, parallel DEVS is the prevalent DEVS, implemented in many libraries. In the following, unless it is explicitly noted, the use of DEVS implies parallel DEVS.
 </p>
@@ -263,9 +294,9 @@ Given the recursive definition of <b>M</b>, a coupled model can itself be a part
 
 
 
-<div id="outline-container-orgbc82942" class="outline-5">
-<h5 id="orgbc82942">EXAMPLE 1</h5>
-<div class="outline-text-5" id="text-orgbc82942">
+<div id="outline-container-orgae8fba3" class="outline-5">
+<h5 id="orgae8fba3">EXAMPLE 1</h5>
+<div class="outline-text-5" id="text-orgae8fba3">
 <p>
 A processor atomic model consumes a job j. When the processor receives a job through an input port, thus the processor remains busy until the processing time j<sub>p</sub> is finished. Then it sends the job through an output port.
 </p>
@@ -291,9 +322,9 @@ Processor=〈X,S,Y,δ<sub>int</sub>,δ<sub>ext</sub>,δ<sub>con</sub>,λ,ta〉
 </div>
 </div>
 
-<div id="outline-container-org889892e" class="outline-5">
-<h5 id="org889892e">EXAMPLE 2</h5>
-<div class="outline-text-5" id="text-org889892e">
+<div id="outline-container-org899f9d8" class="outline-5">
+<h5 id="org899f9d8">EXAMPLE 2</h5>
+<div class="outline-text-5" id="text-org899f9d8">
 <p>
 Figure 2 shows an example of a DEVS coupled model with three components, M1, M2 y M3, as well as their couplings. These models are interconnected through the corresponding I/O ports presented in the Figure. The models are connected to the external coupled models through the EIC and EOC connectors. M1, M2 and M3 can be atomic or coupled models.
 </p>
@@ -326,9 +357,9 @@ where:
 </div>
 </div>
 
-<div id="outline-container-org450167d" class="outline-5">
-<h5 id="org450167d">EXAMPLE 3</h5>
-<div class="outline-text-5" id="text-org450167d">
+<div id="outline-container-orgd4ef6fc" class="outline-5">
+<h5 id="orgd4ef6fc">EXAMPLE 3</h5>
+<div class="outline-text-5" id="text-orgd4ef6fc">
 <p>
 The Experimental frame – Processor model is usually presented as one of the initial examples to start to practice with DEVS modeling and simulation. It is a DEVS coupled model consisting of three atomic models and one coupled model (see Figure 3).
 </p>
@@ -428,9 +459,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-org74a46f2" class="outline-3">
-<h3 id="org74a46f2">Bibliography</h3>
-<div class="outline-text-3" id="text-org74a46f2">
+<div id="outline-container-org4801a55" class="outline-3">
+<h3 id="org4801a55">Bibliography</h3>
+<div class="outline-text-3" id="text-org4801a55">
 <ol class="org-ol">
 <li>Zeigler, B. P.; Muzy, A. &amp; Kofman, E. Theory of modeling and simulation: discrete event &amp; iterative system computational foundations Academic press, 2018.</li>
 <li>Mittal, S. &amp; Risco-Martín, J. L. Netcentric system of systems engineering with DEVS unified process CRC Press, 2013.</li>
@@ -439,10 +470,237 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 </div>
+
+<div id="outline-container-org2040497" class="outline-2">
+<h2 id="org2040497">Getting started with xDEVS</h2>
+<div class="outline-text-2" id="text-org2040497">
+<p>
+In this section, we introduce the basics of xDEVS by developing a simple Ping Pong model. This model is inspired by the DEVS formalism as described on Wikipedia: <a href="https://en.wikipedia.org/wiki/DEVS">https://en.wikipedia.org/wiki/DEVS</a>
+</p>
+
+
+<div class="figure">
+<p><img src="./fig/devs-pingpong.jpg" alt="devs-pingpong.jpg" />
+</p>
+</div>
+
+<p>
+The Ping Pong model simulates two players hitting a ball back and forth. We will define the model's behavior using output, internal transition, and external transition functions.
+</p>
+</div>
+
+<div id="outline-container-org6d2ac94" class="outline-3">
+<h3 id="org6d2ac94">Output Function</h3>
+<div class="outline-text-3" id="text-org6d2ac94">
+<p>
+The output function \(\lambda\) determines the output based on the current state:
+</p>
+
+<p>
+\[
+\lambda(\text{Send}, \sigma) = !\text{send}
+\]
+\[
+\lambda(\text{Wait}, \sigma) = \emptyset
+\]
+</p>
+
+<p>
+This is implemented in Python as follows:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Version 1.0</span>
+<span style="color: #00bfff;">def</span> <span style="color: #daa520;">lambdaf</span>(<span style="color: #00bfff;">self</span>):
+    <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.phase_is(<span style="color: #deb887;">"Send"</span>):
+        <span style="color: #00bfff;">self</span>.o_send.add(<span style="color: #deb887;">"!send"</span>)
+        <span style="color: #00bfff;">print</span>(f<span style="color: #deb887;">"{self.name} sends the ball"</span>)
+
+<span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Version 2.0</span>
+<span style="color: #00bfff;">def</span> <span style="color: #daa520;">lambdaf</span>(<span style="color: #00bfff;">self</span>):
+    <span style="color: #00bfff;">self</span>.o_send.add(<span style="color: #deb887;">"!send"</span>)
+    <span style="color: #00bfff;">print</span>(f<span style="color: #deb887;">"{self.name} sends the ball"</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6f45b15" class="outline-3">
+<h3 id="org6f45b15">Internal Transition Function</h3>
+<div class="outline-text-3" id="text-org6f45b15">
+<p>
+The internal transition function \(\delta_{int}\) updates the state based on the elapsed time:
+</p>
+
+<p>
+\[
+\delta_{int}(\text{Send}, \sigma) = (\text{Wait}, \infty)
+\]
+\[
+\delta_{int}(\text{Wait}, \sigma) = (\text{Send}, 0.1)
+\]
+</p>
+
+<p>
+Implemented in Python:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Version 1.0</span>
+<span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltint</span>(<span style="color: #00bfff;">self</span>):
+    <span style="color: #00bfff;">if</span> (<span style="color: #00bfff;">self</span>.phase == <span style="color: #deb887;">"Wait"</span>):
+        <span style="color: #00bfff;">self</span>.hold_in(<span style="color: #deb887;">"Send"</span>, 0.1)
+    <span style="color: #00bfff;">elif</span> (<span style="color: #00bfff;">self</span>.phase == <span style="color: #deb887;">"Send"</span>):
+        <span style="color: #00bfff;">self</span>.hold_in(<span style="color: #deb887;">"Wait"</span>, INFINITY)
+
+<span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Version 2.0</span>
+<span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltint</span>(<span style="color: #00bfff;">self</span>):
+    <span style="color: #00bfff;">if</span> (<span style="color: #00bfff;">self</span>.phase == <span style="color: #deb887;">"Send"</span>):
+        <span style="color: #00bfff;">self</span>.hold_in(<span style="color: #deb887;">"Wait"</span>, INFINITY)
+
+<span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Version 3.0</span>
+<span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltint</span>(<span style="color: #00bfff;">self</span>):
+    <span style="color: #00bfff;">self</span>.hold_in(<span style="color: #deb887;">"Wait"</span>, INFINITY)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4fce688" class="outline-3">
+<h3 id="org4fce688">External Transition Function</h3>
+<div class="outline-text-3" id="text-org4fce688">
+<p>
+The external transition function \(\delta_{ext}\) modifies the state in response to external events:
+</p>
+
+<p>
+\[
+\delta_{ext}(((\text{Wait}, \sigma), t_e), ?\text{receive}) = (\text{Send}, 0.1)
+\]
+</p>
+
+<p>
+Python implementation:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Version 1.0</span>
+<span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltext</span>(<span style="color: #00bfff;">self</span>, e):
+    <span style="color: #00bfff;">self</span>.continuef(e) <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">VERY IMPORTANT!!!</span>
+    <span style="color: #00bfff;">print</span>(f<span style="color: #deb887;">"{self.name} receives the ball"</span>)
+    <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.i_receive:
+        <span style="color: #00bfff;">self</span>.hold_in(<span style="color: #deb887;">"Send"</span>, 0.1)
+
+<span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Version 2.0</span>
+<span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltext</span>(<span style="color: #00bfff;">self</span>, e):
+    <span style="color: #00bfff;">self</span>.continuef(e) <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">VERY IMPORTANT!!!</span>
+    <span style="color: #00bfff;">print</span>(f<span style="color: #deb887;">"{self.name} receives the ball"</span>)
+    <span style="color: #00bfff;">self</span>.hold_in(<span style="color: #deb887;">"Send"</span>, 0.1)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcf98ed9" class="outline-3">
+<h3 id="orgcf98ed9">Complete model implementation</h3>
+<div class="outline-text-3" id="text-orgcf98ed9">
+<p>
+The complete Python implementation of the Ping Pong model using xDEVS is as follows:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #00bfff;">import</span> logging
+
+<span style="color: #00bfff;">from</span> xdevs <span style="color: #00bfff;">import</span> get_logger
+<span style="color: #00bfff;">from</span> xdevs.models <span style="color: #00bfff;">import</span> Atomic, Coupled, Port, INFINITY
+<span style="color: #00bfff;">from</span> xdevs.sim <span style="color: #00bfff;">import</span> Coordinator
+
+<span style="color: #4eee94;">logger</span> = get_logger(<span style="color: #f08080;">__name__</span>, logging.INFO)
+
+PHASE_SEND:<span style="color: #f08080;">str</span> = <span style="color: #deb887;">"Send"</span>
+PHASE_WAIT:<span style="color: #f08080;">str</span> = <span style="color: #deb887;">"Wait"</span>
+
+<span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Player</span>(Atomic):
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>, name, sender:<span style="color: #f08080;">bool</span>=<span style="color: #a2cd5a;">False</span>):
+        Atomic.__init__(<span style="color: #00bfff;">self</span>, name)
+        <span style="color: #00bfff;">self</span>.sender = sender
+        <span style="color: #00bfff;">self</span>.i_receive = Port(<span style="color: #f08080;">str</span>, <span style="color: #deb887;">"i_receive"</span>)
+        <span style="color: #00bfff;">self</span>.o_send = Port(<span style="color: #f08080;">str</span>, <span style="color: #deb887;">"o_send"</span>)
+        <span style="color: #00bfff;">self</span>.add_in_port(<span style="color: #00bfff;">self</span>.i_receive)
+        <span style="color: #00bfff;">self</span>.add_out_port(<span style="color: #00bfff;">self</span>.o_send)
+
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">initialize</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">if</span> (<span style="color: #00bfff;">self</span>.sender):
+            <span style="color: #00bfff;">self</span>.hold_in(PHASE_SEND, 0.1)
+        <span style="color: #00bfff;">else</span>:
+            <span style="color: #00bfff;">self</span>.hold_in(PHASE_WAIT, INFINITY)
+
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">exit</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">pass</span>
+
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">lambdaf</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">if</span> (<span style="color: #00bfff;">self</span>.phase == PHASE_SEND):
+            <span style="color: #00bfff;">self</span>.o_send.add(<span style="color: #deb887;">"!send"</span>)
+            logger.info(f<span style="color: #deb887;">"{self.name} sends the ball"</span>)
+
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltint</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">if</span> (<span style="color: #00bfff;">self</span>.phase == PHASE_SEND):
+            <span style="color: #00bfff;">self</span>.hold_in(PHASE_WAIT, INFINITY)
+
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltext</span>(<span style="color: #00bfff;">self</span>, e):
+        <span style="color: #00bfff;">self</span>.continuef(e)
+        logger.info(f<span style="color: #deb887;">"{self.name} receives the ball"</span>)
+        <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.i_receive:
+            <span style="color: #00bfff;">self</span>.hold_in(PHASE_SEND, 0.1)
+
+<span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">PingPong</span>(Coupled):
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>):
+        Coupled.__init__(<span style="color: #00bfff;">self</span>)
+        <span style="color: #4eee94;">player1</span> = Player(<span style="color: #deb887;">"Player A"</span>, <span style="color: #a2cd5a;">True</span>)
+        <span style="color: #4eee94;">player2</span> = Player(<span style="color: #deb887;">"Player B"</span>)
+        <span style="color: #00bfff;">self</span>.add_component(player1)
+        <span style="color: #00bfff;">self</span>.add_component(player2)
+        <span style="color: #00bfff;">self</span>.add_coupling(player1.o_send, player2.i_receive)
+        <span style="color: #00bfff;">self</span>.add_coupling(player2.o_send, player1.i_receive)
+
+<span style="color: #00bfff;">if</span> <span style="color: #f08080;">__name__</span> == <span style="color: #deb887;">"__main__"</span>:
+    <span style="color: #4eee94;">model</span> = PingPong()
+    <span style="color: #4eee94;">coord</span> = Coordinator(model)
+    coord.initialize()
+    coord.simulate(num_iters=10)
+    coord.<span style="color: #a2cd5a;">exit</span>()
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org91b6365" class="outline-3">
+<h3 id="org91b6365">Running the model</h3>
+<div class="outline-text-3" id="text-org91b6365">
+<p>
+To run the model, follow these steps on Ubuntu 22.04:
+</p>
+
+<pre class="example">
+sudo apt install python3 python3-pip
+pip3 install -U xdevs
+python3 ping-pong.py
+
+Player A sends the ball
+Player B receives the ball
+Player B sends the ball
+Player A receives the ball
+Player A sends the ball
+Player B receives the ball
+...
+</pre>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: José L. Risco-Martín</p>
-<p class="date">Created: 2024-05-06 lun 18:25</p>
+<p class="date">Created: 2024-05-16 jue 18:42</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

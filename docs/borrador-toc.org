@@ -1,0 +1,48 @@
+1. *Introduction to xDEVS*
+   - Overview of xDEVS
+   - Key Features
+   - Installation and Setup
+
+2. *The DEVS Formalism*
+   - Basic Concepts
+   - Model Structure
+   - Time Advance Functions
+
+3. *Getting Started with xDEVS*
+   - First Model: Hello World
+   - Running Simulations
+   - Analyzing Output
+
+4. *Building Models in xDEVS*
+   - Atomic Models
+   - Coupled Models
+   - Model Configuration
+
+5. *Advanced Features*
+   - Real-time Simulation
+   - Parallel Execution
+   - Custom Extensions
+
+6. *Integration with Other Tools*
+   - Data Visualization
+   - Interfacing with External Software
+   - Exporting and Importing Models
+
+7. *Case Studies and Examples*
+   - Simple Queue System
+   - Network Packet Routing
+   - Manufacturing Process
+
+8. *Troubleshooting and FAQs*
+   - Common Errors
+   - Performance Optimization
+   - Community and Support
+
+9. *Appendices*
+   - Glossary of Terms
+   - Bibliography and References
+   - Change Log
+
+10. *Index*
+
+This structure will help guide the user from introductory concepts through to advanced usage and integration, providing a comprehensive resource for both new and experienced users of xDEVS.

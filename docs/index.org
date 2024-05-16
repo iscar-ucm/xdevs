@@ -13,3 +13,7 @@
 * The DEVS formalism
 
 #+INCLUDE: 2-devs.org :lines "2-"
+
+* Getting started with xDEVS
+
+#+INCLUDE: 3-getting-started.org :lines "2-"
