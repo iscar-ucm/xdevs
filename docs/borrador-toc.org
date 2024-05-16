@@ -46,3 +46,11 @@
 10. *Index*
 
 This structure will help guide the user from introductory concepts through to advanced usage and integration, providing a comprehensive resource for both new and experienced users of xDEVS.
+
+Yo haría:
+
+3 Getting Started (solo ping pong)
+4 Building models in xDEVS
+5 EFP model (GPT, EFP)
+6 Advanced features (real-time, parallel, distributed)
+7 Case studies?
