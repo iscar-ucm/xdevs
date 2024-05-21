@@ -17,6 +17,7 @@ There are seven repositories associated with xDEVS, each one offering the equiva
 - xDEVS/Java ([[https://github.com/iscar-ucm/xdevs.java][xdevs.java]]) - [[https://iscar-ucm.github.io/xdevs.java][API documentation]]
 - xDEVS/Python ([[https://github.com/iscar-ucm/xdevs.py][xdevs.py]])
 - xDEVS/Rust ([[https://github.com/iscar-ucm/xdevs.rs][xdevs.rs]])
+- xDEVS/Rust for embedded systems ([[https://github.com/iscar-ucm/xdevs_no_std.rs][xdevs_no_std.rs]])
 
 All the repositories are included as submodules inside this main repository.
 
