@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-05-16 jue 18:50 -->
+<!-- 2024-05-27 lun 11:05 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>xDEVS user's manual</title>
@@ -92,38 +92,45 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org05b6407">Introduction to xDEVS</a>
+<li><a href="#orgb7a203b">Introduction to xDEVS</a>
 <ul>
-<li><a href="#org5bd5e87">Introduction</a></li>
-<li><a href="#orgf742176">Top features</a></li>
-<li><a href="#orge3e0377">Quick start</a></li>
+<li><a href="#org8f6b1fe">Introduction</a></li>
+<li><a href="#orgbbcb518">Top features</a></li>
+<li><a href="#org2306f6a">Quick start</a></li>
 </ul>
 </li>
-<li><a href="#org13194ae">The DEVS formalism</a>
+<li><a href="#org3da6aff">The DEVS formalism</a>
 <ul>
-<li><a href="#org56d3e0d">Bibliography</a></li>
+<li><a href="#org2e57542">Bibliography</a></li>
 </ul>
 </li>
-<li><a href="#orga392e9d">Getting started with xDEVS</a>
+<li><a href="#org511b2bc">Getting started with xDEVS</a>
 <ul>
-<li><a href="#org58bc9ba">Output Function</a></li>
-<li><a href="#org1f7e4f4">Internal Transition Function</a></li>
-<li><a href="#org2829a71">External Transition Function</a></li>
-<li><a href="#org6d0808e">Complete model implementation</a></li>
-<li><a href="#orgf9b29de">Running the model</a></li>
+<li><a href="#orga38422f">Output Function</a></li>
+<li><a href="#org8ed8b45">Internal Transition Function</a></li>
+<li><a href="#org97d3e39">External Transition Function</a></li>
+<li><a href="#org509d838">Complete model implementation</a></li>
+<li><a href="#orgb73db72">Running the model</a></li>
+</ul>
+</li>
+<li><a href="#orgf96adde">Building models in xDEVS</a>
+<ul>
+<li><a href="#org3f31d2f">Atomic models</a></li>
+<li><a href="#orgefcf58a">Coupled models</a></li>
+<li><a href="#orgbe7c7ca">Models configuration</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org05b6407" class="outline-2">
-<h2 id="org05b6407">Introduction to xDEVS</h2>
-<div class="outline-text-2" id="text-org05b6407">
+<div id="outline-container-orgb7a203b" class="outline-2">
+<h2 id="orgb7a203b">Introduction to xDEVS</h2>
+<div class="outline-text-2" id="text-orgb7a203b">
 </div>
-<div id="outline-container-org5bd5e87" class="outline-3">
-<h3 id="org5bd5e87">Introduction</h3>
-<div class="outline-text-3" id="text-org5bd5e87">
+<div id="outline-container-org8f6b1fe" class="outline-3">
+<h3 id="org8f6b1fe">Introduction</h3>
+<div class="outline-text-3" id="text-org8f6b1fe">
 <p>
 xDEVS stands for <i>A cross-platform (x) Discrete EVent System simulator</i>. This library includes a set of C, C++, C#, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism <i>Discrete Event System Specification (DEVS)</i>. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
 </p>
@@ -148,6 +155,7 @@ There are seven repositories associated with xDEVS, each one offering the equiva
 <li>xDEVS/Java (<a href="https://github.com/iscar-ucm/xdevs.java">xdevs.java</a>) - <a href="https://iscar-ucm.github.io/xdevs.java">API documentation</a></li>
 <li>xDEVS/Python (<a href="https://github.com/iscar-ucm/xdevs.py">xdevs.py</a>)</li>
 <li>xDEVS/Rust (<a href="https://github.com/iscar-ucm/xdevs.rs">xdevs.rs</a>)</li>
+<li>xDEVS/Rust for embedded systems (<a href="https://github.com/iscar-ucm/xdevs_no_std.rs">xdevs<sub>no</sub><sub>std.rs</sub></a>)</li>
 </ul>
 
 <p>
@@ -160,9 +168,9 @@ The xDEVS user's manual can be found <a href="https://iscar-ucm.github.io/xdevs/
 </div>
 </div>
 
-<div id="outline-container-orgf742176" class="outline-3">
-<h3 id="orgf742176">Top features</h3>
-<div class="outline-text-3" id="text-orgf742176">
+<div id="outline-container-orgbbcb518" class="outline-3">
+<h3 id="orgbbcb518">Top features</h3>
+<div class="outline-text-3" id="text-orgbbcb518">
 <ul class="org-ul">
 <li>PDEVS Modeling and Simulation formalism</li>
 <li>Object-Oriented Programming</li>
@@ -172,9 +180,9 @@ The xDEVS user's manual can be found <a href="https://iscar-ucm.github.io/xdevs/
 </div>
 </div>
 
-<div id="outline-container-orge3e0377" class="outline-3">
-<h3 id="orge3e0377">Quick start</h3>
-<div class="outline-text-3" id="text-orge3e0377">
+<div id="outline-container-org2306f6a" class="outline-3">
+<h3 id="org2306f6a">Quick start</h3>
+<div class="outline-text-3" id="text-org2306f6a">
 <p>
 Switch to the corresponding particular language. A README file will be found to start with minimal examples and demos.
 </p>
@@ -182,9 +190,9 @@ Switch to the corresponding particular language. A README file will be found to 
 </div>
 </div>
 
-<div id="outline-container-org13194ae" class="outline-2">
-<h2 id="org13194ae">The DEVS formalism</h2>
-<div class="outline-text-2" id="text-org13194ae">
+<div id="outline-container-org3da6aff" class="outline-2">
+<h2 id="org3da6aff">The DEVS formalism</h2>
+<div class="outline-text-2" id="text-org3da6aff">
 <p>
 The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
 </p>
@@ -236,9 +244,9 @@ The reader should refer to the book Theory of Modeling and Simulation [1], to un
 </p>
 </div>
 
-<div id="outline-container-orgfb33a57" class="outline-4">
-<h4 id="orgfb33a57">The parallel DEVS formalism</h4>
-<div class="outline-text-4" id="text-orgfb33a57">
+<div id="outline-container-orge58e15a" class="outline-4">
+<h4 id="orge58e15a">The parallel DEVS formalism</h4>
+<div class="outline-text-4" id="text-orge58e15a">
 <p>
 The parallel DEVS approach was introduced, after 15 years, as a revision of Classic DEVS. Currently, parallel DEVS is the prevalent DEVS, implemented in many libraries. In the following, unless it is explicitly noted, the use of DEVS implies parallel DEVS.
 </p>
@@ -298,9 +306,9 @@ Given the recursive definition of <b>M</b>, a coupled model can itself be a part
 
 
 
-<div id="outline-container-org20d0443" class="outline-5">
-<h5 id="org20d0443">EXAMPLE 1</h5>
-<div class="outline-text-5" id="text-org20d0443">
+<div id="outline-container-org1a546c9" class="outline-5">
+<h5 id="org1a546c9">EXAMPLE 1</h5>
+<div class="outline-text-5" id="text-org1a546c9">
 <p>
 A processor atomic model consumes a job j. When the processor receives a job through an input port, thus the processor remains busy until the processing time j<sub>p</sub> is finished. Then it sends the job through an output port.
 </p>
@@ -326,9 +334,9 @@ Processor=〈X,S,Y,δ<sub>int</sub>,δ<sub>ext</sub>,δ<sub>con</sub>,λ,ta〉
 </div>
 </div>
 
-<div id="outline-container-org8c0663b" class="outline-5">
-<h5 id="org8c0663b">EXAMPLE 2</h5>
-<div class="outline-text-5" id="text-org8c0663b">
+<div id="outline-container-orga446222" class="outline-5">
+<h5 id="orga446222">EXAMPLE 2</h5>
+<div class="outline-text-5" id="text-orga446222">
 <p>
 Figure 2 shows an example of a DEVS coupled model with three components, M1, M2 y M3, as well as their couplings. These models are interconnected through the corresponding I/O ports presented in the Figure. The models are connected to the external coupled models through the EIC and EOC connectors. M1, M2 and M3 can be atomic or coupled models.
 </p>
@@ -361,9 +369,9 @@ where:
 </div>
 </div>
 
-<div id="outline-container-org541764e" class="outline-5">
-<h5 id="org541764e">EXAMPLE 3</h5>
-<div class="outline-text-5" id="text-org541764e">
+<div id="outline-container-org020bfce" class="outline-5">
+<h5 id="org020bfce">EXAMPLE 3</h5>
+<div class="outline-text-5" id="text-org020bfce">
 <p>
 The Experimental frame – Processor model is usually presented as one of the initial examples to start to practice with DEVS modeling and simulation. It is a DEVS coupled model consisting of three atomic models and one coupled model (see Figure 3).
 </p>
@@ -463,9 +471,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-org56d3e0d" class="outline-3">
-<h3 id="org56d3e0d">Bibliography</h3>
-<div class="outline-text-3" id="text-org56d3e0d">
+<div id="outline-container-org2e57542" class="outline-3">
+<h3 id="org2e57542">Bibliography</h3>
+<div class="outline-text-3" id="text-org2e57542">
 <ol class="org-ol">
 <li>Zeigler, B. P.; Muzy, A. &amp; Kofman, E. Theory of modeling and simulation: discrete event &amp; iterative system computational foundations Academic press, 2018.</li>
 <li>Mittal, S. &amp; Risco-Martín, J. L. Netcentric system of systems engineering with DEVS unified process CRC Press, 2013.</li>
@@ -475,9 +483,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-orga392e9d" class="outline-2">
-<h2 id="orga392e9d">Getting started with xDEVS</h2>
-<div class="outline-text-2" id="text-orga392e9d">
+<div id="outline-container-org511b2bc" class="outline-2">
+<h2 id="org511b2bc">Getting started with xDEVS</h2>
+<div class="outline-text-2" id="text-org511b2bc">
 <p>
 In this section, we introduce the basics of xDEVS by developing a simple Ping Pong model. This model is inspired by the DEVS formalism as described on Wikipedia: <a href="https://en.wikipedia.org/wiki/DEVS">https://en.wikipedia.org/wiki/DEVS</a>
 </p>
@@ -493,9 +501,9 @@ The Ping Pong model simulates two players hitting a ball back and forth. We will
 </p>
 </div>
 
-<div id="outline-container-org58bc9ba" class="outline-3">
-<h3 id="org58bc9ba">Output Function</h3>
-<div class="outline-text-3" id="text-org58bc9ba">
+<div id="outline-container-orga38422f" class="outline-3">
+<h3 id="orga38422f">Output Function</h3>
+<div class="outline-text-3" id="text-orga38422f">
 <p>
 The output function \(\lambda\) determines the output based on the current state:
 </p>
@@ -529,9 +537,9 @@ This is implemented in Python as follows:
 </div>
 </div>
 
-<div id="outline-container-org1f7e4f4" class="outline-3">
-<h3 id="org1f7e4f4">Internal Transition Function</h3>
-<div class="outline-text-3" id="text-org1f7e4f4">
+<div id="outline-container-org8ed8b45" class="outline-3">
+<h3 id="org8ed8b45">Internal Transition Function</h3>
+<div class="outline-text-3" id="text-org8ed8b45">
 <p>
 The internal transition function \(\delta_{int}\) updates the state based on the elapsed time:
 </p>
@@ -570,9 +578,9 @@ Implemented in Python:
 </div>
 </div>
 
-<div id="outline-container-org2829a71" class="outline-3">
-<h3 id="org2829a71">External Transition Function</h3>
-<div class="outline-text-3" id="text-org2829a71">
+<div id="outline-container-org97d3e39" class="outline-3">
+<h3 id="org97d3e39">External Transition Function</h3>
+<div class="outline-text-3" id="text-org97d3e39">
 <p>
 The external transition function \(\delta_{ext}\) modifies the state in response to external events:
 </p>
@@ -605,9 +613,9 @@ Python implementation:
 </div>
 </div>
 
-<div id="outline-container-org6d0808e" class="outline-3">
-<h3 id="org6d0808e">Complete model implementation</h3>
-<div class="outline-text-3" id="text-org6d0808e">
+<div id="outline-container-org509d838" class="outline-3">
+<h3 id="org509d838">Complete model implementation</h3>
+<div class="outline-text-3" id="text-org509d838">
 <p>
 The complete Python implementation of the Ping Pong model using xDEVS is as follows:
 </p>
@@ -678,9 +686,9 @@ PHASE_WAIT:<span style="color: #f08080;">str</span> = <span style="color: #deb88
 </div>
 </div>
 
-<div id="outline-container-orgf9b29de" class="outline-3">
-<h3 id="orgf9b29de">Running the model</h3>
-<div class="outline-text-3" id="text-orgf9b29de">
+<div id="outline-container-orgb73db72" class="outline-3">
+<h3 id="orgb73db72">Running the model</h3>
+<div class="outline-text-3" id="text-orgb73db72">
 <p>
 To run the model, follow these steps on Ubuntu 22.04:
 </p>
@@ -701,10 +709,111 @@ Player B receives the ball
 </div>
 </div>
 </div>
+
+<div id="outline-container-orgf96adde" class="outline-2">
+<h2 id="orgf96adde">Building models in xDEVS</h2>
+<div class="outline-text-2" id="text-orgf96adde">
+</div>
+<div id="outline-container-org3f31d2f" class="outline-3">
+<h3 id="org3f31d2f">Atomic models</h3>
+<div class="outline-text-3" id="text-org3f31d2f">
+<p>
+In xDEVS, atomic models are the fundamental building blocks for constructing simulation models. An atomic model in xDEVS encapsulates the behavior of a system component that cannot be further decomposed into smaller components. It defines the state changes and interactions of the component in response to internal and external events.
+</p>
+</div>
+
+<div id="outline-container-org77b730f" class="outline-4">
+<h4 id="org77b730f">Structure of an atomic model</h4>
+<div class="outline-text-4" id="text-org77b730f">
+<p>
+The <code>Atomic</code> class, derived from the <code>Component</code> class and marked as an abstract base class, serves as the base class for all atomic models in xDEVS. Here's a breakdown of its key components and functionalities:
+</p>
+
+<ul class="org-ul">
+<li><b>Initialization</b>: The constructor initializes the atomic model, setting its name and initializing its phase to <code>passive</code> and its time advance (<code>sigma</code>) to infinity. This represents a state where the model is waiting indefinitely for an external event.</li>
+
+<li><b>Time Advance Function (<code>ta</code>)</b>: This property method returns the time until the next scheduled internal transition (<code>sigma</code>). It dictates how long the model stays in its current state before an internal transition occurs.</li>
+
+<li><b>Internal Transition (<code>deltint</code>)</b>: This abstract method must be implemented by all subclasses. It defines the state changes that occur when an internal event is triggered after the elapse of the time advance.</li>
+
+<li><b>External Transition (<code>deltext</code>)</b>: This abstract method handles state changes in response to external events. It takes the elapsed time (<code>e</code>) since the last transition as an argument, allowing the model to update its state based on external inputs.</li>
+
+<li><b>Output Function (<code>lambdaf</code>)</b>: Another abstract method that specifies the output of the model just before an internal transition occurs. This function is crucial for sending outputs to other models in a coupled model configuration.</li>
+
+<li><b>Confluent Transition (<code>deltcon</code>)</b>: By default, this method handles the simultaneous occurrence of internal and external events. It first processes the internal transition and then the external transition with zero elapsed time.</li>
+
+<li><b>State Management Methods</b>: The methods <code>hold_in</code>, <code>activate</code>, <code>passivate</code>, and <code>continuef</code> are utility functions to manage the model's state and timing:
+<ul class="org-ul">
+<li><code>hold_in</code>: Sets the model's phase and schedules the next internal transition.</li>
+<li><code>activate</code>: Immediately triggers an internal transition by setting <code>sigma</code> to zero.</li>
+<li><code>passivate</code>: Puts the model into a passive state with an infinite wait time.</li>
+<li><code>continuef</code>: Adjusts the time advance by reducing it by the elapsed time <code>e</code>, useful for resuming after a paused state.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgb8320f4" class="outline-4">
+<h4 id="orgb8320f4"><span class="todo TODO">TODO</span> Ports</h4>
+<div class="outline-text-4" id="text-orgb8320f4">
+<p>
+To be continued here &#x2026;
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3bab875" class="outline-4">
+<h4 id="org3bab875">Implementing an atomic model</h4>
+<div class="outline-text-4" id="text-org3bab875">
+<p>
+To implement an atomic model in xDEVS, you need to subclass the <code>Atomic</code> class and provide concrete implementations for the <code>deltint</code>, <code>deltext</code>, and <code>lambdaf</code> methods. Each method should define how the model reacts to different types of events and manages its state transitions effectively.
+</p>
+
+<p>
+Here is a simple example of an atomic model that increments a counter:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">CounterModel</span>(Atomic):
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>, name=<span style="color: #a2cd5a;">None</span>):
+        <span style="color: #f08080;">super</span>().__init__(name)
+        <span style="color: #00bfff;">self</span>.count = 0
+        <span style="color: #00bfff;">self</span>.hold_in(<span style="color: #deb887;">"active"</span>, 1)  <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Active for 1 time unit</span>
+
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltint</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.count += 1
+        <span style="color: #00bfff;">self</span>.hold_in(<span style="color: #deb887;">"active"</span>, 1)  <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Schedule next increment</span>
+
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltext</span>(<span style="color: #00bfff;">self</span>, e):
+        <span style="color: #00bfff;">self</span>.continuef(e)  <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Continue countdown</span>
+
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">lambdaf</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">pass</span> <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">No output</span>
+
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__str__</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">return</span> f<span style="color: #deb887;">"CounterModel(name={self.name}, count={self.count})"</span>
+</pre>
+</div>
+
+<p>
+This model demonstrates basic internal and external transitions. It continuously counts upwards.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgefcf58a" class="outline-3">
+<h3 id="orgefcf58a">Coupled models</h3>
+</div>
+
+<div id="outline-container-orgbe7c7ca" class="outline-3">
+<h3 id="orgbe7c7ca">Models configuration</h3>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: José L. Risco-Martín</p>
-<p class="date">Created: 2024-05-16 jue 18:50</p>
+<p class="date">Created: 2024-05-27 lun 11:05</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

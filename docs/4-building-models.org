@@ -1,0 +1,64 @@
+* Building models in xDEVS
+
+** Atomic models
+
+In xDEVS, atomic models are the fundamental building blocks for constructing simulation models. An atomic model in xDEVS encapsulates the behavior of a system component that cannot be further decomposed into smaller components. It defines the state changes and interactions of the component in response to internal and external events.
+
+*** Structure of an atomic model
+
+The =Atomic= class, derived from the =Component= class and marked as an abstract base class, serves as the base class for all atomic models in xDEVS. Here's a breakdown of its key components and functionalities:
+
+- *Initialization*: The constructor initializes the atomic model, setting its name and initializing its phase to =passive= and its time advance (=sigma=) to infinity. This represents a state where the model is waiting indefinitely for an external event.
+
+- *Time Advance Function (=ta=)*: This property method returns the time until the next scheduled internal transition (=sigma=). It dictates how long the model stays in its current state before an internal transition occurs.
+
+- *Internal Transition (=deltint=)*: This abstract method must be implemented by all subclasses. It defines the state changes that occur when an internal event is triggered after the elapse of the time advance.
+
+- *External Transition (=deltext=)*: This abstract method handles state changes in response to external events. It takes the elapsed time (=e=) since the last transition as an argument, allowing the model to update its state based on external inputs.
+
+- *Output Function (=lambdaf=)*: Another abstract method that specifies the output of the model just before an internal transition occurs. This function is crucial for sending outputs to other models in a coupled model configuration.
+
+- *Confluent Transition (=deltcon=)*: By default, this method handles the simultaneous occurrence of internal and external events. It first processes the internal transition and then the external transition with zero elapsed time.
+
+- *State Management Methods*: The methods =hold_in=, =activate=, =passivate=, and =continuef= are utility functions to manage the model's state and timing:
+  - =hold_in=: Sets the model's phase and schedules the next internal transition.
+  - =activate=: Immediately triggers an internal transition by setting =sigma= to zero.
+  - =passivate=: Puts the model into a passive state with an infinite wait time.
+  - =continuef=: Adjusts the time advance by reducing it by the elapsed time =e=, useful for resuming after a paused state.
+
+*** TODO Ports
+
+To be continued here ...
+
+*** Implementing an atomic model
+
+To implement an atomic model in xDEVS, you need to subclass the =Atomic= class and provide concrete implementations for the =deltint=, =deltext=, and =lambdaf= methods. Each method should define how the model reacts to different types of events and manages its state transitions effectively.
+
+Here is a simple example of an atomic model that increments a counter:
+
+#+begin_src python
+class CounterModel(Atomic):
+    def __init__(self, name=None):
+        super().__init__(name)
+        self.count = 0
+        self.hold_in("active", 1)  # Active for 1 time unit
+
+    def deltint(self):
+        self.count += 1
+        self.hold_in("active", 1)  # Schedule next increment
+
+    def deltext(self, e):
+        self.continuef(e)  # Continue countdown
+
+    def lambdaf(self):
+        pass # No output
+
+    def __str__(self):
+        return f"CounterModel(name={self.name}, count={self.count})"
+#+end_src
+
+This model demonstrates basic internal and external transitions. It continuously counts upwards.
+
+** Coupled models
+
+** Models configuration

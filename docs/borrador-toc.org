@@ -9,9 +9,12 @@
    - Time Advance Functions
 
 3. *Getting Started with xDEVS*
-   - First Model: Hello World
-   - Running Simulations
-   - Analyzing Output
+   - First Model: Ping Pong
+   - Output function
+   - Internal Transition Function
+   - External transition function
+   - Complete model implementation
+   - Running the model
 
 4. *Building Models in xDEVS*
    - Atomic Models

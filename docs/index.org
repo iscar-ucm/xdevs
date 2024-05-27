@@ -17,3 +17,8 @@
 * Getting started with xDEVS
 
 #+INCLUDE: 3-getting-started.org :lines "2-"
+
+* Building models in xDEVS
+
+#+INCLUDE: 4-building-models.org :lines "2-"
+
