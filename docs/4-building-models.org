@@ -26,10 +26,6 @@ The =Atomic= class, derived from the =Component= class and marked as an abstract
   - =passivate=: Puts the model into a passive state with an infinite wait time.
   - =continuef=: Adjusts the time advance by reducing it by the elapsed time =e=, useful for resuming after a paused state.
 
-*** TODO Ports
-
-To be continued here ...
-
 *** Implementing an atomic model
 
 To implement an atomic model in xDEVS, you need to subclass the =Atomic= class and provide concrete implementations for the =deltint=, =deltext=, and =lambdaf= methods. Each method should define how the model reacts to different types of events and manages its state transitions effectively.
@@ -59,6 +55,327 @@ class CounterModel(Atomic):
 
 This model demonstrates basic internal and external transitions. It continuously counts upwards.
 
+*** Ports
+
+In xDEVS, ports are essential for enabling communication between atomic models and facilitating the flow of events in a coupled model configuration. Ports are used to send and receive messages, allowing models to interact with each other.
+
+- /Input Ports/: These ports receive messages from other models. Each input port is associated with a specific type of message it can accept. When an external event occurs, the message is placed in the corresponding input port, and the =deltext= method is invoked to handle the event.
+
+- /Output Ports/: These ports send messages to other models. Before an internal transition occurs, the =lambdaf= method generates the output, which is then placed in the appropriate output port. The coupled model configuration ensures that these messages are routed to the correct input ports of other models.
+
+To define ports in an atomic model, you need to create instances of the =Port= class and add them to the model using the =add_in_port= and =add_out_port= methods. Here is an example demonstrating the use of ports in atomic models:
+
+#+begin_src python
+class Generator(Atomic):
+    def __init__(self, name, period):
+        super().__init__(name)
+        self.i_stop = Port(Job, "i_stop")
+        self.o_out = Port(Job, "o_out")
+        
+        self.add_in_port(self.i_stop)
+        self.add_out_port(self.o_out)
+        
+        self.period = period
+        self.job_counter = 1
+        
+    def initialize(self):
+        self.hold_in(PHASE_ACTIVE, self.period)
+        
+    def deltint(self):
+        self.job_counter += 1
+        self.hold_in(PHASE_ACTIVE, self.period)
+        
+    def deltext(self, e):
+        self.passivate()
+    
+    def lambdaf(self):
+        self.o_out.add(Job(str(self.job_counter)))
+
+class Processor(Atomic):
+    def __init__(self, name, proc_time):
+        super().__init__(name)
+        
+        self.i_in = Port(Job, "i_in")
+        self.o_out = Port(Job, "o_out")
+        
+        self.add_in_port(self.i_in)
+        self.add_out_port(self.o_out)
+
+        self.current_job = None
+        self.proc_time = proc_time
+        
+    def initialize(self):
+        self.passivate()
+        
+    def deltint(self):
+        self.passivate()
+    
+    def deltext(self, e):
+        if self.phase == PHASE_PASSIVE:
+            self.current_job = self.i_in.get()
+            self.hold_in(PHASE_ACTIVE, self.proc_time)
+        self.continuef(e)
+    
+    def lambdaf(self):
+        self.o_out.add(self.current_job)
+#+end_src
+
+In this example, the =Generator= model has input ports =i_start= and =i_stop= and an output port =o_out=. The =Processor= model has an input port =i_in= and an output port =o_out=. These ports facilitate the communication between the =Generator= and =Processor= models, allowing them to exchange =Job= messages.
+
+By defining and using ports, you can create complex coupled models where multiple atomic models interact seamlessly, enabling sophisticated simulations of system behaviors.
+
 ** Coupled models
 
+In xDEVS, coupled models are composite models that consist of multiple atomic and/or other coupled models. They define the structure and interaction of these submodels, enabling the construction of complex systems by combining simpler components. Coupled models manage the routing of messages between their submodels and handle the overall coordination of events.
+
+*** Structure of a coupled model
+
+The =Coupled= class, derived from the =Component= class, serves as the base class for all coupled models in xDEVS. Here are the key components and functionalities of a coupled model:
+
+- /Submodels/: A coupled model contains a collection of submodels, which can be either atomic models or other coupled models. These submodels are added to the coupled model using the =add_component= method.
+
+- /Ports/: Similar to atomic models, coupled models have input and output ports. These ports are used to receive external messages and send messages to other models outside the coupled model.
+
+- /Couplings/: Couplings define the connections between the ports of submodels and the ports of the coupled model. There are three types of couplings:
+  - /Internal Couplings/: Connect the output ports of one submodel to the input ports of another submodel within the same coupled model.
+  - /External Input Couplings (EIC)*: Connect the input ports of the coupled model to the input ports of its submodels.
+  - /External Output Couplings (EOC)*: Connect the output ports of the submodels to the output ports of the coupled model.
+
+- /Routing/: The coupled model is responsible for routing messages according to the defined couplings. When a message arrives at an input port, it is routed to the appropriate submodel(s) based on the EIC. Similarly, when a submodel generates an output, it is routed to other submodels or the coupled model's output ports based on the internal couplings and EOC.
+
+*** Implementing a coupled model
+
+To implement a coupled model in xDEVS, you need to subclass the =Coupled= class and define its submodels and couplings. Here is an example of a simple coupled model that combines a =Generator= and a =Processor=:
+
+#+begin_src python
+class BasicCoupledModel(Coupled):
+    def __init__(self, name):
+        super().__init__(name)
+        
+        # Define ports
+        self.i_in = Port(Job, "i_in")
+        self.o_out = Port(Job, "o_out")        
+        self.add_in_port(self.i_in)
+        self.add_out_port(self.o_out)
+
+        # Create submodels
+        self.generator = Generator("Generator", period=5)
+        self.processor = Processor("Processor", proc_time=3)
+        
+        # Add submodels to the coupled model
+        self.add_component(self.generator)
+        self.add_component(self.processor)
+        
+        # Define couplings
+        self.add_coupling(self.generator.o_out, self.processor.i_in)  # Internal coupling
+        self.add_coupling(self.processor.o_out, self.o_out)           # External output coupling
+        self.add_coupling(self.i_in, self.generator.i_stop)           # External input coupling
+
+#+end_src
+
+In this example, the =BasicCoupledModel= class defines a coupled model that includes a =Generator= and a =Processor= as submodels. The couplings are set up to route messages from the generator to the processor and from the processor to the coupled model's output port. Additionally, an external input coupling is defined to allow external messages to stop the generator.
+
+By defining submodels and their couplings, you can create complex systems that simulate the interactions and behaviors of multiple components working together. Coupled models provide a powerful way to build hierarchical and modular simulations in xDEVS.
+
 ** Models configuration
+
+In this section, we will configure and run a simulation using the xDEVS framework. The provided source code defines several atomic models (Generator, Processor, and Transducer) and a coupled model (Gpt) that combines these atomic models. We will walk through the configuration and execution of the simulation.
+
+1. *Importing Required Modules*:
+   The necessary modules and classes are imported, including logging, xDEVS components, and the simulation coordinator.
+
+2. *Defining the Job Class*:
+   The =Job= class represents a job with a name and a timestamp.
+
+3. *Defining Atomic Models*:
+   - *Generator*: Generates jobs at a specified period and sends them to the processor and transducer.
+   - *Processor*: Processes incoming jobs for a specified processing time.
+   - *Transducer*: Observes the system, collects statistics, and logs performance metrics.
+
+4. *Defining the Coupled Model*:
+   The =Gpt= class is a coupled model that integrates the Generator, Processor, and Transducer models. It sets up the internal and external couplings to route messages between these submodels.
+
+5. *Running the Simulation*:
+   The main block of the code creates an instance of the =Gpt= coupled model, initializes the simulation coordinator, and runs the simulation.
+
+Here is the complete source code for configuring and running the simulation:
+
+#+begin_src python
+import logging
+
+from xdevs import PHASE_ACTIVE, PHASE_PASSIVE, get_logger
+from xdevs.models import Atomic, Coupled, Port
+from xdevs.sim import Coordinator
+
+logger = get_logger(__name__, logging.DEBUG)
+
+PHASE_DONE = "done"
+
+class Job:
+    def __init__(self, name):
+        self.name = name
+        self.time = 0
+
+class Generator(Atomic):
+    def __init__(self, name, period):
+        super().__init__(name)
+        self.i_stop = Port(Job, "i_stop")
+        self.o_out = Port(Job, "o_out")
+        
+        self.add_in_port(self.i_stop)
+        self.add_out_port(self.o_out)
+        
+        self.period = period
+        self.job_counter = 1
+        
+    def initialize(self):
+        self.hold_in(PHASE_ACTIVE, self.period)
+        
+    def exit(self):
+        pass
+        
+    def deltint(self):
+        self.job_counter += 1
+        self.hold_in(PHASE_ACTIVE, self.period)
+        
+    def deltext(self, e):
+        self.passivate()
+    
+    def lambdaf(self):
+        self.o_out.add(Job(str(self.job_counter)))
+
+class Processor(Atomic):
+    def __init__(self, name, proc_time):
+        super().__init__(name)
+        
+        self.i_in = Port(Job, "i_in")
+        self.o_out = Port(Job, "o_out")
+        
+        self.add_in_port(self.i_in)
+        self.add_out_port(self.o_out)
+
+        self.current_job = None
+        self.proc_time = proc_time
+        
+    def initialize(self):
+        self.passivate()
+        
+    def exit(self):
+        pass
+        
+    def deltint(self):
+        self.passivate()
+    
+    def deltext(self, e):
+        if self.phase == PHASE_PASSIVE:
+            self.current_job = self.i_in.get()
+            self.hold_in(PHASE_ACTIVE, self.proc_time)
+        self.continuef(e)
+    
+    def lambdaf(self):
+        self.o_out.add(self.current_job)
+
+class Transducer(Atomic):
+    def __init__(self, name, obs_time):
+        super().__init__(name)
+        
+        self.i_arrived = Port(Job, "i_arrived")
+        self.i_solved = Port(Job, "i_solved")
+        self.o_out = Port(Job, "o_out")
+        
+        self.add_in_port(self.i_arrived)
+        self.add_in_port(self.i_solved)
+        self.add_out_port(self.o_out)
+        
+        self.jobs_arrived = []
+        self.jobs_solved = []
+        
+        self.total_ta = 0
+        self.clock = 0
+        self.obs_time = obs_time
+        
+    def initialize(self):
+        self.hold_in(PHASE_ACTIVE, self.obs_time)
+        
+    def exit(self):
+        pass
+        
+    def deltint(self):
+        self.clock += self.sigma
+        
+        if self.phase == PHASE_ACTIVE:
+            if self.jobs_solved:
+                avg_ta = self.total_ta / len(self.jobs_solved)
+                throughput = len(self.jobs_solved) / self.clock if self.clock > 0 else 0
+            else:
+                avg_ta = 0
+                throughput = 0
+                
+            logger.info("End time: %f" % self.clock)
+            logger.info("Jobs arrived: %d" % len(self.jobs_arrived))
+            logger.info("Jobs solved: %d" % len(self.jobs_solved))
+            logger.info("Average TA: %f" % avg_ta)
+            logger.info("Throughput: %f\n" % throughput)
+            
+            self.hold_in(PHASE_DONE, 0)
+        else:
+            self.passivate()
+            
+    def deltext(self, e):
+        self.clock += e
+        
+        if self.phase == PHASE_ACTIVE:
+            if self.i_arrived:
+                job = self.i_arrived.get()
+                logger.info("Starting job %s @ t = %d" % (job.name, self.clock))
+                job.time = self.clock
+                self.jobs_arrived.append(job)
+                
+            if self.i_solved:
+                job = self.i_solved.get()
+                logger.info("Job %s finished @ t = %d" % (job.name, self.clock))
+                self.total_ta += self.clock - job.time
+                self.jobs_solved.append(job)
+
+        self.continuef(e)
+    
+    def lambdaf(self):
+        if self.phase == PHASE_DONE:
+            self.o_out.add(Job("null"))
+
+class Gpt(Coupled):
+    def __init__(self, name, period, obs_time):
+        super().__init__(name)
+
+        if period < 1:
+            raise ValueError("period has to be greater than 0")
+
+        if obs_time < 0:
+            raise ValueError("obs_time has to be greater or equal than 0")
+
+        gen = Generator("generator", period)
+        proc = Processor("processor", 3*period)
+        trans = Transducer("transducer", obs_time)
+
+        self.add_component(gen)
+        self.add_component(proc)
+        self.add_component(trans)
+
+        self.add_coupling(gen.o_out, proc.i_in)
+        self.add_coupling(gen.o_out, trans.i_arrived)
+        self.add_coupling(proc.o_out, trans.i_solved)
+        self.add_coupling(trans.o_out, gen.i_stop)
+
+if __name__ == '__main__':
+    gpt = Gpt("gpt", 1, 100)
+    coord = Coordinator(gpt)
+    coord.initialize()
+    coord.simulate()
+#+end_src
+
+In this configuration:
+- The =Generator= model generates jobs at a specified period and sends them to the =Processor= and =Transducer=.
+- The =Processor= model processes the jobs for a specified processing time.
+- The =Transducer= model observes the system, collects statistics, and logs performance metrics.
+- The =Gpt= coupled model integrates these atomic models and sets up the necessary couplings to route messages between them.
+- The simulation is run by creating an instance of the =Gpt= model, initializing the coordinator, and calling the =simulate= method.

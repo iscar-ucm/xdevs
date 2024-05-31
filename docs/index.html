@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-05-27 lun 11:05 -->
+<!-- 2024-05-31 vie 12:09 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>xDEVS user's manual</title>
@@ -92,45 +92,45 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb7a203b">Introduction to xDEVS</a>
+<li><a href="#org65750af">Introduction to xDEVS</a>
 <ul>
-<li><a href="#org8f6b1fe">Introduction</a></li>
-<li><a href="#orgbbcb518">Top features</a></li>
-<li><a href="#org2306f6a">Quick start</a></li>
+<li><a href="#org99bfaa8">Introduction</a></li>
+<li><a href="#orged8bdec">Top features</a></li>
+<li><a href="#orge9a54e7">Quick start</a></li>
 </ul>
 </li>
-<li><a href="#org3da6aff">The DEVS formalism</a>
+<li><a href="#orgff138aa">The DEVS formalism</a>
 <ul>
-<li><a href="#org2e57542">Bibliography</a></li>
+<li><a href="#orgd9be9a9">Bibliography</a></li>
 </ul>
 </li>
-<li><a href="#org511b2bc">Getting started with xDEVS</a>
+<li><a href="#orge7652da">Getting started with xDEVS</a>
 <ul>
-<li><a href="#orga38422f">Output Function</a></li>
-<li><a href="#org8ed8b45">Internal Transition Function</a></li>
-<li><a href="#org97d3e39">External Transition Function</a></li>
-<li><a href="#org509d838">Complete model implementation</a></li>
-<li><a href="#orgb73db72">Running the model</a></li>
+<li><a href="#orgceb1795">Output Function</a></li>
+<li><a href="#org7f02af6">Internal Transition Function</a></li>
+<li><a href="#org1197072">External Transition Function</a></li>
+<li><a href="#org8a08d8a">Complete model implementation</a></li>
+<li><a href="#org1465cbd">Running the model</a></li>
 </ul>
 </li>
-<li><a href="#orgf96adde">Building models in xDEVS</a>
+<li><a href="#org7c55f93">Building models in xDEVS</a>
 <ul>
-<li><a href="#org3f31d2f">Atomic models</a></li>
-<li><a href="#orgefcf58a">Coupled models</a></li>
-<li><a href="#orgbe7c7ca">Models configuration</a></li>
+<li><a href="#org6ced4fb">Atomic models</a></li>
+<li><a href="#org7d650f4">Coupled models</a></li>
+<li><a href="#orgb612d79">Models configuration</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgb7a203b" class="outline-2">
-<h2 id="orgb7a203b">Introduction to xDEVS</h2>
-<div class="outline-text-2" id="text-orgb7a203b">
+<div id="outline-container-org65750af" class="outline-2">
+<h2 id="org65750af">Introduction to xDEVS</h2>
+<div class="outline-text-2" id="text-org65750af">
 </div>
-<div id="outline-container-org8f6b1fe" class="outline-3">
-<h3 id="org8f6b1fe">Introduction</h3>
-<div class="outline-text-3" id="text-org8f6b1fe">
+<div id="outline-container-org99bfaa8" class="outline-3">
+<h3 id="org99bfaa8">Introduction</h3>
+<div class="outline-text-3" id="text-org99bfaa8">
 <p>
 xDEVS stands for <i>A cross-platform (x) Discrete EVent System simulator</i>. This library includes a set of C, C++, C#, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism <i>Discrete Event System Specification (DEVS)</i>. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
 </p>
@@ -168,9 +168,9 @@ The xDEVS user's manual can be found <a href="https://iscar-ucm.github.io/xdevs/
 </div>
 </div>
 
-<div id="outline-container-orgbbcb518" class="outline-3">
-<h3 id="orgbbcb518">Top features</h3>
-<div class="outline-text-3" id="text-orgbbcb518">
+<div id="outline-container-orged8bdec" class="outline-3">
+<h3 id="orged8bdec">Top features</h3>
+<div class="outline-text-3" id="text-orged8bdec">
 <ul class="org-ul">
 <li>PDEVS Modeling and Simulation formalism</li>
 <li>Object-Oriented Programming</li>
@@ -180,9 +180,9 @@ The xDEVS user's manual can be found <a href="https://iscar-ucm.github.io/xdevs/
 </div>
 </div>
 
-<div id="outline-container-org2306f6a" class="outline-3">
-<h3 id="org2306f6a">Quick start</h3>
-<div class="outline-text-3" id="text-org2306f6a">
+<div id="outline-container-orge9a54e7" class="outline-3">
+<h3 id="orge9a54e7">Quick start</h3>
+<div class="outline-text-3" id="text-orge9a54e7">
 <p>
 Switch to the corresponding particular language. A README file will be found to start with minimal examples and demos.
 </p>
@@ -190,9 +190,9 @@ Switch to the corresponding particular language. A README file will be found to 
 </div>
 </div>
 
-<div id="outline-container-org3da6aff" class="outline-2">
-<h2 id="org3da6aff">The DEVS formalism</h2>
-<div class="outline-text-2" id="text-org3da6aff">
+<div id="outline-container-orgff138aa" class="outline-2">
+<h2 id="orgff138aa">The DEVS formalism</h2>
+<div class="outline-text-2" id="text-orgff138aa">
 <p>
 The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
 </p>
@@ -244,9 +244,9 @@ The reader should refer to the book Theory of Modeling and Simulation [1], to un
 </p>
 </div>
 
-<div id="outline-container-orge58e15a" class="outline-4">
-<h4 id="orge58e15a">The parallel DEVS formalism</h4>
-<div class="outline-text-4" id="text-orge58e15a">
+<div id="outline-container-orga89397d" class="outline-4">
+<h4 id="orga89397d">The parallel DEVS formalism</h4>
+<div class="outline-text-4" id="text-orga89397d">
 <p>
 The parallel DEVS approach was introduced, after 15 years, as a revision of Classic DEVS. Currently, parallel DEVS is the prevalent DEVS, implemented in many libraries. In the following, unless it is explicitly noted, the use of DEVS implies parallel DEVS.
 </p>
@@ -306,9 +306,9 @@ Given the recursive definition of <b>M</b>, a coupled model can itself be a part
 
 
 
-<div id="outline-container-org1a546c9" class="outline-5">
-<h5 id="org1a546c9">EXAMPLE 1</h5>
-<div class="outline-text-5" id="text-org1a546c9">
+<div id="outline-container-orgcc910ad" class="outline-5">
+<h5 id="orgcc910ad">EXAMPLE 1</h5>
+<div class="outline-text-5" id="text-orgcc910ad">
 <p>
 A processor atomic model consumes a job j. When the processor receives a job through an input port, thus the processor remains busy until the processing time j<sub>p</sub> is finished. Then it sends the job through an output port.
 </p>
@@ -334,9 +334,9 @@ Processor=〈X,S,Y,δ<sub>int</sub>,δ<sub>ext</sub>,δ<sub>con</sub>,λ,ta〉
 </div>
 </div>
 
-<div id="outline-container-orga446222" class="outline-5">
-<h5 id="orga446222">EXAMPLE 2</h5>
-<div class="outline-text-5" id="text-orga446222">
+<div id="outline-container-org36e4036" class="outline-5">
+<h5 id="org36e4036">EXAMPLE 2</h5>
+<div class="outline-text-5" id="text-org36e4036">
 <p>
 Figure 2 shows an example of a DEVS coupled model with three components, M1, M2 y M3, as well as their couplings. These models are interconnected through the corresponding I/O ports presented in the Figure. The models are connected to the external coupled models through the EIC and EOC connectors. M1, M2 and M3 can be atomic or coupled models.
 </p>
@@ -369,9 +369,9 @@ where:
 </div>
 </div>
 
-<div id="outline-container-org020bfce" class="outline-5">
-<h5 id="org020bfce">EXAMPLE 3</h5>
-<div class="outline-text-5" id="text-org020bfce">
+<div id="outline-container-orgb613318" class="outline-5">
+<h5 id="orgb613318">EXAMPLE 3</h5>
+<div class="outline-text-5" id="text-orgb613318">
 <p>
 The Experimental frame – Processor model is usually presented as one of the initial examples to start to practice with DEVS modeling and simulation. It is a DEVS coupled model consisting of three atomic models and one coupled model (see Figure 3).
 </p>
@@ -471,9 +471,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-org2e57542" class="outline-3">
-<h3 id="org2e57542">Bibliography</h3>
-<div class="outline-text-3" id="text-org2e57542">
+<div id="outline-container-orgd9be9a9" class="outline-3">
+<h3 id="orgd9be9a9">Bibliography</h3>
+<div class="outline-text-3" id="text-orgd9be9a9">
 <ol class="org-ol">
 <li>Zeigler, B. P.; Muzy, A. &amp; Kofman, E. Theory of modeling and simulation: discrete event &amp; iterative system computational foundations Academic press, 2018.</li>
 <li>Mittal, S. &amp; Risco-Martín, J. L. Netcentric system of systems engineering with DEVS unified process CRC Press, 2013.</li>
@@ -483,9 +483,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-org511b2bc" class="outline-2">
-<h2 id="org511b2bc">Getting started with xDEVS</h2>
-<div class="outline-text-2" id="text-org511b2bc">
+<div id="outline-container-orge7652da" class="outline-2">
+<h2 id="orge7652da">Getting started with xDEVS</h2>
+<div class="outline-text-2" id="text-orge7652da">
 <p>
 In this section, we introduce the basics of xDEVS by developing a simple Ping Pong model. This model is inspired by the DEVS formalism as described on Wikipedia: <a href="https://en.wikipedia.org/wiki/DEVS">https://en.wikipedia.org/wiki/DEVS</a>
 </p>
@@ -501,9 +501,9 @@ The Ping Pong model simulates two players hitting a ball back and forth. We will
 </p>
 </div>
 
-<div id="outline-container-orga38422f" class="outline-3">
-<h3 id="orga38422f">Output Function</h3>
-<div class="outline-text-3" id="text-orga38422f">
+<div id="outline-container-orgceb1795" class="outline-3">
+<h3 id="orgceb1795">Output Function</h3>
+<div class="outline-text-3" id="text-orgceb1795">
 <p>
 The output function \(\lambda\) determines the output based on the current state:
 </p>
@@ -537,9 +537,9 @@ This is implemented in Python as follows:
 </div>
 </div>
 
-<div id="outline-container-org8ed8b45" class="outline-3">
-<h3 id="org8ed8b45">Internal Transition Function</h3>
-<div class="outline-text-3" id="text-org8ed8b45">
+<div id="outline-container-org7f02af6" class="outline-3">
+<h3 id="org7f02af6">Internal Transition Function</h3>
+<div class="outline-text-3" id="text-org7f02af6">
 <p>
 The internal transition function \(\delta_{int}\) updates the state based on the elapsed time:
 </p>
@@ -578,9 +578,9 @@ Implemented in Python:
 </div>
 </div>
 
-<div id="outline-container-org97d3e39" class="outline-3">
-<h3 id="org97d3e39">External Transition Function</h3>
-<div class="outline-text-3" id="text-org97d3e39">
+<div id="outline-container-org1197072" class="outline-3">
+<h3 id="org1197072">External Transition Function</h3>
+<div class="outline-text-3" id="text-org1197072">
 <p>
 The external transition function \(\delta_{ext}\) modifies the state in response to external events:
 </p>
@@ -613,9 +613,9 @@ Python implementation:
 </div>
 </div>
 
-<div id="outline-container-org509d838" class="outline-3">
-<h3 id="org509d838">Complete model implementation</h3>
-<div class="outline-text-3" id="text-org509d838">
+<div id="outline-container-org8a08d8a" class="outline-3">
+<h3 id="org8a08d8a">Complete model implementation</h3>
+<div class="outline-text-3" id="text-org8a08d8a">
 <p>
 The complete Python implementation of the Ping Pong model using xDEVS is as follows:
 </p>
@@ -686,9 +686,9 @@ PHASE_WAIT:<span style="color: #f08080;">str</span> = <span style="color: #deb88
 </div>
 </div>
 
-<div id="outline-container-orgb73db72" class="outline-3">
-<h3 id="orgb73db72">Running the model</h3>
-<div class="outline-text-3" id="text-orgb73db72">
+<div id="outline-container-org1465cbd" class="outline-3">
+<h3 id="org1465cbd">Running the model</h3>
+<div class="outline-text-3" id="text-org1465cbd">
 <p>
 To run the model, follow these steps on Ubuntu 22.04:
 </p>
@@ -710,21 +710,21 @@ Player B receives the ball
 </div>
 </div>
 
-<div id="outline-container-orgf96adde" class="outline-2">
-<h2 id="orgf96adde">Building models in xDEVS</h2>
-<div class="outline-text-2" id="text-orgf96adde">
+<div id="outline-container-org7c55f93" class="outline-2">
+<h2 id="org7c55f93">Building models in xDEVS</h2>
+<div class="outline-text-2" id="text-org7c55f93">
 </div>
-<div id="outline-container-org3f31d2f" class="outline-3">
-<h3 id="org3f31d2f">Atomic models</h3>
-<div class="outline-text-3" id="text-org3f31d2f">
+<div id="outline-container-org6ced4fb" class="outline-3">
+<h3 id="org6ced4fb">Atomic models</h3>
+<div class="outline-text-3" id="text-org6ced4fb">
 <p>
 In xDEVS, atomic models are the fundamental building blocks for constructing simulation models. An atomic model in xDEVS encapsulates the behavior of a system component that cannot be further decomposed into smaller components. It defines the state changes and interactions of the component in response to internal and external events.
 </p>
 </div>
 
-<div id="outline-container-org77b730f" class="outline-4">
-<h4 id="org77b730f">Structure of an atomic model</h4>
-<div class="outline-text-4" id="text-org77b730f">
+<div id="outline-container-orga81c5f3" class="outline-4">
+<h4 id="orga81c5f3">Structure of an atomic model</h4>
+<div class="outline-text-4" id="text-orga81c5f3">
 <p>
 The <code>Atomic</code> class, derived from the <code>Component</code> class and marked as an abstract base class, serves as the base class for all atomic models in xDEVS. Here's a breakdown of its key components and functionalities:
 </p>
@@ -753,18 +753,9 @@ The <code>Atomic</code> class, derived from the <code>Component</code> class and
 </div>
 </div>
 
-<div id="outline-container-orgb8320f4" class="outline-4">
-<h4 id="orgb8320f4"><span class="todo TODO">TODO</span> Ports</h4>
-<div class="outline-text-4" id="text-orgb8320f4">
-<p>
-To be continued here &#x2026;
-</p>
-</div>
-</div>
-
-<div id="outline-container-org3bab875" class="outline-4">
-<h4 id="org3bab875">Implementing an atomic model</h4>
-<div class="outline-text-4" id="text-org3bab875">
+<div id="outline-container-org2ef1e6c" class="outline-4">
+<h4 id="org2ef1e6c">Implementing an atomic model</h4>
+<div class="outline-text-4" id="text-org2ef1e6c">
 <p>
 To implement an atomic model in xDEVS, you need to subclass the <code>Atomic</code> class and provide concrete implementations for the <code>deltint</code>, <code>deltext</code>, and <code>lambdaf</code> methods. Each method should define how the model reacts to different types of events and manages its state transitions effectively.
 </p>
@@ -800,20 +791,391 @@ This model demonstrates basic internal and external transitions. It continuously
 </p>
 </div>
 </div>
+
+<div id="outline-container-orga6c905e" class="outline-4">
+<h4 id="orga6c905e">Ports</h4>
+<div class="outline-text-4" id="text-orga6c905e">
+<p>
+In xDEVS, ports are essential for enabling communication between atomic models and facilitating the flow of events in a coupled model configuration. Ports are used to send and receive messages, allowing models to interact with each other.
+</p>
+
+<ul class="org-ul">
+<li><i>Input Ports</i>: These ports receive messages from other models. Each input port is associated with a specific type of message it can accept. When an external event occurs, the message is placed in the corresponding input port, and the <code>deltext</code> method is invoked to handle the event.</li>
+
+<li><i>Output Ports</i>: These ports send messages to other models. Before an internal transition occurs, the <code>lambdaf</code> method generates the output, which is then placed in the appropriate output port. The coupled model configuration ensures that these messages are routed to the correct input ports of other models.</li>
+</ul>
+
+<p>
+To define ports in an atomic model, you need to create instances of the <code>Port</code> class and add them to the model using the <code>add_in_port</code> and <code>add_out_port</code> methods. Here is an example demonstrating the use of ports in atomic models:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Generator</span>(Atomic):
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>, name, period):
+        <span style="color: #f08080;">super</span>().__init__(name)
+        <span style="color: #00bfff;">self</span>.i_stop = Port(Job, <span style="color: #deb887;">"i_stop"</span>)
+        <span style="color: #00bfff;">self</span>.o_out = Port(Job, <span style="color: #deb887;">"o_out"</span>)
+        
+        <span style="color: #00bfff;">self</span>.add_in_port(<span style="color: #00bfff;">self</span>.i_stop)
+        <span style="color: #00bfff;">self</span>.add_out_port(<span style="color: #00bfff;">self</span>.o_out)
+        
+        <span style="color: #00bfff;">self</span>.period = period
+        <span style="color: #00bfff;">self</span>.job_counter = 1
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">initialize</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.hold_in(PHASE_ACTIVE, <span style="color: #00bfff;">self</span>.period)
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltint</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.job_counter += 1
+        <span style="color: #00bfff;">self</span>.hold_in(PHASE_ACTIVE, <span style="color: #00bfff;">self</span>.period)
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltext</span>(<span style="color: #00bfff;">self</span>, e):
+        <span style="color: #00bfff;">self</span>.passivate()
+    
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">lambdaf</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.o_out.add(Job(<span style="color: #f08080;">str</span>(<span style="color: #00bfff;">self</span>.job_counter)))
+
+<span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Processor</span>(Atomic):
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>, name, proc_time):
+        <span style="color: #f08080;">super</span>().__init__(name)
+        
+        <span style="color: #00bfff;">self</span>.i_in = Port(Job, <span style="color: #deb887;">"i_in"</span>)
+        <span style="color: #00bfff;">self</span>.o_out = Port(Job, <span style="color: #deb887;">"o_out"</span>)
+        
+        <span style="color: #00bfff;">self</span>.add_in_port(<span style="color: #00bfff;">self</span>.i_in)
+        <span style="color: #00bfff;">self</span>.add_out_port(<span style="color: #00bfff;">self</span>.o_out)
+
+        <span style="color: #00bfff;">self</span>.current_job = <span style="color: #a2cd5a;">None</span>
+        <span style="color: #00bfff;">self</span>.proc_time = proc_time
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">initialize</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.passivate()
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltint</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.passivate()
+    
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltext</span>(<span style="color: #00bfff;">self</span>, e):
+        <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.phase == PHASE_PASSIVE:
+            <span style="color: #00bfff;">self</span>.current_job = <span style="color: #00bfff;">self</span>.i_in.get()
+            <span style="color: #00bfff;">self</span>.hold_in(PHASE_ACTIVE, <span style="color: #00bfff;">self</span>.proc_time)
+        <span style="color: #00bfff;">self</span>.continuef(e)
+    
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">lambdaf</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.o_out.add(<span style="color: #00bfff;">self</span>.current_job)
+</pre>
 </div>
 
-<div id="outline-container-orgefcf58a" class="outline-3">
-<h3 id="orgefcf58a">Coupled models</h3>
+<p>
+In this example, the <code>Generator</code> model has input ports <code>i_start</code> and <code>i_stop</code> and an output port <code>o_out</code>. The <code>Processor</code> model has an input port <code>i_in</code> and an output port <code>o_out</code>. These ports facilitate the communication between the <code>Generator</code> and <code>Processor</code> models, allowing them to exchange <code>Job</code> messages.
+</p>
+
+<p>
+By defining and using ports, you can create complex coupled models where multiple atomic models interact seamlessly, enabling sophisticated simulations of system behaviors.
+</p>
+</div>
+</div>
 </div>
 
-<div id="outline-container-orgbe7c7ca" class="outline-3">
-<h3 id="orgbe7c7ca">Models configuration</h3>
+<div id="outline-container-org7d650f4" class="outline-3">
+<h3 id="org7d650f4">Coupled models</h3>
+<div class="outline-text-3" id="text-org7d650f4">
+<p>
+In xDEVS, coupled models are composite models that consist of multiple atomic and/or other coupled models. They define the structure and interaction of these submodels, enabling the construction of complex systems by combining simpler components. Coupled models manage the routing of messages between their submodels and handle the overall coordination of events.
+</p>
+</div>
+
+<div id="outline-container-org62efe6c" class="outline-4">
+<h4 id="org62efe6c">Structure of a coupled model</h4>
+<div class="outline-text-4" id="text-org62efe6c">
+<p>
+The <code>Coupled</code> class, derived from the <code>Component</code> class, serves as the base class for all coupled models in xDEVS. Here are the key components and functionalities of a coupled model:
+</p>
+
+<ul class="org-ul">
+<li><i>Submodels</i>: A coupled model contains a collection of submodels, which can be either atomic models or other coupled models. These submodels are added to the coupled model using the <code>add_component</code> method.</li>
+
+<li><i>Ports</i>: Similar to atomic models, coupled models have input and output ports. These ports are used to receive external messages and send messages to other models outside the coupled model.</li>
+
+<li><i>Couplings</i>: Couplings define the connections between the ports of submodels and the ports of the coupled model. There are three types of couplings:
+<ul class="org-ul">
+<li><i>Internal Couplings</i>: Connect the output ports of one submodel to the input ports of another submodel within the same coupled model.</li>
+<li>/External Input Couplings (EIC)*: Connect the input ports of the coupled model to the input ports of its submodels.</li>
+<li>/External Output Couplings (EOC)*: Connect the output ports of the submodels to the output ports of the coupled model.</li>
+</ul></li>
+
+<li><i>Routing</i>: The coupled model is responsible for routing messages according to the defined couplings. When a message arrives at an input port, it is routed to the appropriate submodel(s) based on the EIC. Similarly, when a submodel generates an output, it is routed to other submodels or the coupled model's output ports based on the internal couplings and EOC.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org47205fb" class="outline-4">
+<h4 id="org47205fb">Implementing a coupled model</h4>
+<div class="outline-text-4" id="text-org47205fb">
+<p>
+To implement a coupled model in xDEVS, you need to subclass the <code>Coupled</code> class and define its submodels and couplings. Here is an example of a simple coupled model that combines a <code>Generator</code> and a <code>Processor</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">BasicCoupledModel</span>(Coupled):
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>, name):
+        <span style="color: #f08080;">super</span>().__init__(name)
+        
+        <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Define ports</span>
+        <span style="color: #00bfff;">self</span>.i_in = Port(Job, <span style="color: #deb887;">"i_in"</span>)
+        <span style="color: #00bfff;">self</span>.o_out = Port(Job, <span style="color: #deb887;">"o_out"</span>)        
+        <span style="color: #00bfff;">self</span>.add_in_port(<span style="color: #00bfff;">self</span>.i_in)
+        <span style="color: #00bfff;">self</span>.add_out_port(<span style="color: #00bfff;">self</span>.o_out)
+
+        <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Create submodels</span>
+        <span style="color: #00bfff;">self</span>.generator = Generator(<span style="color: #deb887;">"Generator"</span>, period=5)
+        <span style="color: #00bfff;">self</span>.processor = Processor(<span style="color: #deb887;">"Processor"</span>, proc_time=3)
+        
+        <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Add submodels to the coupled model</span>
+        <span style="color: #00bfff;">self</span>.add_component(<span style="color: #00bfff;">self</span>.generator)
+        <span style="color: #00bfff;">self</span>.add_component(<span style="color: #00bfff;">self</span>.processor)
+        
+        <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Define couplings</span>
+        <span style="color: #00bfff;">self</span>.add_coupling(<span style="color: #00bfff;">self</span>.generator.o_out, <span style="color: #00bfff;">self</span>.processor.i_in)  <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">Internal coupling</span>
+        <span style="color: #00bfff;">self</span>.add_coupling(<span style="color: #00bfff;">self</span>.processor.o_out, <span style="color: #00bfff;">self</span>.o_out)           <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">External output coupling</span>
+        <span style="color: #00bfff;">self</span>.add_coupling(<span style="color: #00bfff;">self</span>.i_in, <span style="color: #00bfff;">self</span>.generator.i_stop)           <span style="color: #7f7f7f;"># </span><span style="color: #7f7f7f;">External input coupling</span>
+
+</pre>
+</div>
+
+<p>
+In this example, the <code>BasicCoupledModel</code> class defines a coupled model that includes a <code>Generator</code> and a <code>Processor</code> as submodels. The couplings are set up to route messages from the generator to the processor and from the processor to the coupled model's output port. Additionally, an external input coupling is defined to allow external messages to stop the generator.
+</p>
+
+<p>
+By defining submodels and their couplings, you can create complex systems that simulate the interactions and behaviors of multiple components working together. Coupled models provide a powerful way to build hierarchical and modular simulations in xDEVS.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb612d79" class="outline-3">
+<h3 id="orgb612d79">Models configuration</h3>
+<div class="outline-text-3" id="text-orgb612d79">
+<p>
+In this section, we will configure and run a simulation using the xDEVS framework. The provided source code defines several atomic models (Generator, Processor, and Transducer) and a coupled model (Gpt) that combines these atomic models. We will walk through the configuration and execution of the simulation.
+</p>
+
+<ol class="org-ol">
+<li><b>Importing Required Modules</b>:
+The necessary modules and classes are imported, including logging, xDEVS components, and the simulation coordinator.</li>
+
+<li><b>Defining the Job Class</b>:
+The <code>Job</code> class represents a job with a name and a timestamp.</li>
+
+<li><b>Defining Atomic Models</b>:
+<ul class="org-ul">
+<li><b>Generator</b>: Generates jobs at a specified period and sends them to the processor and transducer.</li>
+<li><b>Processor</b>: Processes incoming jobs for a specified processing time.</li>
+<li><b>Transducer</b>: Observes the system, collects statistics, and logs performance metrics.</li>
+</ul></li>
+
+<li><b>Defining the Coupled Model</b>:
+The <code>Gpt</code> class is a coupled model that integrates the Generator, Processor, and Transducer models. It sets up the internal and external couplings to route messages between these submodels.</li>
+
+<li><b>Running the Simulation</b>:
+The main block of the code creates an instance of the <code>Gpt</code> coupled model, initializes the simulation coordinator, and runs the simulation.</li>
+</ol>
+
+<p>
+Here is the complete source code for configuring and running the simulation:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #00bfff;">import</span> logging
+
+<span style="color: #00bfff;">from</span> xdevs <span style="color: #00bfff;">import</span> PHASE_ACTIVE, PHASE_PASSIVE, get_logger
+<span style="color: #00bfff;">from</span> xdevs.models <span style="color: #00bfff;">import</span> Atomic, Coupled, Port
+<span style="color: #00bfff;">from</span> xdevs.sim <span style="color: #00bfff;">import</span> Coordinator
+
+<span style="color: #4eee94;">logger</span> = get_logger(<span style="color: #f08080;">__name__</span>, logging.DEBUG)
+
+<span style="color: #4eee94;">PHASE_DONE</span> = <span style="color: #deb887;">"done"</span>
+
+<span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Job</span>:
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>, name):
+        <span style="color: #00bfff;">self</span>.name = name
+        <span style="color: #00bfff;">self</span>.time = 0
+
+<span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Generator</span>(Atomic):
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>, name, period):
+        <span style="color: #f08080;">super</span>().__init__(name)
+        <span style="color: #00bfff;">self</span>.i_stop = Port(Job, <span style="color: #deb887;">"i_stop"</span>)
+        <span style="color: #00bfff;">self</span>.o_out = Port(Job, <span style="color: #deb887;">"o_out"</span>)
+        
+        <span style="color: #00bfff;">self</span>.add_in_port(<span style="color: #00bfff;">self</span>.i_stop)
+        <span style="color: #00bfff;">self</span>.add_out_port(<span style="color: #00bfff;">self</span>.o_out)
+        
+        <span style="color: #00bfff;">self</span>.period = period
+        <span style="color: #00bfff;">self</span>.job_counter = 1
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">initialize</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.hold_in(PHASE_ACTIVE, <span style="color: #00bfff;">self</span>.period)
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">exit</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">pass</span>
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltint</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.job_counter += 1
+        <span style="color: #00bfff;">self</span>.hold_in(PHASE_ACTIVE, <span style="color: #00bfff;">self</span>.period)
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltext</span>(<span style="color: #00bfff;">self</span>, e):
+        <span style="color: #00bfff;">self</span>.passivate()
+    
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">lambdaf</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.o_out.add(Job(<span style="color: #f08080;">str</span>(<span style="color: #00bfff;">self</span>.job_counter)))
+
+<span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Processor</span>(Atomic):
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>, name, proc_time):
+        <span style="color: #f08080;">super</span>().__init__(name)
+        
+        <span style="color: #00bfff;">self</span>.i_in = Port(Job, <span style="color: #deb887;">"i_in"</span>)
+        <span style="color: #00bfff;">self</span>.o_out = Port(Job, <span style="color: #deb887;">"o_out"</span>)
+        
+        <span style="color: #00bfff;">self</span>.add_in_port(<span style="color: #00bfff;">self</span>.i_in)
+        <span style="color: #00bfff;">self</span>.add_out_port(<span style="color: #00bfff;">self</span>.o_out)
+
+        <span style="color: #00bfff;">self</span>.current_job = <span style="color: #a2cd5a;">None</span>
+        <span style="color: #00bfff;">self</span>.proc_time = proc_time
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">initialize</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.passivate()
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">exit</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">pass</span>
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltint</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.passivate()
+    
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltext</span>(<span style="color: #00bfff;">self</span>, e):
+        <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.phase == PHASE_PASSIVE:
+            <span style="color: #00bfff;">self</span>.current_job = <span style="color: #00bfff;">self</span>.i_in.get()
+            <span style="color: #00bfff;">self</span>.hold_in(PHASE_ACTIVE, <span style="color: #00bfff;">self</span>.proc_time)
+        <span style="color: #00bfff;">self</span>.continuef(e)
+    
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">lambdaf</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.o_out.add(<span style="color: #00bfff;">self</span>.current_job)
+
+<span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Transducer</span>(Atomic):
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>, name, obs_time):
+        <span style="color: #f08080;">super</span>().__init__(name)
+        
+        <span style="color: #00bfff;">self</span>.i_arrived = Port(Job, <span style="color: #deb887;">"i_arrived"</span>)
+        <span style="color: #00bfff;">self</span>.i_solved = Port(Job, <span style="color: #deb887;">"i_solved"</span>)
+        <span style="color: #00bfff;">self</span>.o_out = Port(Job, <span style="color: #deb887;">"o_out"</span>)
+        
+        <span style="color: #00bfff;">self</span>.add_in_port(<span style="color: #00bfff;">self</span>.i_arrived)
+        <span style="color: #00bfff;">self</span>.add_in_port(<span style="color: #00bfff;">self</span>.i_solved)
+        <span style="color: #00bfff;">self</span>.add_out_port(<span style="color: #00bfff;">self</span>.o_out)
+        
+        <span style="color: #00bfff;">self</span>.jobs_arrived = []
+        <span style="color: #00bfff;">self</span>.jobs_solved = []
+        
+        <span style="color: #00bfff;">self</span>.total_ta = 0
+        <span style="color: #00bfff;">self</span>.clock = 0
+        <span style="color: #00bfff;">self</span>.obs_time = obs_time
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">initialize</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.hold_in(PHASE_ACTIVE, <span style="color: #00bfff;">self</span>.obs_time)
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">exit</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">pass</span>
+        
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltint</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">self</span>.clock += <span style="color: #00bfff;">self</span>.sigma
+        
+        <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.phase == PHASE_ACTIVE:
+            <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.jobs_solved:
+                <span style="color: #4eee94;">avg_ta</span> = <span style="color: #00bfff;">self</span>.total_ta / <span style="color: #f08080;">len</span>(<span style="color: #00bfff;">self</span>.jobs_solved)
+                <span style="color: #4eee94;">throughput</span> = <span style="color: #f08080;">len</span>(<span style="color: #00bfff;">self</span>.jobs_solved) / <span style="color: #00bfff;">self</span>.clock <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.clock &gt; 0 <span style="color: #00bfff;">else</span> 0
+            <span style="color: #00bfff;">else</span>:
+                <span style="color: #4eee94;">avg_ta</span> = 0
+                <span style="color: #4eee94;">throughput</span> = 0
+                
+            logger.info(<span style="color: #deb887;">"End time: %f"</span> % <span style="color: #00bfff;">self</span>.clock)
+            logger.info(<span style="color: #deb887;">"Jobs arrived: %d"</span> % <span style="color: #f08080;">len</span>(<span style="color: #00bfff;">self</span>.jobs_arrived))
+            logger.info(<span style="color: #deb887;">"Jobs solved: %d"</span> % <span style="color: #f08080;">len</span>(<span style="color: #00bfff;">self</span>.jobs_solved))
+            logger.info(<span style="color: #deb887;">"Average TA: %f"</span> % avg_ta)
+            logger.info(<span style="color: #deb887;">"Throughput: %f\n"</span> % throughput)
+            
+            <span style="color: #00bfff;">self</span>.hold_in(PHASE_DONE, 0)
+        <span style="color: #00bfff;">else</span>:
+            <span style="color: #00bfff;">self</span>.passivate()
+            
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">deltext</span>(<span style="color: #00bfff;">self</span>, e):
+        <span style="color: #00bfff;">self</span>.clock += e
+        
+        <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.phase == PHASE_ACTIVE:
+            <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.i_arrived:
+                <span style="color: #4eee94;">job</span> = <span style="color: #00bfff;">self</span>.i_arrived.get()
+                logger.info(<span style="color: #deb887;">"Starting job %s @ t = %d"</span> % (job.name, <span style="color: #00bfff;">self</span>.clock))
+                <span style="color: #4eee94;">job.time</span> = <span style="color: #00bfff;">self</span>.clock
+                <span style="color: #00bfff;">self</span>.jobs_arrived.append(job)
+                
+            <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.i_solved:
+                <span style="color: #4eee94;">job</span> = <span style="color: #00bfff;">self</span>.i_solved.get()
+                logger.info(<span style="color: #deb887;">"Job %s finished @ t = %d"</span> % (job.name, <span style="color: #00bfff;">self</span>.clock))
+                <span style="color: #00bfff;">self</span>.total_ta += <span style="color: #00bfff;">self</span>.clock - job.time
+                <span style="color: #00bfff;">self</span>.jobs_solved.append(job)
+
+        <span style="color: #00bfff;">self</span>.continuef(e)
+    
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">lambdaf</span>(<span style="color: #00bfff;">self</span>):
+        <span style="color: #00bfff;">if</span> <span style="color: #00bfff;">self</span>.phase == PHASE_DONE:
+            <span style="color: #00bfff;">self</span>.o_out.add(Job(<span style="color: #deb887;">"null"</span>))
+
+<span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Gpt</span>(Coupled):
+    <span style="color: #00bfff;">def</span> <span style="color: #daa520;">__init__</span>(<span style="color: #00bfff;">self</span>, name, period, obs_time):
+        <span style="color: #f08080;">super</span>().__init__(name)
+
+        <span style="color: #00bfff;">if</span> period &lt; 1:
+            <span style="color: #00bfff;">raise</span> <span style="color: #98f5ff;">ValueError</span>(<span style="color: #deb887;">"period has to be greater than 0"</span>)
+
+        <span style="color: #00bfff;">if</span> obs_time &lt; 0:
+            <span style="color: #00bfff;">raise</span> <span style="color: #98f5ff;">ValueError</span>(<span style="color: #deb887;">"obs_time has to be greater or equal than 0"</span>)
+
+        <span style="color: #4eee94;">gen</span> = Generator(<span style="color: #deb887;">"generator"</span>, period)
+        <span style="color: #4eee94;">proc</span> = Processor(<span style="color: #deb887;">"processor"</span>, 3*period)
+        <span style="color: #4eee94;">trans</span> = Transducer(<span style="color: #deb887;">"transducer"</span>, obs_time)
+
+        <span style="color: #00bfff;">self</span>.add_component(gen)
+        <span style="color: #00bfff;">self</span>.add_component(proc)
+        <span style="color: #00bfff;">self</span>.add_component(trans)
+
+        <span style="color: #00bfff;">self</span>.add_coupling(gen.o_out, proc.i_in)
+        <span style="color: #00bfff;">self</span>.add_coupling(gen.o_out, trans.i_arrived)
+        <span style="color: #00bfff;">self</span>.add_coupling(proc.o_out, trans.i_solved)
+        <span style="color: #00bfff;">self</span>.add_coupling(trans.o_out, gen.i_stop)
+
+<span style="color: #00bfff;">if</span> <span style="color: #f08080;">__name__</span> == <span style="color: #deb887;">'__main__'</span>:
+    <span style="color: #4eee94;">gpt</span> = Gpt(<span style="color: #deb887;">"gpt"</span>, 1, 100)
+    <span style="color: #4eee94;">coord</span> = Coordinator(gpt)
+    coord.initialize()
+    coord.simulate()
+</pre>
+</div>
+
+<p>
+In this configuration:
+</p>
+<ul class="org-ul">
+<li>The <code>Generator</code> model generates jobs at a specified period and sends them to the <code>Processor</code> and <code>Transducer</code>.</li>
+<li>The <code>Processor</code> model processes the jobs for a specified processing time.</li>
+<li>The <code>Transducer</code> model observes the system, collects statistics, and logs performance metrics.</li>
+<li>The <code>Gpt</code> coupled model integrates these atomic models and sets up the necessary couplings to route messages between them.</li>
+<li>The simulation is run by creating an instance of the <code>Gpt</code> model, initializing the coordinator, and calling the <code>simulate</code> method.</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: José L. Risco-Martín</p>
-<p class="date">Created: 2024-05-27 lun 11:05</p>
+<p class="date">Created: 2024-05-31 vie 12:09</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
