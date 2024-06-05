@@ -1,0 +1,350 @@
+* Advanced features
+
+These advanced features are mostly implemented in xDEVS/Java. In the following, all the examples will be provided using the xDEVS/Java API.
+
+** Wrappers
+
+Adding compatibility between different DEVS simulation engines, and more specifically, between DEVS models developed in the same programming language, is the first step to designing a DEVS M&S interoperable framework. Thus, xDEVS incorporates adapters to interact with other simulation engines.
+
+xDEVS includes wrappers for aDEVS 3.3 (in xDEVS/C++), DEVSJAVA 3 (in xDEVS/Java), and PyPDEVS 2.4.1 (in xDEVS/Python). The design of the other adapters follows the same pattern. Adding more wrappers is a straightforward process. The target model is added as an attribute, and each DEVS function elaborates a simple conversion. Using these adapters, xDEVS models can be easily combined with external DEVS libraries, especially in C++, Java, and Python.
+
+Another important wrapper is =Coupled2Atomic=, which represents an abstraction of a coupled model with an atomic model. Due to the closure under coupling property of the DEVS formalism (borrowed from Systems theoretical closure under composition principle), we have an abstraction mechanism by which a coupled model can be executed like an atomic model. In traditional DEVS hierarchical modeling, a coupled model is merely a container and has corresponding coupled-simulators. Using the closure under coupling property, it can be transformed into an atomic model with the lowest level atomic simulator. This has been accomplished by implementing this adapter. The =Coupled2Atomic= wrapper takes special relevance in distributed simulations: when a model is split, and each part is simulated in different machines, a whole part can be a coupled model. Without this wrapper, partitioning a hierarchical model for distributed deployment is a challenge. This wrapper allows simulating the whole coupled model hierarchy as a single atomic model deployed on a specific machine.
+
+[[./fig/coupled2atomic.png]]
+Figure: Hierarchical simulator assignment with Coupled2Atomic adapter.
+
+Finally, the mechanism of building wrappers is also a powerful tool to provide interoperability between DEVS and non-DEVS models. We do not address this issue formally because there is no standard mechanism to communicate a DEVS wrapper with a non-DEVS model. The structure of the wrapper completely depends on the implementation of the non-DEVS model.
+
+Below is the implementation of the =Coupled2Atomic= class in Java:
+
+#+begin_src java
+/*
+ ,* Copyright (C) 2024 José Luis Risco Martín <jlrisco@ucm.es>
+ ,*
+ ,* This program is free software: you can redistribute it and/or modify
+ ,* it under the terms of the GNU General Public License as published by
+ ,* the Free Software Foundation, either version 3 of the License, or
+ ,* (at your option) any later version.
+ ,*
+ ,* This program is distributed in the hope that it will be useful,
+ ,* but WITHOUT ANY WARRANTY; without even the implied warranty of
+ ,* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ ,* GNU General Public License for more details.
+ ,*
+ ,* You should have received a copy of the GNU General Public License
+ ,* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ,*
+ ,* Contributors:
+ ,*  - José Luis Risco Martín
+ ,*/
+
+package xdevs.core.modeling;
+
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.logging.Level;
+
+import xdevs.core.examples.efp.Ef;
+import xdevs.core.examples.efp.Processor;
+import xdevs.core.simulation.Coordinator;
+import xdevs.core.util.Constants;
+import xdevs.core.util.DevsLogger;
+
+/**
+ ,* Class that makes a coupled model behave as an atomic model.
+ ,* 
+ ,* This class is used to simulate a coupled model as an atomic model.
+ ,*/
+public class Coupled2Atomic extends Atomic {
+
+    /**
+     ,* The coupled model to simulate as an atomic model.
+     ,*/
+    protected Coupled coupled;
+
+    /**
+     ,* Constructor of the class.
+     ,* @param model The coupled model to simulate as an atomic model.
+     ,*/
+    public Coupled2Atomic(Coupled model) {
+        super(model.getName());
+        this.coupled = model;
+        for (Port<?> port : coupled.getInPorts()) {
+            super.addInPort(port);
+        }
+        for (Port<?> port : coupled.getOutPorts()) {
+            super.addOutPort(port);
+        }
+    }
+    
+    @Override
+    public void initialize() {
+        initialize(coupled);
+        super.setPhase("PHASE_" + super.getName());
+    }
+
+    @Override
+    public void exit() {
+        exit(coupled);
+    }
+
+    @Override
+    public void deltint() {
+        deltfcn(super.getSigma(), coupled);
+    }
+
+    @Override
+    public void deltext(double e) {        
+        deltfcn(e, coupled);
+        // Important: super.resume(e) must go here, at the end.
+        super.resume(e);
+    }
+
+    @Override
+    public void deltcon(double e) {
+        deltfcn(e, coupled);
+    }
+
+    @Override
+    public void lambda() {
+        lambda(coupled);
+    }
+
+    @Override
+    public double ta() {
+        super.setSigma(ta(coupled));
+        return super.getSigma();
+    }
+
+    /**
+     ,* Initializes the components of the coupled model.
+     ,* @param model The coupled model to initialize.
+     ,*/
+    private void initialize(Coupled model) {
+        for (Component component : model.getComponents()) {
+            if (component instanceof Atomic) {
+                component.initialize();
+            } else if (component instanceof Coupled) {
+                initialize((Coupled)component);
+            }
+        }
+    }
+
+    /**
+     ,* Called when the simulation ends.
+     ,* @param model The coupled model to exit.
+     ,*/
+    private void exit(Coupled model) {
+        for (Component component : model.getComponents()) {
+            if (component instanceof Atomic) {
+                component.exit();
+            } else if (component instanceof Coupled) {
+                exit((Coupled)component);
+            }
+        }
+    }
+
+    /**
+     ,* xDEVS-like transition function. This method decides the next transition function to execute.
+     ,* @param e The elapsed time.
+     ,* @param model The coupled model to execute the transition function.
+     ,*/
+    private void deltfcn(double e, Coupled model) {
+        if(!model.isInputEmpty())
+            propagateInput(model);
+        for (Component component : model.getComponents()) {
+            if (component instanceof Atomic) {
+                Atomic atomic = (Atomic)component;
+                if (!atomic.isInputEmpty()) {
+                    if (e == atomic.getSigma()) {
+                        atomic.deltcon(e);
+                    } 
+                    else {                        
+                        atomic.deltext(e);
+                    }
+                }
+                else if (e == atomic.getSigma()) {
+                    atomic.deltint();
+                }
+            } else if (component instanceof Coupled) {
+                deltfcn(e, (Coupled)component);
+            }
+        }
+        clear(model);
+    }
+
+    /**
+     ,* Executes the output function of the components of the coupled model.
+     ,* @param model The coupled model to execute the output function.
+     ,*/
+    private void lambda(Coupled model) {
+        for (Component component : model.getComponents()) {
+            if (component instanceof Atomic) {
+                Atomic atomic = (Atomic)component;
+                if(atomic.getSigma()==super.getSigma())
+                    atomic.lambda();
+            } else if (component instanceof Coupled) {
+                lambda((Coupled)component);                
+            }
+        }
+        propagateOutput(model);
+    }
+
+    /**
+     ,* Propagates the input values to the components of the coupled model.
+     ,* @param model The coupled model to propagate the input values.
+     ,*/
+    private void propagateInput(Coupled model) {
+        LinkedList<Coupling<?>> eic = model.getEIC();
+        eic.forEach((c) -> {
+                c.propagateValues();
+            });
+    }
+
+    /**
+     ,* Propagates the output values to the components of the coupled model.
+     ,* @param model The coupled model to propagate the output values.
+     ,*/
+    private void propagateOutput(Coupled model) {
+        LinkedList<Coupling<?>> ic = model.getIC();
+        ic.forEach((c) -> {
+                c.propagateValues();
+            });
+
+        LinkedList<Coupling<?>> eoc = model.getEOC();
+        eoc.forEach((c) -> {
+                c.propagateValues();
+            });
+    }
+
+    /**
+     ,* Returns the time advance of the coupled model.
+     ,* @param model The coupled model to get the time advance.
+     ,* @return The time advance of the coupled model.
+     ,*/
+    private double ta(Coupled model) {
+        double sigma = Constants.INFINITY;
+        for (Component component : model.getComponents()) {
+            if (component instanceof Atomic) {
+                Atomic atomic = (Atomic)component;
+                if (atomic.ta() < sigma) {
+                    sigma = atomic.ta();
+                }
+            } else if (component instanceof Coupled) {
+                double sigma_aux = ta((Coupled)component);
+                if (sigma_aux < sigma) {
+                    sigma = sigma_aux;
+                }
+            }
+        }
+        return sigma;
+    }
+
+    /**
+     ,* Clears the input and output ports of the components of the coupled model.
+     ,* @param model The coupled model to clear the input and output ports.
+     ,*/
+    private void clear(Coupled model) {
+        for (Component component : model.getComponents()) {
+            if (component instanceof Atomic) {
+                Collection<Port<?>> inPorts;
+                inPorts = component.getInPorts();
+                inPorts.forEach((port) -> {
+                        port.clear();
+                    });
+                Collection<Port<?>> outPorts;
+                outPorts = component.getOutPorts();
+                outPorts.forEach((port) -> {
+                        port.clear();
+                    });    
+            }
+            else if (component instanceof Coupled) {
+                clear((Coupled)component);
+            }
+        }
+        Collection<Port<?>> inPorts;
+        inPorts = model.getInPorts();
+        inPorts.forEach((port) -> {
+                port.clear();
+            });
+        Collection<Port<?>> outPorts;
+        outPorts = model.getOutPorts();
+        outPorts.forEach((port) -> {
+                port.clear();
+            });
+    }
+
+    public static void main(String[] args) {
+        DevsLogger.setup(Level.FINE);
+        Coupled coupled = new Coupled("Coupled2Atomic-EFP");
+        Processor processor = new Processor("processor", 3);
+        coupled.addComponent(processor);
+        Atomic ef = new Coupled2Atomic(new Ef("ef", 1, 100));
+        coupled.addComponent(ef);
+        coupled.addCoupling(ef.getOutPort("out"), processor.getInPort("in"));
+        coupled.addCoupling(processor.getOutPort("out"), ef.getInPort("in"));
+
+
+        Coordinator coordinator = new Coordinator(coupled);
+        coordinator.initialize();
+        coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
+    }
+}
+#+end_src
+
+This class allows a coupled model to be simulated as an atomic model, facilitating the integration and interoperability of DEVS models across different simulation engines and programming languages.
+
+** Models Flattening
+
+Model flattening is often used to simplify models for simulation efficiency and reduce the overheads introduced by message passing between coordinators in complex models with deep hierarchies. This technique takes advantage of the closure under coupling property to generate an equivalent single-level model from the original model. Hence, the intermediate coupled models are eliminated, and the message passing happens directly between all the atomic models. This algorithm has been incorporated in all the xDEVS branches, allowing this transformation when specifying the simulation root coordinator.
+
+The following Java code demonstrates how to perform a flattened simulation of the EFP model using the xDEVS framework:
+
+#+begin_src java
+public class Efp extends Coupled {
+
+    /**
+     * Constructor
+     * @param name Model name
+     * @param generatorPeriod Generator period
+     * @param processorPeriod Processor period
+     * @param transducerPeriod Transducer period
+     */
+    public Efp(String name, double generatorPeriod, double processorPeriod, double transducerPeriod) {
+        super(name);
+
+        Ef ef = new Ef("ef", generatorPeriod, transducerPeriod);
+        super.addComponent(ef);
+        Processor processor = new Processor("processor", processorPeriod);
+        super.addComponent(processor);
+
+        super.addCoupling(ef.oOut, processor.iIn);
+        super.addCoupling(processor.oOut, ef.iIn);
+    }
+
+    public static void main(String args[]) {
+        DevsLogger.setup(Level.FINE);
+        Efp efp = new Efp("efp", 1, 3, 100);
+        Coordinator coordinator = new Coordinator(efp, true); // Flattened simulation
+        coordinator.initialize();
+        coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
+    }
+}
+#+end_src
+
+The =Coordinator= includes a constructor that accepts a boolean parameter =flatten=. If =flatten= is set to =true=, the model is flattened before the simulation begins. The =Efp= class defines a coupled model with components =Ef= and =Processor=, and their respective couplings.
+
+To perform a flattened simulation of the EFP model, create the coordinator as follows:
+
+#+begin_src java
+Coordinator coordinator = new Coordinator(efp, true);
+#+end_src
+
+This will ensure that the model is flattened, eliminating intermediate coupled models and allowing direct message passing between all atomic models, thus improving simulation efficiency.
+
+** Parallel simulation
+** Distributed simulation
+** Real-time simulation
+
