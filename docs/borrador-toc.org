@@ -57,3 +57,15 @@ Yo haría:
 5 EFP model (GPT, EFP)
 6 Advanced features (real-time, parallel, distributed)
 7 Case studies?
+
+#+begin_src elisp
+(setq package-check-signature nil)
+(package-refresh-contents)
+(package-install 'gnu-elpa-keyring-update)
+(setq package-check-signature 'allow-unsigned)
+(gnu-elpa-keyring-update)
+(setq package-check-signature t)
+#+end_src
+
+#+RESULTS:
+: t

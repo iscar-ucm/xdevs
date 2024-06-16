@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-06-05 mié 12:39 -->
+<!-- 2024-06-16 dom 10:25 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>xDEVS user's manual</title>
@@ -92,54 +92,54 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org37dc16b">Introduction to xDEVS</a>
+<li><a href="#orgbf90017">Introduction to xDEVS</a>
 <ul>
-<li><a href="#orgbda9bb6">Introduction</a></li>
-<li><a href="#org2b8590e">Top features</a></li>
-<li><a href="#org8f63704">Quick start</a></li>
+<li><a href="#org95e6fb4">Introduction</a></li>
+<li><a href="#org76a9f8b">Top features</a></li>
+<li><a href="#org0f7ba92">Quick start</a></li>
 </ul>
 </li>
-<li><a href="#orga96526f">The DEVS formalism</a>
+<li><a href="#org22f88c0">The DEVS formalism</a>
 <ul>
-<li><a href="#orgfe7b91e">Bibliography</a></li>
+<li><a href="#org360d275">Bibliography</a></li>
 </ul>
 </li>
-<li><a href="#org31d5e92">Getting started with xDEVS</a>
+<li><a href="#orgc9a95b6">Getting started with xDEVS</a>
 <ul>
-<li><a href="#org6a05f12">Output Function</a></li>
-<li><a href="#org72df511">Internal Transition Function</a></li>
-<li><a href="#org25e450d">External Transition Function</a></li>
-<li><a href="#orgbb7dd8a">Complete model implementation</a></li>
-<li><a href="#org9c317b6">Running the model</a></li>
+<li><a href="#orgd7a9cd8">Output Function</a></li>
+<li><a href="#org49faea6">Internal Transition Function</a></li>
+<li><a href="#orgcfa4a27">External Transition Function</a></li>
+<li><a href="#org32b0c22">Complete model implementation</a></li>
+<li><a href="#orgafff4d6">Running the model</a></li>
 </ul>
 </li>
-<li><a href="#org8f44dd5">Building models in xDEVS</a>
+<li><a href="#org5248f73">Building models in xDEVS</a>
 <ul>
-<li><a href="#orgb4580a5">Atomic models</a></li>
-<li><a href="#orga5dafcf">Coupled models</a></li>
-<li><a href="#org68e3cba">Models configuration</a></li>
+<li><a href="#org05578eb">Atomic models</a></li>
+<li><a href="#org63771b6">Coupled models</a></li>
+<li><a href="#orgb3f73bb">Models configuration</a></li>
 </ul>
 </li>
-<li><a href="#orgdfab822">Advanced features</a>
+<li><a href="#org383a19b">Advanced features</a>
 <ul>
-<li><a href="#org8169be7">Wrappers</a></li>
-<li><a href="#orga5ae149">Models Flattening</a></li>
-<li><a href="#org181ee2e">Parallel simulation</a></li>
-<li><a href="#org195185a">Distributed simulation</a></li>
-<li><a href="#org4178e3c">Real-time simulation</a></li>
+<li><a href="#org3b4e4a4">Wrappers</a></li>
+<li><a href="#orgeceab9e">Models Flattening</a></li>
+<li><a href="#org32b3bd0">Parallel simulation</a></li>
+<li><a href="#orgac61789">Distributed simulation</a></li>
+<li><a href="#org8219f40">Real-time simulation</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org37dc16b" class="outline-2">
-<h2 id="org37dc16b">Introduction to xDEVS</h2>
-<div class="outline-text-2" id="text-org37dc16b">
+<div id="outline-container-orgbf90017" class="outline-2">
+<h2 id="orgbf90017">Introduction to xDEVS</h2>
+<div class="outline-text-2" id="text-orgbf90017">
 </div>
-<div id="outline-container-orgbda9bb6" class="outline-3">
-<h3 id="orgbda9bb6">Introduction</h3>
-<div class="outline-text-3" id="text-orgbda9bb6">
+<div id="outline-container-org95e6fb4" class="outline-3">
+<h3 id="org95e6fb4">Introduction</h3>
+<div class="outline-text-3" id="text-org95e6fb4">
 <p>
 xDEVS stands for <i>A cross-platform (x) Discrete EVent System simulator</i>. This library includes a set of C, C++, C#, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism <i>Discrete Event System Specification (DEVS)</i>. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
 </p>
@@ -177,9 +177,9 @@ The xDEVS user's manual can be found <a href="https://iscar-ucm.github.io/xdevs/
 </div>
 </div>
 
-<div id="outline-container-org2b8590e" class="outline-3">
-<h3 id="org2b8590e">Top features</h3>
-<div class="outline-text-3" id="text-org2b8590e">
+<div id="outline-container-org76a9f8b" class="outline-3">
+<h3 id="org76a9f8b">Top features</h3>
+<div class="outline-text-3" id="text-org76a9f8b">
 <ul class="org-ul">
 <li>PDEVS Modeling and Simulation formalism</li>
 <li>Object-Oriented Programming</li>
@@ -189,9 +189,9 @@ The xDEVS user's manual can be found <a href="https://iscar-ucm.github.io/xdevs/
 </div>
 </div>
 
-<div id="outline-container-org8f63704" class="outline-3">
-<h3 id="org8f63704">Quick start</h3>
-<div class="outline-text-3" id="text-org8f63704">
+<div id="outline-container-org0f7ba92" class="outline-3">
+<h3 id="org0f7ba92">Quick start</h3>
+<div class="outline-text-3" id="text-org0f7ba92">
 <p>
 Switch to the corresponding particular language. A README file will be found to start with minimal examples and demos.
 </p>
@@ -199,9 +199,9 @@ Switch to the corresponding particular language. A README file will be found to 
 </div>
 </div>
 
-<div id="outline-container-orga96526f" class="outline-2">
-<h2 id="orga96526f">The DEVS formalism</h2>
-<div class="outline-text-2" id="text-orga96526f">
+<div id="outline-container-org22f88c0" class="outline-2">
+<h2 id="org22f88c0">The DEVS formalism</h2>
+<div class="outline-text-2" id="text-org22f88c0">
 <p>
 The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
 </p>
@@ -253,9 +253,9 @@ The reader should refer to the book Theory of Modeling and Simulation [1], to un
 </p>
 </div>
 
-<div id="outline-container-orgb850e1b" class="outline-4">
-<h4 id="orgb850e1b">The parallel DEVS formalism</h4>
-<div class="outline-text-4" id="text-orgb850e1b">
+<div id="outline-container-orga99c120" class="outline-4">
+<h4 id="orga99c120">The parallel DEVS formalism</h4>
+<div class="outline-text-4" id="text-orga99c120">
 <p>
 The parallel DEVS approach was introduced, after 15 years, as a revision of Classic DEVS. Currently, parallel DEVS is the prevalent DEVS, implemented in many libraries. In the following, unless it is explicitly noted, the use of DEVS implies parallel DEVS.
 </p>
@@ -315,9 +315,9 @@ Given the recursive definition of <b>M</b>, a coupled model can itself be a part
 
 
 
-<div id="outline-container-org6628954" class="outline-5">
-<h5 id="org6628954">EXAMPLE 1</h5>
-<div class="outline-text-5" id="text-org6628954">
+<div id="outline-container-orgaf67345" class="outline-5">
+<h5 id="orgaf67345">EXAMPLE 1</h5>
+<div class="outline-text-5" id="text-orgaf67345">
 <p>
 A processor atomic model consumes a job j. When the processor receives a job through an input port, thus the processor remains busy until the processing time j<sub>p</sub> is finished. Then it sends the job through an output port.
 </p>
@@ -343,9 +343,9 @@ Processor=〈X,S,Y,δ<sub>int</sub>,δ<sub>ext</sub>,δ<sub>con</sub>,λ,ta〉
 </div>
 </div>
 
-<div id="outline-container-org155ef5f" class="outline-5">
-<h5 id="org155ef5f">EXAMPLE 2</h5>
-<div class="outline-text-5" id="text-org155ef5f">
+<div id="outline-container-org0535e35" class="outline-5">
+<h5 id="org0535e35">EXAMPLE 2</h5>
+<div class="outline-text-5" id="text-org0535e35">
 <p>
 Figure 2 shows an example of a DEVS coupled model with three components, M1, M2 y M3, as well as their couplings. These models are interconnected through the corresponding I/O ports presented in the Figure. The models are connected to the external coupled models through the EIC and EOC connectors. M1, M2 and M3 can be atomic or coupled models.
 </p>
@@ -378,9 +378,9 @@ where:
 </div>
 </div>
 
-<div id="outline-container-org3c78cf5" class="outline-5">
-<h5 id="org3c78cf5">EXAMPLE 3</h5>
-<div class="outline-text-5" id="text-org3c78cf5">
+<div id="outline-container-org4123e15" class="outline-5">
+<h5 id="org4123e15">EXAMPLE 3</h5>
+<div class="outline-text-5" id="text-org4123e15">
 <p>
 The Experimental frame – Processor model is usually presented as one of the initial examples to start to practice with DEVS modeling and simulation. It is a DEVS coupled model consisting of three atomic models and one coupled model (see Figure 3).
 </p>
@@ -480,9 +480,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-orgfe7b91e" class="outline-3">
-<h3 id="orgfe7b91e">Bibliography</h3>
-<div class="outline-text-3" id="text-orgfe7b91e">
+<div id="outline-container-org360d275" class="outline-3">
+<h3 id="org360d275">Bibliography</h3>
+<div class="outline-text-3" id="text-org360d275">
 <ol class="org-ol">
 <li>Zeigler, B. P.; Muzy, A. &amp; Kofman, E. Theory of modeling and simulation: discrete event &amp; iterative system computational foundations Academic press, 2018.</li>
 <li>Mittal, S. &amp; Risco-Martín, J. L. Netcentric system of systems engineering with DEVS unified process CRC Press, 2013.</li>
@@ -492,9 +492,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-org31d5e92" class="outline-2">
-<h2 id="org31d5e92">Getting started with xDEVS</h2>
-<div class="outline-text-2" id="text-org31d5e92">
+<div id="outline-container-orgc9a95b6" class="outline-2">
+<h2 id="orgc9a95b6">Getting started with xDEVS</h2>
+<div class="outline-text-2" id="text-orgc9a95b6">
 <p>
 In this section, we introduce the basics of xDEVS by developing a simple Ping Pong model. This model is inspired by the DEVS formalism as described on Wikipedia: <a href="https://en.wikipedia.org/wiki/DEVS">https://en.wikipedia.org/wiki/DEVS</a>
 </p>
@@ -510,9 +510,9 @@ The Ping Pong model simulates two players hitting a ball back and forth. We will
 </p>
 </div>
 
-<div id="outline-container-org6a05f12" class="outline-3">
-<h3 id="org6a05f12">Output Function</h3>
-<div class="outline-text-3" id="text-org6a05f12">
+<div id="outline-container-orgd7a9cd8" class="outline-3">
+<h3 id="orgd7a9cd8">Output Function</h3>
+<div class="outline-text-3" id="text-orgd7a9cd8">
 <p>
 The output function \(\lambda\) determines the output based on the current state:
 </p>
@@ -546,9 +546,9 @@ This is implemented in Python as follows:
 </div>
 </div>
 
-<div id="outline-container-org72df511" class="outline-3">
-<h3 id="org72df511">Internal Transition Function</h3>
-<div class="outline-text-3" id="text-org72df511">
+<div id="outline-container-org49faea6" class="outline-3">
+<h3 id="org49faea6">Internal Transition Function</h3>
+<div class="outline-text-3" id="text-org49faea6">
 <p>
 The internal transition function \(\delta_{int}\) updates the state based on the elapsed time:
 </p>
@@ -587,9 +587,9 @@ Implemented in Python:
 </div>
 </div>
 
-<div id="outline-container-org25e450d" class="outline-3">
-<h3 id="org25e450d">External Transition Function</h3>
-<div class="outline-text-3" id="text-org25e450d">
+<div id="outline-container-orgcfa4a27" class="outline-3">
+<h3 id="orgcfa4a27">External Transition Function</h3>
+<div class="outline-text-3" id="text-orgcfa4a27">
 <p>
 The external transition function \(\delta_{ext}\) modifies the state in response to external events:
 </p>
@@ -622,9 +622,9 @@ Python implementation:
 </div>
 </div>
 
-<div id="outline-container-orgbb7dd8a" class="outline-3">
-<h3 id="orgbb7dd8a">Complete model implementation</h3>
-<div class="outline-text-3" id="text-orgbb7dd8a">
+<div id="outline-container-org32b0c22" class="outline-3">
+<h3 id="org32b0c22">Complete model implementation</h3>
+<div class="outline-text-3" id="text-org32b0c22">
 <p>
 The complete Python implementation of the Ping Pong model using xDEVS is as follows:
 </p>
@@ -695,9 +695,9 @@ PHASE_WAIT:<span style="color: #f08080;">str</span> = <span style="color: #deb88
 </div>
 </div>
 
-<div id="outline-container-org9c317b6" class="outline-3">
-<h3 id="org9c317b6">Running the model</h3>
-<div class="outline-text-3" id="text-org9c317b6">
+<div id="outline-container-orgafff4d6" class="outline-3">
+<h3 id="orgafff4d6">Running the model</h3>
+<div class="outline-text-3" id="text-orgafff4d6">
 <p>
 To run the model, follow these steps on Ubuntu 22.04:
 </p>
@@ -719,21 +719,21 @@ Player B receives the ball
 </div>
 </div>
 
-<div id="outline-container-org8f44dd5" class="outline-2">
-<h2 id="org8f44dd5">Building models in xDEVS</h2>
-<div class="outline-text-2" id="text-org8f44dd5">
+<div id="outline-container-org5248f73" class="outline-2">
+<h2 id="org5248f73">Building models in xDEVS</h2>
+<div class="outline-text-2" id="text-org5248f73">
 </div>
-<div id="outline-container-orgb4580a5" class="outline-3">
-<h3 id="orgb4580a5">Atomic models</h3>
-<div class="outline-text-3" id="text-orgb4580a5">
+<div id="outline-container-org05578eb" class="outline-3">
+<h3 id="org05578eb">Atomic models</h3>
+<div class="outline-text-3" id="text-org05578eb">
 <p>
 In xDEVS, atomic models are the fundamental building blocks for constructing simulation models. An atomic model in xDEVS encapsulates the behavior of a system component that cannot be further decomposed into smaller components. It defines the state changes and interactions of the component in response to internal and external events.
 </p>
 </div>
 
-<div id="outline-container-org7fa2fd9" class="outline-4">
-<h4 id="org7fa2fd9">Structure of an atomic model</h4>
-<div class="outline-text-4" id="text-org7fa2fd9">
+<div id="outline-container-orgab57de3" class="outline-4">
+<h4 id="orgab57de3">Structure of an atomic model</h4>
+<div class="outline-text-4" id="text-orgab57de3">
 <p>
 The <code>Atomic</code> class, derived from the <code>Component</code> class and marked as an abstract base class, serves as the base class for all atomic models in xDEVS. Here's a breakdown of its key components and functionalities:
 </p>
@@ -762,9 +762,9 @@ The <code>Atomic</code> class, derived from the <code>Component</code> class and
 </div>
 </div>
 
-<div id="outline-container-org9958fb3" class="outline-4">
-<h4 id="org9958fb3">Implementing an atomic model</h4>
-<div class="outline-text-4" id="text-org9958fb3">
+<div id="outline-container-org5820176" class="outline-4">
+<h4 id="org5820176">Implementing an atomic model</h4>
+<div class="outline-text-4" id="text-org5820176">
 <p>
 To implement an atomic model in xDEVS, you need to subclass the <code>Atomic</code> class and provide concrete implementations for the <code>deltint</code>, <code>deltext</code>, and <code>lambdaf</code> methods. Each method should define how the model reacts to different types of events and manages its state transitions effectively.
 </p>
@@ -801,9 +801,9 @@ This model demonstrates basic internal and external transitions. It continuously
 </div>
 </div>
 
-<div id="outline-container-org7794e81" class="outline-4">
-<h4 id="org7794e81">Ports</h4>
-<div class="outline-text-4" id="text-org7794e81">
+<div id="outline-container-orgd5a108e" class="outline-4">
+<h4 id="orgd5a108e">Ports</h4>
+<div class="outline-text-4" id="text-orgd5a108e">
 <p>
 In xDEVS, ports are essential for enabling communication between atomic models and facilitating the flow of events in a coupled model configuration. Ports are used to send and receive messages, allowing models to interact with each other.
 </p>
@@ -885,17 +885,17 @@ By defining and using ports, you can create complex coupled models where multipl
 </div>
 </div>
 
-<div id="outline-container-orga5dafcf" class="outline-3">
-<h3 id="orga5dafcf">Coupled models</h3>
-<div class="outline-text-3" id="text-orga5dafcf">
+<div id="outline-container-org63771b6" class="outline-3">
+<h3 id="org63771b6">Coupled models</h3>
+<div class="outline-text-3" id="text-org63771b6">
 <p>
 In xDEVS, coupled models are composite models that consist of multiple atomic and/or other coupled models. They define the structure and interaction of these submodels, enabling the construction of complex systems by combining simpler components. Coupled models manage the routing of messages between their submodels and handle the overall coordination of events.
 </p>
 </div>
 
-<div id="outline-container-org24a7b88" class="outline-4">
-<h4 id="org24a7b88">Structure of a coupled model</h4>
-<div class="outline-text-4" id="text-org24a7b88">
+<div id="outline-container-orgbbbe91d" class="outline-4">
+<h4 id="orgbbbe91d">Structure of a coupled model</h4>
+<div class="outline-text-4" id="text-orgbbbe91d">
 <p>
 The <code>Coupled</code> class, derived from the <code>Component</code> class, serves as the base class for all coupled models in xDEVS. Here are the key components and functionalities of a coupled model:
 </p>
@@ -917,9 +917,9 @@ The <code>Coupled</code> class, derived from the <code>Component</code> class, s
 </div>
 </div>
 
-<div id="outline-container-org1d7fe8d" class="outline-4">
-<h4 id="org1d7fe8d">Implementing a coupled model</h4>
-<div class="outline-text-4" id="text-org1d7fe8d">
+<div id="outline-container-orgcf42526" class="outline-4">
+<h4 id="orgcf42526">Implementing a coupled model</h4>
+<div class="outline-text-4" id="text-orgcf42526">
 <p>
 To implement a coupled model in xDEVS, you need to subclass the <code>Coupled</code> class and define its submodels and couplings. Here is an example of a simple coupled model that combines a <code>Generator</code> and a <code>Processor</code>:
 </p>
@@ -962,9 +962,9 @@ By defining submodels and their couplings, you can create complex systems that s
 </div>
 </div>
 
-<div id="outline-container-org68e3cba" class="outline-3">
-<h3 id="org68e3cba">Models configuration</h3>
-<div class="outline-text-3" id="text-org68e3cba">
+<div id="outline-container-orgb3f73bb" class="outline-3">
+<h3 id="orgb3f73bb">Models configuration</h3>
+<div class="outline-text-3" id="text-orgb3f73bb">
 <p>
 In this section, we will configure and run a simulation using the xDEVS framework. The provided source code defines several atomic models (Generator, Processor, and Transducer) and a coupled model (Gpt) that combines these atomic models. We will walk through the configuration and execution of the simulation.
 </p>
@@ -1182,17 +1182,17 @@ In this configuration:
 </div>
 </div>
 
-<div id="outline-container-orgdfab822" class="outline-2">
-<h2 id="orgdfab822">Advanced features</h2>
-<div class="outline-text-2" id="text-orgdfab822">
+<div id="outline-container-org383a19b" class="outline-2">
+<h2 id="org383a19b">Advanced features</h2>
+<div class="outline-text-2" id="text-org383a19b">
 <p>
 These advanced features are mostly implemented in xDEVS/Java. In the following, all the examples will be provided using the xDEVS/Java API.
 </p>
 </div>
 
-<div id="outline-container-org8169be7" class="outline-3">
-<h3 id="org8169be7">Wrappers</h3>
-<div class="outline-text-3" id="text-org8169be7">
+<div id="outline-container-org3b4e4a4" class="outline-3">
+<h3 id="org3b4e4a4">Wrappers</h3>
+<div class="outline-text-3" id="text-org3b4e4a4">
 <p>
 Adding compatibility between different DEVS simulation engines, and more specifically, between DEVS models developed in the same programming language, is the first step to designing a DEVS M&amp;S interoperable framework. Thus, xDEVS incorporates adapters to interact with other simulation engines.
 </p>
@@ -1501,9 +1501,9 @@ This class allows a coupled model to be simulated as an atomic model, facilitati
 </div>
 </div>
 
-<div id="outline-container-orga5ae149" class="outline-3">
-<h3 id="orga5ae149">Models Flattening</h3>
-<div class="outline-text-3" id="text-orga5ae149">
+<div id="outline-container-orgeceab9e" class="outline-3">
+<h3 id="orgeceab9e">Models Flattening</h3>
+<div class="outline-text-3" id="text-orgeceab9e">
 <p>
 Model flattening is often used to simplify models for simulation efficiency and reduce the overheads introduced by message passing between coordinators in complex models with deep hierarchies. This technique takes advantage of the closure under coupling property to generate an equivalent single-level model from the original model. Hence, the intermediate coupled models are eliminated, and the message passing happens directly between all the atomic models. This algorithm has been incorporated in all the xDEVS branches, allowing this transformation when specifying the simulation root coordinator.
 </p>
@@ -1565,20 +1565,76 @@ This will ensure that the model is flattened, eliminating intermediate coupled m
 </div>
 </div>
 
-<div id="outline-container-org181ee2e" class="outline-3">
-<h3 id="org181ee2e">Parallel simulation</h3>
+<div id="outline-container-org32b3bd0" class="outline-3">
+<h3 id="org32b3bd0">Parallel simulation</h3>
+<div class="outline-text-3" id="text-org32b3bd0">
+<p>
+Parallel simulation in xDEVS allows you to run simulations using multiple threads, which can significantly speed up the process, especially for complex models. This is particularly useful when your model has many components that can be computed independently.
+</p>
+
+<p>
+Here's how you can use the parallel simulation feature:
+</p>
+
+<ol class="org-ol">
+<li><b>Setup the Model</b>: First, define your model as usual. Let's say you have a model named <code>Gpt</code> that you want to simulate.</li>
+
+<li><b>Choose the Coordinator</b>: For parallel simulation, use the <code>CoordinatorParallel</code> class. This coordinator can automatically distribute the simulation tasks across multiple threads.</li>
+
+<li><b>Initialization</b>: Initialize the coordinator with your model. You can specify the number of threads, or let the system decide based on the available processors.</li>
+
+<li><b>Run the Simulation</b>: Start the simulation. The coordinator manages how tasks are distributed and executed in parallel, ensuring that all parts of the model are synchronized correctly.</li>
+
+<li><b>Completion</b>: Once the simulation is complete, you can shut down the coordinator and handle the results.</li>
+</ol>
+
+<p>
+Here is a simple example of how to set up and run a parallel simulation:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #7f7f7f;">// </span><span style="color: #7f7f7f;">Import necessary xDEVS classes</span>
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">modeling</span>.<span style="color: #98f5ff;">Coupled</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">simulation</span>.<span style="color: #a2cd5a;">parallel</span>.<span style="color: #98f5ff;">CoordinatorParallel</span>;
+
+<span style="color: #00bfff;">public</span> <span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">SimulationExample</span> {
+    <span style="color: #00bfff;">public</span> <span style="color: #00bfff;">static</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">main</span>(<span style="color: #98f5ff;">String</span>[] <span style="color: #4eee94;">args</span>) {
+        <span style="color: #7f7f7f;">// </span><span style="color: #7f7f7f;">Create your model</span>
+        <span style="color: #98f5ff;">Coupled</span> <span style="color: #4eee94;">model</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Gpt</span>(<span style="color: #deb887;">"gpt"</span>, 1, 100);
+
+        <span style="color: #7f7f7f;">// </span><span style="color: #7f7f7f;">Create a parallel coordinator with the model</span>
+        <span style="color: #98f5ff;">CoordinatorParallel</span> <span style="color: #4eee94;">coordinator</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">CoordinatorParallel</span>(model);
+
+        <span style="color: #7f7f7f;">// </span><span style="color: #7f7f7f;">Initialize the simulation</span>
+        coordinator.initialize();
+
+        <span style="color: #7f7f7f;">// </span><span style="color: #7f7f7f;">Run the simulation for a maximum number of iterations</span>
+        coordinator.simulate(<span style="color: #a2cd5a;">Long</span>.MAX_VALUE);
+
+        <span style="color: #7f7f7f;">// </span><span style="color: #7f7f7f;">Exit the simulation</span>
+        coordinator.exit();
+    }
+}
+</pre>
 </div>
-<div id="outline-container-org195185a" class="outline-3">
-<h3 id="org195185a">Distributed simulation</h3>
+
+<p>
+In this setup, the <code>CoordinatorParallel</code> handles the distribution of tasks across threads, making the simulation run faster than a sequential approach, especially for large models. This method is effective for reducing simulation time and is ideal for performance-critical simulations.
+</p>
 </div>
-<div id="outline-container-org4178e3c" class="outline-3">
-<h3 id="org4178e3c">Real-time simulation</h3>
+</div>
+
+<div id="outline-container-orgac61789" class="outline-3">
+<h3 id="orgac61789">Distributed simulation</h3>
+</div>
+<div id="outline-container-org8219f40" class="outline-3">
+<h3 id="org8219f40">Real-time simulation</h3>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: José L. Risco-Martín</p>
-<p class="date">Created: 2024-06-05 mié 12:39</p>
+<p class="date">Created: 2024-06-16 dom 10:25</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

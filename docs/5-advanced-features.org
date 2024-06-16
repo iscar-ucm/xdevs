@@ -345,6 +345,52 @@ Coordinator coordinator = new Coordinator(efp, true);
 This will ensure that the model is flattened, eliminating intermediate coupled models and allowing direct message passing between all atomic models, thus improving simulation efficiency.
 
 ** Parallel simulation
+
+
+
+Parallel simulation in xDEVS allows you to run simulations using multiple threads, which can significantly speed up the process, especially for complex models. This is particularly useful when your model has many components that can be computed independently.
+
+Here's how you can use the parallel simulation feature:
+
+1. *Setup the Model*: First, define your model as usual. Let's say you have a model named =Gpt= that you want to simulate.
+
+2. *Choose the Coordinator*: For parallel simulation, use the =CoordinatorParallel= class. This coordinator can automatically distribute the simulation tasks across multiple threads.
+
+3. *Initialization*: Initialize the coordinator with your model. You can specify the number of threads, or let the system decide based on the available processors.
+
+4. *Run the Simulation*: Start the simulation. The coordinator manages how tasks are distributed and executed in parallel, ensuring that all parts of the model are synchronized correctly.
+
+5. *Completion*: Once the simulation is complete, you can shut down the coordinator and handle the results.
+
+Here is a simple example of how to set up and run a parallel simulation:
+
+#+begin_src java
+// Import necessary xDEVS classes
+import xdevs.core.modeling.Coupled;
+import xdevs.core.simulation.parallel.CoordinatorParallel;
+
+public class SimulationExample {
+    public static void main(String[] args) {
+        // Create your model
+        Coupled model = new Gpt("gpt", 1, 100);
+
+        // Create a parallel coordinator with the model
+        CoordinatorParallel coordinator = new CoordinatorParallel(model);
+
+        // Initialize the simulation
+        coordinator.initialize();
+
+        // Run the simulation for a maximum number of iterations
+        coordinator.simulate(Long.MAX_VALUE);
+
+        // Exit the simulation
+        coordinator.exit();
+    }
+}
+#+end_src
+
+In this setup, the =CoordinatorParallel= handles the distribution of tasks across threads, making the simulation run faster than a sequential approach, especially for large models. This method is effective for reducing simulation time and is ideal for performance-critical simulations.
+
 ** Distributed simulation
 ** Real-time simulation
 
