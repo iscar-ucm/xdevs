@@ -346,8 +346,6 @@ This will ensure that the model is flattened, eliminating intermediate coupled m
 
 ** Parallel simulation
 
-
-
 Parallel simulation in xDEVS allows you to run simulations using multiple threads, which can significantly speed up the process, especially for complex models. This is particularly useful when your model has many components that can be computed independently.
 
 Here's how you can use the parallel simulation feature:
@@ -391,6 +389,120 @@ public class SimulationExample {
 
 In this setup, the =CoordinatorParallel= handles the distribution of tasks across threads, making the simulation run faster than a sequential approach, especially for large models. This method is effective for reducing simulation time and is ideal for performance-critical simulations.
 
-** Distributed simulation
+** Distributed Simulation
+
+Distributed simulation in xDEVS allows you to run simulations across multiple machines or processes, which can significantly enhance performance and scalability for complex models. Distributed simulation involves splitting the simulation tasks across different machines or processes. Each machine or process runs a part of the model, and they communicate with each other to synchronize the simulation. This setup can be complex, requiring the deployment of virtual machines, containers, or other distributed infrastructures. However, for testing purposes, you can run a distributed simulation on a single computer by using multiple terminals.
+
+*** Setting Up a Distributed Simulation
+
+1. *Prepare the Model*: Define your coupled model and its components. Each component will run on a different process or machine.
+
+2. *Create Configuration Files*: Use XML files to specify the configuration of the coupled model and its components, including their network addresses and ports.
+
+3. *Run the Coordinator*: The coordinator manages the overall simulation and synchronizes the components. It reads the configuration file and initializes the simulation.
+
+4. *Run the Simulators*: Each simulator runs a part of the model. They read the configuration file to know their role and communicate with the coordinator.
+
+*** Example
+
+Below is an example of how to set up and run a distributed simulation using xDEVS.
+
+**** XML Configuration File
+
+Create an XML file to define the coupled model and its components:
+
+#+begin_src xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<coupled name="GPT" class="xdevs.core.examples.efp.Efp" host="127.0.0.1" mainPort="5000" auxPort="6000">
+  <atomic name="processor" class="xdevs.core.examples.efp.Processor" host="127.0.0.1" mainPort="5001" auxPort="6001">
+    <constructor-arg value="3.0"/>
+  </atomic>
+  <atomic name="generator" class="xdevs.core.examples.efp.Generator" host="127.0.0.1" mainPort="5002" auxPort="6002">
+    <constructor-arg value="1.0"/>
+  </atomic>
+  <atomic name="transducer" class="xdevs.core.examples.efp.Transducer" host="127.0.0.1" mainPort="5003" auxPort="6003">
+    <constructor-arg value="100.0"/>
+  </atomic>
+  <connection componentFrom="processor" portFrom="oOut" componentTo="transducer" portTo="iSolved"/>
+  <connection componentFrom="generator" portFrom="oOut" componentTo="processor" portTo="iIn"/>
+  <connection componentFrom="generator" portFrom="oOut" componentTo="transducer" portTo="iArrived"/>
+  <connection componentFrom="transducer" portFrom="oOut" componentTo="generator" portTo="iStop"/>
+</coupled>
+#+end_src
+
+**** Java Class to Run Distributed Simulation
+
+Create a Java class to run the distributed simulation:
+
+#+begin_src java
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+import xdevs.core.simulation.CoordinatorDistributed;
+import xdevs.core.simulation.SimulatorDistributed;
+import xdevs.core.util.DevsLogger;
+
+public class RunDistributedSimulation {
+    
+    private static final Logger LOGGER = Logger.getLogger(RunDistributedSimulation.class.getName());
+    
+    public static void main(String[] args) {
+        if(args.length > 0) {
+            String fileName = args[0];
+            Element xmlCoupled;
+            try {
+                Document xmlCoupledModel = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(fileName));
+                xmlCoupled = (Element) xmlCoupledModel.getElementsByTagName("coupled").item(0);
+            } catch (IOException | ParserConfigurationException | SAXException ex) {
+                Logger.getLogger(CoupledDistributed.class.getName()).log(Level.SEVERE, null, ex);
+                return;
+            }
+            DevsLogger.setup(Level.INFO);
+            if(args.length == 2) { // Simulator
+                String atomicName = args[1];                                        
+                CoupledDistributed gpt = new CoupledDistributed(xmlCoupled);
+                LOGGER.info("Run " + atomicName + " .....");
+                new SimulatorDistributed(gpt, atomicName);
+            } else if(args.length == 1) { // Coordinator
+                LOGGER.info("Run Coordinator .....");
+                CoupledDistributed gpt = new CoupledDistributed(xmlCoupled);
+                CoordinatorDistributed coordinator = new CoordinatorDistributed(gpt);
+                long start = System.currentTimeMillis();
+                coordinator.initialize();
+                coordinator.simulate(Long.MAX_VALUE);
+                coordinator.exit();
+                long end = System.currentTimeMillis();
+                double time = (end - start) / 1000.0;
+                LOGGER.info("TIME: " + time);
+            }
+        } else {
+            LOGGER.info("Check the arguments: Two for Simulator(file name and atomic name) and One for Coordinator(file name)");
+        }
+    }
+}
+#+end_src
+
+*** Running the Simulation
+
+1. *Start the Coordinator*: Open a terminal and run the coordinator with the XML configuration file as an argument:
+   #+begin_src sh
+   java RunDistributedSimulation config.xml
+   #+end_src
+
+2. *Start the Simulators*: Open separate terminals for each simulator and run them with the XML configuration file and the name of the atomic model they simulate:
+   #+begin_src sh
+   java RunDistributedSimulation config.xml processor
+   java RunDistributedSimulation config.xml generator
+   java RunDistributedSimulation config.xml transducer
+   #+end_src
+
+Distributed simulation in xDEVS allows for efficient and scalable simulation of complex models by distributing the workload across multiple machines or processes. By following the steps outlined above, you can set up and run distributed simulations, leveraging the power of xDEVS to handle large-scale simulations effectively.
+
 ** Real-time simulation
 
