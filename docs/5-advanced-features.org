@@ -506,3 +506,72 @@ Distributed simulation in xDEVS allows for efficient and scalable simulation of 
 
 ** Real-time simulation
 
+Real-time simulation in xDEVS allows you to run simulations that synchronize with real-world time, making it possible to interact with the simulation in real-time or to integrate it with real-time systems. This feature is particularly useful for applications such as hardware-in-the-loop testing, real-time control systems, and interactive simulations.
+
+The real-time simulation in xDEVS is managed by the =RTCentralCoordinator= class, which extends the capabilities of the =CoordinatorParallel= to support real-time execution. The =RTCentralCoordinator= ensures that the simulation clock progresses in sync with the real-world clock, scaled by a user-defined factor.
+
+*** Key Features
+
+1. *Time Scaling*: The =RTCentralCoordinator= allows you to scale the simulation time relative to real-world time. This means you can run the simulation faster or slower than the actual system. The time scaling factor is set using the =setTimeScale= method.
+
+2. *Real-time Synchronization*: The coordinator ensures that the simulation events are processed in real-time, maintaining synchronization with the real-world clock.
+
+3. *Parallel Execution*: Leveraging the =CoordinatorParallel=, the real-time coordinator can distribute simulation tasks across multiple threads, enhancing performance.
+
+*** Setting Up a Real-time Simulation
+
+To set up a real-time simulation using xDEVS, follow these steps:
+
+1. *Define the Model*: Create your coupled model as usual. For example, let's use the =Efp= model.
+
+2. *Initialize the Real-time Coordinator*: Instantiate the =RTCentralCoordinator= with your model.
+
+3. *Set the Time Scale*: Define the time scaling factor to control the speed of the simulation relative to real-world time.
+
+4. *Run the Simulation*: Start the simulation for a specified duration.
+
+*** Example
+
+Below is an example demonstrating how to set up and run a real-time simulation using the =RTCentralCoordinator=:
+
+#+begin_src java
+import java.util.logging.Level;
+import xdevs.core.examples.efp.Efp;
+import xdevs.core.simulation.realtime.RTCentralCoordinator;
+import xdevs.core.util.DevsLogger;
+
+public class RealTimeSimulationExample {
+    public static void main(String[] args) {
+        double timeStart = System.currentTimeMillis();
+        DevsLogger.setup(Level.FINE);
+
+        // Create the EFP model
+        Efp efp = new Efp("EFP", 1, 3, 20);
+
+        // Initialize the real-time coordinator with the model
+        RTCentralCoordinator coordinator = new RTCentralCoordinator(efp);
+        coordinator.initialize();
+
+        // Set the time scale factor (e.g., 0.1 for 10x faster than real-time)
+        coordinator.setTimeScale(0.1);
+
+        // Run the simulation for 60 seconds of real-time
+        coordinator.simulate(60.0);
+
+        double timeEnd = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (timeEnd - timeStart) + "ms");
+    }
+}
+#+end_src
+
+*** Explanation
+
+1. *Model Initialization*: The =Efp= model is created and passed to the =RTCentralCoordinator=.
+
+2. *Time Scale Setting*: The =setTimeScale= method is used to set the time scaling factor. In this example, a factor of =0.1= means the simulation runs 10 times faster than real-time.
+
+3. *Simulation Execution*: The =simulate= method starts the real-time simulation for 60 seconds of real-world time.
+
+*** Conclusion
+
+Real-time simulation in xDEVS provides a powerful tool for applications requiring synchronization with real-world time. By using the =RTCentralCoordinator=, you can control the speed of your simulation, interact with it in real-time, and leverage parallel execution for enhanced performance. This feature is essential for developing and testing real-time systems and interactive applications.
