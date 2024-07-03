@@ -575,3 +575,106 @@ public class RealTimeSimulationExample {
 *** Conclusion
 
 Real-time simulation in xDEVS provides a powerful tool for applications requiring synchronization with real-world time. By using the =RTCentralCoordinator=, you can control the speed of your simulation, interact with it in real-time, and leverage parallel execution for enhanced performance. This feature is essential for developing and testing real-time systems and interactive applications.
+** Hardware in the loop
+
+** Hardware-in-the-Loop (HIL) Simulation with xDEVS
+
+Hardware-in-the-Loop (HIL) simulation is a powerful technique that integrates real hardware components into a simulation environment. This allows for testing and validation of systems in a more realistic setting, where the hardware interacts with the simulated environment in real-time. The xDEVS framework supports HIL simulation by providing real-time simulation capabilities and flexible communication interfaces.
+
+To follow the following sections, we refer the reader to: 
+
+- Óscar Fernández-Sebastián, Román Cárdenas, Patricia Arroba and José L. Risco-Martín (2024). A novel real-time DEVS simulation architecture with hardware-in-the-loop capabilities. Proceedings of the 2024 Annual Modeling and Simulation Conference (ANNSIM'24).
+
+*** Setting Up HIL Simulation in xDEVS
+
+To set up a HIL simulation using xDEVS, follow these steps:
+
+1. *Define the DEVS Model*: Create your DEVS model as usual. This model will represent the part of the system that is simulated.
+
+2. *Implement Input and Output Handlers*: Use the provided input and output handlers to interface with the hardware. These handlers will manage the communication between the DEVS model and the hardware components.
+
+3. *Configure the Real-Time Manager*: Set up the real-time manager to handle the timing and synchronization of the simulation with the real world.
+
+4. *Run the Simulation*: Initialize and run the simulation, ensuring that the real-time manager and handlers are correctly configured to interact with the hardware.
+
+*** Example: HIL Simulation with MQTT Protocol
+
+Below is an example of how to set up a HIL simulation using the MQTT protocol for communication between the DEVS model and the hardware.
+
+**** Step 1: Define the DEVS Model
+
+Create a DEVS model that represents the system to be simulated. For this example, let's assume we have a simple model of a store cashier system.
+
+#+begin_src java
+public class StoreCashier extends Coupled {
+    public StoreCashier(String name) {
+        super(name);
+        // Add components and couplings
+    }
+}
+#+end_src
+
+**** Step 2: Implement Input and Output Handlers
+
+Use the provided MQTT input and output handlers to manage communication with the hardware.
+
+#+begin_src python
+from xdevs.abc.handler import InputHandler, OutputHandler
+from xdevs.sim import RealTimeManager, RealTimeCoordinator
+
+class MQTTInputHandler(InputHandler):
+    def __init__(self, subscriptions, **kwargs):
+        super().__init__(**kwargs)
+        self.subscriptions = subscriptions
+        self.client = MQTTClient(event_queue=self.queue)
+
+    def initialize(self):
+        self.client.connect('mqtt_broker_address', 1883, 60)
+        for topic, qos in self.subscriptions.items():
+            self.client.subscribe(topic, qos)
+        self.client.loop_start()
+
+    def run(self):
+        while True:
+            event = self.queue.get()
+            self.push_event(event)
+
+class MQTTOutputHandler(OutputHandler):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.client = MQTTClient()
+
+    def initialize(self):
+        self.client.connect('mqtt_broker_address', 1883, 60)
+        self.client.loop_start()
+
+    def run(self):
+        while True:
+            topic, payload = self.pop_event()
+            self.client.publish(topic, payload)
+#+end_src
+
+**** Step 3: Configure the Real-Time Manager
+
+Set up the real-time manager to handle the timing and synchronization of the simulation.
+
+#+begin_src python
+manager = RealTimeManager(max_jitter=0.2, time_scale=1, event_window=0.5)
+manager.add_input_handler('mqtt', subscriptions={'topic/input': 0})
+manager.add_output_handler('mqtt', topic='topic/output')
+#+end_src
+
+**** Step 4: Run the Simulation
+
+Initialize and run the simulation using the real-time coordinator.
+
+#+begin_src python
+model = StoreCashier("StoreCashier")
+coordinator = RealTimeCoordinator(model, manager)
+coordinator.simulate_rt(60.0)  # Run the simulation for 60 seconds of real-time
+#+end_src
+
+*** Conclusion
+
+By following these steps, you can set up a HIL simulation using xDEVS. The real-time manager and input/output handlers provide a flexible and powerful way to integrate hardware components into your simulation, allowing for more realistic and comprehensive testing of your system. This approach is particularly useful for applications such as hardware-in-the-loop testing, real-time control systems, and interactive simulations.
+
