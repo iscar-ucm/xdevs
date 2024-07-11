@@ -25,3 +25,7 @@
 * Advanced features
 
 #+INCLUDE: 5-advanced-features.org :lines "2-"
+
+* Examples
+
+#+INCLUDE: 6-examples.org :lines "2-"
