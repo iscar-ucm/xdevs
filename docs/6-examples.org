@@ -4,11 +4,7 @@
 
 *** Problem Description
 
-In this example, we will model a simple traffic light system using the xDEVS/Python API. The traffic light will cycle through three states: Green, Yellow, and Red. Each state will have a specific duration, and the system will transition between these states in a loop.
-
-*** Model Implementation
-
-We will create an atomic model for the traffic light, which will handle the state transitions and timing. The traffic light will have one output port to indicate the current state.
+In this example, we will model a simple traffic light system using the xDEVS/Python API. The traffic light will cycle through three states: Green, Yellow, and Red. Each state will have a specific duration, and the system will transition between these states in a loop. We will create an atomic model for the traffic light, which will handle the state transitions and timing. The traffic light will have one output port to indicate the current state.
 
 *** Traffic Light Model
 
@@ -86,3 +82,157 @@ This example demonstrates how to model a simple traffic light system using the x
 *** Exercise
 
 Modify the previous example. There should be an output right after the change in the state, i.e., once the light turns green, yellow, or red, the output is triggered with the new color, instantaneously.
+
+** Queueing System Simulation
+
+*** Problem Description
+
+In this example, we will simulate a queueing system, such as a bank or a customer service center, using the xDEVS/Python API. The system will consist of a generator that produces customers, a queue where customers wait, and a server that processes the customers. The goal is to model the arrival, waiting, and service processes. We will create atomic models for the generator, queue, and server. The generator will produce customers at a specified rate, the queue will manage the waiting customers, and the server will process the customers.
+
+*** TODO Queueing System Model
+
+#+begin_src python
+from xdevs.models import Atomic, Port
+from xdevs.sim import Coordinator, SimulationClock
+
+class Customer:
+    def __init__(self, id):
+        self.id = id
+
+class Generator(Atomic):
+    def __init__(self, name, interarrival_time):
+        super().__init__(name)
+        self.interarrival_time = interarrival_time
+        self.customer_id = 0
+        self.output_port = Port(Customer, "out")
+        self.add_out_port(self.output_port)
+
+    def initialize(self):
+        self.hold_in("active", self.interarrival_time)
+
+    def deltint(self):
+        self.customer_id += 1
+        self.hold_in("active", self.interarrival_time)
+
+    def lambdaf(self):
+        self.output_port.add(Customer(self.customer_id))
+
+    def deltext(self, e):
+        pass
+
+    def exit(self):
+        pass
+
+class Queue(Atomic):
+    def __init__(self, name):
+        super().__init__(name)
+        self.queue = []
+        self.input_port = Port(Customer, "in")
+        self.output_port = Port(Customer, "out")
+        self.add_in_port(self.input_port)
+        self.add_out_port(self.output_port)
+
+    def initialize(self):
+        self.passivate()
+
+    def deltint(self):
+        if self.queue:
+            self.hold_in("active", 0)
+        else:
+            self.passivate()
+
+    def deltext(self, e):
+        if self.input_port:
+            self.queue.append(self.input_port.get())
+            if self.phase == "passive":
+                self.hold_in("active", 0)
+
+    def lambdaf(self):
+        if self.queue:
+            self.output_port.add(self.queue.pop(0))
+
+    def exit(self):
+        pass
+
+class Server(Atomic):
+    def __init__(self, name, service_time):
+        super().__init__(name)
+        self.service_time = service_time
+        self.current_customer = None
+        self.input_port = Port(Customer, "in")
+        self.add_in_port(self.input_port)
+
+    def initialize(self):
+        self.passivate()
+
+    def deltint(self):
+        self.current_customer = None
+        self.passivate()
+
+    def deltext(self, e):
+        if self.input_port:
+            self.current_customer = self.input_port.get()
+            self.hold_in("busy", self.service_time)
+
+    def lambdaf(self):
+        pass
+
+    def exit(self):
+        pass
+
+class QueueingSystem(Coupled):
+    def __init__(self, name, interarrival_time, service_time):
+        super().__init__(name)
+        self.generator = Generator("Generator", interarrival_time)
+        self.queue = Queue("Queue")
+        self.server = Server("Server", service_time)
+
+        self.add_component(self.generator)
+        self.add_component(self.queue)
+        self.add_component(self.server)
+
+        self.add_coupling(self.generator.output_port, self.queue.input_port)
+        self.add_coupling(self.queue.output_port, self.server.input_port)
+#+end_src
+
+*** Simulation setup
+
+#+begin_src python
+if __name__ == "__main__":
+    interarrival_time = 5.0
+    service_time = 3.0
+
+    queueing_system = QueueingSystem("QueueingSystem", interarrival_time, service_time)
+    clock = SimulationClock()
+    coordinator = Coordinator(queueing_system, clock)
+
+    coordinator.initialize()
+    coordinator.simulate(100)  # Simulate for 100 iterations
+#+end_src
+
+*** Explanation
+
+1. /Customer Class/: Represents a customer with a unique ID.
+
+2. /Generator Class/: Produces customers at a specified interarrival time.
+   - =initialize()=: Sets the initial state to active and the initial time advance to the interarrival time.
+   - =deltint()=: Handles internal transitions by incrementing the customer ID and setting the next event.
+   - =lambdaf()=: Outputs a new customer to the output port.
+
+3. /Queue Class/: Manages the waiting customers.
+   - =initialize()=: Sets the initial state to passive.
+   - =deltint()=: Handles internal transitions by checking the queue and setting the next event.
+   - =deltext()=: Handles external transitions by adding customers to the queue.
+   - =lambdaf()=: Outputs the next customer from the queue.
+
+4. /Server Class/: Processes customers with a specified service time.
+   - =initialize()=: Sets the initial state to passive.
+   - =deltint()=: Handles internal transitions by setting the server to idle.
+   - =deltext()=: Handles external transitions by starting the service for a new customer.
+
+5. /QueueingSystem Class/: A coupled model that integrates the generator, queue, and server.
+   - =__init__()=: Initializes the components and sets up the couplings between them.
+
+6. /Simulation Setup/: The main block sets up the queueing system model with specified interarrival and service times. It then creates a =Coordinator= to manage the simulation and runs the simulation for 100 iterations.
+
+This example demonstrates how to model a queueing system using the xDEVS/Python API, showcasing the basic principles of discrete event simulation with DEVS formalism.
