@@ -1,6 +1,6 @@
 * Examples
 
-** Traffic Light System Example
+** Traffic light system example
 
 *** Problem Description
 
@@ -83,7 +83,7 @@ This example demonstrates how to model a simple traffic light system using the x
 
 Modify the previous example. There should be an output right after the change in the state, i.e., once the light turns green, yellow, or red, the output is triggered with the new color, instantaneously.
 
-** Queueing System Simulation
+** Queueing system simulation
 
 *** Problem Description
 
@@ -236,3 +236,302 @@ if __name__ == "__main__":
 6. /Simulation Setup/: The main block sets up the queueing system model with specified interarrival and service times. It then creates a =Coordinator= to manage the simulation and runs the simulation for 100 iterations.
 
 This example demonstrates how to model a queueing system using the xDEVS/Python API, showcasing the basic principles of discrete event simulation with DEVS formalism.
+
+** Parallel Simulation Example
+
+In this section, we will demonstrate how to run a parallel simulation using the DEVS/Java API. We will use the Experimental Frame - Processor (EFP) model as an example. The EFP model consists of a generator, a processor, and a transducer. The generator produces jobs, the processor processes them, and the transducer collects statistics.
+
+*** EFP Model
+
+The EFP model is a coupled model that integrates the generator, processor, and transducer components.
+
+#+begin_src java
+package xdevs.core.examples.efp;
+
+import java.util.logging.Level;
+import xdevs.core.modeling.Coupled;
+import xdevs.core.simulation.Coordinator;
+import xdevs.core.util.DevsLogger;
+
+public class Efp extends Coupled {
+
+    public Efp(String name, double generatorPeriod, double processorPeriod, double transducerPeriod) {
+        super(name);
+
+        Ef ef = new Ef("ef", generatorPeriod, transducerPeriod);
+        super.addComponent(ef);
+        Processor processor = new Processor("processor", processorPeriod);
+        super.addComponent(processor);
+
+        super.addCoupling(ef.oOut, processor.iIn);
+        super.addCoupling(processor.oOut, ef.iIn);
+    }
+
+    public static void main(String args[]) {
+        DevsLogger.setup(Level.FINE);
+        Efp efp = new Efp("efp", 1, 3, 100);
+        Coordinator coordinator = new Coordinator(efp);
+        coordinator.initialize();
+        coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
+    }
+}
+#+end_src
+
+*** Generator
+
+The generator produces jobs at a specified period.
+
+#+begin_src java
+package xdevs.core.examples.efp;
+
+import org.w3c.dom.Element;
+import xdevs.core.modeling.Atomic;
+import xdevs.core.modeling.Port;
+
+public class Generator extends Atomic {
+    public Port<Job> iStop = new Port<>("iStop");
+    public Port<Job> oOut = new Port<>("oOut");
+    protected int jobCounter;
+    protected double period;
+
+    public Generator(String name, double period) {
+        super(name);
+        super.addInPort(iStop);
+        super.addOutPort(oOut);
+        this.period = period;
+    }
+
+    public Generator(Element xmlAtomic) {
+        this(xmlAtomic.getAttribute("name"), Double.parseDouble(
+                ((Element) (xmlAtomic.getElementsByTagName("constructor-arg").item(0))).getAttribute("value")));
+    }
+
+    @Override
+    public void initialize() {
+        jobCounter = 1;
+        this.holdIn("active", period);
+    }
+
+    @Override
+    public void exit() {
+    }
+
+    @Override
+    public void deltint() {
+        jobCounter++;
+        this.holdIn("active", period);
+    }
+
+    @Override
+    public void deltext(double e) {
+        super.resume(e);
+        super.passivate();
+    }
+
+    @Override
+    public void lambda() {
+        Job job = new Job("" + jobCounter + "");
+        oOut.addValue(job);
+    }
+}
+#+end_src
+
+*** Processor
+
+The processor processes jobs with a given processing time.
+
+#+begin_src java
+package xdevs.core.examples.efp;
+
+import org.w3c.dom.Element;
+import xdevs.core.modeling.Atomic;
+import xdevs.core.modeling.Port;
+
+public class Processor extends Atomic {
+
+    protected Port<Job> iIn = new Port<>("in");
+    protected Port<Job> oOut = new Port<>("out");
+    protected Job currentJob = null;
+    protected double processingTime;
+    protected double clock;
+
+    public Processor(String name, double processingTime) {
+        super(name);
+        super.addInPort(iIn);
+        super.addOutPort(oOut);
+        this.processingTime = processingTime;
+        this.clock = 0;
+    }
+
+    public Processor(Element xmlAtomic) {
+        this(xmlAtomic.getAttribute("name"), 
+             Double.parseDouble(((Element)(xmlAtomic.getElementsByTagName("constructor-arg").item(0))).getAttribute("value")));
+    }
+
+    @Override
+    public void initialize() {
+        super.passivate();
+    }
+
+    @Override
+    public void exit() {
+    }
+
+    @Override
+    public void deltint() {
+        clock += super.getSigma();
+        super.passivate();
+    }
+
+    @Override
+    public void deltext(double e) {
+        super.resume(e);
+        clock += e;
+        if (super.phaseIs("passive")) {
+            currentJob = iIn.getSingleValue();
+            super.holdIn("active", processingTime);
+            currentJob.time = clock;
+        }
+    }
+
+    @Override
+    public void lambda() {
+        oOut.addValue(currentJob);
+    }
+}
+#+end_src
+
+*** Transducer
+
+The transducer collects statistics about the jobs and finishes the simulation when the observation time is reached.
+
+#+begin_src java
+package xdevs.core.examples.efp;
+
+import java.util.LinkedList;
+import java.util.logging.Logger;
+import org.w3c.dom.Element;
+import xdevs.core.modeling.Atomic;
+import xdevs.core.modeling.Port;
+
+public class Transducer extends Atomic {
+
+    private static final Logger LOGGER = Logger.getLogger(Transducer.class.getName());
+
+    public Port<Job> iArrived = new Port<>("iArrived");
+    public Port<Job> iSolved = new Port<>("iSolved");
+    public Port<Job> oOut = new Port<>("oOut");
+    protected LinkedList<Job> jobsArrived = new LinkedList<>();
+    protected LinkedList<Job> jobsSolved = new LinkedList<>();
+    protected double observationTime;
+    protected double totalTa;
+    protected double clock;
+
+    public Transducer(String name, double observationTime) {
+        super(name);
+        super.addInPort(iArrived);
+        super.addInPort(iSolved);
+        super.addOutPort(oOut);
+        totalTa = 0;
+        clock = 0;
+        this.observationTime = observationTime;
+    }
+
+    public Transducer(Element xmlAtomic) {
+        this(xmlAtomic.getAttribute("name"), 
+             Double.parseDouble(((Element)(xmlAtomic.getElementsByTagName("constructor-arg").item(0))).getAttribute("value")));
+    }
+
+    @Override
+    public void initialize() {
+        super.holdIn("active", observationTime);
+    }
+
+    @Override
+    public void exit() {
+    }
+
+    @Override
+    public void deltint() {
+        clock = clock + getSigma();
+        double throughput;
+        double avgTaTime;
+        if (phaseIs("active")) {
+            if (!jobsSolved.isEmpty()) {
+                avgTaTime = totalTa / jobsSolved.size();
+                if (clock > 0.0) {
+                    throughput = jobsSolved.size() / clock;
+                } else {
+                    throughput = 0.0;
+                }
+            } else {
+                avgTaTime = 0.0;
+                throughput = 0.0;
+            }
+            LOGGER.info("End time: " + clock);
+            LOGGER.info("Jobs arrived : " + jobsArrived.size());
+            LOGGER.info("Jobs solved : " + jobsSolved.size());
+            LOGGER.info("Average TA = " + avgTaTime);
+            LOGGER.info("Throughput = " + throughput);
+            holdIn("done", 0);
+        } else {
+            passivate();
+        }
+    }
+
+    @Override
+    public void deltext(double e) {
+        super.resume(e);
+        clock = clock + e;
+        if (phaseIs("active")) {
+            if (!iArrived.isEmpty()) {
+                Job job = iArrived.getSingleValue();
+                LOGGER.fine("Start job " + job.id + " @ t = " + clock);
+                job.time = clock;
+                jobsArrived.add(job);
+            }
+            if (!iSolved.isEmpty()) {
+                for(Job job : iSolved.getValues()) {
+                    totalTa += (clock - job.time);
+                    LOGGER.fine("Finish job " + job.id + " @ t = " + clock);
+                    job.time = clock;
+                    jobsSolved.add(job);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void lambda() {
+        if (phaseIs("done")) {
+            Job job = new Job("null");
+            oOut.addValue(job);
+        }
+    }
+}
+#+end_src
+
+*** Parallel Execution
+
+The parallel coordinator manages the parallel execution of the simulation.
+
+#+begin_src java
+// Complete the imports ...
+
+public class ParallelExample {
+
+    // ...
+
+    public static void main(String[] args) {
+        DevsLogger.setup(Level.INFO);
+        Efp efp = new Efp("EFP", 1, 3, 1000000);
+        CoordinatorParallel coordinator = new CoordinatorParallel(efp);
+        coordinator.initialize();
+        coordinator.simulate(Long.MAX_VALUE);
+        coordinator.exit();
+    }
+}
+#+end_src
+
+This example demonstrates how to run a parallel simulation using the DEVS/Java API. The =CoordinatorParallel= class manages the parallel execution of the simulation, allowing for efficient processing of the EFP model components.

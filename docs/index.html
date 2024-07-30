@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-17 mié 09:34 -->
+<!-- 2024-07-30 mar 12:19 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>xDEVS user's manual</title>
@@ -92,62 +92,63 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9c29d52">Introduction to xDEVS</a>
+<li><a href="#org06a1d3e">Introduction to xDEVS</a>
 <ul>
-<li><a href="#orgfda00ff">Introduction</a></li>
-<li><a href="#orgc9e702c">Top features</a></li>
-<li><a href="#orge9313b7">Quick start</a></li>
+<li><a href="#orgd4e9259">Introduction</a></li>
+<li><a href="#org3f994e6">Top features</a></li>
+<li><a href="#orgd16ecc7">Quick start</a></li>
 </ul>
 </li>
-<li><a href="#orgb891ee6">The DEVS formalism</a>
+<li><a href="#org923969d">The DEVS formalism</a>
 <ul>
-<li><a href="#org34555d9">Bibliography</a></li>
+<li><a href="#orga68fe34">Bibliography</a></li>
 </ul>
 </li>
-<li><a href="#orgeaae527">Getting started with xDEVS</a>
+<li><a href="#org4ba0504">Getting started with xDEVS</a>
 <ul>
-<li><a href="#org3eacc86">Output Function</a></li>
-<li><a href="#org68afe9c">Internal Transition Function</a></li>
-<li><a href="#orgf744744">External Transition Function</a></li>
-<li><a href="#org7407c22">Complete model implementation</a></li>
-<li><a href="#org5be7f9a">Running the model</a></li>
+<li><a href="#org0e1ccd9">Output Function</a></li>
+<li><a href="#org81f5556">Internal Transition Function</a></li>
+<li><a href="#orgdfc76a5">External Transition Function</a></li>
+<li><a href="#orga920bb4">Complete model implementation</a></li>
+<li><a href="#org72e88f7">Running the model</a></li>
 </ul>
 </li>
-<li><a href="#org68ec201">Building models in xDEVS</a>
+<li><a href="#org5630d8b">Building models in xDEVS</a>
 <ul>
-<li><a href="#org06a721f">Atomic models</a></li>
-<li><a href="#org361c3af">Coupled models</a></li>
-<li><a href="#orgebe3ad6">Models configuration</a></li>
+<li><a href="#org0734dd9">Atomic models</a></li>
+<li><a href="#orga66e061">Coupled models</a></li>
+<li><a href="#org8165415">Models configuration</a></li>
 </ul>
 </li>
-<li><a href="#org68b5a1f">Advanced features</a>
+<li><a href="#org495805b">Advanced features</a>
 <ul>
-<li><a href="#org77a4113">Wrappers</a></li>
-<li><a href="#orgf1d576f">Models Flattening</a></li>
-<li><a href="#orga1c77a4">Parallel simulation</a></li>
-<li><a href="#orgf8a273d">Distributed Simulation</a></li>
-<li><a href="#org30d49ea">Real-time simulation</a></li>
-<li><a href="#orgaba15ef">Hardware in the loop</a></li>
-<li><a href="#org5dfd389">Hardware-in-the-Loop (HIL) Simulation with xDEVS</a></li>
+<li><a href="#orgdc6d79c">Wrappers</a></li>
+<li><a href="#org656868a">Models Flattening</a></li>
+<li><a href="#orgd3f8c5a">Parallel simulation</a></li>
+<li><a href="#org3b836e7">Distributed Simulation</a></li>
+<li><a href="#org9c51747">Real-time simulation</a></li>
+<li><a href="#org5305655">Hardware in the loop</a></li>
+<li><a href="#org4b43980">Hardware-in-the-Loop (HIL) Simulation with xDEVS</a></li>
 </ul>
 </li>
-<li><a href="#org79aad21">Examples</a>
+<li><a href="#orgdccddf0">Examples</a>
 <ul>
-<li><a href="#orgc3eaf93">Traffic Light System Example</a></li>
-<li><a href="#orgd52c476">Queueing System Simulation</a></li>
+<li><a href="#orgb4ee5a2">Traffic light system example</a></li>
+<li><a href="#orgc8c89de">Queueing system simulation</a></li>
+<li><a href="#orgf9a5dd6">Parallel Simulation Example</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org9c29d52" class="outline-2">
-<h2 id="org9c29d52">Introduction to xDEVS</h2>
-<div class="outline-text-2" id="text-org9c29d52">
+<div id="outline-container-org06a1d3e" class="outline-2">
+<h2 id="org06a1d3e">Introduction to xDEVS</h2>
+<div class="outline-text-2" id="text-org06a1d3e">
 </div>
-<div id="outline-container-orgfda00ff" class="outline-3">
-<h3 id="orgfda00ff">Introduction</h3>
-<div class="outline-text-3" id="text-orgfda00ff">
+<div id="outline-container-orgd4e9259" class="outline-3">
+<h3 id="orgd4e9259">Introduction</h3>
+<div class="outline-text-3" id="text-orgd4e9259">
 <p>
 xDEVS stands for <i>A cross-platform (x) Discrete EVent System simulator</i>. This library includes a set of C, C++, C#, Go, Java, Python and Rust repositories that provide an event-driven simulation interface. This interface follows the formalism <i>Discrete Event System Specification (DEVS)</i>. The project final goal is to elaborate the fastest DEVS simulation interface with capacity to simulate models in virtual and real time, and to run simulations in sequential (single-threaded), parallel (multi-threaded) and distributed (not shared memory) architectures. 
 </p>
@@ -185,9 +186,9 @@ The xDEVS user's manual can be found <a href="https://iscar-ucm.github.io/xdevs/
 </div>
 </div>
 
-<div id="outline-container-orgc9e702c" class="outline-3">
-<h3 id="orgc9e702c">Top features</h3>
-<div class="outline-text-3" id="text-orgc9e702c">
+<div id="outline-container-org3f994e6" class="outline-3">
+<h3 id="org3f994e6">Top features</h3>
+<div class="outline-text-3" id="text-org3f994e6">
 <ul class="org-ul">
 <li>PDEVS Modeling and Simulation formalism</li>
 <li>Object-Oriented Programming</li>
@@ -197,9 +198,9 @@ The xDEVS user's manual can be found <a href="https://iscar-ucm.github.io/xdevs/
 </div>
 </div>
 
-<div id="outline-container-orge9313b7" class="outline-3">
-<h3 id="orge9313b7">Quick start</h3>
-<div class="outline-text-3" id="text-orge9313b7">
+<div id="outline-container-orgd16ecc7" class="outline-3">
+<h3 id="orgd16ecc7">Quick start</h3>
+<div class="outline-text-3" id="text-orgd16ecc7">
 <p>
 Switch to the corresponding particular language. A README file will be found to start with minimal examples and demos.
 </p>
@@ -207,9 +208,9 @@ Switch to the corresponding particular language. A README file will be found to 
 </div>
 </div>
 
-<div id="outline-container-orgb891ee6" class="outline-2">
-<h2 id="orgb891ee6">The DEVS formalism</h2>
-<div class="outline-text-2" id="text-orgb891ee6">
+<div id="outline-container-org923969d" class="outline-2">
+<h2 id="org923969d">The DEVS formalism</h2>
+<div class="outline-text-2" id="text-org923969d">
 <p>
 The Discrete EVent system Specification (DEVS) formalism [1] was first introduced by Zeigler in 1976, to provide a rigorous common basis for discrete-event modeling and simulation. A "common" basis means that it is possible to express popular discrete-event formalisms such as event-scheduling, activity-scanning and process-interaction using the DEVS formalism.
 </p>
@@ -261,9 +262,9 @@ The reader should refer to the book Theory of Modeling and Simulation [1], to un
 </p>
 </div>
 
-<div id="outline-container-orgb0bc208" class="outline-4">
-<h4 id="orgb0bc208">The parallel DEVS formalism</h4>
-<div class="outline-text-4" id="text-orgb0bc208">
+<div id="outline-container-org615e945" class="outline-4">
+<h4 id="org615e945">The parallel DEVS formalism</h4>
+<div class="outline-text-4" id="text-org615e945">
 <p>
 The parallel DEVS approach was introduced, after 15 years, as a revision of Classic DEVS. Currently, parallel DEVS is the prevalent DEVS, implemented in many libraries. In the following, unless it is explicitly noted, the use of DEVS implies parallel DEVS.
 </p>
@@ -323,9 +324,9 @@ Given the recursive definition of <b>M</b>, a coupled model can itself be a part
 
 
 
-<div id="outline-container-orgbac46de" class="outline-5">
-<h5 id="orgbac46de">EXAMPLE 1</h5>
-<div class="outline-text-5" id="text-orgbac46de">
+<div id="outline-container-org0aa22c0" class="outline-5">
+<h5 id="org0aa22c0">EXAMPLE 1</h5>
+<div class="outline-text-5" id="text-org0aa22c0">
 <p>
 A processor atomic model consumes a job j. When the processor receives a job through an input port, thus the processor remains busy until the processing time j<sub>p</sub> is finished. Then it sends the job through an output port.
 </p>
@@ -351,9 +352,9 @@ Processor=〈X,S,Y,δ<sub>int</sub>,δ<sub>ext</sub>,δ<sub>con</sub>,λ,ta〉
 </div>
 </div>
 
-<div id="outline-container-orgcc25cab" class="outline-5">
-<h5 id="orgcc25cab">EXAMPLE 2</h5>
-<div class="outline-text-5" id="text-orgcc25cab">
+<div id="outline-container-orgbccede5" class="outline-5">
+<h5 id="orgbccede5">EXAMPLE 2</h5>
+<div class="outline-text-5" id="text-orgbccede5">
 <p>
 Figure 2 shows an example of a DEVS coupled model with three components, M1, M2 y M3, as well as their couplings. These models are interconnected through the corresponding I/O ports presented in the Figure. The models are connected to the external coupled models through the EIC and EOC connectors. M1, M2 and M3 can be atomic or coupled models.
 </p>
@@ -386,9 +387,9 @@ where:
 </div>
 </div>
 
-<div id="outline-container-org9b7343a" class="outline-5">
-<h5 id="org9b7343a">EXAMPLE 3</h5>
-<div class="outline-text-5" id="text-org9b7343a">
+<div id="outline-container-orgba90c22" class="outline-5">
+<h5 id="orgba90c22">EXAMPLE 3</h5>
+<div class="outline-text-5" id="text-orgba90c22">
 <p>
 The Experimental frame – Processor model is usually presented as one of the initial examples to start to practice with DEVS modeling and simulation. It is a DEVS coupled model consisting of three atomic models and one coupled model (see Figure 3).
 </p>
@@ -488,9 +489,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-org34555d9" class="outline-3">
-<h3 id="org34555d9">Bibliography</h3>
-<div class="outline-text-3" id="text-org34555d9">
+<div id="outline-container-orga68fe34" class="outline-3">
+<h3 id="orga68fe34">Bibliography</h3>
+<div class="outline-text-3" id="text-orga68fe34">
 <ol class="org-ol">
 <li>Zeigler, B. P.; Muzy, A. &amp; Kofman, E. Theory of modeling and simulation: discrete event &amp; iterative system computational foundations Academic press, 2018.</li>
 <li>Mittal, S. &amp; Risco-Martín, J. L. Netcentric system of systems engineering with DEVS unified process CRC Press, 2013.</li>
@@ -500,9 +501,9 @@ where J<sub>A</sub> and J<sub>S</sub> are sets of arrived and solved jobs, respe
 </div>
 </div>
 
-<div id="outline-container-orgeaae527" class="outline-2">
-<h2 id="orgeaae527">Getting started with xDEVS</h2>
-<div class="outline-text-2" id="text-orgeaae527">
+<div id="outline-container-org4ba0504" class="outline-2">
+<h2 id="org4ba0504">Getting started with xDEVS</h2>
+<div class="outline-text-2" id="text-org4ba0504">
 <p>
 In this section, we introduce the basics of xDEVS by developing a simple Ping Pong model. This model is inspired by the DEVS formalism as described on Wikipedia: <a href="https://en.wikipedia.org/wiki/DEVS">https://en.wikipedia.org/wiki/DEVS</a>
 </p>
@@ -518,9 +519,9 @@ The Ping Pong model simulates two players hitting a ball back and forth. We will
 </p>
 </div>
 
-<div id="outline-container-org3eacc86" class="outline-3">
-<h3 id="org3eacc86">Output Function</h3>
-<div class="outline-text-3" id="text-org3eacc86">
+<div id="outline-container-org0e1ccd9" class="outline-3">
+<h3 id="org0e1ccd9">Output Function</h3>
+<div class="outline-text-3" id="text-org0e1ccd9">
 <p>
 The output function \(\lambda\) determines the output based on the current state:
 </p>
@@ -554,9 +555,9 @@ This is implemented in Python as follows:
 </div>
 </div>
 
-<div id="outline-container-org68afe9c" class="outline-3">
-<h3 id="org68afe9c">Internal Transition Function</h3>
-<div class="outline-text-3" id="text-org68afe9c">
+<div id="outline-container-org81f5556" class="outline-3">
+<h3 id="org81f5556">Internal Transition Function</h3>
+<div class="outline-text-3" id="text-org81f5556">
 <p>
 The internal transition function \(\delta_{int}\) updates the state based on the elapsed time:
 </p>
@@ -595,9 +596,9 @@ Implemented in Python:
 </div>
 </div>
 
-<div id="outline-container-orgf744744" class="outline-3">
-<h3 id="orgf744744">External Transition Function</h3>
-<div class="outline-text-3" id="text-orgf744744">
+<div id="outline-container-orgdfc76a5" class="outline-3">
+<h3 id="orgdfc76a5">External Transition Function</h3>
+<div class="outline-text-3" id="text-orgdfc76a5">
 <p>
 The external transition function \(\delta_{ext}\) modifies the state in response to external events:
 </p>
@@ -630,9 +631,9 @@ Python implementation:
 </div>
 </div>
 
-<div id="outline-container-org7407c22" class="outline-3">
-<h3 id="org7407c22">Complete model implementation</h3>
-<div class="outline-text-3" id="text-org7407c22">
+<div id="outline-container-orga920bb4" class="outline-3">
+<h3 id="orga920bb4">Complete model implementation</h3>
+<div class="outline-text-3" id="text-orga920bb4">
 <p>
 The complete Python implementation of the Ping Pong model using xDEVS is as follows:
 </p>
@@ -703,9 +704,9 @@ PHASE_WAIT:<span style="color: #f08080;">str</span> = <span style="color: #deb88
 </div>
 </div>
 
-<div id="outline-container-org5be7f9a" class="outline-3">
-<h3 id="org5be7f9a">Running the model</h3>
-<div class="outline-text-3" id="text-org5be7f9a">
+<div id="outline-container-org72e88f7" class="outline-3">
+<h3 id="org72e88f7">Running the model</h3>
+<div class="outline-text-3" id="text-org72e88f7">
 <p>
 To run the model, follow these steps on Ubuntu 22.04:
 </p>
@@ -727,21 +728,21 @@ Player B receives the ball
 </div>
 </div>
 
-<div id="outline-container-org68ec201" class="outline-2">
-<h2 id="org68ec201">Building models in xDEVS</h2>
-<div class="outline-text-2" id="text-org68ec201">
+<div id="outline-container-org5630d8b" class="outline-2">
+<h2 id="org5630d8b">Building models in xDEVS</h2>
+<div class="outline-text-2" id="text-org5630d8b">
 </div>
-<div id="outline-container-org06a721f" class="outline-3">
-<h3 id="org06a721f">Atomic models</h3>
-<div class="outline-text-3" id="text-org06a721f">
+<div id="outline-container-org0734dd9" class="outline-3">
+<h3 id="org0734dd9">Atomic models</h3>
+<div class="outline-text-3" id="text-org0734dd9">
 <p>
 In xDEVS, atomic models are the fundamental building blocks for constructing simulation models. An atomic model in xDEVS encapsulates the behavior of a system component that cannot be further decomposed into smaller components. It defines the state changes and interactions of the component in response to internal and external events.
 </p>
 </div>
 
-<div id="outline-container-org618bbf5" class="outline-4">
-<h4 id="org618bbf5">Structure of an atomic model</h4>
-<div class="outline-text-4" id="text-org618bbf5">
+<div id="outline-container-org5e4ded3" class="outline-4">
+<h4 id="org5e4ded3">Structure of an atomic model</h4>
+<div class="outline-text-4" id="text-org5e4ded3">
 <p>
 The <code>Atomic</code> class, derived from the <code>Component</code> class and marked as an abstract base class, serves as the base class for all atomic models in xDEVS. Here's a breakdown of its key components and functionalities:
 </p>
@@ -770,9 +771,9 @@ The <code>Atomic</code> class, derived from the <code>Component</code> class and
 </div>
 </div>
 
-<div id="outline-container-orgfb0033e" class="outline-4">
-<h4 id="orgfb0033e">Implementing an atomic model</h4>
-<div class="outline-text-4" id="text-orgfb0033e">
+<div id="outline-container-orgf9a4854" class="outline-4">
+<h4 id="orgf9a4854">Implementing an atomic model</h4>
+<div class="outline-text-4" id="text-orgf9a4854">
 <p>
 To implement an atomic model in xDEVS, you need to subclass the <code>Atomic</code> class and provide concrete implementations for the <code>deltint</code>, <code>deltext</code>, and <code>lambdaf</code> methods. Each method should define how the model reacts to different types of events and manages its state transitions effectively.
 </p>
@@ -809,9 +810,9 @@ This model demonstrates basic internal and external transitions. It continuously
 </div>
 </div>
 
-<div id="outline-container-org72df5bd" class="outline-4">
-<h4 id="org72df5bd">Ports</h4>
-<div class="outline-text-4" id="text-org72df5bd">
+<div id="outline-container-orgc04adca" class="outline-4">
+<h4 id="orgc04adca">Ports</h4>
+<div class="outline-text-4" id="text-orgc04adca">
 <p>
 In xDEVS, ports are essential for enabling communication between atomic models and facilitating the flow of events in a coupled model configuration. Ports are used to send and receive messages, allowing models to interact with each other.
 </p>
@@ -893,17 +894,17 @@ By defining and using ports, you can create complex coupled models where multipl
 </div>
 </div>
 
-<div id="outline-container-org361c3af" class="outline-3">
-<h3 id="org361c3af">Coupled models</h3>
-<div class="outline-text-3" id="text-org361c3af">
+<div id="outline-container-orga66e061" class="outline-3">
+<h3 id="orga66e061">Coupled models</h3>
+<div class="outline-text-3" id="text-orga66e061">
 <p>
 In xDEVS, coupled models are composite models that consist of multiple atomic and/or other coupled models. They define the structure and interaction of these submodels, enabling the construction of complex systems by combining simpler components. Coupled models manage the routing of messages between their submodels and handle the overall coordination of events.
 </p>
 </div>
 
-<div id="outline-container-org6335c97" class="outline-4">
-<h4 id="org6335c97">Structure of a coupled model</h4>
-<div class="outline-text-4" id="text-org6335c97">
+<div id="outline-container-orge16ac71" class="outline-4">
+<h4 id="orge16ac71">Structure of a coupled model</h4>
+<div class="outline-text-4" id="text-orge16ac71">
 <p>
 The <code>Coupled</code> class, derived from the <code>Component</code> class, serves as the base class for all coupled models in xDEVS. Here are the key components and functionalities of a coupled model:
 </p>
@@ -925,9 +926,9 @@ The <code>Coupled</code> class, derived from the <code>Component</code> class, s
 </div>
 </div>
 
-<div id="outline-container-orgc001a2c" class="outline-4">
-<h4 id="orgc001a2c">Implementing a coupled model</h4>
-<div class="outline-text-4" id="text-orgc001a2c">
+<div id="outline-container-orgf63a867" class="outline-4">
+<h4 id="orgf63a867">Implementing a coupled model</h4>
+<div class="outline-text-4" id="text-orgf63a867">
 <p>
 To implement a coupled model in xDEVS, you need to subclass the <code>Coupled</code> class and define its submodels and couplings. Here is an example of a simple coupled model that combines a <code>Generator</code> and a <code>Processor</code>:
 </p>
@@ -970,9 +971,9 @@ By defining submodels and their couplings, you can create complex systems that s
 </div>
 </div>
 
-<div id="outline-container-orgebe3ad6" class="outline-3">
-<h3 id="orgebe3ad6">Models configuration</h3>
-<div class="outline-text-3" id="text-orgebe3ad6">
+<div id="outline-container-org8165415" class="outline-3">
+<h3 id="org8165415">Models configuration</h3>
+<div class="outline-text-3" id="text-org8165415">
 <p>
 In this section, we will configure and run a simulation using the xDEVS framework. The provided source code defines several atomic models (Generator, Processor, and Transducer) and a coupled model (Gpt) that combines these atomic models. We will walk through the configuration and execution of the simulation.
 </p>
@@ -1190,17 +1191,17 @@ In this configuration:
 </div>
 </div>
 
-<div id="outline-container-org68b5a1f" class="outline-2">
-<h2 id="org68b5a1f">Advanced features</h2>
-<div class="outline-text-2" id="text-org68b5a1f">
+<div id="outline-container-org495805b" class="outline-2">
+<h2 id="org495805b">Advanced features</h2>
+<div class="outline-text-2" id="text-org495805b">
 <p>
 These advanced features are mostly implemented in xDEVS/Java. In the following, all the examples will be provided using the xDEVS/Java API.
 </p>
 </div>
 
-<div id="outline-container-org77a4113" class="outline-3">
-<h3 id="org77a4113">Wrappers</h3>
-<div class="outline-text-3" id="text-org77a4113">
+<div id="outline-container-orgdc6d79c" class="outline-3">
+<h3 id="orgdc6d79c">Wrappers</h3>
+<div class="outline-text-3" id="text-orgdc6d79c">
 <p>
 Adding compatibility between different DEVS simulation engines, and more specifically, between DEVS models developed in the same programming language, is the first step to designing a DEVS M&amp;S interoperable framework. Thus, xDEVS incorporates adapters to interact with other simulation engines.
 </p>
@@ -1509,9 +1510,9 @@ This class allows a coupled model to be simulated as an atomic model, facilitati
 </div>
 </div>
 
-<div id="outline-container-orgf1d576f" class="outline-3">
-<h3 id="orgf1d576f">Models Flattening</h3>
-<div class="outline-text-3" id="text-orgf1d576f">
+<div id="outline-container-org656868a" class="outline-3">
+<h3 id="org656868a">Models Flattening</h3>
+<div class="outline-text-3" id="text-org656868a">
 <p>
 Model flattening is often used to simplify models for simulation efficiency and reduce the overheads introduced by message passing between coordinators in complex models with deep hierarchies. This technique takes advantage of the closure under coupling property to generate an equivalent single-level model from the original model. Hence, the intermediate coupled models are eliminated, and the message passing happens directly between all the atomic models. This algorithm has been incorporated in all the xDEVS branches, allowing this transformation when specifying the simulation root coordinator.
 </p>
@@ -1573,9 +1574,9 @@ This will ensure that the model is flattened, eliminating intermediate coupled m
 </div>
 </div>
 
-<div id="outline-container-orga1c77a4" class="outline-3">
-<h3 id="orga1c77a4">Parallel simulation</h3>
-<div class="outline-text-3" id="text-orga1c77a4">
+<div id="outline-container-orgd3f8c5a" class="outline-3">
+<h3 id="orgd3f8c5a">Parallel simulation</h3>
+<div class="outline-text-3" id="text-orgd3f8c5a">
 <p>
 Parallel simulation in xDEVS allows you to run simulations using multiple threads, which can significantly speed up the process, especially for complex models. This is particularly useful when your model has many components that can be computed independently.
 </p>
@@ -1632,17 +1633,17 @@ In this setup, the <code>CoordinatorParallel</code> handles the distribution of 
 </div>
 </div>
 
-<div id="outline-container-orgf8a273d" class="outline-3">
-<h3 id="orgf8a273d">Distributed Simulation</h3>
-<div class="outline-text-3" id="text-orgf8a273d">
+<div id="outline-container-org3b836e7" class="outline-3">
+<h3 id="org3b836e7">Distributed Simulation</h3>
+<div class="outline-text-3" id="text-org3b836e7">
 <p>
 Distributed simulation in xDEVS allows you to run simulations across multiple machines or processes, which can significantly enhance performance and scalability for complex models. Distributed simulation involves splitting the simulation tasks across different machines or processes. Each machine or process runs a part of the model, and they communicate with each other to synchronize the simulation. This setup can be complex, requiring the deployment of virtual machines, containers, or other distributed infrastructures. However, for testing purposes, you can run a distributed simulation on a single computer by using multiple terminals.
 </p>
 </div>
 
-<div id="outline-container-orgdc2f32b" class="outline-4">
-<h4 id="orgdc2f32b">Setting Up a Distributed Simulation</h4>
-<div class="outline-text-4" id="text-orgdc2f32b">
+<div id="outline-container-org487204f" class="outline-4">
+<h4 id="org487204f">Setting Up a Distributed Simulation</h4>
+<div class="outline-text-4" id="text-org487204f">
 <ol class="org-ol">
 <li><b>Prepare the Model</b>: Define your coupled model and its components. Each component will run on a different process or machine.</li>
 
@@ -1655,17 +1656,17 @@ Distributed simulation in xDEVS allows you to run simulations across multiple ma
 </div>
 </div>
 
-<div id="outline-container-orgb42f7f3" class="outline-4">
-<h4 id="orgb42f7f3">Example</h4>
-<div class="outline-text-4" id="text-orgb42f7f3">
+<div id="outline-container-org54b2169" class="outline-4">
+<h4 id="org54b2169">Example</h4>
+<div class="outline-text-4" id="text-org54b2169">
 <p>
 Below is an example of how to set up and run a distributed simulation using xDEVS.
 </p>
 </div>
 
-<div id="outline-container-orgfc2b026" class="outline-5">
-<h5 id="orgfc2b026">XML Configuration File</h5>
-<div class="outline-text-5" id="text-orgfc2b026">
+<div id="outline-container-orge64b3ff" class="outline-5">
+<h5 id="orge64b3ff">XML Configuration File</h5>
+<div class="outline-text-5" id="text-orge64b3ff">
 <p>
 Create an XML file to define the coupled model and its components:
 </p>
@@ -1692,9 +1693,9 @@ Create an XML file to define the coupled model and its components:
 </div>
 </div>
 
-<div id="outline-container-orgf771f69" class="outline-5">
-<h5 id="orgf771f69">Java Class to Run Distributed Simulation</h5>
-<div class="outline-text-5" id="text-orgf771f69">
+<div id="outline-container-orgbf52a94" class="outline-5">
+<h5 id="orgbf52a94">Java Class to Run Distributed Simulation</h5>
+<div class="outline-text-5" id="text-orgbf52a94">
 <p>
 Create a Java class to run the distributed simulation:
 </p>
@@ -1757,9 +1758,9 @@ Create a Java class to run the distributed simulation:
 </div>
 </div>
 
-<div id="outline-container-org1957940" class="outline-4">
-<h4 id="org1957940">Running the Simulation</h4>
-<div class="outline-text-4" id="text-org1957940">
+<div id="outline-container-orgaedd36d" class="outline-4">
+<h4 id="orgaedd36d">Running the Simulation</h4>
+<div class="outline-text-4" id="text-orgaedd36d">
 <ol class="org-ol">
 <li><p>
 <b>Start the Coordinator</b>: Open a terminal and run the coordinator with the XML configuration file as an argument:
@@ -1787,9 +1788,9 @@ Distributed simulation in xDEVS allows for efficient and scalable simulation of 
 </div>
 </div>
 
-<div id="outline-container-org30d49ea" class="outline-3">
-<h3 id="org30d49ea">Real-time simulation</h3>
-<div class="outline-text-3" id="text-org30d49ea">
+<div id="outline-container-org9c51747" class="outline-3">
+<h3 id="org9c51747">Real-time simulation</h3>
+<div class="outline-text-3" id="text-org9c51747">
 <p>
 Real-time simulation in xDEVS allows you to run simulations that synchronize with real-world time, making it possible to interact with the simulation in real-time or to integrate it with real-time systems. This feature is particularly useful for applications such as hardware-in-the-loop testing, real-time control systems, and interactive simulations.
 </p>
@@ -1799,9 +1800,9 @@ The real-time simulation in xDEVS is managed by the <code>RTCentralCoordinator</
 </p>
 </div>
 
-<div id="outline-container-org655bb01" class="outline-4">
-<h4 id="org655bb01">Key Features</h4>
-<div class="outline-text-4" id="text-org655bb01">
+<div id="outline-container-orgde64c5c" class="outline-4">
+<h4 id="orgde64c5c">Key Features</h4>
+<div class="outline-text-4" id="text-orgde64c5c">
 <ol class="org-ol">
 <li><b>Time Scaling</b>: The <code>RTCentralCoordinator</code> allows you to scale the simulation time relative to real-world time. This means you can run the simulation faster or slower than the actual system. The time scaling factor is set using the <code>setTimeScale</code> method.</li>
 
@@ -1812,9 +1813,9 @@ The real-time simulation in xDEVS is managed by the <code>RTCentralCoordinator</
 </div>
 </div>
 
-<div id="outline-container-org21c6882" class="outline-4">
-<h4 id="org21c6882">Setting Up a Real-time Simulation</h4>
-<div class="outline-text-4" id="text-org21c6882">
+<div id="outline-container-org1b21e68" class="outline-4">
+<h4 id="org1b21e68">Setting Up a Real-time Simulation</h4>
+<div class="outline-text-4" id="text-org1b21e68">
 <p>
 To set up a real-time simulation using xDEVS, follow these steps:
 </p>
@@ -1831,9 +1832,9 @@ To set up a real-time simulation using xDEVS, follow these steps:
 </div>
 </div>
 
-<div id="outline-container-orgf1a797d" class="outline-4">
-<h4 id="orgf1a797d">Example</h4>
-<div class="outline-text-4" id="text-orgf1a797d">
+<div id="outline-container-org99d2924" class="outline-4">
+<h4 id="org99d2924">Example</h4>
+<div class="outline-text-4" id="text-org99d2924">
 <p>
 Below is an example demonstrating how to set up and run a real-time simulation using the <code>RTCentralCoordinator</code>:
 </p>
@@ -1871,9 +1872,9 @@ Below is an example demonstrating how to set up and run a real-time simulation u
 </div>
 </div>
 
-<div id="outline-container-org15fb02a" class="outline-4">
-<h4 id="org15fb02a">Explanation</h4>
-<div class="outline-text-4" id="text-org15fb02a">
+<div id="outline-container-org37a1793" class="outline-4">
+<h4 id="org37a1793">Explanation</h4>
+<div class="outline-text-4" id="text-org37a1793">
 <ol class="org-ol">
 <li><b>Model Initialization</b>: The <code>Efp</code> model is created and passed to the <code>RTCentralCoordinator</code>.</li>
 
@@ -1884,22 +1885,22 @@ Below is an example demonstrating how to set up and run a real-time simulation u
 </div>
 </div>
 
-<div id="outline-container-org39c4838" class="outline-4">
-<h4 id="org39c4838">Conclusion</h4>
-<div class="outline-text-4" id="text-org39c4838">
+<div id="outline-container-org3aa36f9" class="outline-4">
+<h4 id="org3aa36f9">Conclusion</h4>
+<div class="outline-text-4" id="text-org3aa36f9">
 <p>
 Real-time simulation in xDEVS provides a powerful tool for applications requiring synchronization with real-world time. By using the <code>RTCentralCoordinator</code>, you can control the speed of your simulation, interact with it in real-time, and leverage parallel execution for enhanced performance. This feature is essential for developing and testing real-time systems and interactive applications.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgaba15ef" class="outline-3">
-<h3 id="orgaba15ef">Hardware in the loop</h3>
+<div id="outline-container-org5305655" class="outline-3">
+<h3 id="org5305655">Hardware in the loop</h3>
 </div>
 
-<div id="outline-container-org5dfd389" class="outline-3">
-<h3 id="org5dfd389">Hardware-in-the-Loop (HIL) Simulation with xDEVS</h3>
-<div class="outline-text-3" id="text-org5dfd389">
+<div id="outline-container-org4b43980" class="outline-3">
+<h3 id="org4b43980">Hardware-in-the-Loop (HIL) Simulation with xDEVS</h3>
+<div class="outline-text-3" id="text-org4b43980">
 <p>
 Hardware-in-the-Loop (HIL) simulation is a powerful technique that integrates real hardware components into a simulation environment. This allows for testing and validation of systems in a more realistic setting, where the hardware interacts with the simulated environment in real-time. The xDEVS framework supports HIL simulation by providing real-time simulation capabilities and flexible communication interfaces.
 </p>
@@ -1913,9 +1914,9 @@ To follow the following sections, we refer the reader to:
 </ul>
 </div>
 
-<div id="outline-container-orgc0e7220" class="outline-4">
-<h4 id="orgc0e7220">Setting Up HIL Simulation in xDEVS</h4>
-<div class="outline-text-4" id="text-orgc0e7220">
+<div id="outline-container-org053bf9f" class="outline-4">
+<h4 id="org053bf9f">Setting Up HIL Simulation in xDEVS</h4>
+<div class="outline-text-4" id="text-org053bf9f">
 <p>
 To set up a HIL simulation using xDEVS, follow these steps:
 </p>
@@ -1932,17 +1933,17 @@ To set up a HIL simulation using xDEVS, follow these steps:
 </div>
 </div>
 
-<div id="outline-container-org8398566" class="outline-4">
-<h4 id="org8398566">Example: HIL Simulation with MQTT Protocol</h4>
-<div class="outline-text-4" id="text-org8398566">
+<div id="outline-container-orga57c7bd" class="outline-4">
+<h4 id="orga57c7bd">Example: HIL Simulation with MQTT Protocol</h4>
+<div class="outline-text-4" id="text-orga57c7bd">
 <p>
 Below is an example of how to set up a HIL simulation using the MQTT protocol for communication between the DEVS model and the hardware.
 </p>
 </div>
 
-<div id="outline-container-orga19232b" class="outline-5">
-<h5 id="orga19232b">Step 1: Define the DEVS Model</h5>
-<div class="outline-text-5" id="text-orga19232b">
+<div id="outline-container-orgac27b39" class="outline-5">
+<h5 id="orgac27b39">Step 1: Define the DEVS Model</h5>
+<div class="outline-text-5" id="text-orgac27b39">
 <p>
 Create a DEVS model that represents the system to be simulated. For this example, let's assume we have a simple model of a store cashier system.
 </p>
@@ -1959,9 +1960,9 @@ Create a DEVS model that represents the system to be simulated. For this example
 </div>
 </div>
 
-<div id="outline-container-org4afd346" class="outline-5">
-<h5 id="org4afd346">Step 2: Implement Input and Output Handlers</h5>
-<div class="outline-text-5" id="text-org4afd346">
+<div id="outline-container-orgbef52df" class="outline-5">
+<h5 id="orgbef52df">Step 2: Implement Input and Output Handlers</h5>
+<div class="outline-text-5" id="text-orgbef52df">
 <p>
 Use the provided MQTT input and output handlers to manage communication with the hardware.
 </p>
@@ -2005,9 +2006,9 @@ Use the provided MQTT input and output handlers to manage communication with the
 </div>
 </div>
 
-<div id="outline-container-orge67e5a8" class="outline-5">
-<h5 id="orge67e5a8">Step 3: Configure the Real-Time Manager</h5>
-<div class="outline-text-5" id="text-orge67e5a8">
+<div id="outline-container-org557452c" class="outline-5">
+<h5 id="org557452c">Step 3: Configure the Real-Time Manager</h5>
+<div class="outline-text-5" id="text-org557452c">
 <p>
 Set up the real-time manager to handle the timing and synchronization of the simulation.
 </p>
@@ -2021,9 +2022,9 @@ manager.add_output_handler(<span style="color: #deb887;">'mqtt'</span>, topic=<s
 </div>
 </div>
 
-<div id="outline-container-org4a85c78" class="outline-5">
-<h5 id="org4a85c78">Step 4: Run the Simulation</h5>
-<div class="outline-text-5" id="text-org4a85c78">
+<div id="outline-container-org73168e7" class="outline-5">
+<h5 id="org73168e7">Step 4: Run the Simulation</h5>
+<div class="outline-text-5" id="text-org73168e7">
 <p>
 Initialize and run the simulation using the real-time coordinator.
 </p>
@@ -2038,9 +2039,9 @@ coordinator.simulate_rt(60.0)  <span style="color: #7f7f7f;"># </span><span styl
 </div>
 </div>
 
-<div id="outline-container-org8e751ea" class="outline-4">
-<h4 id="org8e751ea">Conclusion</h4>
-<div class="outline-text-4" id="text-org8e751ea">
+<div id="outline-container-orgf984918" class="outline-4">
+<h4 id="orgf984918">Conclusion</h4>
+<div class="outline-text-4" id="text-orgf984918">
 <p>
 By following these steps, you can set up a HIL simulation using xDEVS. The real-time manager and input/output handlers provide a flexible and powerful way to integrate hardware components into your simulation, allowing for more realistic and comprehensive testing of your system. This approach is particularly useful for applications such as hardware-in-the-loop testing, real-time control systems, and interactive simulations.
 </p>
@@ -2049,26 +2050,26 @@ By following these steps, you can set up a HIL simulation using xDEVS. The real-
 </div>
 </div>
 
-<div id="outline-container-org79aad21" class="outline-2">
-<h2 id="org79aad21">Examples</h2>
-<div class="outline-text-2" id="text-org79aad21">
+<div id="outline-container-orgdccddf0" class="outline-2">
+<h2 id="orgdccddf0">Examples</h2>
+<div class="outline-text-2" id="text-orgdccddf0">
 </div>
-<div id="outline-container-orgc3eaf93" class="outline-3">
-<h3 id="orgc3eaf93">Traffic Light System Example</h3>
-<div class="outline-text-3" id="text-orgc3eaf93">
+<div id="outline-container-orgb4ee5a2" class="outline-3">
+<h3 id="orgb4ee5a2">Traffic light system example</h3>
+<div class="outline-text-3" id="text-orgb4ee5a2">
 </div>
-<div id="outline-container-orgbe63fd9" class="outline-4">
-<h4 id="orgbe63fd9">Problem Description</h4>
-<div class="outline-text-4" id="text-orgbe63fd9">
+<div id="outline-container-orgd5f12aa" class="outline-4">
+<h4 id="orgd5f12aa">Problem Description</h4>
+<div class="outline-text-4" id="text-orgd5f12aa">
 <p>
 In this example, we will model a simple traffic light system using the xDEVS/Python API. The traffic light will cycle through three states: Green, Yellow, and Red. Each state will have a specific duration, and the system will transition between these states in a loop. We will create an atomic model for the traffic light, which will handle the state transitions and timing. The traffic light will have one output port to indicate the current state.
 </p>
 </div>
 </div>
 
-<div id="outline-container-orge823384" class="outline-4">
-<h4 id="orge823384">Traffic Light Model</h4>
-<div class="outline-text-4" id="text-orge823384">
+<div id="outline-container-orgd46764e" class="outline-4">
+<h4 id="orgd46764e">Traffic Light Model</h4>
+<div class="outline-text-4" id="text-orgd46764e">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #00bfff;">from</span> xdevs.models <span style="color: #00bfff;">import</span> Atomic, Port
 <span style="color: #00bfff;">from</span> xdevs.sim <span style="color: #00bfff;">import</span> Coordinator, SimulationClock
@@ -2131,9 +2132,9 @@ In this example, we will model a simple traffic light system using the xDEVS/Pyt
 </div>
 </div>
 
-<div id="outline-container-org3817666" class="outline-4">
-<h4 id="org3817666">Explanation</h4>
-<div class="outline-text-4" id="text-org3817666">
+<div id="outline-container-orgbaccaf1" class="outline-4">
+<h4 id="orgbaccaf1">Explanation</h4>
+<div class="outline-text-4" id="text-orgbaccaf1">
 <ol class="org-ol">
 <li><b>TrafficLight Class</b>: This class extends the <code>Atomic</code> class from the xDEVS library. It defines the traffic light states and their durations.
 <ul class="org-ul">
@@ -2152,9 +2153,9 @@ This example demonstrates how to model a simple traffic light system using the x
 </div>
 </div>
 
-<div id="outline-container-org1dce3de" class="outline-4">
-<h4 id="org1dce3de">Exercise</h4>
-<div class="outline-text-4" id="text-org1dce3de">
+<div id="outline-container-orgeb5c5fc" class="outline-4">
+<h4 id="orgeb5c5fc">Exercise</h4>
+<div class="outline-text-4" id="text-orgeb5c5fc">
 <p>
 Modify the previous example. There should be an output right after the change in the state, i.e., once the light turns green, yellow, or red, the output is triggered with the new color, instantaneously.
 </p>
@@ -2162,22 +2163,22 @@ Modify the previous example. There should be an output right after the change in
 </div>
 </div>
 
-<div id="outline-container-orgd52c476" class="outline-3">
-<h3 id="orgd52c476">Queueing System Simulation</h3>
-<div class="outline-text-3" id="text-orgd52c476">
+<div id="outline-container-orgc8c89de" class="outline-3">
+<h3 id="orgc8c89de">Queueing system simulation</h3>
+<div class="outline-text-3" id="text-orgc8c89de">
 </div>
-<div id="outline-container-orgc6f82c5" class="outline-4">
-<h4 id="orgc6f82c5">Problem Description</h4>
-<div class="outline-text-4" id="text-orgc6f82c5">
+<div id="outline-container-org66ef4e5" class="outline-4">
+<h4 id="org66ef4e5">Problem Description</h4>
+<div class="outline-text-4" id="text-org66ef4e5">
 <p>
 In this example, we will simulate a queueing system, such as a bank or a customer service center, using the xDEVS/Python API. The system will consist of a generator that produces customers, a queue where customers wait, and a server that processes the customers. The goal is to model the arrival, waiting, and service processes. We will create atomic models for the generator, queue, and server. The generator will produce customers at a specified rate, the queue will manage the waiting customers, and the server will process the customers.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org6dc829b" class="outline-4">
-<h4 id="org6dc829b"><span class="todo TODO">TODO</span> Queueing System Model</h4>
-<div class="outline-text-4" id="text-org6dc829b">
+<div id="outline-container-orga3c6d64" class="outline-4">
+<h4 id="orga3c6d64"><span class="todo TODO">TODO</span> Queueing System Model</h4>
+<div class="outline-text-4" id="text-orga3c6d64">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #00bfff;">from</span> xdevs.models <span style="color: #00bfff;">import</span> Atomic, Port
 <span style="color: #00bfff;">from</span> xdevs.sim <span style="color: #00bfff;">import</span> Coordinator, SimulationClock
@@ -2285,9 +2286,9 @@ In this example, we will simulate a queueing system, such as a bank or a custome
 </div>
 </div>
 
-<div id="outline-container-org650bc8b" class="outline-4">
-<h4 id="org650bc8b">Simulation setup</h4>
-<div class="outline-text-4" id="text-org650bc8b">
+<div id="outline-container-org8c40287" class="outline-4">
+<h4 id="org8c40287">Simulation setup</h4>
+<div class="outline-text-4" id="text-org8c40287">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #00bfff;">if</span> <span style="color: #f08080;">__name__</span> == <span style="color: #deb887;">"__main__"</span>:
     <span style="color: #4eee94;">interarrival_time</span> = 5.0
@@ -2304,9 +2305,9 @@ In this example, we will simulate a queueing system, such as a bank or a custome
 </div>
 </div>
 
-<div id="outline-container-orgf54c6a8" class="outline-4">
-<h4 id="orgf54c6a8">Explanation</h4>
-<div class="outline-text-4" id="text-orgf54c6a8">
+<div id="outline-container-orgf99842b" class="outline-4">
+<h4 id="orgf99842b">Explanation</h4>
+<div class="outline-text-4" id="text-orgf99842b">
 <ol class="org-ol">
 <li><i>Customer Class</i>: Represents a customer with a unique ID.</li>
 
@@ -2346,11 +2347,347 @@ This example demonstrates how to model a queueing system using the xDEVS/Python 
 </div>
 </div>
 </div>
+
+<div id="outline-container-orgf9a5dd6" class="outline-3">
+<h3 id="orgf9a5dd6">Parallel Simulation Example</h3>
+<div class="outline-text-3" id="text-orgf9a5dd6">
+<p>
+In this section, we will demonstrate how to run a parallel simulation using the DEVS/Java API. We will use the Experimental Frame - Processor (EFP) model as an example. The EFP model consists of a generator, a processor, and a transducer. The generator produces jobs, the processor processes them, and the transducer collects statistics.
+</p>
+</div>
+
+<div id="outline-container-orgedd209e" class="outline-4">
+<h4 id="orgedd209e">EFP Model</h4>
+<div class="outline-text-4" id="text-orgedd209e">
+<p>
+The EFP model is a coupled model that integrates the generator, processor, and transducer components.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #00bfff;">package</span> xdevs.core.examples.<span style="color: #a2cd5a;">efp</span>;
+
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">java</span>.<span style="color: #a2cd5a;">util</span>.<span style="color: #a2cd5a;">logging</span>.<span style="color: #98f5ff;">Level</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">modeling</span>.<span style="color: #98f5ff;">Coupled</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">simulation</span>.<span style="color: #98f5ff;">Coordinator</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">util</span>.<span style="color: #98f5ff;">DevsLogger</span>;
+
+<span style="color: #00bfff;">public</span> <span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Efp</span> <span style="color: #00bfff;">extends</span> <span style="color: #98f5ff;">Coupled</span> {
+
+    <span style="color: #00bfff;">public</span> <span style="color: #daa520;">Efp</span>(<span style="color: #98f5ff;">String</span> <span style="color: #4eee94;">name</span>, <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">generatorPeriod</span>, <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">processorPeriod</span>, <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">transducerPeriod</span>) {
+        <span style="color: #00bfff;">super</span>(name);
+
+        <span style="color: #98f5ff;">Ef</span> <span style="color: #4eee94;">ef</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Ef</span>(<span style="color: #deb887;">"ef"</span>, generatorPeriod, transducerPeriod);
+        <span style="color: #00bfff;">super</span>.addComponent(ef);
+        <span style="color: #98f5ff;">Processor</span> <span style="color: #4eee94;">processor</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Processor</span>(<span style="color: #deb887;">"processor"</span>, processorPeriod);
+        <span style="color: #00bfff;">super</span>.addComponent(processor);
+
+        <span style="color: #00bfff;">super</span>.addCoupling(ef.oOut, processor.iIn);
+        <span style="color: #00bfff;">super</span>.addCoupling(processor.oOut, ef.iIn);
+    }
+
+    <span style="color: #00bfff;">public</span> <span style="color: #00bfff;">static</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">main</span>(<span style="color: #98f5ff;">String</span> <span style="color: #4eee94;">args</span>[]) {
+        DevsLogger.setup(<span style="color: #a2cd5a;">Level</span>.FINE);
+        <span style="color: #98f5ff;">Efp</span> <span style="color: #4eee94;">efp</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Efp</span>(<span style="color: #deb887;">"efp"</span>, 1, 3, 100);
+        <span style="color: #98f5ff;">Coordinator</span> <span style="color: #4eee94;">coordinator</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Coordinator</span>(efp);
+        coordinator.initialize();
+        coordinator.simulate(<span style="color: #a2cd5a;">Long</span>.MAX_VALUE);
+        coordinator.exit();
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgaf6e761" class="outline-4">
+<h4 id="orgaf6e761">Generator</h4>
+<div class="outline-text-4" id="text-orgaf6e761">
+<p>
+The generator produces jobs at a specified period.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #00bfff;">package</span> xdevs.core.examples.<span style="color: #a2cd5a;">efp</span>;
+
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">org</span>.<span style="color: #a2cd5a;">w3c</span>.<span style="color: #a2cd5a;">dom</span>.<span style="color: #98f5ff;">Element</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">modeling</span>.<span style="color: #98f5ff;">Atomic</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">modeling</span>.<span style="color: #98f5ff;">Port</span>;
+
+<span style="color: #00bfff;">public</span> <span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Generator</span> <span style="color: #00bfff;">extends</span> <span style="color: #98f5ff;">Atomic</span> {
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">Port</span>&lt;<span style="color: #98f5ff;">Job</span>&gt; <span style="color: #4eee94;">iStop</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Port</span>&lt;&gt;(<span style="color: #deb887;">"iStop"</span>);
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">Port</span>&lt;<span style="color: #98f5ff;">Job</span>&gt; <span style="color: #4eee94;">oOut</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Port</span>&lt;&gt;(<span style="color: #deb887;">"oOut"</span>);
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">int</span> <span style="color: #4eee94;">jobCounter</span>;
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">period</span>;
+
+    <span style="color: #00bfff;">public</span> <span style="color: #daa520;">Generator</span>(<span style="color: #98f5ff;">String</span> <span style="color: #4eee94;">name</span>, <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">period</span>) {
+        <span style="color: #00bfff;">super</span>(name);
+        <span style="color: #00bfff;">super</span>.addInPort(iStop);
+        <span style="color: #00bfff;">super</span>.addOutPort(oOut);
+        <span style="color: #00bfff;">this</span>.period = period;
+    }
+
+    <span style="color: #00bfff;">public</span> <span style="color: #daa520;">Generator</span>(<span style="color: #98f5ff;">Element</span> <span style="color: #4eee94;">xmlAtomic</span>) {
+        <span style="color: #00bfff;">this</span>(xmlAtomic.getAttribute(<span style="color: #deb887;">"name"</span>), Double.parseDouble(
+                ((<span style="color: #98f5ff;">Element</span>) (xmlAtomic.getElementsByTagName(<span style="color: #deb887;">"constructor-arg"</span>).item(0))).getAttribute(<span style="color: #deb887;">"value"</span>)));
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">initialize</span>() {
+        jobCounter = 1;
+        <span style="color: #00bfff;">this</span>.holdIn(<span style="color: #deb887;">"active"</span>, period);
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">exit</span>() {
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">deltint</span>() {
+        jobCounter++;
+        <span style="color: #00bfff;">this</span>.holdIn(<span style="color: #deb887;">"active"</span>, period);
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">deltext</span>(<span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">e</span>) {
+        <span style="color: #00bfff;">super</span>.resume(e);
+        <span style="color: #00bfff;">super</span>.passivate();
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">lambda</span>() {
+        <span style="color: #98f5ff;">Job</span> <span style="color: #4eee94;">job</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Job</span>(<span style="color: #deb887;">""</span> + jobCounter + <span style="color: #deb887;">""</span>);
+        oOut.addValue(job);
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb2fd8ff" class="outline-4">
+<h4 id="orgb2fd8ff">Processor</h4>
+<div class="outline-text-4" id="text-orgb2fd8ff">
+<p>
+The processor processes jobs with a given processing time.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #00bfff;">package</span> xdevs.core.examples.<span style="color: #a2cd5a;">efp</span>;
+
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">org</span>.<span style="color: #a2cd5a;">w3c</span>.<span style="color: #a2cd5a;">dom</span>.<span style="color: #98f5ff;">Element</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">modeling</span>.<span style="color: #98f5ff;">Atomic</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">modeling</span>.<span style="color: #98f5ff;">Port</span>;
+
+<span style="color: #00bfff;">public</span> <span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Processor</span> <span style="color: #00bfff;">extends</span> <span style="color: #98f5ff;">Atomic</span> {
+
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">Port</span>&lt;<span style="color: #98f5ff;">Job</span>&gt; <span style="color: #4eee94;">iIn</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Port</span>&lt;&gt;(<span style="color: #deb887;">"in"</span>);
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">Port</span>&lt;<span style="color: #98f5ff;">Job</span>&gt; <span style="color: #4eee94;">oOut</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Port</span>&lt;&gt;(<span style="color: #deb887;">"out"</span>);
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">Job</span> <span style="color: #4eee94;">currentJob</span> = <span style="color: #a2cd5a;">null</span>;
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">processingTime</span>;
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">clock</span>;
+
+    <span style="color: #00bfff;">public</span> <span style="color: #daa520;">Processor</span>(<span style="color: #98f5ff;">String</span> <span style="color: #4eee94;">name</span>, <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">processingTime</span>) {
+        <span style="color: #00bfff;">super</span>(name);
+        <span style="color: #00bfff;">super</span>.addInPort(iIn);
+        <span style="color: #00bfff;">super</span>.addOutPort(oOut);
+        <span style="color: #00bfff;">this</span>.processingTime = processingTime;
+        <span style="color: #00bfff;">this</span>.clock = 0;
+    }
+
+    <span style="color: #00bfff;">public</span> <span style="color: #daa520;">Processor</span>(<span style="color: #98f5ff;">Element</span> <span style="color: #4eee94;">xmlAtomic</span>) {
+        <span style="color: #00bfff;">this</span>(xmlAtomic.getAttribute(<span style="color: #deb887;">"name"</span>), 
+             Double.parseDouble(((<span style="color: #98f5ff;">Element</span>)(xmlAtomic.getElementsByTagName(<span style="color: #deb887;">"constructor-arg"</span>).item(0))).getAttribute(<span style="color: #deb887;">"value"</span>)));
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">initialize</span>() {
+        <span style="color: #00bfff;">super</span>.passivate();
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">exit</span>() {
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">deltint</span>() {
+        clock += <span style="color: #00bfff;">super</span>.getSigma();
+        <span style="color: #00bfff;">super</span>.passivate();
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">deltext</span>(<span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">e</span>) {
+        <span style="color: #00bfff;">super</span>.resume(e);
+        clock += e;
+        <span style="color: #00bfff;">if</span> (<span style="color: #00bfff;">super</span>.phaseIs(<span style="color: #deb887;">"passive"</span>)) {
+            currentJob = iIn.getSingleValue();
+            <span style="color: #00bfff;">super</span>.holdIn(<span style="color: #deb887;">"active"</span>, processingTime);
+            currentJob.time = clock;
+        }
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">lambda</span>() {
+        oOut.addValue(currentJob);
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org982fc3a" class="outline-4">
+<h4 id="org982fc3a">Transducer</h4>
+<div class="outline-text-4" id="text-org982fc3a">
+<p>
+The transducer collects statistics about the jobs and finishes the simulation when the observation time is reached.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #00bfff;">package</span> xdevs.core.examples.<span style="color: #a2cd5a;">efp</span>;
+
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">java</span>.<span style="color: #a2cd5a;">util</span>.<span style="color: #98f5ff;">LinkedList</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">java</span>.<span style="color: #a2cd5a;">util</span>.<span style="color: #a2cd5a;">logging</span>.<span style="color: #98f5ff;">Logger</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">org</span>.<span style="color: #a2cd5a;">w3c</span>.<span style="color: #a2cd5a;">dom</span>.<span style="color: #98f5ff;">Element</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">modeling</span>.<span style="color: #98f5ff;">Atomic</span>;
+<span style="color: #00bfff;">import</span> <span style="color: #a2cd5a;">xdevs</span>.<span style="color: #a2cd5a;">core</span>.<span style="color: #a2cd5a;">modeling</span>.<span style="color: #98f5ff;">Port</span>;
+
+<span style="color: #00bfff;">public</span> <span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">Transducer</span> <span style="color: #00bfff;">extends</span> <span style="color: #98f5ff;">Atomic</span> {
+
+    <span style="color: #00bfff;">private</span> <span style="color: #00bfff;">static</span> <span style="color: #00bfff;">final</span> <span style="color: #98f5ff;">Logger</span> <span style="color: #4eee94;">LOGGER</span> = Logger.getLogger(Transducer.<span style="color: #00bfff;">class</span>.getName());
+
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">Port</span>&lt;<span style="color: #98f5ff;">Job</span>&gt; <span style="color: #4eee94;">iArrived</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Port</span>&lt;&gt;(<span style="color: #deb887;">"iArrived"</span>);
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">Port</span>&lt;<span style="color: #98f5ff;">Job</span>&gt; <span style="color: #4eee94;">iSolved</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Port</span>&lt;&gt;(<span style="color: #deb887;">"iSolved"</span>);
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">Port</span>&lt;<span style="color: #98f5ff;">Job</span>&gt; <span style="color: #4eee94;">oOut</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Port</span>&lt;&gt;(<span style="color: #deb887;">"oOut"</span>);
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">LinkedList</span>&lt;<span style="color: #98f5ff;">Job</span>&gt; <span style="color: #4eee94;">jobsArrived</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">LinkedList</span>&lt;&gt;();
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">LinkedList</span>&lt;<span style="color: #98f5ff;">Job</span>&gt; <span style="color: #4eee94;">jobsSolved</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">LinkedList</span>&lt;&gt;();
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">observationTime</span>;
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">totalTa</span>;
+    <span style="color: #00bfff;">protected</span> <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">clock</span>;
+
+    <span style="color: #00bfff;">public</span> <span style="color: #daa520;">Transducer</span>(<span style="color: #98f5ff;">String</span> <span style="color: #4eee94;">name</span>, <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">observationTime</span>) {
+        <span style="color: #00bfff;">super</span>(name);
+        <span style="color: #00bfff;">super</span>.addInPort(iArrived);
+        <span style="color: #00bfff;">super</span>.addInPort(iSolved);
+        <span style="color: #00bfff;">super</span>.addOutPort(oOut);
+        totalTa = 0;
+        clock = 0;
+        <span style="color: #00bfff;">this</span>.observationTime = observationTime;
+    }
+
+    <span style="color: #00bfff;">public</span> <span style="color: #daa520;">Transducer</span>(<span style="color: #98f5ff;">Element</span> <span style="color: #4eee94;">xmlAtomic</span>) {
+        <span style="color: #00bfff;">this</span>(xmlAtomic.getAttribute(<span style="color: #deb887;">"name"</span>), 
+             Double.parseDouble(((<span style="color: #98f5ff;">Element</span>)(xmlAtomic.getElementsByTagName(<span style="color: #deb887;">"constructor-arg"</span>).item(0))).getAttribute(<span style="color: #deb887;">"value"</span>)));
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">initialize</span>() {
+        <span style="color: #00bfff;">super</span>.holdIn(<span style="color: #deb887;">"active"</span>, observationTime);
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">exit</span>() {
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">deltint</span>() {
+        clock = clock + getSigma();
+        <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">throughput</span>;
+        <span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">avgTaTime</span>;
+        <span style="color: #00bfff;">if</span> (phaseIs(<span style="color: #deb887;">"active"</span>)) {
+            <span style="color: #00bfff;">if</span> (!jobsSolved.isEmpty()) {
+                avgTaTime = totalTa / jobsSolved.size();
+                <span style="color: #00bfff;">if</span> (clock &gt; 0.0) {
+                    throughput = jobsSolved.size() / clock;
+                } <span style="color: #00bfff;">else</span> {
+                    throughput = 0.0;
+                }
+            } <span style="color: #00bfff;">else</span> {
+                avgTaTime = 0.0;
+                throughput = 0.0;
+            }
+            LOGGER.info(<span style="color: #deb887;">"End time: "</span> + clock);
+            LOGGER.info(<span style="color: #deb887;">"Jobs arrived : "</span> + jobsArrived.size());
+            LOGGER.info(<span style="color: #deb887;">"Jobs solved : "</span> + jobsSolved.size());
+            LOGGER.info(<span style="color: #deb887;">"Average TA = "</span> + avgTaTime);
+            LOGGER.info(<span style="color: #deb887;">"Throughput = "</span> + throughput);
+            holdIn(<span style="color: #deb887;">"done"</span>, 0);
+        } <span style="color: #00bfff;">else</span> {
+            passivate();
+        }
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">deltext</span>(<span style="color: #98f5ff;">double</span> <span style="color: #4eee94;">e</span>) {
+        <span style="color: #00bfff;">super</span>.resume(e);
+        clock = clock + e;
+        <span style="color: #00bfff;">if</span> (phaseIs(<span style="color: #deb887;">"active"</span>)) {
+            <span style="color: #00bfff;">if</span> (!iArrived.isEmpty()) {
+                <span style="color: #98f5ff;">Job</span> <span style="color: #4eee94;">job</span> = iArrived.getSingleValue();
+                LOGGER.fine(<span style="color: #deb887;">"Start job "</span> + job.id + <span style="color: #deb887;">" @ t = "</span> + clock);
+                job.time = clock;
+                jobsArrived.add(job);
+            }
+            <span style="color: #00bfff;">if</span> (!iSolved.isEmpty()) {
+                <span style="color: #00bfff;">for</span>(<span style="color: #98f5ff;">Job</span> <span style="color: #4eee94;">job</span> : iSolved.getValues()) {
+                    totalTa += (clock - job.time);
+                    LOGGER.fine(<span style="color: #deb887;">"Finish job "</span> + job.id + <span style="color: #deb887;">" @ t = "</span> + clock);
+                    job.time = clock;
+                    jobsSolved.add(job);
+                }
+            }
+        }
+    }
+
+    <span style="color: #a2cd5a;">@Override</span>
+    <span style="color: #00bfff;">public</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">lambda</span>() {
+        <span style="color: #00bfff;">if</span> (phaseIs(<span style="color: #deb887;">"done"</span>)) {
+            <span style="color: #98f5ff;">Job</span> <span style="color: #4eee94;">job</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Job</span>(<span style="color: #deb887;">"null"</span>);
+            oOut.addValue(job);
+        }
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org98c029d" class="outline-4">
+<h4 id="org98c029d">Parallel Execution</h4>
+<div class="outline-text-4" id="text-org98c029d">
+<p>
+The parallel coordinator manages the parallel execution of the simulation.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #7f7f7f;">// </span><span style="color: #7f7f7f;">Complete the imports ...</span>
+
+<span style="color: #00bfff;">public</span> <span style="color: #00bfff;">class</span> <span style="color: #98f5ff;">ParallelExample</span> {
+
+    <span style="color: #7f7f7f;">// </span><span style="color: #7f7f7f;">...</span>
+
+    <span style="color: #00bfff;">public</span> <span style="color: #00bfff;">static</span> <span style="color: #98f5ff;">void</span> <span style="color: #daa520;">main</span>(<span style="color: #98f5ff;">String</span>[] <span style="color: #4eee94;">args</span>) {
+        DevsLogger.setup(<span style="color: #a2cd5a;">Level</span>.INFO);
+        <span style="color: #98f5ff;">Efp</span> <span style="color: #4eee94;">efp</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">Efp</span>(<span style="color: #deb887;">"EFP"</span>, 1, 3, 1000000);
+        <span style="color: #98f5ff;">CoordinatorParallel</span> <span style="color: #4eee94;">coordinator</span> = <span style="color: #00bfff;">new</span> <span style="color: #98f5ff;">CoordinatorParallel</span>(efp);
+        coordinator.initialize();
+        coordinator.simulate(<span style="color: #a2cd5a;">Long</span>.MAX_VALUE);
+        coordinator.exit();
+    }
+}
+</pre>
+</div>
+
+<p>
+This example demonstrates how to run a parallel simulation using the DEVS/Java API. The <code>CoordinatorParallel</code> class manages the parallel execution of the simulation, allowing for efficient processing of the EFP model components.
+</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: José L. Risco-Martín</p>
-<p class="date">Created: 2024-07-17 mié 09:34</p>
+<p class="date">Created: 2024-07-30 mar 12:19</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
