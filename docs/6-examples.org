@@ -87,13 +87,19 @@ Modify the previous example. There should be an output right after the change in
 
 *** Problem Description
 
-In this example, we will simulate a queueing system, such as a bank or a customer service center, using the xDEVS/Python API. The system will consist of a generator that produces customers, a queue where customers wait, and a server that processes the customers. The goal is to model the arrival, waiting, and service processes. We will create atomic models for the generator, queue, and server. The generator will produce customers at a specified rate, the queue will manage the waiting customers, and the server will process the customers.
+In this example, we will simulate a queueing system, such as a bank or a customer service center, using the xDEVS/Python API. The system will consist of a generator that produces customers, a queue where customers wait, and a server that processes the customers.
 
-*** TODO Queueing System Model
+The goal is to model the arrival, waiting, and service processes. We will create atomic models for the generator, queue, and server. The generator will produce customers at a specified rate. The queue will manage the waiting customers. Unlike a simple "push" system, the Server will actively "pull" customers from the Queue by sending a request message when it becomes idle. This ensures the server only receives a customer when it is ready, preventing customer loss.
 
-#+begin_src python
-from xdevs.models import Atomic, Port
+*** Queueing System Model
+
+#+begin_src python :tangle src/queueing-example.py
+import logging
+import xdevs
+from xdevs.models import Atomic, Port, Coupled
 from xdevs.sim import Coordinator, SimulationClock
+
+logger = xdevs.get_logger(__name__, logging.INFO)
 
 class Customer:
     def __init__(self, id):
@@ -103,11 +109,11 @@ class Generator(Atomic):
     def __init__(self, name, interarrival_time):
         super().__init__(name)
         self.interarrival_time = interarrival_time
-        self.customer_id = 0
         self.output_port = Port(Customer, "out")
         self.add_out_port(self.output_port)
 
     def initialize(self):
+        self.customer_id = 1
         self.hold_in("active", self.interarrival_time)
 
     def deltint(self):
@@ -115,6 +121,7 @@ class Generator(Atomic):
         self.hold_in("active", self.interarrival_time)
 
     def lambdaf(self):
+        logger.info(f"Generator::Arriving customer {self.customer_id} to queue.")
         self.output_port.add(Customer(self.customer_id))
 
     def deltext(self, e):
@@ -126,30 +133,40 @@ class Generator(Atomic):
 class Queue(Atomic):
     def __init__(self, name):
         super().__init__(name)
-        self.queue = []
-        self.input_port = Port(Customer, "in")
-        self.output_port = Port(Customer, "out")
-        self.add_in_port(self.input_port)
-        self.add_out_port(self.output_port)
+        self.input_request = Port(bool, "request")
+        self.input_customer = Port(Customer, "in")
+        self.output_customer = Port(Customer, "out")
+        self.add_in_port(self.input_request)
+        self.add_in_port(self.input_customer)
+        self.add_out_port(self.output_customer)
 
     def initialize(self):
+        self.queue = []
+        self.customer_requested = False
+        self.next_customer = None
         self.passivate()
 
     def deltint(self):
-        if self.queue:
-            self.hold_in("active", 0)
-        else:
-            self.passivate()
+        self.customer_requested = False
+        self.next_customer = None
+        self.passivate()
 
     def deltext(self, e):
-        if self.input_port:
-            self.queue.append(self.input_port.get())
-            if self.phase == "passive":
-                self.hold_in("active", 0)
+        self.continuef(e)            
+        if self.input_customer:
+            self.queue.append(self.input_customer.get())
+            logger.info(f"Queue::Customer {self.queue[-1].id} in queue. Queue size: {len(self.queue)}")
+            self.passivate()
+        if self.input_request:
+            self.customer_requested = True
+            self.passivate()
+        if self.customer_requested and not self.next_customer and self.queue:
+            self.next_customer = self.queue.pop(0)
+            self.hold_in("active", 0.1) # Small delay to simulate moving customer
 
     def lambdaf(self):
-        if self.queue:
-            self.output_port.add(self.queue.pop(0))
+        logger.info(f"Queue::Customer {self.next_customer.id} from queue to server. Queue size: {len(self.queue)}")
+        self.output_customer.add(self.next_customer)
 
     def exit(self):
         pass
@@ -158,24 +175,37 @@ class Server(Atomic):
     def __init__(self, name, service_time):
         super().__init__(name)
         self.service_time = service_time
-        self.current_customer = None
-        self.input_port = Port(Customer, "in")
-        self.add_in_port(self.input_port)
+        self.input_customer = Port(Customer, "in")
+        self.output_request = Port(bool, "request")
+        self.add_in_port(self.input_customer)
+        self.add_out_port(self.output_request)
 
     def initialize(self):
-        self.passivate()
+        self.current_customer = None
+        self.hold_in("request", 0.1)
 
     def deltint(self):
-        self.current_customer = None
-        self.passivate()
+        if self.current_customer:
+            logger.info(f"Server::Finished attending customer {self.current_customer.id}.")
+            self.current_customer = None
+            self.hold_in("request", 0.1)
+        else:
+            self.passivate()
 
     def deltext(self, e):
-        if self.input_port:
-            self.current_customer = self.input_port.get()
-            self.hold_in("busy", self.service_time)
+        self.continuef(e)
+        if self.input_customer:
+            if self.current_customer:
+                logger.error(f"Server::ERROR: Server is already attending customer {self.current_customer.id}")
+            else:
+                self.current_customer = self.input_customer.get()
+                logger.info(f"Server::Attending customer {self.current_customer.id}.")
+                self.hold_in("busy", self.service_time)
 
     def lambdaf(self):
-        pass
+        if self.current_customer is None:
+            logger.info(f"Server::Requesting customer.")
+            self.output_request.add(True)
 
     def exit(self):
         pass
@@ -191,51 +221,77 @@ class QueueingSystem(Coupled):
         self.add_component(self.queue)
         self.add_component(self.server)
 
-        self.add_coupling(self.generator.output_port, self.queue.input_port)
-        self.add_coupling(self.queue.output_port, self.server.input_port)
+        self.add_coupling(self.generator.output_port, self.queue.input_customer)
+        self.add_coupling(self.queue.output_customer, self.server.input_customer)
+        self.add_coupling(self.server.output_request, self.queue.input_request)
 #+end_src
 
 *** Simulation setup
 
-#+begin_src python
+#+begin_src python :tangle src/queueing-example.py
 if __name__ == "__main__":
-    interarrival_time = 5.0
-    service_time = 3.0
+    interarrival_time = 2.0
+    service_time = 5.0
 
     queueing_system = QueueingSystem("QueueingSystem", interarrival_time, service_time)
     clock = SimulationClock()
     coordinator = Coordinator(queueing_system, clock)
 
     coordinator.initialize()
-    coordinator.simulate(100)  # Simulate for 100 iterations
+    coordinator.simulate_time(50)  # Simulate for 50 time units
+#+end_src
+
+*** Results
+
+Running the simulation script (with =interarrival_time = 2.0= and =service_time = 5.0=) will produce a log output similar to the one below. This log demonstrates the "pull" mechanism:
+
+#+begin_src bash
+(.venv) xdevs@laptop:~/git/xdevs/docs/src$ python3 queueing-example.py 
+Server::Requesting customer.
+Generator::Arriving customer 1 to queue.
+Queue::Customer 1 in queue. Queue size: 1
+Queue::Customer 1 from queue to server. Queue size: 0
+Server::Attending customer 1.
+Generator::Arriving customer 2 to queue.
+Queue::Customer 2 in queue. Queue size: 1
+Generator::Arriving customer 3 to queue.
+Queue::Customer 3 in queue. Queue size: 2
+Server::Finished attending customer 1.
+Server::Requesting customer.
+Queue::Customer 2 from queue to server. Queue size: 1
+Server::Attending customer 2.
+Generator::Arriving customer 4 to queue.
+Queue::Customer 4 in queue. Queue size: 2
+Generator::Arriving customer 5 to queue.
+Queue::Customer 5 in queue. Queue size: 3
+Generator::Arriving customer 6 to queue.
+Queue::Customer 6 in queue. Queue size: 4
+...
 #+end_src
 
 *** Explanation
 
-1. /Customer Class/: Represents a customer with a unique ID.
+This Python script models a classic **G/G/1 queueing system** using the =xdevs= library for Discrete Event System Specification (DEVS). The system consists of three main components (Atomic models) combined into one Coupled model.
 
-2. /Generator Class/: Produces customers at a specified interarrival time.
-   - =initialize()=: Sets the initial state to active and the initial time advance to the interarrival time.
-   - =deltint()=: Handles internal transitions by incrementing the customer ID and setting the next event.
-   - =lambdaf()=: Outputs a new customer to the output port.
+**** Components
 
-3. /Queue Class/: Manages the waiting customers.
-   - =initialize()=: Sets the initial state to passive.
-   - =deltint()=: Handles internal transitions by checking the queue and setting the next event.
-   - =deltext()=: Handles external transitions by adding customers to the queue.
-   - =lambdaf()=: Outputs the next customer from the queue.
+- *=Generator=*:: This model creates new =Customer= objects. It schedules an internal event to generate a new customer every =interarrival_time=. In this simulation, this time is fixed at *2.0 time units*.
+- *=Queue=*:: This model acts as a buffer. It uses a "pull-based" mechanism.
+  - It receives customers from the =Generator= and adds them to an internal list (=self.queue=).
+  - It *also* receives requests from the =Server= on its =input_request= port.
+  - Only when it has *both* a pending request from the server (=self.customer_requested= is True) *and* at least one customer in its queue, it schedules an event to send the next customer. A small delay of 0.1 time units is used to simulate moving the customer.
+- *=Server=*:: This model processes customers.
+  - When it is idle, it sends a request (=True=) on its =output_request= port to the =Queue=.
+  - When it receives a customer from the =Queue=, it enters a "busy" state and holds for the =service_time=. In this simulation, this time is fixed at *5.0 time units*.
+  - After the service is complete, it logs the completion and immediately schedules another event to request a new customer.
 
-4. /Server Class/: Processes customers with a specified service time.
-   - =initialize()=: Sets the initial state to passive.
-   - =deltint()=: Handles internal transitions by setting the server to idle.
-   - =deltext()=: Handles external transitions by starting the service for a new customer.
+**** System and Simulation
 
-5. /QueueingSystem Class/: A coupled model that integrates the generator, queue, and server.
-   - =__init__()=: Initializes the components and sets up the couplings between them.
-
-6. /Simulation Setup/: The main block sets up the queueing system model with specified interarrival and service times. It then creates a =Coordinator= to manage the simulation and runs the simulation for 100 iterations.
-
-This example demonstrates how to model a queueing system using the xDEVS/Python API, showcasing the basic principles of discrete event simulation with DEVS formalism.
+- *=QueueingSystem=*:: This is the main =Coupled= model that connects the three components:
+  - =Generator.output_port= -> =Queue.input_customer=
+  - =Queue.output_customer= -> =Server.input_customer=
+  - =Server.output_request= -> =Queue.input_request=
+- *=Simulation Run=*:: The main script initializes this =QueueingSystem= with the specified interarrival time (2.0) and service time (5.0). It then runs a simulation for a total of *50.0 time units*. The logging (e.g., "Arriving customer...", "Attending customer...") provides a trace of the discrete events as they occur during this 50-unit simulation.
 
 ** Parallel Simulation Example
 
