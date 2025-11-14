@@ -8,8 +8,8 @@ In this example, we will model a simple traffic light system using the xDEVS/Pyt
 
 *** Traffic Light Model
 
-#+begin_src python
-from xdevs.models import Atomic, Port
+#+begin_src python :tangle src/trafficlight-example.py
+from xdevs.models import Atomic, Port, Coupled
 from xdevs.sim import Coordinator, SimulationClock
 
 # Define the states
@@ -60,8 +60,10 @@ if __name__ == "__main__":
     red_time = 8.0
 
     traffic_light = TrafficLight("TrafficLight", green_time, yellow_time, red_time)
+    coupled = Coupled("TrafficLightSystem")
+    coupled.add_component(traffic_light)
     clock = SimulationClock()
-    coordinator = Coordinator(traffic_light, clock)
+    coordinator = Coordinator(coupled, clock)
 
     coordinator.initialize()
     coordinator.simulate(50)  # Simulate for 50 iterations
